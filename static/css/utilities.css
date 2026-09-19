@@ -103,12 +103,21 @@
 .max-w-lg     { max-width: 720px; margin-left: auto; margin-right: auto; }
 
 /* ── Responsive Utilities ───────────────────────────────────────────────── */
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
 @media (max-width: 992px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
 }
 
 @media (max-width: 640px) {
-  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .grid-4, .grid-3, .grid-2, .form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
   .flex-mobile-col { flex-direction: column; }
 }

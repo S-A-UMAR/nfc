@@ -11,7 +11,7 @@
     <h1 class="dashboard-title">Welcome back, {{ user.first_name|default:user.display_name }}.</h1>
     <p class="dashboard-subtitle">Manage your digital profile, smart card hardware, and live interactions.</p>
   </div>
-  <div class="d-flex gap-2">
+  <div class="dashboard-header-actions d-flex gap-2">
     {% if profile.slug %}
       <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-secondary btn-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -48,7 +48,7 @@
       </div>
     </div>
   </div>
-  <div class="d-flex items-center gap-3">
+  <div class="profile-status-actions d-flex items-center gap-3">
     <span class="badge badge-{% if profile.slug %}active{% else %}pending{% endif %}">
       <span class="dot dot-{% if profile.slug %}active{% else %}pending{% endif %}"></span>
       {% if profile.slug %}Live Profile Active{% else %}Setup Incomplete{% endif %}

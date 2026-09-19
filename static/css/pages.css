@@ -2761,12 +2761,13 @@ html, body {
 .form-row-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .form-row-2col {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 }
 

@@ -196,3 +196,9 @@
   --container-narrow: 860px;
   --navbar-height:    76px;
 }
+
+@media (max-width: 860px) {
+  :root {
+    --navbar-height: 70px;
+  }
+}
