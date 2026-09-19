@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.so
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Environment
+.env
+.env.*
+!.env.example
+*.env
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Static collected
+staticfiles/
+collected_static/
+
+# Secrets
+*.pem
+*.key
+*.crt
+*.p12
