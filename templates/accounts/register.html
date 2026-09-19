@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Create Your Account — UZYRA{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+  <div class="auth-card-container auth-card-wide">
+
+    <!-- Brand Header -->
+    <div class="auth-header">
+      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
+        <svg width="24" height="28" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-reg-silver)"/>
+          <defs>
+            <linearGradient id="uzyra-reg-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFFFFF"/>
+              <stop offset="0.55" stop-color="#BFC5CF"/>
+              <stop offset="1" stop-color="#8E95A3"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>UZYRA</span>
+      </a>
+      <h1 class="auth-title">Create Your Account</h1>
+      <p class="auth-subtitle">Set up your digital profile and manage your smart NFC presence</p>
+    </div>
+
+    <div class="auth-card">
+      <form method="post" action="{% url 'accounts:register' %}" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-error" role="alert">
+            <span>{{ form.non_field_errors|first }}</span>
+          </div>
+        {% endif %}
+
+        <!-- Names Grid -->
+        <div class="grid-2 mb-4">
+          <div class="form-group mb-0">
+            <label for="id_first_name" class="form-label">First Name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              <div class="form-error" role="alert">
+                <span>{{ form.first_name.errors|first }}</span>
+              </div>
+            {% endif %}
+          </div>
+          <div class="form-group mb-0">
+            <label for="id_last_name" class="form-label">Last Name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              <div class="form-error" role="alert">
+                <span>{{ form.last_name.errors|first }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_email" class="form-label">Email Address</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="form-error" role="alert">
+              <span>{{ form.email.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_phone" class="form-label">
+            Phone Number <span class="form-label-hint">(Optional)</span>
+          </label>
+          {{ form.phone }}
+          {% if form.phone.errors %}
+            <div class="form-error" role="alert">
+              <span>{{ form.phone.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_password" class="form-label">Password</label>
+          {{ form.password }}
+          <div class="form-hint">Minimum 6 characters</div>
+          {% if form.password.errors %}
+            <div class="form-error" role="alert">
+              <span>{{ form.password.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_password_confirm" class="form-label">Confirm Password</label>
+          {{ form.password_confirm }}
+          {% if form.password_confirm.errors %}
+            <div class="form-error" role="alert">
+              <span>{{ form.password_confirm.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-check">
+            {{ form.agree_terms }}
+            <span class="text-secondary" style="font-size: 0.8125rem;">
+              I agree to the <a href="{% url 'core:faq' %}" class="text-silver">Terms of Service</a> and <a href="{% url 'core:faq' %}" class="text-silver">Privacy Policy</a>
+            </span>
+          </label>
+          {% if form.agree_terms.errors %}
+            <div class="form-error" role="alert">
+              <span>{{ form.agree_terms.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">
+          <span>Create Account</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
+      <hr class="divider">
+
+      <div class="auth-footer-nav">
+        Already have an account?
+        <a href="{% url 'accounts:login' %}">Sign In</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

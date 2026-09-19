@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sign In — UZYRA{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+  <div class="auth-card-container">
+
+    <!-- Brand Header -->
+    <div class="auth-header">
+      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
+        <svg width="24" height="28" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-auth-silver)"/>
+          <defs>
+            <linearGradient id="uzyra-auth-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFFFFF"/>
+              <stop offset="0.55" stop-color="#BFC5CF"/>
+              <stop offset="1" stop-color="#8E95A3"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>UZYRA</span>
+      </a>
+      <h1 class="auth-title">Welcome Back</h1>
+      <p class="auth-subtitle">Sign in to manage your digital profile and smart cards</p>
+    </div>
+
+    <div class="auth-card">
+      <form method="post" action="{% url 'accounts:login' %}" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-error" role="alert">
+            <span>{{ form.non_field_errors|first }}</span>
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label for="id_username" class="form-label">Email Address</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <div class="form-error" role="alert">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>{{ form.username.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <div class="d-flex justify-between items-center mb-1">
+            <label for="id_password" class="form-label" style="margin-bottom: 0;">Password</label>
+            <a href="{% url 'accounts:password_reset' %}" class="text-caption text-silver" style="font-size: 0.8125rem; text-decoration: none;">Forgot password?</a>
+          </div>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <div class="form-error" role="alert">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>{{ form.password.errors|first }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">
+          <span>Sign In</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
+      <hr class="divider">
+
+      <div class="auth-footer-nav">
+        Don't have an account yet?
+        <a href="{% url 'accounts:register' %}">Create Account</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

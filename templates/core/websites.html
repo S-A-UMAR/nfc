@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Personal & Business Websites — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<section class="section-py" style="border-bottom: 1px solid var(--border-primary);">
+  <div class="container">
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 4rem;">
+      <span class="badge badge-silver" style="margin-bottom: 0.75rem;">BESPOKE WEB DESIGN</span>
+      <h1>Your Card. Your Website. Your Brand.</h1>
+      <p class="lead">
+        Go beyond a standard digital card. We design, host, and maintain high-converting personal and business websites built around your enterprise.
+      </p>
+    </div>
+
+    <!-- 2 Main Website Tiers -->
+    <div class="websites-tier-grid">
+      <!-- Personal Brand Website -->
+      <div class="card card-carbon" style="padding: 2.5rem;">
+        <span class="badge badge-silver" style="margin-bottom: 1rem;">PERSONAL BRAND</span>
+        <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.75rem;">Personal & Creator Website</h2>
+        <p style="margin-bottom: 1.5rem;">Ideal for consultants, developers, executives, lawyers, and public speakers who need an authoritative online home.</p>
+        
+        <ul style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; margin-bottom: 2rem;">
+          <li>✓ Custom Bio & Career Accomplishments</li>
+          <li>✓ Interactive Portfolio / Case Studies</li>
+          <li>✓ Services & Consultation Booking Integration</li>
+          <li>✓ Smart NFC Card Included in Package</li>
+          <li>✓ Custom Domain Connection & SSL Security</li>
+        </ul>
+
+        <div class="websites-tier-actions d-flex gap-3 flex-wrap">
+          <a href="{% url 'websites:template_preview' 'creator-portfolio' %}" class="btn btn-secondary">Live Template Preview</a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary">Choose Package</a>
+        </div>
+      </div>
+
+      <!-- Business Website -->
+      <div class="card card-carbon" style="padding: 2.5rem;">
+        <span class="badge badge-silver" style="margin-bottom: 1rem;">ENTERPRISE & RETAIL</span>
+        <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.75rem;">Corporate & Business Website</h2>
+        <p style="margin-bottom: 1.5rem;">For stores, agencies, consultancies, and commercial companies requiring a comprehensive web catalog and lead engine.</p>
+        
+        <ul style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; margin-bottom: 2rem;">
+          <li>✓ Full Multi-Page Layout (Home, About, Services, Products, Contact)</li>
+          <li>✓ Product / Catalogue Showcase with Direct WhatsApp Ordering</li>
+          <li>✓ Interactive Location Map & Inquiry Lead Capture Form</li>
+          <li>✓ Smart NFC Card Included in Package</li>
+          <li>✓ Dedicated Engineering Maintenance & Updates</li>
+        </ul>
+
+        <div class="websites-tier-actions d-flex gap-3 flex-wrap">
+          <a href="{% url 'websites:template_preview' 'modern-business' %}" class="btn btn-secondary">Live Template Preview</a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary">Choose Package</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

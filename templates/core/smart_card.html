@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Smart NFC Business Card — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO: LUXURY HARDWARE SHOWCASE ──────────────────────────────────────── -->
+<section class="smart-card-hero">
+  <div aria-hidden="true" class="smart-card-watermark">NFC</div>
+  <div class="container">
+    <div class="smart-card-hero-grid">
+
+      <!-- ── Left: Copy & Specs ── -->
+      <div>
+        <div class="card-feature-pills">
+          <span class="feature-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            NTAG216 High Speed
+          </span>
+          <span class="feature-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Zero Battery Required
+          </span>
+          <span class="feature-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            IP68 Water Resistant
+          </span>
+        </div>
+
+        <h1 style="margin-bottom: var(--space-4); line-height: 1.08; letter-spacing: -0.03em;">
+          The Physical Card.<br>
+          <span style="background: linear-gradient(135deg, #BFC5CF 0%, #F1F1F1 50%, #8E95A3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Engineered for Perfection.</span>
+        </h1>
+
+        <p class="lead" style="margin-bottom: var(--space-8); max-width: 560px;">
+          Laser-etched matte graphite composite embedded with high-frequency NTAG216 silicon and precision optical QR redundancy. One tactile touch replaces thousands of paper cards forever.
+        </p>
+
+        <div class="card-hero-specs-list">
+          <div class="hero-spec-item">
+            <div class="hero-spec-icon-box">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+              <div class="hero-spec-title">Passive RF Energy Harvesting</div>
+              <div class="hero-spec-desc">Zero internal battery ever required. Activates in under 50 ms from the electromagnetic field of any reader smartphone.</div>
+            </div>
+          </div>
+
+          <div class="hero-spec-item">
+            <div class="hero-spec-icon-box">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            </div>
+            <div>
+              <div class="hero-spec-title">Dynamic Cloud Redirection Core</div>
+              <div class="hero-spec-desc">Zero static personal info hardcoded on chip. Update your title, phone, or socials anytime — the card never needs reprinting.</div>
+            </div>
+          </div>
+
+          <div class="hero-spec-item">
+            <div class="hero-spec-icon-box">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div>
+              <div class="hero-spec-title">Instant Remote Loss Deactivation</div>
+              <div class="hero-spec-desc">If your card is lost or stolen, a single dashboard click instantly disables redirect access and protects your identity.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-card-actions">
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-lg btn-glow">
+            <span>Order Your Card — ₦25,000</span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#anatomy" class="btn btn-secondary btn-lg">
+            Hardware Architecture
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- ── Right: Interactive 3D Card Studio ── -->
+      <div class="card-studio-wrapper">
+        <div class="card-studio-stage">
+          <div class="card-studio-glow"></div>
+
+          <!-- 3D Card -->
+          <div class="card-flipper-3d finish-graphite" id="interactiveCard" onclick="toggleCardFlip()" title="Click to flip">
+
+            <!-- FRONT FACE -->
+            <div class="physical-card-face card-face-front">
+              <div class="card-sheen-beam"></div>
+
+              <div class="card-top-row">
+                <div class="card-emv-chip"></div>
+                <div class="card-contactless-mark">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M8.5 16.5a5 5 0 0 1 0-9"/>
+                    <path d="M12 19a8.5 8.5 0 0 1 0-14"/>
+                    <path d="M15.5 21.5a12 12 0 0 1 0-19"/>
+                  </svg>
+                  <span class="card-nfc-label">NFC TOUCH</span>
+                </div>
+              </div>
+
+              <div class="card-mid-row">
+                <div class="card-serial-code">BR-000001</div>
+                <div class="card-finish-sub" id="cardFinishLabel">GRAPHITE MATTE SURFACE</div>
+              </div>
+
+              <div class="card-bottom-row">
+                <div>
+                  <div class="card-holder-title">VERIFIED EXECUTIVE</div>
+                  <div class="card-holder-status">OFFICIAL DIGITAL SUITE</div>
+                </div>
+                <div class="card-brand-logo">{{ BRAND_NAME }}</div>
+              </div>
+            </div>
+
+            <!-- BACK FACE -->
+            <div class="physical-card-face card-face-back">
+              <div class="card-back-magstripe"></div>
+
+              <div class="card-back-content">
+                <div class="card-back-details">
+                  <div class="card-back-spec-pill">NTAG216 · 13.56 MHz · ISO 14443-A</div>
+                  <div class="card-back-spec-pill" style="margin-top: 4px;">888 BYTES · 100K+ WRITE CYCLES</div>
+                  <div class="card-back-legal" style="margin-top: 8px;">
+                    Dynamic SSL encrypted endpoint. Tap top of iPhone or centre of Android.
+                  </div>
+                  <div style="font-family: var(--font-mono); font-size: 0.64rem; color: var(--silver-accent); margin-top: 6px;">
+                    SN: UZYRA-NFC-99482-NG
+                  </div>
+                </div>
+
+                <div class="card-back-qr-box">
+                  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- QR Corner Blocks -->
+                    <rect x="5"  y="5"  width="28" height="28" fill="#09090B"/>
+                    <rect x="9"  y="9"  width="20" height="20" fill="#FFF"/>
+                    <rect x="13" y="13" width="12" height="12" fill="#09090B"/>
+                    <rect x="67" y="5"  width="28" height="28" fill="#09090B"/>
+                    <rect x="71" y="9"  width="20" height="20" fill="#FFF"/>
+                    <rect x="75" y="13" width="12" height="12" fill="#09090B"/>
+                    <rect x="5"  y="67" width="28" height="28" fill="#09090B"/>
+                    <rect x="9"  y="71" width="20" height="20" fill="#FFF"/>
+                    <rect x="13" y="75" width="12" height="12" fill="#09090B"/>
+                    <!-- Data Modules -->
+                    <rect x="37" y="5"  width="8"  height="8"  fill="#09090B"/>
+                    <rect x="51" y="5"  width="12" height="8"  fill="#09090B"/>
+                    <rect x="37" y="19" width="24" height="8"  fill="#09090B"/>
+                    <rect x="5"  y="37" width="8"  height="24" fill="#09090B"/>
+                    <rect x="21" y="37" width="14" height="8"  fill="#09090B"/>
+                    <rect x="43" y="37" width="14" height="14" fill="#09090B"/>
+                    <rect x="63" y="37" width="26" height="8"  fill="#09090B"/>
+                    <rect x="63" y="51" width="10" height="16" fill="#09090B"/>
+                    <rect x="79" y="51" width="14" height="26" fill="#09090B"/>
+                    <rect x="37" y="57" width="16" height="10" fill="#09090B"/>
+                    <rect x="55" y="73" width="22" height="20" fill="#09090B"/>
+                    <rect x="37" y="77" width="12" height="16" fill="#09090B"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Studio Controls -->
+        <div class="card-studio-controls">
+          <div class="card-finish-toggles">
+            <button type="button" class="finish-btn active" id="btnGraphite" onclick="setCardFinish('graphite')">
+              <span class="finish-dot" style="background: #1C1C22; border: 1px solid rgba(255,255,255,0.3);"></span>
+              Graphite
+            </button>
+            <button type="button" class="finish-btn" id="btnPlatinum" onclick="setCardFinish('platinum')">
+              <span class="finish-dot" style="background: #C9CED7; border: 1px solid rgba(255,255,255,0.6);"></span>
+              Platinum
+            </button>
+          </div>
+
+          <button type="button" class="btn-flip-card" onclick="toggleCardFlip()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span id="flipLabel">Flip to Back</span>
+          </button>
+        </div>
+      </div>
+      <!-- end hero grid -->
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 2: HARDWARE ANATOMY ────────────────────────────────────────── -->
+<section class="anatomy-section" id="anatomy">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto;">
+      <div class="label-overline" style="margin-bottom: var(--space-3);">Hardware Anatomy</div>
+      <h2 style="margin-bottom: var(--space-3);">Engineered from the Molecular Layer Up</h2>
+      <p class="lead">A breakdown of the materials, microcontroller, and induction physics inside every card.</p>
+    </div>
+
+    <div class="anatomy-grid">
+      <div class="anatomy-card">
+        <div>
+          <span class="anatomy-step-num">LAYER 01 · SURFACE</span>
+          <div class="anatomy-icon">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div class="anatomy-title">Matte Tactile Armor</div>
+          <div class="anatomy-desc">Scratch-resistant high-density polymer composite with fine tactile micro-texture and chamfered metallic edges. Certified IP68.</div>
+        </div>
+        <div class="anatomy-tag">IP68 · WATER &amp; UV PROOF</div>
+      </div>
+
+      <div class="anatomy-card">
+        <div>
+          <span class="anatomy-step-num">LAYER 02 · SILICON</span>
+          <div class="anatomy-icon">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+          </div>
+          <div class="anatomy-title">NTAG216 Microcontroller</div>
+          <div class="anatomy-desc">High-frequency silicon operating at 13.56 MHz with 888 bytes user memory, 100,000+ write endurance, and 10-year data retention.</div>
+        </div>
+        <div class="anatomy-tag">13.56 MHz · 888 BYTES MEMORY</div>
+      </div>
+
+      <div class="anatomy-card">
+        <div>
+          <span class="anatomy-step-num">LAYER 03 · INDUCTION</span>
+          <div class="anatomy-icon">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.93 4.93a10 10 0 0 1 14.14 0"/><path d="M7.76 7.76a6 6 0 0 1 8.48 0"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div class="anatomy-title">Planar High-Q Antenna Loop</div>
+          <div class="anatomy-desc">Micro-etched planar copper antenna tuned for rapid 50 ms RF coupling with iOS and Android at distances up to 40 mm.</div>
+        </div>
+        <div class="anatomy-tag">50 ms COUPLING SPEED</div>
+      </div>
+
+      <div class="anatomy-card">
+        <div>
+          <span class="anatomy-step-num">LAYER 04 · SECURITY</span>
+          <div class="anatomy-icon">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="anatomy-title">Dynamic Cloud Routing</div>
+          <div class="anatomy-desc">Zero static personal data on chip. Only a secure encrypted redirect token is stored. Change your details in real time with no reprinting.</div>
+        </div>
+        <div class="anatomy-tag">ZERO STATIC DATA ON CHIP</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 3: UNIVERSAL COMPATIBILITY ─────────────────────────────────── -->
+<section class="compatibility-section">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto;">
+      <div class="label-overline" style="margin-bottom: var(--space-3);">Universal Compatibility</div>
+      <h2 style="margin-bottom: var(--space-3);">Native Tap Across 99% of Smartphones</h2>
+      <p class="lead">Zero third-party apps. The recipient taps their phone and your digital suite opens natively.</p>
+    </div>
+
+    <div class="compatibility-grid">
+      <div class="compat-card">
+        <div class="compat-header">
+          <div class="compat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.76 1.06-1.82.94-2.88-.92.04-2.02.62-2.67 1.38-.58.67-1.09 1.76-.95 2.8.02.01 1.05.08 2.68-1.3"/></svg>
+          </div>
+          <div>
+            <div class="compat-title">Apple iOS</div>
+            <div class="compat-subtitle">Native Background Tag Reading</div>
+          </div>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">All modern iPhones read UZYRA cards natively in the background — no camera scanner or app needed.</p>
+        <div class="compat-list">
+          <div class="compat-list-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>iPhone 7 → iPhone 16 Pro Max</strong> supported natively</span>
+          </div>
+          <div class="compat-list-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Tap the <strong>top edge</strong> of the iPhone toward your card</span>
+          </div>
+          <div class="compat-list-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Native iOS banner drops in <strong>under 0.5 seconds</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="compat-card">
+        <div class="compat-header">
+          <div class="compat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5898 8.4116 13.8475 8.1 12 8.1s-3.5898.3116-5.1368.8497L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+          </div>
+          <div>
+            <div class="compat-title">Android Ecosystem</div>
+            <div class="compat-subtitle">Universal Native NFC Standard</div>
+          </div>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Virtually all modern Android devices feature native NFC hardware embedded directly in the chassis.</p>
+        <div class="compat-list">
+          <div class="compat-list-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Samsung, Pixel, Xiaomi, OnePlus, Motorola</strong></span>
+          </div>
+          <div class="compat-list-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Tap the <strong>centre rear</strong> of the phone to trigger handshake</span>
+          </div>
+          <div class="compat-list-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Optical QR fallback</strong> laser-etched on back for legacy devices</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 4: COMPARISON MATRIX ──────────────────────────────────────── -->
+<section class="comparison-section">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto;">
+      <div class="label-overline" style="margin-bottom: var(--space-3);">Performance Breakdown</div>
+      <h2 style="margin-bottom: var(--space-3);">Why Modern Executives Are Retiring Paper Cards</h2>
+      <p class="lead">Compare smart hardware against disposable paper across economics, function, and sustainability.</p>
+    </div>
+
+    <div class="comparison-table-wrapper">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th class="col-feature">Feature &amp; Metric</th>
+            <th class="col-paper">Traditional Paper Card</th>
+            <th class="col-uzyra">UZYRA Smart NFC Card</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-feature">Lifetime Card Capacity</td>
+            <td class="cell-paper"><span class="matrix-cross">✕</span>500 Cards — runs out in months</td>
+            <td class="cell-uzyra"><span class="matrix-check">✓</span><strong>1 Card for Life</strong> (Unlimited taps)</td>
+          </tr>
+          <tr>
+            <td class="cell-feature">Contact Saving Speed</td>
+            <td class="cell-paper"><span class="matrix-cross">✕</span>Manual typing, typos, lost numbers</td>
+            <td class="cell-uzyra"><span class="matrix-check">✓</span><strong>1-Tap .vcf contact download</strong></td>
+          </tr>
+          <tr>
+            <td class="cell-feature">Updating Contact Details</td>
+            <td class="cell-paper"><span class="matrix-cross">✕</span>Discard 500 cards &amp; reprint</td>
+            <td class="cell-uzyra"><span class="matrix-check">✓</span><strong>Instant cloud update — 1 click</strong></td>
+          </tr>
+          <tr>
+            <td class="cell-feature">Annual Cost</td>
+            <td class="cell-paper">₦40,000 – ₦80,000 recurring per year</td>
+            <td class="cell-uzyra"><strong>₦25,000 one-time</strong> (Zero recurring)</td>
+          </tr>
+          <tr>
+            <td class="cell-feature">Analytics &amp; Tap Telemetry</td>
+            <td class="cell-paper"><span class="matrix-cross">✕</span>Zero visibility into engagement</td>
+            <td class="cell-uzyra"><span class="matrix-check">✓</span><strong>Real-time tap counts &amp; device insights</strong></td>
+          </tr>
+          <tr>
+            <td class="cell-feature">Rich Links &amp; Digital Portfolio</td>
+            <td class="cell-paper"><span class="matrix-cross">✕</span>Flat text on card stock</td>
+            <td class="cell-uzyra"><span class="matrix-check">✓</span><strong>Full digital suite, socials &amp; booking</strong></td>
+          </tr>
+          <tr>
+            <td class="cell-feature">Lost Card Security</td>
+            <td class="cell-paper"><span class="matrix-cross">✕</span>Anyone has your private contacts</td>
+            <td class="cell-uzyra"><span class="matrix-check">✓</span><strong>Instant 1-click remote kill-switch</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 5: TACTILE FLOW ────────────────────────────────────────────── -->
+<section class="flow-section">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto;">
+      <div class="label-overline" style="margin-bottom: var(--space-3);">Tactile Experience</div>
+      <h2 style="margin-bottom: var(--space-3);">From Pocket to Connection in Seconds</h2>
+      <p class="lead">How physical radio-frequency technology powers frictionless digital networking.</p>
+    </div>
+
+    <div class="flow-grid">
+      <div class="flow-card">
+        <div class="flow-step-badge">01</div>
+        <div class="flow-title">Contact Proximity</div>
+        <div class="flow-desc">Bring the card within 0–3 cm of the recipient's smartphone. No unlocking, no scanning app required.</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-step-badge">02</div>
+        <div class="flow-title">50 ms Induction</div>
+        <div class="flow-desc">The phone's electromagnetic field powers the chip and completes a secure cryptographic handshake in under 50 milliseconds.</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-step-badge">03</div>
+        <div class="flow-title">Executive Presentation</div>
+        <div class="flow-desc">The recipient's browser launches your verified digital identity suite with 1-tap contact saving directly to their address book.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 6: ENTERPRISE & SECURITY ──────────────────────────────────── -->
+<section class="security-fleet-section">
+  <div class="container">
+    <div class="security-fleet-grid">
+      <div class="security-fleet-card">
+        <span class="badge badge-silver" style="margin-bottom: var(--space-4);">CORPORATE &amp; ENTERPRISE</span>
+        <h3 style="margin-bottom: var(--space-3);">Enterprise Fleet Deployments</h3>
+        <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-6);">
+          Equip entire executive teams with cohesive corporate-branded NFC cards. Manage all cards, employees, and permissions centrally from one dashboard.
+        </p>
+        <ul style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6);">
+          <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Centralised staff profile administration
+          </li>
+          <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Uniform brand guidelines &amp; logo integration
+          </li>
+          <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Volume fleet discounting for 10+ employees
+          </li>
+        </ul>
+        <a href="{% url 'core:contact' %}" class="btn btn-secondary">Inquire About Corporate Fleets</a>
+      </div>
+
+      <div class="security-fleet-card">
+        <span class="badge badge-silver" style="margin-bottom: var(--space-4);">DATA INTEGRITY &amp; PRIVACY</span>
+        <h3 style="margin-bottom: var(--space-3);">Hardware Security Architecture</h3>
+        <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-6);">
+          No sensitive data, passwords, or payment credentials are stored on the physical card. Engineered around strict privacy standards from the silicon layer up.
+        </p>
+        <ul style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6);">
+          <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            End-to-end 256-bit TLS encrypted cloud endpoints
+          </li>
+          <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Instant remote kill-switch on misplaced cards
+          </li>
+          <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Optional password protection on private profiles
+          </li>
+        </ul>
+        <a href="{% url 'core:faq' %}" class="btn btn-secondary">Hardware Security FAQ</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 7: CLOSING CTA ─────────────────────────────────────────────── -->
+<section class="card-cta-banner">
+  <div class="container">
+    <div class="card-cta-box">
+      <div class="card-cta-glow"></div>
+      <div class="card-cta-content">
+        <span class="badge badge-silver" style="margin-bottom: var(--space-4);">READY TO SHIP · NATIONWIDE</span>
+        <h2 style="margin-bottom: var(--space-3);">Step into the Modern Executive Standard.</h2>
+        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.65; max-width: 560px; margin-left: auto; margin-right: auto;">
+          Order your laser-etched UZYRA Smart NFC Business Card. Includes your verified digital identity suite, contact download (.vcf), and lifetime cloud updates.
+        </p>
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-4); margin-bottom: var(--space-8); flex-wrap: wrap;">
+          <div style="font-family: var(--font-heading); font-size: 2.25rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.03em;">
+            ₦25,000 <span style="font-size: 0.875rem; font-weight: 500; color: var(--text-muted);">one-time</span>
+          </div>
+          <div style="font-size: 0.84rem; color: var(--silver-accent); font-weight: 600;">
+            ✓ Free Delivery &nbsp;&bull;&nbsp; Zero Monthly Fees
+          </div>
+        </div>
+
+        <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-lg btn-glow">
+            Order Your Smart Card
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">View All Packages</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CARD INTERACTIVITY ──────────────────────────────────────────────────── -->
+<script>
+(function () {
+  function toggleCardFlip() {
+    var card  = document.getElementById('interactiveCard');
+    var label = document.getElementById('flipLabel');
+    if (!card) return;
+    card.classList.toggle('flipped');
+    if (label) label.textContent = card.classList.contains('flipped') ? 'Flip to Front' : 'Flip to Back';
+  }
+
+  function setCardFinish(finish) {
+    var card        = document.getElementById('interactiveCard');
+    var btnG        = document.getElementById('btnGraphite');
+    var btnP        = document.getElementById('btnPlatinum');
+    var finishLabel = document.getElementById('cardFinishLabel');
+    if (!card) return;
+    if (finish === 'platinum') {
+      card.classList.replace('finish-graphite', 'finish-platinum');
+      if (btnP) btnP.classList.add('active');
+      if (btnG) btnG.classList.remove('active');
+      if (finishLabel) finishLabel.textContent = 'BRUSHED PLATINUM SURFACE';
+    } else {
+      card.classList.replace('finish-platinum', 'finish-graphite');
+      if (btnG) btnG.classList.add('active');
+      if (btnP) btnP.classList.remove('active');
+      if (finishLabel) finishLabel.textContent = 'GRAPHITE MATTE SURFACE';
+    }
+  }
+
+  // Expose globally for onclick attributes
+  window.toggleCardFlip = toggleCardFlip;
+  window.setCardFinish  = setCardFinish;
+}());
+</script>
+
+{% endblock %}

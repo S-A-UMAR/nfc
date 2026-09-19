@@ -1,0 +1,147 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+{% block title %}Submit Design Information — Order #{{ order.order_number }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+      <a href="{% url 'dashboard:order_detail' order.order_number %}" style="color: var(--text-muted); font-size: 0.85rem;">&larr; Back to Order #{{ order.order_number }}</a>
+      <span style="color: var(--border-primary);">/</span>
+      <span style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Order Customization Details</span>
+    </div>
+    <p class="dashboard-subtitle">Provide your exact information for card engraving and website creation.</p>
+  </div>
+</div>
+
+<div class="card-carbon" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Ordered Package</span>
+      <div style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--silver-accent);">{{ order.package.name }}</div>
+    </div>
+    <span class="badge badge-silver">Order #{{ order.order_number }}</span>
+  </div>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+
+  <!-- Identity Info -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Personal Identity on Card & Profile</h4>
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label class="form-label">Full Name <span class="form-label-hint">(Laser-engraved on card)</span></label>
+        {{ form.full_name }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Professional Title</label>
+        {{ form.title }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bio / Professional Headline</label>
+      {{ form.bio }}
+    </div>
+  </div>
+
+  <!-- Business Info -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Business Details</h4>
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label class="form-label">Business / Brand Name</label>
+        {{ form.business_name }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category / Industry</label>
+        {{ form.business_category }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Business Description & Services</label>
+      {{ form.business_description }}
+    </div>
+  </div>
+
+  <!-- Contact Points -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Direct Contact Channels</h4>
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        {{ form.phone }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp Number</label>
+        {{ form.whatsapp }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Official Email</label>
+        {{ form.email }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Physical Address</label>
+        {{ form.address }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Socials -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Social Media Handles & Links</h4>
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label class="form-label">Instagram Handle or URL</label>
+        {{ form.social_instagram }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">LinkedIn Profile URL</label>
+        {{ form.social_linkedin }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">X / Twitter</label>
+        {{ form.social_x }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">TikTok</label>
+        {{ form.social_tiktok }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Facebook Page</label>
+        {{ form.social_facebook }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Existing Website (if any)</label>
+        {{ form.website_url }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Website Preferences (if applicable) -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Website Design Scope & Pages</h4>
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label class="form-label">Website Type</label>
+        {{ form.website_type }}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pages Needed</label>
+        {{ form.pages_needed }}
+        <div class="form-hint">e.g. Home, About, Services, Products, Contact, Gallery</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Design & Branding Notes</label>
+      {{ form.design_notes }}
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+    <a href="{% url 'dashboard:order_detail' order.order_number %}" class="btn btn-ghost">Cancel</a>
+    <button type="submit" class="btn btn-primary btn-lg">Save & Submit Requirements</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Security Notice: Card Inactive — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
+  <div style="max-width: 460px; width: 100%;">
+    <div style="width: 70px; height: 70px; background: var(--status-danger-bg); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--status-danger)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+
+    <span class="badge badge-danger" style="margin-bottom: 0.75rem;">SECURITY NOTICE</span>
+    <h2 style="margin-bottom: 0.5rem;">Card Inactive</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">This card has been reported lost by its registered owner and has been deactivated. Card code: <code style="color: var(--silver-accent);">{{ card.card_code }}</code>.</p>
+
+    <div class="card card-carbon" style="text-align: center;">
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">If you found this card, please contact {{ BRAND_NAME }} support to help return it.</p>
+      <a href="{% url 'core:contact' %}" class="btn btn-secondary btn-sm">Contact Support</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

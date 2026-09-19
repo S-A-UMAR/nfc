@@ -1,0 +1,739 @@
+/* ==========================================================================
+   UZYRA PUBLIC DIGITAL PROFILE — LUXURY MOBILE-FIRST DESIGN SYSTEM
+   Ultra-premium, tactile, responsive digital business card experience
+   ========================================================================== */
+
+:root {
+  --prf-bg-canvas: #09090B;
+  --prf-card-bg: rgba(18, 18, 22, 0.85);
+  --prf-surface-1: rgba(255, 255, 255, 0.045);
+  --prf-surface-2: rgba(255, 255, 255, 0.08);
+  --prf-surface-hover: rgba(255, 255, 255, 0.08);
+  --prf-border: rgba(255, 255, 255, 0.10);
+  --prf-border-hover: rgba(255, 255, 255, 0.20);
+  --prf-border-active: rgba(255, 255, 255, 0.32);
+  --prf-text-primary: #FFFFFF;
+  --prf-text-secondary: #A1A1AA;
+  --prf-text-muted: #71717A;
+  --prf-accent-silver: #E4E4E7;
+  --prf-radius-lg: 16px;
+  --prf-radius-md: 12px;
+  --prf-radius-sm: 8px;
+  --prf-radius-pill: 9999px;
+  --prf-shadow-card: 0 20px 50px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --prf-shadow-glow: 0 0 30px -5px rgba(255, 255, 255, 0.10);
+}
+
+/* Base Body & Reset for Profile View */
+.profile-body {
+  background-color: var(--prf-bg-canvas);
+  color: var(--prf-text-primary);
+  font-family: var(--font-body, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Viewport Shell */
+.profile-viewport {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 0 3.5rem;
+  position: relative;
+  background:
+    radial-gradient(1000px 600px at 50% -10%, rgba(245, 247, 250, 0.12) 0%, rgba(191, 197, 207, 0.07) 45%, transparent 75%),
+    radial-gradient(800px 600px at 85% 65%, rgba(142, 149, 163, 0.06) 0%, transparent 60%),
+    radial-gradient(700px 500px at 15% 85%, rgba(200, 210, 225, 0.05) 0%, transparent 55%),
+    var(--prf-bg-canvas);
+}
+
+/* Main Profile Card Container */
+.profile-card {
+  width: 100%;
+  max-width: 460px;
+  min-height: 100vh;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(20, 20, 26, 0.85) 40%, rgba(12, 12, 16, 0.92) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+  .profile-viewport {
+    padding: 2.5rem 1rem 5rem;
+  }
+  .profile-card {
+    min-height: auto;
+    border-radius: 24px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.22) rgba(255, 255, 255, 0.12) rgba(255, 255, 255, 0.06) rgba(255, 255, 255, 0.16);
+    box-shadow:
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.50),
+      0 32px 80px rgba(0, 0, 0, 0.90),
+      0 0 35px rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1. COVER BANNER & AMBIENT HEADER
+   -------------------------------------------------------------------------- */
+.profile-cover {
+  width: 100%;
+  height: 130px;
+  position: relative;
+  background: linear-gradient(180deg, #18181D 0%, #0F0F12 100%);
+  overflow: hidden;
+}
+
+.profile-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.75;
+}
+
+.profile-cover-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 15, 18, 0.2) 0%, rgba(15, 15, 18, 0.95) 100%);
+}
+
+/* Ambient glow when no cover */
+.profile-ambient-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. TOP NAVIGATION / BAR
+   -------------------------------------------------------------------------- */
+.profile-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 0.5rem;
+  z-index: 10;
+}
+
+.profile-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--prf-text-primary);
+  transition: opacity 0.2s ease;
+}
+
+.profile-brand-link:hover {
+  opacity: 0.8;
+}
+
+.profile-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--prf-border);
+  color: var(--prf-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.profile-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--prf-text-primary);
+  border-color: var(--prf-border-hover);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   3. AVATAR & IDENTITY SECTION
+   -------------------------------------------------------------------------- */
+.profile-header-content {
+  position: relative;
+  text-align: center;
+  padding: 0 1.5rem 1.25rem;
+  z-index: 5;
+}
+
+.profile-avatar-container {
+  display: inline-flex;
+  position: relative;
+  margin-top: -45px;
+  margin-bottom: 1rem;
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #24242A 0%, #121215 100%);
+  border: 3px solid #16161A;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--prf-accent-silver);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-verified-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFFFFF 0%, #BFC5CF 100%);
+  color: #09090B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  border: 2px solid #0F0F12;
+}
+
+.profile-name {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--prf-text-primary);
+  margin: 0 0 0.3rem;
+  line-height: 1.25;
+}
+
+.profile-title {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: var(--prf-text-secondary);
+  margin-bottom: 0.65rem;
+  line-height: 1.4;
+}
+
+/* Micro Meta Pills (Business, Location) */
+.profile-meta-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+
+.profile-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--prf-radius-pill);
+  background: var(--prf-surface-1);
+  border: 1px solid var(--prf-border);
+  font-size: 0.775rem;
+  font-weight: 500;
+  color: var(--prf-text-secondary);
+}
+
+.profile-chip svg {
+  color: var(--prf-text-muted);
+}
+
+/* Profile Bio Card */
+.profile-bio {
+  font-size: 0.875rem;
+  color: var(--prf-text-secondary);
+  line-height: 1.65;
+  margin: 0.5rem auto 0.5rem;
+  max-width: 380px;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   4. PRIMARY DIRECT CONTACT ACTIONS (Tactile Action Hub)
+   -------------------------------------------------------------------------- */
+.profile-contact-hub {
+  padding: 0 1.25rem 1.25rem;
+}
+
+/* Direct Action Grid: WhatsApp, Call, Email, Website */
+.profile-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.profile-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.85rem 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--prf-border);
+  border-radius: var(--prf-radius-md);
+  color: var(--prf-text-primary);
+  text-decoration: none;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.775rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 64px;
+}
+
+.profile-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--prf-border-hover);
+  transform: translateY(-1px);
+  color: var(--prf-text-primary);
+}
+
+.profile-action-btn:active {
+  transform: translateY(0);
+}
+
+.profile-action-icon-wrap {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--prf-accent-silver);
+  transition: all 0.2s ease;
+}
+
+.profile-action-btn:hover .profile-action-icon-wrap {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+/* Specific Accent Colors for quick recognition */
+.profile-action-btn.btn-wa .profile-action-icon-wrap {
+  color: #25D366;
+  background: rgba(37, 211, 102, 0.12);
+}
+.profile-action-btn.btn-call .profile-action-icon-wrap {
+  color: #60A5FA;
+  background: rgba(96, 165, 250, 0.12);
+}
+.profile-action-btn.btn-email .profile-action-icon-wrap {
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.12);
+}
+.profile-action-btn.btn-web .profile-action-icon-wrap {
+  color: #A78BFA;
+  background: rgba(167, 139, 250, 0.12);
+}
+
+/* Primary Save Contact to Phone Button */
+.btn-save-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.95rem 1.25rem;
+  background: linear-gradient(135deg, #FFFFFF 0%, #D4D4D8 100%);
+  color: #09090B;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.925rem;
+  font-weight: 700;
+  border-radius: var(--prf-radius-pill);
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.15), 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.btn-save-contact:hover {
+  background: #FFFFFF;
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.25);
+  transform: translateY(-1.5px);
+  color: #000000;
+}
+
+.btn-save-contact:active {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   5. SOCIAL LINKS HUB (Distinct Group — Badges / Icon Grid)
+   -------------------------------------------------------------------------- */
+.profile-section-block {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.profile-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.profile-section-label {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.725rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--prf-text-muted);
+}
+
+.profile-socials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 0.6rem;
+}
+
+.profile-social-item {
+  height: 48px;
+  border-radius: var(--prf-radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--prf-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--prf-text-secondary);
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.profile-social-item svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.profile-social-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--prf-border-hover);
+  color: var(--prf-text-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.profile-social-item:hover svg {
+  transform: scale(1.1);
+}
+
+/* Specific Social Brand Color Touches on Hover */
+.profile-social-item[data-platform="instagram"]:hover { color: #E1306C; border-color: rgba(225, 48, 108, 0.4); }
+.profile-social-item[data-platform="linkedin"]:hover { color: #0A66C2; border-color: rgba(10, 102, 194, 0.4); }
+.profile-social-item[data-platform="x_twitter"]:hover { color: #FFFFFF; border-color: rgba(255, 255, 255, 0.4); }
+.profile-social-item[data-platform="youtube"]:hover { color: #FF0000; border-color: rgba(255, 0, 0, 0.4); }
+.profile-social-item[data-platform="tiktok"]:hover { color: #00F2FE; border-color: rgba(0, 242, 254, 0.4); }
+.profile-social-item[data-platform="facebook"]:hover { color: #1877F2; border-color: rgba(24, 119, 242, 0.4); }
+.profile-social-item[data-platform="github"]:hover { color: #FFFFFF; border-color: rgba(255, 255, 255, 0.4); }
+.profile-social-item[data-platform="telegram"]:hover { color: #229ED9; border-color: rgba(34, 158, 217, 0.4); }
+.profile-social-item[data-platform="whatsapp"]:hover { color: #25D366; border-color: rgba(37, 211, 102, 0.4); }
+.profile-social-item[data-platform="behance"]:hover { color: #0057FF; border-color: rgba(0, 87, 255, 0.4); }
+.profile-social-item[data-platform="dribbble"]:hover { color: #EA4C89; border-color: rgba(234, 76, 137, 0.4); }
+
+/* --------------------------------------------------------------------------
+   6. CUSTOM FEATURED LINKS (Distinct Group — Rich Interactive Cards)
+   -------------------------------------------------------------------------- */
+.profile-custom-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.profile-custom-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.15rem;
+  background: rgba(255, 255, 255, 0.065);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--prf-radius-md);
+  color: var(--prf-text-primary);
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.profile-custom-link-card:hover {
+  background: rgba(255, 255, 255, 0.095);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.profile-custom-link-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.profile-custom-link-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--prf-radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--prf-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--prf-accent-silver);
+  transition: all 0.2s ease;
+}
+
+.profile-custom-link-card:hover .profile-custom-link-icon {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.profile-custom-link-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--prf-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-custom-link-arrow {
+  color: var(--prf-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.profile-custom-link-card:hover .profile-custom-link-arrow {
+  color: var(--prf-text-primary);
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   7. ABOUT / BUSINESS CARD SECTION
+   -------------------------------------------------------------------------- */
+.profile-business-card {
+  background: var(--prf-surface-1);
+  border: 1px solid var(--prf-border);
+  border-radius: var(--prf-radius-lg);
+  padding: 1.25rem;
+}
+
+.profile-business-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.profile-business-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--prf-radius-sm);
+  object-fit: cover;
+  background: var(--prf-surface-2);
+  border: 1px solid var(--prf-border);
+}
+
+.profile-business-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-business-name {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--prf-text-primary);
+  margin: 0;
+}
+
+.profile-business-category {
+  font-size: 0.775rem;
+  color: var(--prf-text-muted);
+}
+
+.profile-business-body {
+  font-size: 0.85rem;
+  color: var(--prf-text-secondary);
+  line-height: 1.65;
+}
+
+.profile-business-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--prf-border);
+  font-size: 0.8rem;
+  color: var(--prf-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   8. FOOTER BRANDING & TOAST NOTIFICATION
+   -------------------------------------------------------------------------- */
+.profile-footer {
+  text-align: center;
+  padding: 2rem 1.25rem 1rem;
+}
+
+.profile-powered-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.775rem;
+  color: var(--prf-text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-weight: 500;
+}
+
+.profile-powered-link:hover {
+  color: var(--prf-text-secondary);
+}
+
+.profile-powered-link svg {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.profile-powered-link:hover svg {
+  opacity: 1;
+}
+
+/* Toast alert notification for Share / Copy */
+.profile-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(24, 24, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--prf-radius-pill);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-toast.active {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   9. MOBILE REFINEMENTS (320px – 414px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .profile-viewport {
+    padding: 0 0 2.5rem;
+    overflow-x: hidden;
+  }
+  .profile-card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .profile-header-content {
+    padding: 0 0.875rem 1rem;
+  }
+  .profile-contact-hub {
+    padding: 0 0.875rem 1rem;
+  }
+  .profile-section-block {
+    padding: 0 0.875rem 1rem;
+  }
+  .profile-actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+    gap: 0.45rem;
+  }
+  .profile-action-btn {
+    padding: 0.7rem 0.25rem;
+    min-height: 58px;
+    font-size: 0.725rem;
+  }
+  .profile-action-icon-wrap {
+    width: 24px;
+    height: 24px;
+  }
+  .profile-avatar {
+    width: 84px;
+    height: 84px;
+    font-size: 2rem;
+  }
+  .profile-name {
+    font-size: 1.3rem;
+  }
+  .profile-socials-grid {
+    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    gap: 0.45rem;
+  }
+  .profile-social-item {
+    height: 44px;
+  }
+  .btn-save-contact {
+    font-size: 0.875rem;
+    padding: 0.85rem 1rem;
+  }
+}

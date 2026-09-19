@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell">
+
+  <!-- =====================================================================
+       DESKTOP SIDEBAR
+       ===================================================================== -->
+  <aside class="dashboard-sidebar" aria-label="Dashboard Navigation">
+    <div>
+      <!-- User Profile Badge -->
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">
+          {% if user_profile and user_profile.profile_image %}
+            <img src="{{ user_profile.profile_image.url }}" alt="{{ user.display_name }}" width="36" height="36" loading="lazy" decoding="async">
+          {% else %}
+            <span>{{ user.first_name|default:user.email|make_list|first|upper }}</span>
+          {% endif %}
+        </div>
+        <div>
+          <div class="sidebar-user-name">{{ user.first_name|default:user.display_name }}</div>
+          <div class="sidebar-user-role">{{ user.email }}</div>
+        </div>
+      </div>
+
+      <!-- Sidebar Navigation Links -->
+      <nav class="sidebar-nav">
+        <a href="{% url 'dashboard:overview' %}" class="sidebar-link {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Workspace</span>
+        </a>
+        <a href="{% url 'dashboard:profile_edit' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Digital Profile</span>
+        </a>
+        <a href="{% url 'dashboard:links_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Links Manager</span>
+        </a>
+        <a href="{% url 'dashboard:card_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span>Smart Card</span>
+        </a>
+        <a href="{% url 'dashboard:website_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'website_manage' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Websites</span>
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span>Orders</span>
+        </a>
+        <a href="{% url 'dashboard:analytics_view' %}" class="sidebar-link {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Analytics</span>
+        </a>
+        <a href="{% url 'dashboard:settings_view' %}" class="sidebar-link {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Sidebar Bottom Actions -->
+    <div class="sidebar-bottom-actions">
+      {% if user_profile and user_profile.slug %}
+        <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" class="sidebar-link sidebar-view-profile">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>View Public Profile</span>
+        </a>
+      {% endif %}
+      <a href="{% url 'accounts:logout' %}" class="sidebar-logout">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- =====================================================================
+       MAIN DASHBOARD AREA
+       ===================================================================== -->
+  <div class="d-flex flex-column flex-1">
+
+    <!-- Mobile Sub-Navigation Bar (Horizontal Pill Navigation) -->
+    <div class="dashboard-mobile-nav" aria-label="Dashboard Section Navigation">
+      <div class="mobile-nav-inner">
+        <a href="{% url 'dashboard:overview' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">Workspace</a>
+        <a href="{% url 'dashboard:profile_edit' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}">Profile</a>
+        <a href="{% url 'dashboard:links_manage' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">Links</a>
+        <a href="{% url 'dashboard:card_manage' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}">Card</a>
+        <a href="{% url 'dashboard:website_manage' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'website_manage' %}active{% endif %}">Website</a>
+        <a href="{% url 'dashboard:orders_list' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">Orders</a>
+        <a href="{% url 'dashboard:analytics_view' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">Analytics</a>
+        <a href="{% url 'dashboard:settings_view' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">Settings</a>
+      </div>
+    </div>
+
+    <div class="dashboard-content" role="region" aria-label="Dashboard View">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block dashboard_content %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

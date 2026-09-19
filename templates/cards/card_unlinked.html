@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Card Pending Profile Link — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
+  <div style="max-width: 460px; width: 100%;">
+    <span class="badge badge-silver" style="margin-bottom: 0.75rem;">ACTIVE CARD</span>
+    <h2 style="margin-bottom: 0.5rem;">Profile Setup in Progress</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">Card <code style="color: var(--silver-accent);">{{ card.card_code }}</code> is active, but its owner has not completed their digital profile setup yet.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-secondary">Learn More About {{ BRAND_NAME }}</a>
+  </div>
+</div>
+{% endblock %}

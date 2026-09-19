@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Paystack Gateway — Order #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="section-py">
+  <div class="container-narrow" style="max-width: 540px;">
+    <div class="card" style="border-color: var(--silver-accent); box-shadow: var(--shadow-lg);">
+      <div style="text-align: center; margin-bottom: 1.75rem;">
+        <div style="width: 60px; height: 60px; background: var(--bg-surface); border: 1px solid var(--border-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <span class="badge badge-silver" style="margin-bottom: 0.5rem;">PAYSTACK PAYMENT</span>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">Complete Your Payment</h2>
+        <p style="color: var(--text-secondary); font-size: 0.875rem;">Order #{{ order.order_number }} &bull; {{ order.package.name }}</p>
+      </div>
+
+      <div style="background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+          <span style="color: var(--text-muted);">Customer:</span>
+          <span style="color: var(--text-primary); font-weight: 600;">{{ user.display_name }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+          <span style="color: var(--text-muted);">Reference:</span>
+          <span style="font-family: var(--font-mono); color: var(--silver-accent);">{{ reference }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-primary); padding-top: 0.75rem; margin-top: 0.75rem;">
+          <span style="font-family: var(--font-heading); font-weight: 600; color: var(--text-primary);">Total Amount:</span>
+          <span style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #FFFFFF;">₦{{ order.amount|floatformat:"0" }}</span>
+        </div>
+      </div>
+
+      {% if test_mode %}
+      <div class="alert alert-info" style="margin-bottom: 1.5rem; font-size: 0.85rem;">
+        <div><strong>Test Environment Mode:</strong> You can test server-side payment verification instantly with the sandbox simulation button below.</div>
+      </div>
+
+      <form method="post" action="{% url 'payments:verify' %}" style="margin-bottom: 0.75rem;">
+        {% csrf_token %}
+        <input type="hidden" name="reference" value="{{ reference }}">
+        <input type="hidden" name="simulated" value="true">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Simulate Successful Payment (Test Mode)
+        </button>
+      </form>
+      {% endif %}
+
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="{% url 'dashboard:order_detail' order.order_number %}" style="font-size: 0.85rem; color: var(--text-muted);">Cancel and Return to Order</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

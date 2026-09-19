@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Template Preview: {{ data.name }} — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<section style="background: var(--bg-surface); border-bottom: 1px solid var(--border-primary); padding: 1.5rem 0;">
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span class="badge badge-silver" style="font-size: 0.7rem; margin-bottom: 0.35rem;">CLIENT TEMPLATE SHOWCASE</span>
+      <h3 style="font-size: 1.25rem; margin: 0;">{{ data.name }}</h3>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">Designed for {{ data.category }}</div>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm">Order This Package</a>
+      <a href="{% url 'core:websites' %}" class="btn btn-secondary btn-sm">All Templates</a>
+    </div>
+  </div>
+</section>
+
+<!-- Live Simulated Template View -->
+<div style="background-color: var(--bg-primary); padding: 4rem 1rem;">
+  <div class="container-narrow" style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 4rem 2.5rem; box-shadow: var(--shadow-lg);">
+    <div style="text-align: center; max-width: 650px; margin: 0 auto 3.5rem;">
+      <span class="badge badge-silver" style="margin-bottom: 1rem;">SAMPLE CLIENT SITE</span>
+      <h1 style="font-size: clamp(2rem, 3.5vw, 3rem); margin-bottom: 1rem;">{{ data.headline }}</h1>
+      <p class="lead">{{ data.tagline }}</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <button class="btn btn-primary">Book Consultation</button>
+        <button class="btn btn-secondary">Explore Services</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+      <div class="card card-carbon">
+        <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem;">Bespoke Strategy</h4>
+        <p style="font-size: 0.85rem;">Custom architectures built specifically to accelerate enterprise growth.</p>
+      </div>
+      <div class="card card-carbon">
+        <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem;">Global Infrastructure</h4>
+        <p style="font-size: 0.85rem;">Enterprise-grade hosting and speed with 99.9% verified uptime.</p>
+      </div>
+      <div class="card card-carbon">
+        <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem;">WhatsApp Integration</h4>
+        <p style="font-size: 0.85rem;">Direct lead capture straight into your team's WhatsApp inbox.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

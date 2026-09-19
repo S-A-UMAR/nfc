@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Card Not Found — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
+  <div style="max-width: 460px; width: 100%;">
+    <span class="badge badge-danger" style="margin-bottom: 0.75rem;">UNKNOWN CARD</span>
+    <h2 style="margin-bottom: 0.5rem;">Card Not Found</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">The card code <code style="color: var(--silver-accent);">{{ card_code }}</code> was not found in our registry. Please ensure the NFC link or QR code is correct.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Return Home</a>
+  </div>
+</div>
+{% endblock %}

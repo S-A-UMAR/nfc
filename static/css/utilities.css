@@ -1,0 +1,114 @@
+/* ==========================================================================
+   UZYRA DESIGN SYSTEM — UTILITY CLASSES
+   Consistent layout, spacing, flexbox, grid, and display primitives.
+   ========================================================================== */
+
+/* ── Display & Visibility ───────────────────────────────────────────────── */
+.d-none         { display: none !important; }
+.d-block        { display: block !important; }
+.d-inline       { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+.d-flex         { display: flex !important; }
+.d-inline-flex  { display: inline-flex !important; }
+.d-grid         { display: grid !important; }
+
+/* ── Flexbox ────────────────────────────────────────────────────────────── */
+.flex-row         { flex-direction: row; }
+.flex-column      { flex-direction: column; }
+.flex-wrap        { flex-wrap: wrap; }
+.flex-nowrap      { flex-wrap: nowrap; }
+.flex-1           { flex: 1 1 0%; }
+.flex-auto        { flex: 1 1 auto; }
+.flex-none        { flex: none; }
+.flex-shrink-0    { flex-shrink: 0; }
+
+.justify-start    { justify-content: flex-start; }
+.justify-center   { justify-content: center; }
+.justify-end      { justify-content: flex-end; }
+.justify-between  { justify-content: space-between; }
+.justify-around   { justify-content: space-around; }
+
+.items-start      { align-items: flex-start; }
+.items-center     { align-items: center; }
+.items-end        { align-items: flex-end; }
+.items-stretch    { align-items: stretch; }
+
+/* ── Grid Layouts ───────────────────────────────────────────────────────── */
+.grid-1 { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+
+/* ── Gaps ───────────────────────────────────────────────────────────────── */
+.gap-1  { gap: var(--space-1); }
+.gap-2  { gap: var(--space-2); }
+.gap-3  { gap: var(--space-3); }
+.gap-4  { gap: var(--space-4); }
+.gap-6  { gap: var(--space-6); }
+.gap-8  { gap: var(--space-8); }
+
+/* ── Text Align & Colors ────────────────────────────────────────────────── */
+.text-left      { text-align: left; }
+.text-center    { text-align: center; }
+.text-right     { text-align: right; }
+
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted); }
+.text-silver    { color: var(--silver-accent); }
+.text-danger    { color: var(--status-danger); }
+.text-active    { color: var(--status-active); }
+
+.font-heading   { font-family: var(--font-heading); }
+.font-body      { font-family: var(--font-body); }
+.font-mono      { font-family: var(--font-mono); }
+
+.font-normal    { font-weight: 400; }
+.font-medium    { font-weight: 500; }
+.font-semibold  { font-weight: 600; }
+.font-bold      { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+.uppercase      { text-transform: uppercase; }
+.tracking-wide  { letter-spacing: 0.05em; }
+.tracking-wider { letter-spacing: 0.1em; }
+
+/* ── Spacing Helpers (Margins & Paddings) ───────────────────────────────── */
+.m-0  { margin: 0 !important; }
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mt-8 { margin-top: var(--space-8); }
+
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+
+.p-0  { padding: 0 !important; }
+.p-2  { padding: var(--space-2); }
+.p-3  { padding: var(--space-3); }
+.p-4  { padding: var(--space-4); }
+.p-6  { padding: var(--space-6); }
+
+/* ── Width & Max-Width ──────────────────────────────────────────────────── */
+.w-full       { width: 100%; }
+.max-w-xs     { max-width: 360px; margin-left: auto; margin-right: auto; }
+.max-w-sm     { max-width: 440px; margin-left: auto; margin-right: auto; }
+.max-w-md     { max-width: 540px; margin-left: auto; margin-right: auto; }
+.max-w-lg     { max-width: 720px; margin-left: auto; margin-right: auto; }
+
+/* ── Responsive Utilities ───────────────────────────────────────────────── */
+@media (max-width: 992px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .flex-mobile-col { flex-direction: column; }
+}

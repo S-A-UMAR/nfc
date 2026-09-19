@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}403 — Access Forbidden — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem;">
+  <div>
+    <div style="font-family: var(--font-heading); font-size: 6rem; font-weight: 800; color: var(--border-primary); line-height: 1; margin-bottom: 1rem;">403</div>
+    <h2 style="margin-bottom: 0.75rem;">Access Forbidden</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 420px;">You do not have permission to view or modify this resource. If you believe this is an error, please verify your session or contact support.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{% url 'dashboard:overview' %}" class="btn btn-primary">Go to Dashboard</a>
+      <a href="{% url 'core:home' %}" class="btn btn-secondary">Platform Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

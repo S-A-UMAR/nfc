@@ -1,0 +1,114 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+{% block title %}My Website — {{ BRAND_NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">My Website</h1>
+    <p class="dashboard-subtitle">Manage your personal or corporate website, custom domain, and change requests.</p>
+  </div>
+</div>
+
+{% if primary_website %}
+  <!-- Live Website Overview Card -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <div>
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.25rem;">{{ primary_website.title }}</h2>
+        <span class="badge badge-{% if primary_website.status == 'live' %}active{% else %}pending{% endif %}">
+          <span class="dot dot-{% if primary_website.status == 'live' %}active{% else %}pending{% endif %}"></span>
+          {{ primary_website.get_status_display }}
+        </span>
+      </div>
+      <button class="btn btn-primary btn-sm" data-modal-target="modal-change-request">Request Changes</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+      <div>
+        <div style="font-size: 0.775rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">Domain</div>
+        <div style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--silver-accent);">{{ primary_website.domain|default:"Pending Domain Setup" }}</div>
+      </div>
+      <div>
+        <div style="font-size: 0.775rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">Template Model</div>
+        <div style="font-size: 0.9rem; color: var(--text-primary);">{{ primary_website.get_template_choice_display }}</div>
+      </div>
+      <div>
+        <div style="font-size: 0.775rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">Last Updated</div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">{{ primary_website.updated_at|date:"M d, Y" }}</div>
+      </div>
+    </div>
+
+    {% if primary_website.live_url %}
+    <div style="display: flex; gap: 1rem;">
+      <a href="{{ primary_website.live_url }}" target="_blank" class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Visit Live Website
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Change Request History -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 1rem; margin: 0;">Change Request History</h2>
+    </div>
+    {% if change_requests %}
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for req in change_requests %}
+        <div style="background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <strong style="color: var(--text-primary); font-size: 0.95rem;">{{ req.subject }}</strong>
+            <span class="badge badge-{% if req.status == 'completed' %}active{% elif req.status == 'in_progress' %}pending{% else %}silver{% endif %}">
+              {{ req.get_status_display }}
+            </span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">{{ req.message }}</p>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Submitted on {{ req.created_at|date:"M d, Y" }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+        No change requests submitted yet. Click "Request Changes" anytime you need text, images, or pricing updated.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- CHANGE REQUEST MODAL -->
+  <div class="modal-overlay" id="modal-change-request" role="dialog" aria-modal="true" aria-labelledby="modal-change-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-change-title">Request Website Changes</h3>
+        <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <form method="post" action="{% url 'websites:submit_change_request' primary_website.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="id_subject">Subject</label>
+          {{ form.subject }}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_message">Details of Changes</label>
+          {{ form.message }}
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% else %}
+  <div class="card" style="text-align: center; padding: 4rem 2rem;">
+    <div style="width: 70px; height: 70px; background: var(--bg-surface); border: 1px solid var(--border-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--border-hover)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </div>
+    <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.5rem;">No Website Package Active</h2>
+    <p style="color: var(--text-secondary); max-width: 440px; margin: 0 auto 1.5rem;">Take your enterprise or personal brand beyond a digital card with a fully managed, custom-designed website.</p>
+    <a href="{% url 'core:websites' %}" class="btn btn-primary">Explore Website Packages</a>
+  </div>
+{% endif %}
+{% endblock %}

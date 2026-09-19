@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Checkout — {{ package.name }} — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<section class="section-py">
+  <div class="container-narrow">
+    <div style="margin-bottom: 2.5rem;">
+      <a href="{% url 'core:pricing' %}" style="font-size: 0.875rem; color: var(--text-muted);">&larr; Back to Pricing</a>
+      <h1 style="margin-top: 0.5rem; font-size: 2.25rem;">Order Checkout</h1>
+    </div>
+
+    <div class="checkout-layout-grid">
+      <!-- Shipping Form -->
+      <div class="card">
+        <h2 style="font-size: 1.05rem; margin-bottom: 1.25rem;">Delivery & Contact Details</h2>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label" for="id_shipping_name">Recipient Full Name</label>
+            {{ form.shipping_name }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_shipping_phone">Phone Number for Courier Delivery</label>
+            {{ form.shipping_phone }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_shipping_address">Delivery Street Address</label>
+            {{ form.shipping_address }}
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label" for="id_shipping_city">City</label>
+              {{ form.shipping_city }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="id_shipping_state">State</label>
+              {{ form.shipping_state }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_customer_notes">Special Delivery / Packaging Notes <span class="form-label-hint">(Optional)</span></label>
+            {{ form.customer_notes }}
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+            <span>Proceed to Payment</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="card card-carbon" style="position: sticky; top: 100px;">
+        <h2 style="font-size: 1.05rem; margin-bottom: 1.25rem;">Order Summary</h2>
+
+        <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--border-primary); margin-bottom: 1rem;">
+          <div style="font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">{{ package.name }}</div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">{{ package.description }}</div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">Included Features:</div>
+          <ul style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-secondary);">
+            {% for f in package.feature_list %}
+            <li style="display: flex; gap: 0.4rem; align-items: center;">✓ {{ f }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-primary); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-heading); font-weight: 600; color: var(--text-secondary);">Total to Pay:</span>
+          <span style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--silver-accent);">₦{{ package.price_ngn|intcomma }}</span>
+        </div>
+
+        <div style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+          🔒 Secure 256-bit encrypted checkout via Paystack.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

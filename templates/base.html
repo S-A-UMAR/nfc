@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}UZYRA — YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH.{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Smart cards, professional websites and digital profiles — everything your business needs, all in one place.{% endblock %}">
+  
+  <!-- Fonts: Sora (Headings), Inter (Body), JetBrains Mono (Technical) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Core Design System CSS -->
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Skip to Main Content for Screen Readers & Keyboard Users -->
+  <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+  <!-- MASTER NAVBAR (Floating Glassmorphism Pill) -->
+  <div class="navbar-wrapper">
+    <header class="navbar" role="banner">
+      <!-- UZYRA Brand Logo -->
+      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
+        <svg width="20" height="24" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-nav-silver)"/>
+          <defs>
+            <linearGradient id="uzyra-nav-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFFFFF"/>
+              <stop offset="0.55" stop-color="#BFC5CF"/>
+              <stop offset="1" stop-color="#8E95A3"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>UZYRA</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="{% url 'core:smart_card' %}" class="nav-link {% if request.resolver_match.url_name == 'smart_card' %}active{% endif %}">Smart Card</a>
+        <a href="{% url 'core:how_it_works' %}" class="nav-link {% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">How It Works</a>
+        <a href="{% url 'core:websites' %}" class="nav-link {% if request.resolver_match.url_name == 'websites' %}active{% endif %}">Websites</a>
+        <a href="{% url 'core:pricing' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}">Pricing</a>
+      </nav>
+
+      <!-- Auth Actions -->
+      <div class="nav-actions">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard:overview' %}" class="btn btn-secondary btn-sm nav-btn-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-sm nav-hide-mobile">Sign Out</a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm nav-hide-mobile">Sign In</a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm nav-btn-pill">Get Started</a>
+        {% endif %}
+
+        <!-- Mobile Menu Toggle Button -->
+        <button class="nav-toggle" aria-label="Open Navigation Menu" aria-expanded="false" aria-controls="mobile-navigation-drawer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </header>
+  </div>
+
+  <!-- MOBILE SLIDE-OUT DRAWER -->
+  <div class="drawer-backdrop" aria-hidden="true"></div>
+  <aside id="mobile-navigation-drawer" class="mobile-drawer" aria-label="Mobile Navigation Menu">
+    <div>
+      <div class="drawer-header">
+        <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
+          <svg width="20" height="24" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-drawer-silver)"/>
+            <defs>
+              <linearGradient id="uzyra-drawer-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FFFFFF"/>
+                <stop offset="0.55" stop-color="#BFC5CF"/>
+                <stop offset="1" stop-color="#8E95A3"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>UZYRA</span>
+        </a>
+        <button class="drawer-close btn btn-ghost btn-sm" aria-label="Close navigation menu" style="padding: 0.25rem 0.5rem; font-size: 1.25rem; line-height: 1;">&times;</button>
+      </div>
+
+      {% if user.is_authenticated %}
+        <div class="drawer-user-badge">
+          <div class="drawer-user-avatar">
+            {% if user_profile and user_profile.profile_image %}
+              <img src="{{ user_profile.profile_image.url }}" alt="{{ user.display_name }}" width="38" height="38" loading="lazy" decoding="async">
+            {% else %}
+              <span>{{ user.first_name|default:user.email|make_list|first|upper }}</span>
+            {% endif %}
+          </div>
+          <div class="drawer-user-info">
+            <div class="drawer-user-name">{{ user.first_name|default:user.display_name }}</div>
+            <div class="drawer-user-email">{{ user.email }}</div>
+          </div>
+        </div>
+
+        <nav class="drawer-links" aria-label="Mobile Menu Links">
+          <div class="drawer-section-title">Dashboard</div>
+          <a href="{% url 'dashboard:overview' %}" class="nav-link {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Workspace</span>
+          </a>
+          <a href="{% url 'dashboard:profile_edit' %}" class="nav-link {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Digital Profile</span>
+          </a>
+          <a href="{% url 'dashboard:links_manage' %}" class="nav-link {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Links Manager</span>
+          </a>
+          <a href="{% url 'dashboard:card_manage' %}" class="nav-link {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>Smart Card</span>
+          </a>
+          <a href="{% url 'dashboard:website_manage' %}" class="nav-link {% if request.resolver_match.url_name == 'website_manage' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Websites</span>
+          </a>
+          <a href="{% url 'dashboard:orders_list' %}" class="nav-link {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span>Orders</span>
+          </a>
+          <a href="{% url 'dashboard:analytics_view' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Analytics</span>
+          </a>
+          <a href="{% url 'dashboard:settings_view' %}" class="nav-link {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+          <div class="drawer-section-title">Platform</div>
+        {% else %}
+        <nav class="drawer-links" aria-label="Mobile Menu Links">
+        {% endif %}
+        <a href="{% url 'core:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+        <a href="{% url 'core:smart_card' %}" class="nav-link {% if request.resolver_match.url_name == 'smart_card' %}active{% endif %}">Smart Card</a>
+        <a href="{% url 'core:how_it_works' %}" class="nav-link {% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">How It Works</a>
+        <a href="{% url 'core:websites' %}" class="nav-link {% if request.resolver_match.url_name == 'websites' %}active{% endif %}">Websites</a>
+        <a href="{% url 'core:pricing' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}">Pricing</a>
+        <a href="{% url 'core:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+        <a href="{% url 'core:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+        <a href="{% url 'core:faq' %}" class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}">FAQ</a>
+      </nav>
+    </div>
+
+    <div class="drawer-footer">
+      {% if user.is_authenticated %}
+        {% if user_profile and user_profile.slug %}
+          <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" class="btn btn-secondary btn-block">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>View Public Profile</span>
+          </a>
+        {% endif %}
+        <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-block" style="color: var(--text-muted);">Sign Out</a>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-block">Sign In</a>
+        <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-block">Get Started</a>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- FLASH MESSAGES -->
+  {% if messages %}
+    <div class="container" style="margin-top: 1.25rem;" role="region" aria-label="System messages">
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- MAIN BODY CONTENT -->
+  <main id="main-content" class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- MASTER FOOTER -->
+  {% block footer %}
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="{% url 'core:home' %}" class="brand-logo" style="margin-bottom: var(--space-4);" aria-label="UZYRA Home">
+            <svg width="22" height="26" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-ftr-silver)"/>
+              <defs>
+                <linearGradient id="uzyra-ftr-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FFFFFF"/>
+                  <stop offset="0.55" stop-color="#BFC5CF"/>
+                  <stop offset="1" stop-color="#8E95A3"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span>UZYRA</span>
+          </a>
+          <p style="font-size: 0.875rem; max-width: 320px; margin-bottom: var(--space-4); color: var(--text-secondary); line-height: 1.6;">
+            YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH. Smart NFC cards, digital identity and modern business web platforms.
+          </p>
+          <div class="d-flex gap-2">
+            <span class="badge badge-silver">NFC + QR</span>
+            <span class="badge badge-silver">No App Needed</span>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="footer-title">Products</h2>
+          <ul class="footer-links">
+            <li><a href="{% url 'core:smart_card' %}">Smart NFC Cards</a></li>
+            <li><a href="{% url 'core:how_it_works' %}">Digital Profiles</a></li>
+            <li><a href="{% url 'core:websites' %}">Personal Websites</a></li>
+            <li><a href="{% url 'core:websites' %}">Business Websites</a></li>
+            <li><a href="{% url 'core:pricing' %}">Packages & Pricing</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="footer-title">Company</h2>
+          <ul class="footer-links">
+            <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
+            <li><a href="{% url 'core:about' %}">About UZYRA</a></li>
+            <li><a href="{% url 'core:faq' %}">Frequently Asked</a></li>
+            <li><a href="{% url 'core:contact' %}">Contact & Support</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="footer-title">Account</h2>
+          <ul class="footer-links">
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'dashboard:overview' %}">Customer Dashboard</a></li>
+              <li><a href="{% url 'dashboard:profile_edit' %}">My Profile</a></li>
+              <li><a href="{% url 'dashboard:card_manage' %}">My Smart Card</a></li>
+              <li><a href="{% url 'accounts:logout' %}">Sign Out</a></li>
+            {% else %}
+              <li><a href="{% url 'accounts:login' %}">Sign In</a></li>
+              <li><a href="{% url 'accounts:register' %}">Create Account</a></li>
+              <li><a href="{% url 'core:pricing' %}">Order a Smart Card</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 UZYRA Platform. All rights reserved.</div>
+        <div class="d-flex gap-4">
+          <a href="{% url 'core:faq' %}">Security & Privacy</a>
+          <a href="{% url 'core:contact' %}">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <!-- Core JavaScript -->
+  <script src="{% static 'js/main.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

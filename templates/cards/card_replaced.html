@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Card Replaced — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
+  <div style="max-width: 460px; width: 100%;">
+    <span class="badge badge-silver" style="margin-bottom: 0.75rem;">CARD REPLACED</span>
+    <h2 style="margin-bottom: 0.5rem;">Card Replaced</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">This physical card has been superseded by a replacement smart card.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Visit {{ BRAND_NAME }}</a>
+  </div>
+</div>
+{% endblock %}

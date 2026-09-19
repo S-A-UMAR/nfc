@@ -1,0 +1,53 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static humanize %}
+{% block title %}My Orders — {{ BRAND_NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">My Orders</h1>
+    <p class="dashboard-subtitle">Track hardware production, smart card engraving, and website delivery.</p>
+  </div>
+  <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm">+ New Order</a>
+</div>
+
+{% if orders %}
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for order in orders %}
+    <div class="card card-carbon" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+          <span style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">#{{ order.order_number }}</span>
+          <span class="badge badge-{% if order.payment_status == 'paid' %}active{% elif order.payment_status == 'pending' %}pending{% else %}danger{% endif %}">
+            {{ order.get_payment_status_display }}
+          </span>
+          <span class="badge badge-silver">
+            {{ order.get_order_status_display }}
+          </span>
+        </div>
+        <div style="font-size: 0.875rem; color: var(--silver-accent); font-weight: 600;">{{ order.package.name }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Placed on {{ order.created_at|date:"M d, Y" }} &bull; Total: ₦{{ order.amount|intcomma }}</div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        {% if not order.is_paid %}
+          <a href="{% url 'payments:initialize' order.order_number %}" class="btn btn-primary btn-sm">Pay Now</a>
+        {% elif not order.has_submitted_requirements %}
+          <a href="{% url 'dashboard:order_submit_info' order.order_number %}" class="btn btn-primary btn-sm">Submit Information</a>
+        {% endif %}
+        <a href="{% url 'dashboard:order_detail' order.order_number %}" class="btn btn-secondary btn-sm">View Timeline &rarr;</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card" style="text-align: center; padding: 4rem 2rem;">
+    <div style="width: 70px; height: 70px; background: var(--bg-surface); border: 1px solid var(--border-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--border-hover)" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    </div>
+    <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">No Orders Yet</h2>
+    <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 1.5rem;">Choose a package to order your custom laser-engraved Smart Card or Website.</p>
+    <a href="{% url 'core:pricing' %}" class="btn btn-primary">Browse Packages</a>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}About — {{ BRAND_NAME }}{% endblock %}
+{% block content %}
+<section class="section-py" style="border-bottom: 1px solid var(--border-primary);">
+  <div class="container-narrow">
+    <span class="badge badge-silver" style="margin-bottom: 0.75rem;">THE BRAND STORY</span>
+    <h1 style="margin-bottom: 1.5rem;">Why {{ BRAND_NAME }} Exists.</h1>
+
+    <div style="display: flex; flex-direction: column; gap: 2rem; color: var(--text-secondary); font-size: 1rem; line-height: 1.8;">
+      <div>
+        <h2 class="h3" style="color: var(--text-primary); margin-bottom: 0.75rem; font-size: 1.25rem;">The Problem</h2>
+        <p>Sharing your identity as a professional or business owner still requires an embarrassing manual process. Searching for your Instagram, typing phone numbers on the spot, sending links through WhatsApp, emailing PDFs. A dozen clumsy steps just to answer a simple question: <em>"How can I reach you?"</em></p>
+      </div>
+
+      <div>
+        <h2 class="h3" style="color: var(--text-primary); margin-bottom: 0.75rem; font-size: 1.25rem;">The Solution</h2>
+        <p>One physical card. One single tap. One complete digital identity. {{ BRAND_NAME }} was built on the principle that your professional identity should match the quality of your work. A premium matte graphite smart card that instantly transmits everything about you and your business to any smartphone — with zero friction.</p>
+      </div>
+
+      <div>
+        <h2 class="h3" style="color: var(--text-primary); margin-bottom: 0.75rem; font-size: 1.25rem;">The Design Philosophy</h2>
+        <p>We believe the technology you carry should reflect your standards. That is why every {{ BRAND_NAME }} card is built to feel like a luxury instrument — heavy, matte, considered. And your digital profile carries that same philosophy: minimal, premium, and built to convert first impressions into lasting business relationships.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

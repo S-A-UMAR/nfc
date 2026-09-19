@@ -1,0 +1,229 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+{% block title %}Smart Card Management — UZYRA{% endblock %}
+
+{% block dashboard_content %}
+<!-- ==========================================================================
+     HEADER: Smart Card Hardware Management
+     ========================================================================== -->
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Smart NFC Hardware</h1>
+    <p class="dashboard-subtitle">Manage your physical contactless smart card, NFC redirect URL, and QR code assets.</p>
+  </div>
+  {% if profile.slug %}
+    <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-secondary btn-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <span>View Live Profile</span>
+    </a>
+  {% endif %}
+</div>
+
+{% if primary_card %}
+  <!-- ========================================================================
+       ASSIGNED PHYSICAL SMART CARD VIEW
+       ======================================================================== -->
+  <div class="dashboard-grid-2 mb-6">
+
+    <!-- Left: Tactile Digital Card Representation -->
+    <div class="d-flex flex-column items-center">
+      <div class="smart-card-mockup mb-4" aria-label="Smart Card Hardware Preview">
+        <!-- Top Row: Chip & Wave -->
+        <div class="d-flex justify-between items-center">
+          <div class="card-mockup-chip">
+            <div class="card-chip-icon"></div>
+            <span class="label-overline" style="color: var(--silver-steel); font-size: 0.65rem;">NFC</span>
+          </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="opacity: 0.85;" aria-hidden="true">
+            <path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/>
+            <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/>
+            <path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+
+        <!-- Center: UZYRA Shield Emblem -->
+        <div class="text-center" style="margin: var(--space-3) 0;">
+          <svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto var(--space-2);" aria-hidden="true">
+            <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#card-manage-silver)"/>
+            <defs>
+              <linearGradient id="card-manage-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FFFFFF"/>
+                <stop offset="0.55" stop-color="#BFC5CF"/>
+                <stop offset="1" stop-color="#8E95A3"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; letter-spacing: 0.2em; color: var(--text-primary);">UZYRA</div>
+        </div>
+
+        <!-- Bottom: Card Code & Owner Info -->
+        <div class="d-flex justify-between items-end">
+          <div>
+            <div class="card-mockup-owner">{{ profile.full_name|default:user.display_name|upper }}</div>
+            <div style="font-size: 0.6875rem; color: var(--silver-steel); font-weight: 500;">
+              {% if profile.title %}{{ profile.title|upper }}{% else %}PROFESSIONAL IDENTITY{% endif %}
+            </div>
+          </div>
+          <div class="card-mockup-code">{{ primary_card.card_code }}</div>
+        </div>
+      </div>
+
+      <div class="text-caption text-center">
+        Contactless NTAG NFC Smart Card · Passive Power Induction
+      </div>
+    </div>
+
+    <!-- Right: Hardware Details & Status Controls -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Hardware Status & Routing</h2>
+        <span class="badge badge-{% if primary_card.status == 'ACTIVE' %}active{% elif primary_card.status == 'LOST' %}danger{% else %}pending{% endif %}">
+          <span class="dot dot-{% if primary_card.status == 'ACTIVE' %}active{% elif primary_card.status == 'LOST' %}danger{% else %}pending{% endif %}"></span>
+          {{ primary_card.get_status_display }}
+        </span>
+      </div>
+
+      <div class="grid-2 mb-6">
+        <div>
+          <div class="label-overline mb-1">Physical Card Code</div>
+          <div class="font-mono font-bold text-primary" style="font-size: 1.125rem;">{{ primary_card.card_code }}</div>
+        </div>
+        <div>
+          <div class="label-overline mb-1">Activation Date</div>
+          <div class="text-primary font-medium" style="font-size: 0.9375rem;">
+            {% if primary_card.activated_at %}
+              {{ primary_card.activated_at|date:"d M Y" }}
+            {% else %}
+              <span class="text-muted">Pending Activation</span>
+            {% endif %}
+          </div>
+        </div>
+        <div>
+          <div class="label-overline mb-1">NFC Redirect URL</div>
+          <code class="text-silver font-mono" style="font-size: 0.8125rem;">{{ primary_card.nfc_url_path }}</code>
+        </div>
+        <div>
+          <div class="label-overline mb-1">Target Digital Profile</div>
+          <div class="text-primary font-medium" style="font-size: 0.9375rem;">/u/{{ profile.slug }}/</div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Action Buttons -->
+      <div class="d-flex gap-2 flex-wrap mt-4">
+        {% if profile.slug %}
+          <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Test Live Profile</span>
+          </a>
+        {% endif %}
+
+        {% if primary_card.qr_code_image %}
+          <a href="{{ primary_card.qr_code_image.url }}" download class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download QR Asset</span>
+          </a>
+        {% endif %}
+
+        {% if primary_card.status == 'ACTIVE' %}
+          <button class="btn btn-danger btn-sm" data-modal-target="modal-report-lost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Report Lost</span>
+          </button>
+        {% endif %}
+      </div>
+
+      <!-- QR Code High-Res Asset Box -->
+      {% if primary_card.qr_code_image %}
+        <div class="mt-6 pt-6" style="border-top: 1px solid var(--border-primary);">
+          <div class="label-overline mb-3">Laser-Etched QR Code Asset</div>
+          <div class="d-flex items-center gap-4 flex-wrap">
+            <div style="width: 130px; height: 130px; background: #FFFFFF; border-radius: var(--radius-sm); padding: 8px; display: flex; align-items: center; justify-content: center;">
+              <img src="{{ primary_card.qr_code_image.url }}" alt="QR Code for {{ primary_card.card_code }}" width="114" height="114" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <div class="flex-1" style="min-width: 180px;">
+              <p class="text-caption mb-2">High-contrast vector QR code programmed to redirect to <code class="text-silver">{{ primary_card.nfc_url_path }}</code>.</p>
+              <a href="{{ primary_card.qr_code_image.url }}" download class="btn btn-ghost btn-sm">Download PNG</a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- REPORT LOST MODAL -->
+  <div class="modal-overlay" id="modal-report-lost">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title text-danger">Report Card as Lost</h3>
+        <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="alert alert-warning mb-4">
+        <div>Deactivating card <strong>{{ primary_card.card_code }}</strong> will prevent any future taps from opening your profile. Anyone scanning it will see a secure "Card Inactive" notification.</div>
+      </div>
+      <p class="text-secondary mb-6" style="font-size: 0.875rem;">Your digital profile, database records, and settings will remain completely safe. You can request a replacement card from your dashboard anytime.</p>
+      <div class="d-flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+        <form method="post" action="{% url 'cards:card_report_lost' primary_card.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Confirm Deactivation</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+  <!-- ========================================================================
+       EMPTY STATE: NO SMART CARD ASSIGNED YET
+       ======================================================================== -->
+  <div class="card text-center p-8">
+    <div class="empty-state-icon" style="width: 68px; height: 68px; margin: 0 auto var(--space-4);">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    </div>
+    <h2 class="font-heading font-bold text-primary mb-2">No Smart Card Linked Yet</h2>
+    <p class="text-secondary max-w-sm mb-6" style="font-size: 0.9375rem; line-height: 1.6;">
+      Order your custom physical NFC smart card, or activate an existing physical card using the unique ID code printed on the back.
+    </p>
+    <div class="d-flex justify-center gap-3 flex-wrap">
+      <a href="{% url 'core:pricing' %}" class="btn btn-primary">
+        <span>Order a Smart Card</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <button class="btn btn-secondary" data-modal-target="modal-activate-card">
+        <span>Activate Physical Card</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ACTIVATE CARD MODAL -->
+  <div class="modal-overlay" id="modal-activate-card" role="dialog" aria-modal="true" aria-labelledby="activate-card-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="activate-card-modal-title">Activate Physical Smart Card</h3>
+        <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <p class="text-secondary mb-4" style="font-size: 0.875rem;">
+        Enter the Card ID code printed on the back of your physical card (e.g. <code class="text-silver font-mono">BR-000001</code>).
+      </p>
+      <form method="post" action="{% url 'cards:card_activate' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="id_card_code">Physical Card ID</label>
+          <input type="text" name="card_code" id="id_card_code" class="form-control font-mono tracking-wide" placeholder="BR-000001" required style="text-transform: uppercase;">
+          <div class="form-hint">Case-insensitive. Matches the format printed on your physical card.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_activation_code">Security Activation PIN / Code</label>
+          <input type="text" name="activation_code" id="id_activation_code" class="form-control font-mono tracking-wide" placeholder="e.g. UZ8K-3921" style="text-transform: uppercase;">
+          <div class="form-hint">Found on the security sleeve or packaging of your physical card.</div>
+        </div>
+        <div class="d-flex justify-end gap-2 mt-6">
+          <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Activate & Link Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

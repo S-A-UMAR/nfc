@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Card Suspended — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
+  <div style="max-width: 460px; width: 100%;">
+    <span class="badge badge-pending" style="margin-bottom: 0.75rem;">ACCOUNT NOTICE</span>
+    <h2 style="margin-bottom: 0.5rem;">Card Suspended</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">This card is currently inactive. Smart Card <code style="color: var(--silver-accent);">{{ card.card_code }}</code> has been suspended.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Return Home</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}How It Works — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<section class="section-py" style="border-bottom: 1px solid var(--border-primary);">
+  <div class="container-narrow">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="badge badge-silver" style="margin-bottom: 0.75rem;">THE FULL PROCESS</span>
+      <h1>From Order to Tap in Three Steps</h1>
+      <p class="lead">Here is exactly how our smart hardware and digital profile ecosystem operates.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 3rem;">
+      <div class="card" style="display: flex; gap: 2rem; align-items: flex-start;">
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--silver-accent); background: var(--bg-primary); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid var(--border-primary); flex-shrink: 0;">01</div>
+        <div>
+          <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.5rem;">1. Order Your Package</h2>
+          <p>Select whether you only need a physical Smart NFC Card or a bundle with a complete Personal or Business Website. Complete checkout securely with Paystack.</p>
+        </div>
+      </div>
+
+      <div class="card" style="display: flex; gap: 2rem; align-items: flex-start;">
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--silver-accent); background: var(--bg-primary); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid var(--border-primary); flex-shrink: 0;">02</div>
+        <div>
+          <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.5rem;">2. Customize Your Identity in the Dashboard</h2>
+          <p>Provide your name, title, bio, WhatsApp, phone, email, and social media handles. Upload your company logo or profile picture. If you ordered a website, select your design preferences.</p>
+        </div>
+      </div>
+
+      <div class="card" style="display: flex; gap: 2rem; align-items: flex-start;">
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--silver-accent); background: var(--bg-primary); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid var(--border-primary); flex-shrink: 0;">03</div>
+        <div>
+          <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.5rem;">3. Laser Engraving, Encoding & Delivery</h2>
+          <p>We precision encode your physical card with its internal identifier (<code style="color: var(--silver-accent);">BR-000001</code>) and ship it directly to your doorstep. Tap it to any smartphone to start connecting!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

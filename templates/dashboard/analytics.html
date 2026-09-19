@@ -1,0 +1,71 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+{% block title %}Analytics — {{ BRAND_NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Analytics & Insights</h1>
+    <p class="dashboard-subtitle">Real-time interaction breakdown for the past 30 days.</p>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-card-title">Profile Views</div>
+    <div class="stat-card-value">{{ total_views }}</div>
+    <div class="stat-card-sub">Direct digital profile loads</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Card Taps & QR Scans</div>
+    <div class="stat-card-value">{{ total_card_taps }}</div>
+    <div class="stat-card-sub">Hardware NFC + QR redirects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">WhatsApp Conversations</div>
+    <div class="stat-card-value">{{ total_whatsapp }}</div>
+    <div class="stat-card-sub">Direct chats initiated</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Phone Calls</div>
+    <div class="stat-card-value">{{ total_calls }}</div>
+    <div class="stat-card-sub">Click-to-call taps</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">vCards Saved</div>
+    <div class="stat-card-value">{{ total_vcards }}</div>
+    <div class="stat-card-sub">Contacts saved to phonebook</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">External Clicks</div>
+    <div class="stat-card-value">{{ total_websites }}</div>
+    <div class="stat-card-sub">Portfolio & website clicks</div>
+  </div>
+</div>
+
+<!-- Recent Event Stream -->
+<div class="card" style="margin-top: 2rem;">
+  <div class="card-header">
+    <h2 style="font-size: 1rem; margin: 0;">Recent Activity Log</h2>
+  </div>
+  {% if recent_events %}
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      {% for event in recent_events %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="badge badge-silver" style="font-size: 0.7rem;">{{ event.get_event_type_display }}</span>
+          {% if event.target_label %}
+            <span style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600;">{{ event.target_label }}</span>
+          {% endif %}
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ event.timestamp|date:"M d, Y \a\t H:i" }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.9rem;">
+      No activity recorded in the past 30 days yet. Share your profile link or tap your smart card to begin collecting analytics.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
