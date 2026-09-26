@@ -18,17 +18,15 @@ class Website(models.Model):
         ('retail_showcase', 'Template 04 — Retail & Product Showcase'),
     )
 
-    STATUS_PROVISIONING = 'provisioning'
-    STATUS_DESIGNING = 'designing'
-    STATUS_REVIEW = 'review'
-    STATUS_LIVE = 'live'
+    STATUS_DRAFT = 'draft'
+    STATUS_PUBLISHED = 'published'
+    STATUS_UNPUBLISHED = 'unpublished'
     STATUS_MAINTENANCE = 'maintenance'
 
     STATUS_CHOICES = (
-        (STATUS_PROVISIONING, 'Setting up Environment'),
-        (STATUS_DESIGNING, 'In Custom Design'),
-        (STATUS_REVIEW, 'Client Review'),
-        (STATUS_LIVE, 'Active & Live'),
+        (STATUS_DRAFT, 'Draft / Designing'),
+        (STATUS_PUBLISHED, 'Published & Live'),
+        (STATUS_UNPUBLISHED, 'Unpublished'),
         (STATUS_MAINTENANCE, 'Maintenance Mode'),
     )
 
@@ -37,9 +35,25 @@ class Website(models.Model):
     website_type = models.CharField(max_length=30, choices=TYPE_CHOICES, default=TYPE_BUSINESS)
     template_choice = models.CharField(max_length=50, choices=TEMPLATE_CHOICES, default='modern_business')
     title = models.CharField(max_length=150)
+    slug = models.SlugField(max_length=150, unique=True, blank=True, null=True)
     domain = models.CharField(max_length=150, blank=True, help_text="e.g. www.ahmedphones.com or ahmed.ulva.io")
     live_url = models.URLField(blank=True, help_text="Full external live link")
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_DESIGNING)
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_DRAFT)
+    
+    # Section Toggles
+    show_hero = models.BooleanField(default=True)
+    show_about = models.BooleanField(default=True)
+    show_services = models.BooleanField(default=True)
+    show_products = models.BooleanField(default=True)
+    show_gallery = models.BooleanField(default=False)
+    show_social = models.BooleanField(default=True)
+    show_contact = models.BooleanField(default=True)
+    show_footer = models.BooleanField(default=True)
+    
+    # Brand Customization
+    primary_color = models.CharField(max_length=20, default="#000000")
+    secondary_color = models.CharField(max_length=20, default="#ffffff")
+    button_style = models.CharField(max_length=20, choices=[('solid', 'Solid'), ('outline', 'Outline'), ('rounded', 'Rounded')], default='solid')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -48,7 +62,20 @@ class Website(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title} ({self.domain or 'Pending Domain'}) - {self.get_status_display()}"
+        return f"{self.title} ({self.slug or 'No slug'}) - {self.get_status_display()}"
+        
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            import uuid
+            base_slug = slugify(self.title) or "site"
+            slug = base_slug
+            counter = 1
+            while Website.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
 
 class WebsiteChangeRequest(models.Model):
@@ -79,3 +106,33 @@ class WebsiteChangeRequest(models.Model):
 
     def __str__(self):
         return f"Change Request #{self.id} on {self.website.title} [{self.get_status_display()}]"
+class Service(models.Model):
+    website = models.ForeignKey(Website, on_delete=models.CASCADE, related_name='services')
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
+    price = models.CharField(max_length=100, blank=True)
+    image = models.ImageField(upload_to='websites/services/', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['display_order', 'id']
+
+    def __str__(self):
+        return f"{self.name} - {self.website.title}"
+
+
+class Product(models.Model):
+    website = models.ForeignKey(Website, on_delete=models.CASCADE, related_name='products')
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
+    price = models.CharField(max_length=100, blank=True)
+    image = models.ImageField(upload_to='websites/products/', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['display_order', 'id']
+
+    def __str__(self):
+        return f"{self.name} - {self.website.title}"

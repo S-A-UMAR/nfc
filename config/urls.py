@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from apps.accounts import views as account_views
 from apps.cards import views as card_views
 from apps.profiles import views as profile_views
+from apps.websites import views as web_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,6 +36,12 @@ urlpatterns = [
 
     # Websites & Template Previews
     path('websites-catalog/', include('apps.websites.urls', namespace='websites')),
+    
+    # Public Website Builder URLs
+    path('site/', include([
+        path('preview/<slug:slug>/', web_views.preview_website_view, name='preview_website'),
+        path('<slug:slug>/', web_views.public_website_view, name='public_website'),
+    ])),
 
     # Analytics Tracking API
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),

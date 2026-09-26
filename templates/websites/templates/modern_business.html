@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ website.title }} — {{ profile.business_name|default:profile.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --site-primary: {{ website.primary_color|default:'#000000' }};
+    --site-secondary: {{ website.secondary_color|default:'#ffffff' }};
+  }
+  .site-btn-primary {
+    background: var(--site-primary);
+    color: var(--site-secondary);
+    border: none;
+    {% if website.button_style == 'rounded' %}border-radius: 9999px;{% endif %}
+    {% if website.button_style == 'outline' %}background: transparent; border: 2px solid var(--site-primary); color: var(--site-primary);{% endif %}
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .site-header { padding: 1.5rem 0; border-bottom: 1px solid var(--border-primary); }
+  .site-hero { padding: 6rem 1rem; text-align: center; }
+  .site-section { padding: 4rem 1rem; }
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .service-card { border: 1px solid var(--border-primary); padding: 1.5rem; border-radius: var(--radius-md); background: var(--bg-surface); }
+  .product-card { border: 1px solid var(--border-primary); padding: 1.5rem; border-radius: var(--radius-md); background: var(--bg-surface); }
+  .site-footer { padding: 4rem 1rem; border-top: 1px solid var(--border-primary); background: var(--bg-primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if is_preview %}
+<div style="background: var(--danger-color, #e53e3e); color: white; text-align: center; padding: 0.5rem; font-weight: bold; position: sticky; top: 0; z-index: 9999;">
+  PREVIEW MODE: Changes may not be saved or published.
+</div>
+{% endif %}
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container d-flex justify-between items-center">
+    <div style="font-size: 1.5rem; font-weight: 800;">
+      {% if profile.business_logo %}
+        <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="max-height: 40px;">
+      {% else %}
+        {{ website.title }}
+      {% endif %}
+    </div>
+    <nav>
+      {% if website.show_about %}<a href="#about" style="margin-left:1rem; color:var(--text-secondary);">About</a>{% endif %}
+      {% if website.show_services and services %}<a href="#services" style="margin-left:1rem; color:var(--text-secondary);">Services</a>{% endif %}
+      {% if website.show_products and products %}<a href="#products" style="margin-left:1rem; color:var(--text-secondary);">Products</a>{% endif %}
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+{% if website.show_hero %}
+<section class="site-hero" style="background: var(--bg-secondary);">
+  <div class="container-narrow">
+    <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 1.5rem; font-weight: 800;">
+      {{ profile.title|default:profile.business_name }}
+    </h1>
+    <p class="lead" style="margin-bottom: 2rem;">{{ profile.bio|default:profile.business_description }}</p>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      {% if profile.whatsapp %}
+        <a href="https://wa.me/{{ profile.clean_whatsapp }}" class="site-btn-primary">Chat on WhatsApp</a>
+      {% endif %}
+      {% if website.show_contact and profile.email %}
+        <a href="mailto:{{ profile.email }}" class="site-btn-primary" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-primary);">Contact Us</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- About -->
+{% if website.show_about and profile.business_description %}
+<section id="about" class="site-section">
+  <div class="container-narrow text-center">
+    <h2 style="margin-bottom: 1.5rem;">About Us</h2>
+    <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary);">{{ profile.business_description }}</p>
+  </div>
+</section>
+{% endif %}
+
+<!-- Services -->
+{% if website.show_services and services %}
+<section id="services" class="site-section" style="background: var(--bg-secondary);">
+  <div class="container">
+    <h2 class="text-center" style="margin-bottom: 3rem;">Our Services</h2>
+    <div class="grid-cards">
+      {% for svc in services %}
+      <div class="service-card">
+        {% if svc.image %}
+          <img src="{{ svc.image.url }}" alt="{{ svc.name }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 1rem;">
+        {% endif %}
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ svc.name }}</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">{{ svc.description }}</p>
+        {% if svc.price %}
+          <div style="font-weight: bold; color: var(--text-primary);">{{ svc.price }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Products -->
+{% if website.show_products and products %}
+<section id="products" class="site-section">
+  <div class="container">
+    <h2 class="text-center" style="margin-bottom: 3rem;">Products</h2>
+    <div class="grid-cards">
+      {% for prod in products %}
+      <div class="product-card">
+        {% if prod.image %}
+          <img src="{{ prod.image.url }}" alt="{{ prod.name }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 1rem;">
+        {% endif %}
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ prod.name }}</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">{{ prod.description }}</p>
+        {% if prod.price %}
+          <div style="font-weight: bold; color: var(--site-primary);">{{ prod.price }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Social / Contact Footer -->
+{% if website.show_footer %}
+<footer class="site-footer text-center">
+  <div class="container-narrow">
+    {% if website.show_social and social_links %}
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
+        {% for link in social_links %}
+          <a href="{{ link.url }}" target="_blank" style="color: var(--text-secondary); font-weight: 500;">{{ link.get_platform_display }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div style="color: var(--text-muted); font-size: 0.9rem;">
+      <p>{{ profile.address }}</p>
+      <p>&copy; {% now "Y" %} {{ website.title }}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+{% endif %}
+
+{% endblock %}

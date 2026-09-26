@@ -25,6 +25,13 @@ urlpatterns = [
     path('orders/<str:order_number>/', order_views.order_detail_view, name='order_detail'),
     path('orders/<str:order_number>/submit-info/', order_views.order_submit_info_view, name='order_submit_info'),
     path('website/', web_views.website_manage_view, name='website_manage'),
+    path('website/<int:website_id>/publish/', web_views.website_publish_toggle, name='website_publish'),
+    path('website/<int:website_id>/service/add/', web_views.service_create_view, name='service_add'),
+    path('website/service/<int:service_id>/edit/', web_views.service_edit_view, name='service_edit'),
+    path('website/service/<int:service_id>/delete/', web_views.service_delete_view, name='service_delete'),
+    path('website/<int:website_id>/product/add/', web_views.product_create_view, name='product_add'),
+    path('website/product/<int:product_id>/edit/', web_views.product_edit_view, name='product_edit'),
+    path('website/product/<int:product_id>/delete/', web_views.product_delete_view, name='product_delete'),
     path('analytics/', ana_views.analytics_dashboard_view, name='analytics_view'),
     path('settings/', acc_dash.settings_view, name='settings_view'),
 ]
