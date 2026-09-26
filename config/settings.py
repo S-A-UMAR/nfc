@@ -14,6 +14,11 @@ if allowed_hosts_env:
 else:
     ALLOWED_HOSTS = ['*'] if DEBUG else ['uzyra.com', 'www.uzyra.com', '127.0.0.1', 'localhost', 'testserver']
 
+# ⚠️  TEMPORARY — NFC testing via Cloudflare Tunnel — REMOVE AFTER TESTING
+CSRF_TRUSTED_ORIGINS = [
+    'https://deal-computing-sent-bias.trycloudflare.com',
+]
+
 # Security Headers & Browser Protections
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
