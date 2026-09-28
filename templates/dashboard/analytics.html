@@ -2,70 +2,433 @@
 {% load static %}
 {% block title %}Analytics — {{ BRAND_NAME }}{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<style>
+/* ── Analytics Page Styles ──────────────────────────────────────────── */
+.analytics-range-tabs {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+.analytics-range-tab {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.analytics-range-tab:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+.analytics-range-tab.active {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+/* ── Stat Grid ──────────────────────────────────────────────────────── */
+.analytics-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.analytics-stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.analytics-stat-card__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+.analytics-stat-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+.analytics-stat-card__sub {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
+.analytics-stat-card.highlight {
+  border-color: rgba(255,255,255,0.15);
+  background: var(--bg-surface);
+}
+
+/* ── Bar Chart ──────────────────────────────────────────────────────── */
+.chart-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+.chart-section__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+.chart-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 18px;
+  max-width: 40px;
+  gap: 4px;
+}
+.chart-bar {
+  width: 100%;
+  background: var(--text-primary);
+  border-radius: 3px 3px 0 0;
+  opacity: 0.85;
+  min-height: 2px;
+  transition: opacity 0.15s;
+  position: relative;
+}
+.chart-bar:hover {
+  opacity: 1;
+}
+.chart-bar.zero {
+  background: var(--border-primary);
+  opacity: 0.4;
+}
+.chart-bar-label {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transform: rotate(-45deg);
+  transform-origin: top center;
+  margin-top: 6px;
+}
+
+/* ── Breakdown Tables ───────────────────────────────────────────────── */
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.breakdown-table th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-primary);
+}
+.breakdown-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+.breakdown-table tr:last-child td {
+  border-bottom: none;
+}
+.breakdown-table tr:hover td {
+  background: var(--bg-surface);
+}
+
+/* ── Visually hidden for screen readers ────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Top insight banner ─────────────────────────────────────────────── */
+.top-insight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.top-insight strong {
+  color: var(--text-primary);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.empty-state svg {
+  opacity: 0.3;
+  margin-bottom: 0.75rem;
+}
+</style>
+{% endblock %}
+
 {% block dashboard_content %}
 <div class="dashboard-header">
   <div>
-    <h1 class="dashboard-title">Analytics & Insights</h1>
-    <p class="dashboard-subtitle">Real-time interaction breakdown for the past 30 days.</p>
+    <h1 class="dashboard-title">Analytics &amp; Insights</h1>
+    <p class="dashboard-subtitle">Interaction data for your digital profile, smart cards, and websites.</p>
   </div>
 </div>
 
-<div class="stat-grid">
-  <div class="stat-card">
-    <div class="stat-card-title">Profile Views</div>
-    <div class="stat-card-value">{{ total_views }}</div>
-    <div class="stat-card-sub">Direct digital profile loads</div>
+<!-- ── Date Range Tabs ──────────────────────────────────────────────── -->
+<nav class="analytics-range-tabs" aria-label="Date range filter">
+  {% for key, label in range_labels.items %}
+  <a href="?range={{ key }}"
+     class="analytics-range-tab {% if current_range == key %}active{% endif %}"
+     aria-current="{% if current_range == key %}page{% else %}false{% endif %}">
+    {{ label }}
+  </a>
+  {% endfor %}
+</nav>
+
+<!-- ── Top Interaction Insight ──────────────────────────────────────── -->
+{% if top_interaction and top_count > 0 %}
+<div class="top-insight" role="status">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
+  <span>Top interaction: <strong>{{ top_interaction }}</strong> with <strong>{{ top_count }}</strong> click{{ top_count|pluralize }}.</span>
+</div>
+{% endif %}
+
+<!-- ── Overview Stat Cards ─────────────────────────────────────────── -->
+<div class="analytics-stat-grid" aria-label="Analytics overview">
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Card Taps &amp; QR Scans</div>
+    <div class="analytics-stat-card__value">{{ card_taps }}</div>
+    <div class="analytics-stat-card__sub">NFC hardware + QR redirects</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Card Taps & QR Scans</div>
-    <div class="stat-card-value">{{ total_card_taps }}</div>
-    <div class="stat-card-sub">Hardware NFC + QR redirects</div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Profile Views</div>
+    <div class="analytics-stat-card__value">{{ profile_views }}</div>
+    <div class="analytics-stat-card__sub">Direct profile loads</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-card-title">WhatsApp Conversations</div>
-    <div class="stat-card-value">{{ total_whatsapp }}</div>
-    <div class="stat-card-sub">Direct chats initiated</div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Website Views</div>
+    <div class="analytics-stat-card__value">{{ website_views }}</div>
+    <div class="analytics-stat-card__sub">Public website page loads</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Phone Calls</div>
-    <div class="stat-card-value">{{ total_calls }}</div>
-    <div class="stat-card-sub">Click-to-call taps</div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">WhatsApp Clicks</div>
+    <div class="analytics-stat-card__value">{{ whatsapp_clicks }}</div>
+    <div class="analytics-stat-card__sub">Direct chats initiated</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-card-title">vCards Saved</div>
-    <div class="stat-card-value">{{ total_vcards }}</div>
-    <div class="stat-card-sub">Contacts saved to phonebook</div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Phone Clicks</div>
+    <div class="analytics-stat-card__value">{{ phone_clicks }}</div>
+    <div class="analytics-stat-card__sub">Click-to-call taps</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-card-title">External Clicks</div>
-    <div class="stat-card-value">{{ total_websites }}</div>
-    <div class="stat-card-sub">Portfolio & website clicks</div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Email Clicks</div>
+    <div class="analytics-stat-card__value">{{ email_clicks }}</div>
+    <div class="analytics-stat-card__sub">Mailto link activations</div>
   </div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Social Clicks</div>
+    <div class="analytics-stat-card__value">{{ social_clicks }}</div>
+    <div class="analytics-stat-card__sub">Social media link taps</div>
+  </div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">vCard Saves</div>
+    <div class="analytics-stat-card__value">{{ vcard_downloads }}</div>
+    <div class="analytics-stat-card__sub">Contacts saved to phonebook</div>
+  </div>
+
+  <div class="analytics-stat-card">
+    <div class="analytics-stat-card__label">Website CTA Clicks</div>
+    <div class="analytics-stat-card__value">{{ website_cta_clicks }}</div>
+    <div class="analytics-stat-card__sub">Button actions on website</div>
+  </div>
+
+  <div class="analytics-stat-card highlight">
+    <div class="analytics-stat-card__label">Total Link Clicks</div>
+    <div class="analytics-stat-card__value">{{ total_link_clicks }}</div>
+    <div class="analytics-stat-card__sub">All non-view interactions</div>
+  </div>
+
 </div>
 
-<!-- Recent Event Stream -->
-<div class="card" style="margin-top: 2rem;">
-  <div class="card-header">
-    <h2 style="font-size: 1rem; margin: 0;">Recent Activity Log</h2>
-  </div>
-  {% if recent_events %}
-    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-      {% for event in recent_events %}
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs);">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span class="badge badge-silver" style="font-size: 0.7rem;">{{ event.get_event_type_display }}</span>
-          {% if event.target_label %}
-            <span style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600;">{{ event.target_label }}</span>
-          {% endif %}
+<!-- ── Activity Bar Chart ─────────────────────────────────────────── -->
+<section class="chart-section" aria-labelledby="chart-title">
+  <h2 id="chart-title" class="chart-section__title">
+    Daily Activity
+    <span style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem; margin-left: 0.5rem;">
+      ({{ range_labels|default_if_none:"30 Days" }}{% for key, label in range_labels.items %}{% if current_range == key %}{{ label }}{% endif %}{% endfor %})
+    </span>
+  </h2>
+
+  {% if daily_chart %}
+    <div class="chart-bars" role="img" aria-label="Bar chart showing daily activity events">
+      {% for item in daily_chart %}
+      {% if item.count > 0 %}
+        {% widthratio item.count max_daily 110 as bar_height %}
+      {% else %}
+        {% with bar_height=2 %}{% endwith %}
+      {% endif %}
+      <div class="chart-bar-wrap">
+        <div class="chart-bar {% if item.count == 0 %}zero{% endif %}"
+             style="height: {% if item.count > 0 %}{% widthratio item.count max_daily 110 %}{% else %}2{% endif %}px;"
+             aria-label="{{ item.date }}: {{ item.count }} event{{ item.count|pluralize }}"
+             title="{{ item.date }}: {{ item.count }} event{{ item.count|pluralize }}">
         </div>
-        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ event.timestamp|date:"M d, Y \a\t H:i" }}</div>
+        {% if forloop.counter|divisibleby:5 or forloop.first or forloop.last %}
+        <span class="chart-bar-label" aria-hidden="true">{{ item.date }}</span>
+        {% else %}
+        <span class="chart-bar-label" aria-hidden="true"></span>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
+
+    <!-- Screen-reader accessible data table -->
+    <details class="sr-only" style="position: static; width: auto; height: auto; clip: auto; white-space: normal; overflow: visible; margin: 0;">
+      <summary>Chart data table</summary>
+      <table>
+        <caption>Daily event counts</caption>
+        <thead><tr><th scope="col">Date</th><th scope="col">Events</th></tr></thead>
+        <tbody>
+          {% for item in daily_chart %}
+          <tr><td>{{ item.date }}</td><td>{{ item.count }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </details>
+
   {% else %}
-    <div style="text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.9rem;">
-      No activity recorded in the past 30 days yet. Share your profile link or tap your smart card to begin collecting analytics.
-    </div>
+    <div class="empty-state">No activity data for this period.</div>
   {% endif %}
+</section>
+
+<!-- ── Per-Card Breakdown ─────────────────────────────────────────── -->
+{% if card_breakdown %}
+<section class="card" style="margin-bottom: 1.5rem;" aria-labelledby="card-breakdown-title">
+  <div class="card-header">
+    <h2 id="card-breakdown-title" style="font-size: 0.9rem; margin: 0; font-weight: 600;">Smart Card Breakdown</h2>
+  </div>
+  {% if card_breakdown %}
+  <div style="overflow-x: auto;">
+    <table class="breakdown-table">
+      <thead>
+        <tr>
+          <th scope="col">Card ID</th>
+          <th scope="col">Status</th>
+          <th scope="col">Material</th>
+          <th scope="col" style="text-align:right;">Taps &amp; Scans</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in card_breakdown %}
+        <tr>
+          <td>
+            <span class="badge badge-silver" style="font-size: 0.72rem; letter-spacing: 0.06em;">{{ row.card.card_code }}</span>
+          </td>
+          <td>{{ row.card.get_status_display }}</td>
+          <td>{{ row.card.get_material_display }}</td>
+          <td style="text-align:right; font-weight: 600;">{{ row.tap_count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state">No cards linked yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- ── Per-Website Breakdown ──────────────────────────────────────── -->
+{% if website_breakdown %}
+<section class="card" style="margin-bottom: 1.5rem;" aria-labelledby="website-breakdown-title">
+  <div class="card-header">
+    <h2 id="website-breakdown-title" style="font-size: 0.9rem; margin: 0; font-weight: 600;">Website Breakdown</h2>
+  </div>
+  <div style="overflow-x: auto;">
+    <table class="breakdown-table">
+      <thead>
+        <tr>
+          <th scope="col">Website</th>
+          <th scope="col">Slug</th>
+          <th scope="col">Status</th>
+          <th scope="col" style="text-align:right;">Views</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in website_breakdown %}
+        <tr>
+          <td>{{ row.website.title }}</td>
+          <td style="font-size: 0.78rem; color: var(--text-muted);">{{ row.website.slug }}</td>
+          <td>
+            {% if row.website.status == 'published' %}
+              <span class="badge" style="background: rgba(34,197,94,0.12); color: #22c55e; font-size: 0.7rem;">Live</span>
+            {% else %}
+              <span class="badge badge-silver" style="font-size: 0.7rem;">{{ row.website.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td style="text-align:right; font-weight: 600;">{{ row.view_count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state">No websites yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- ── Zero-data empty state ─────────────────────────────────────── -->
+{% if not card_taps and not profile_views and not website_views and not total_link_clicks %}
+<div class="card">
+  <div class="empty-state">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+    </svg>
+    <p style="margin: 0;">No analytics data recorded yet for this period.</p>
+    <p style="margin: 0.5rem 0 0; font-size: 0.8rem;">Share your profile link or tap your smart card to start collecting data.</p>
+  </div>
 </div>
+{% endif %}
+
 {% endblock %}

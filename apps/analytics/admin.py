@@ -1,9 +1,13 @@
 from django.contrib import admin
 from .models import AnalyticsEvent
 
+
 @admin.register(AnalyticsEvent)
 class AnalyticsEventAdmin(admin.ModelAdmin):
-    list_display = ('event_type', 'target_label', 'profile', 'card', 'timestamp', 'user_agent')
+    """Admin registration for AnalyticsEvent with search, filter, and display config."""
+    list_display = ('id', 'event_type', 'target_label', 'profile', 'card', 'website', 'timestamp')
     list_filter = ('event_type', 'timestamp')
-    search_fields = ('profile__full_name', 'card__card_code', 'target_label', 'user_agent')
+    search_fields = ('event_type', 'profile__full_name', 'card__card_code')
     readonly_fields = ('timestamp',)
+    ordering = ('-timestamp',)
+    date_hierarchy = 'timestamp'

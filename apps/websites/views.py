@@ -137,10 +137,21 @@ def template_preview_view(request, template_code):
         'data': templates.get(template_code, templates['modern_business']),
     })
 
+from apps.analytics.models import AnalyticsEvent
+
 def public_website_view(request, slug):
     """The live public website rendered for visitors."""
     website = get_object_or_404(Website, slug=slug, status=Website.STATUS_PUBLISHED)
     profile = website.user.profile
+    
+    # Log anonymous website view analytics event
+    AnalyticsEvent.objects.create(
+        profile=profile,
+        website=website,
+        event_type=AnalyticsEvent.TYPE_WEBSITE_PAGE_VIEW,
+        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
+        referer=request.META.get('HTTP_REFERER', '')[:255]
+    )
     
     return render(request, f'websites/templates/{website.template_choice}.html', {
         'website': website,
