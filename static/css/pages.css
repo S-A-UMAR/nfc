@@ -9,6 +9,7 @@
 .hero-section {
   position: relative;
   min-height: 100svh;
+  margin-top: calc(-1 * var(--navbar-height));
   padding: calc(var(--navbar-height) + var(--space-8)) 0 var(--space-12);
   display: flex;
   flex-direction: column;

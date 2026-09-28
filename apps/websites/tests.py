@@ -14,6 +14,12 @@ class WebsiteBuilderTests(TestCase):
         self.other_user = User.objects.create_user(email="other@uzyra.com", password="password123")
         self.other_profile = self.other_user.profile
 
+    def test_website_manage_empty_state_get(self):
+        self.client.login(email="builder@uzyra.com", password="password123")
+        response = self.client.get(reverse('dashboard:website_manage'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No Website Created Yet")
+
     def test_create_website(self):
         self.client.login(email="builder@uzyra.com", password="password123")
         response = self.client.post(reverse('dashboard:website_manage'), {'title': 'My New Website'})

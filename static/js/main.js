@@ -4,6 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initNavbarScroll();
   initMobileDrawer();
   initModals();
   initAccordions();
@@ -12,7 +13,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* --------------------------------------------------------------------------
-   0. ACCORDIONS (FAQ & Expandable panels)
+   0. NAVBAR SCROLL ENHANCEMENT
+   -------------------------------------------------------------------------- */
+function initNavbarScroll() {
+  const navWrapper = document.querySelector('.navbar-wrapper');
+  if (!navWrapper) return;
+
+  function onScroll() {
+    if (window.scrollY > 20) {
+      navWrapper.classList.add('scrolled');
+    } else {
+      navWrapper.classList.remove('scrolled');
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* --------------------------------------------------------------------------
+   1. ACCORDIONS (FAQ & Expandable panels)
    -------------------------------------------------------------------------- */
 function initAccordions() {
   const accordionTriggers = document.querySelectorAll('.accordion-trigger, [data-accordion-trigger]');

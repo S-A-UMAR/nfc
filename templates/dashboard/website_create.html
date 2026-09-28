@@ -1,0 +1,27 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+{% block title %}Create Website — UZYRA{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Website Builder</h1>
+    <p class="dashboard-subtitle">Deploy a professional website connected to your digital profile.</p>
+  </div>
+</div>
+
+<div class="card text-center p-8">
+  <div class="empty-state-icon" style="width: 68px; height: 68px; margin: 0 auto var(--space-4);">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+  </div>
+  <h2 class="font-heading font-bold text-primary mb-2">No Website Created Yet</h2>
+  <p class="text-secondary max-w-sm mb-6" style="font-size: 0.9375rem; line-height: 1.6;">
+    Deploy a professional website connected to your UZYRA digital profile.
+  </p>
+  <form method="post" action="{% url 'dashboard:website_manage' %}" class="d-flex justify-center gap-3 flex-wrap">
+    {% csrf_token %}
+    <input type="text" name="title" class="form-control" placeholder="Business Name" required style="max-width: 260px;">
+    <button type="submit" class="btn btn-primary">Create Your Website</button>
+  </form>
+</div>
+{% endblock %}
