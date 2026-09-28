@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+  /* ── Operations Portal Custom Luxury Enhancements ── */
+  .ops-badge-staff {
+    background: rgba(163, 230, 53, 0.12);
+    color: #a3e635;
+    border: 1px solid rgba(163, 230, 53, 0.25);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-xs);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+  .ops-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .ops-table-container {
+    overflow-x: auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+  }
+  .ops-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .ops-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    white-space: nowrap;
+  }
+  .ops-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    vertical-align: middle;
+  }
+  .ops-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .ops-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .ops-search-box {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 260px;
+    max-width: 480px;
+  }
+  .ops-status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.4rem;
+  }
+  .ops-dot-active { background: #10B981; }
+  .ops-dot-unassigned { background: #9A9A9A; }
+  .ops-dot-reserved { background: #3B82F6; }
+  .ops-dot-suspended { background: #F59E0B; }
+  .ops-dot-lost { background: #EF4444; }
+  .ops-dot-replaced { background: #6B7280; }
+  .ops-pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .ops-action-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell">
+
+  <!-- =====================================================================
+       OPERATIONS SIDEBAR
+       ===================================================================== -->
+  <aside class="dashboard-sidebar" aria-label="Operations Navigation">
+    <div>
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar" style="border-color: #a3e635;">
+          <span>OP</span>
+        </div>
+        <div>
+          <div class="sidebar-user-name">{{ user.first_name|default:user.display_name }}</div>
+          <div class="sidebar-user-role" style="color: #a3e635; font-weight: 600;">Staff Operations</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="{% url 'operations:overview' %}" class="sidebar-link {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Operations Hub</span>
+        </a>
+        <a href="{% url 'operations:customers_list' %}" class="sidebar-link {% if 'customer' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Customers</span>
+        </a>
+        <a href="{% url 'operations:cards_list' %}" class="sidebar-link {% if 'card' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span>Card Inventory</span>
+        </a>
+        <a href="{% url 'operations:websites_list' %}" class="sidebar-link {% if 'website' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Websites</span>
+        </a>
+        <a href="{% url 'operations:orders_list' %}" class="sidebar-link {% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span>Orders</span>
+        </a>
+        <a href="{% url 'operations:audit_logs' %}" class="sidebar-link {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Audit Logs</span>
+        </a>
+        <a href="{% url 'admin:index' %}" target="_blank" class="sidebar-link" style="color: var(--text-muted);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Django Admin ↗</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom-actions">
+      <a href="{% url 'dashboard:overview' %}" class="sidebar-link" style="color: var(--text-primary); font-weight: 600;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>Customer Dashboard</span>
+      </a>
+      <a href="{% url 'accounts:logout' %}" class="sidebar-logout">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- =====================================================================
+       MAIN OPERATIONS CONTENT AREA
+       ===================================================================== -->
+  <div class="d-flex flex-column flex-1">
+
+    <!-- Mobile Sub-Nav -->
+    <div class="dashboard-mobile-nav" aria-label="Operations Section Navigation">
+      <div class="mobile-nav-inner">
+        <a href="{% url 'operations:overview' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">Hub</a>
+        <a href="{% url 'operations:customers_list' %}" class="mobile-nav-pill {% if 'customer' in request.resolver_match.url_name %}active{% endif %}">Customers</a>
+        <a href="{% url 'operations:cards_list' %}" class="mobile-nav-pill {% if 'card' in request.resolver_match.url_name %}active{% endif %}">Cards</a>
+        <a href="{% url 'operations:websites_list' %}" class="mobile-nav-pill {% if 'website' in request.resolver_match.url_name %}active{% endif %}">Websites</a>
+        <a href="{% url 'operations:orders_list' %}" class="mobile-nav-pill {% if 'order' in request.resolver_match.url_name %}active{% endif %}">Orders</a>
+        <a href="{% url 'operations:audit_logs' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}">Audit</a>
+        <a href="{% url 'dashboard:overview' %}" class="mobile-nav-pill">Client View</a>
+      </div>
+    </div>
+
+    <div class="dashboard-content" role="region" aria-label="Operations View">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block operations_content %}{% endblock %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

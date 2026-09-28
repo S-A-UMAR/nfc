@@ -1,0 +1,56 @@
+{% extends 'operations/base_operations.html' %}
+{% load static %}
+
+{% block title %}Add Card to Inventory — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Add Smart Card to Inventory</h1>
+    <p class="dashboard-subtitle">Register a single physical NFC card record before programming or dispatch.</p>
+  </div>
+  <div>
+    <a href="{% url 'operations:cards_list' %}" class="btn btn-ghost btn-sm">← Back to Cards</a>
+  </div>
+</div>
+
+<div class="card" style="max-width: 600px;">
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-group" style="margin-bottom: 1.25rem;">
+      <label for="card_code" class="form-label" style="font-weight: 600;">Card ID / Code *</label>
+      <input type="text" name="card_code" id="card_code" value="{{ card_code }}" required
+             placeholder="e.g. UZY-CARD-000101 or BR-000101"
+             class="form-control" style="font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Must be unique. This code will be written to the NFC chip as <code>/c/CODE/</code>.
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 1.25rem;">
+      <label for="material" class="form-label" style="font-weight: 600;">Hardware Material Finish</label>
+      <select name="material" id="material" class="form-control">
+        {% for mat_key, mat_name in material_choices %}
+          <option value="{{ mat_key }}">{{ mat_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 1.5rem;">
+      <label for="activation_pin" class="form-label" style="font-weight: 600;">Custom Activation PIN (Optional)</label>
+      <input type="text" name="activation_pin" id="activation_pin"
+             placeholder="Leave blank to auto-generate secure 8-char PIN"
+             class="form-control" style="font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+        If left blank, an 8-character cryptographic security PIN (e.g. <code>A3F2-9X7K</code>) will be generated and hashed.
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <button type="submit" class="btn btn-primary">Create Card Record</button>
+      <a href="{% url 'operations:cards_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

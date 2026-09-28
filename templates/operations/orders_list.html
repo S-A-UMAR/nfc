@@ -1,0 +1,121 @@
+{% extends 'operations/base_operations.html' %}
+{% load static humanize %}
+
+{% block title %}Orders Directory — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Orders &amp; Package Requests</h1>
+    <p class="dashboard-subtitle">Track hardware orders, package purchases, fulfillment status, and card assignments.</p>
+  </div>
+  <div style="font-size: 0.85rem; color: var(--text-muted);">
+    Total: <strong style="color: var(--text-primary);">{{ total_count }}</strong> orders
+  </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="ops-filter-bar">
+  <form method="get" class="ops-search-box">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by order #, customer, phone..." class="form-control" style="font-size: 0.85rem;">
+    {% if payment_filter != 'all' %}<input type="hidden" name="payment_status" value="{{ payment_filter }}">{% endif %}
+    {% if order_filter != 'all' %}<input type="hidden" name="order_status" value="{{ order_filter }}">{% endif %}
+    <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+    {% if search_query or payment_filter != 'all' or order_filter != 'all' %}
+      <a href="{% url 'operations:orders_list' %}" class="btn btn-ghost btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Payment:</span>
+    <a href="?payment_status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if payment_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?payment_status=paid{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if payment_filter == 'paid' %}badge-silver{% endif %}" style="text-decoration:none;">Paid</a>
+    <a href="?payment_status=pending{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if payment_filter == 'pending' %}badge-silver{% endif %}" style="text-decoration:none;">Pending</a>
+  </div>
+</div>
+
+<!-- Orders Table -->
+<div class="ops-table-container">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th scope="col">Order #</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Package</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Payment</th>
+        <th scope="col">Fulfillment</th>
+        <th scope="col">Assigned Card</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-primary);">
+          #{{ o.order_number }}
+        </td>
+        <td>
+          <a href="{% url 'operations:customer_detail' o.user.id %}" style="color: var(--text-primary); text-decoration: none; font-weight: 600;">
+            {{ o.user.display_name }}
+          </a>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">{{ o.user.email }}</div>
+        </td>
+        <td style="font-size: 0.8rem; color: var(--text-secondary);">
+          {{ o.package.name }}
+        </td>
+        <td style="font-weight: 600; white-space: nowrap;">
+          ₦{{ o.amount|intcomma }}
+        </td>
+        <td>
+          {% if o.payment_status == 'paid' %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Paid</span>
+          {% elif o.payment_status == 'pending' %}
+            <span style="color: #F59E0B; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-suspended"></span>Pending</span>
+          {% else %}
+            <span class="badge badge-silver">{{ o.get_payment_status_display }}</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="badge badge-silver" style="font-size: 0.72rem;">{{ o.get_order_status_display }}</span>
+        </td>
+        <td>
+          {% if o.card_assigned %}
+            <a href="{% url 'operations:card_detail' o.card_assigned.id %}" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--silver-steel);">
+              {{ o.card_assigned.card_code }}
+            </a>
+          {% else %}
+            <span style="color: var(--text-muted); font-size: 0.8rem;">Unassigned</span>
+          {% endif %}
+        </td>
+        <td style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">
+          {{ o.created_at|date:"M d, Y" }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          No orders found matching the filter criteria.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if orders.has_other_pages %}
+<div class="ops-pagination">
+  <div>Page {{ orders.number }} of {{ orders.paginator.num_pages }}</div>
+  <div style="display: flex; gap: 0.5rem;">
+    {% if orders.has_previous %}
+      <a href="?page={{ orders.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if payment_filter != 'all' %}&payment_status={{ payment_filter }}{% endif %}" class="btn btn-secondary btn-sm">← Previous</a>
+    {% endif %}
+    {% if orders.has_next %}
+      <a href="?page={{ orders.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if payment_filter != 'all' %}&payment_status={{ payment_filter }}{% endif %}" class="btn btn-secondary btn-sm">Next →</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

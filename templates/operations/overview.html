@@ -1,0 +1,154 @@
+{% extends 'operations/base_operations.html' %}
+{% load static humanize %}
+
+{% block title %}Operations Hub — {{ BRAND_NAME }}{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+      <h1 class="dashboard-title">Operations Hub</h1>
+      <span class="ops-badge-staff">CONFIDENTIAL INTERNAL</span>
+    </div>
+    <p class="dashboard-subtitle">Operational oversight, card inventory, customer records, and system health.</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <a href="{% url 'operations:card_create' %}" class="btn btn-secondary btn-sm">+ Add Single Card</a>
+    <a href="{% url 'operations:card_bulk_create' %}" class="btn btn-primary btn-sm">+ Bulk Generate Cards</a>
+  </div>
+</div>
+
+<!-- =====================================================================
+     METRICS OVERVIEW
+     ===================================================================== -->
+<h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem;">1. Smart Card Inventory</h3>
+<div class="ops-stat-grid">
+  <div class="stat-card">
+    <div class="stat-card-title">Total Cards</div>
+    <div class="stat-card-value">{{ card_counts.total|default:0 }}</div>
+    <div class="stat-card-sub">In database</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Unassigned Stock</div>
+    <div class="stat-card-value" style="color: #9A9A9A;">{{ card_counts.unassigned|default:0 }}</div>
+    <div class="stat-card-sub">Ready to allocate</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Active &amp; Linked</div>
+    <div class="stat-card-value" style="color: #10B981;">{{ card_counts.active|default:0 }}</div>
+    <div class="stat-card-sub">In customer hands</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Suspended</div>
+    <div class="stat-card-value" style="color: #F59E0B;">{{ card_counts.suspended|default:0 }}</div>
+    <div class="stat-card-sub">Temporarily disabled</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Reported Lost</div>
+    <div class="stat-card-value" style="color: #EF4444;">{{ card_counts.lost|default:0 }}</div>
+    <div class="stat-card-sub">Taps blocked</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Replaced</div>
+    <div class="stat-card-value" style="color: #6B7280;">{{ card_counts.replaced|default:0 }}</div>
+    <div class="stat-card-sub">Superseded cards</div>
+  </div>
+</div>
+
+<h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem;">2. Platform Entities</h3>
+<div class="ops-stat-grid">
+  <div class="stat-card">
+    <div class="stat-card-title">Total Customers</div>
+    <div class="stat-card-value">{{ total_customers|default:0 }}</div>
+    <div class="stat-card-sub">{{ active_customers }} active accounts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Staff Members</div>
+    <div class="stat-card-value" style="color: #a3e635;">{{ total_staff|default:0 }}</div>
+    <div class="stat-card-sub">Internal operators</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Published Websites</div>
+    <div class="stat-card-value" style="color: #10B981;">{{ website_counts.published|default:0 }}</div>
+    <div class="stat-card-sub">{{ website_counts.draft|default:0 }} in draft</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-title">Total Orders</div>
+    <div class="stat-card-value">{{ order_counts.total|default:0 }}</div>
+    <div class="stat-card-sub">{{ order_counts.paid|default:0 }} confirmed paid</div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     RECENT ACTIVITY & AUDIT TRAIL
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+
+  <!-- Recent Audit Logs -->
+  <div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Recent Staff Operations</h2>
+      <a href="{% url 'operations:audit_logs' %}" style="font-size: 0.8rem; color: var(--silver-steel);">View All →</a>
+    </div>
+    {% if recent_audit_logs %}
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for log in recent_audit_logs %}
+        <div style="padding: 0.65rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.825rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span class="badge badge-silver" style="font-size: 0.68rem;">{{ log.get_action_display }}</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">{{ log.created_at|date:"M d, H:i" }}</span>
+          </div>
+          <div style="font-weight: 600; color: var(--text-primary);">{{ log.target_repr }}</div>
+          {% if log.details %}
+            <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem;">{{ log.details|truncatechars:70 }}</div>
+          {% endif %}
+          <div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.25rem;">
+            By: <strong style="color: var(--text-secondary);">{{ log.staff_user.email|default:"System" }}</strong>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No operational audit logs recorded yet.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Hardware NFC/QR Taps -->
+  <div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Live Card Scans &amp; Taps</h2>
+      <a href="{% url 'operations:cards_list' %}" style="font-size: 0.8rem; color: var(--silver-steel);">Card Inventory →</a>
+    </div>
+    {% if recent_card_events %}
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for evt in recent_card_events %}
+        <div style="padding: 0.65rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.825rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+              {{ evt.card.card_code }}
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">
+              {{ evt.get_event_type_display }}
+              {% if evt.card.user %} · {{ evt.card.user.display_name }}{% endif %}
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.68rem;">LIVE</span>
+            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+              {{ evt.created_at|date:"H:i:s" }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No hardware taps recorded recently.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

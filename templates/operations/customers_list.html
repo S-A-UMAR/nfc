@@ -1,0 +1,118 @@
+{% extends 'operations/base_operations.html' %}
+{% load static %}
+
+{% block title %}Customers Directory — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Customer Directory</h1>
+    <p class="dashboard-subtitle">Manage customer profiles, associated smart cards, websites, and account access.</p>
+  </div>
+  <div style="font-size: 0.85rem; color: var(--text-muted);">
+    Total: <strong style="color: var(--text-primary);">{{ total_count }}</strong> customers
+  </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="ops-filter-bar">
+  <form method="get" class="ops-search-box">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name, email, phone, card ID, website slug..." class="form-control" style="font-size: 0.85rem;">
+    {% if status_filter != 'all' %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+    <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+    {% if search_query %}
+      <a href="{% url 'operations:customers_list' %}?status={{ status_filter }}" class="btn btn-ghost btn-sm">Clear</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Filter:</span>
+    <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?status=active{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'active' %}badge-silver{% endif %}" style="text-decoration:none;">Active</a>
+    <a href="?status=inactive{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'inactive' %}badge-silver{% endif %}" style="text-decoration:none;">Suspended</a>
+    <a href="?status=staff{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'staff' %}badge-silver{% endif %}" style="text-decoration:none;">Staff Only</a>
+  </div>
+</div>
+
+<!-- Customers Table -->
+<div class="ops-table-container">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th scope="col">Customer</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Cards</th>
+        <th scope="col">Websites</th>
+        <th scope="col">Orders</th>
+        <th scope="col">Status</th>
+        <th scope="col">Joined</th>
+        <th scope="col" style="text-align: right;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td>
+          <div style="font-weight: 600; color: var(--text-primary);">
+            {{ c.display_name }}
+            {% if c.is_staff %}<span class="ops-badge-staff" style="margin-left: 0.25rem;">STAFF</span>{% endif %}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">{{ c.email }}</div>
+        </td>
+        <td>{{ c.phone|default:"—" }}</td>
+        <td>
+          {% if c.cards_count > 0 %}
+            <span class="badge badge-silver" style="font-size: 0.72rem;">{{ c.cards_count }} card{{ c.cards_count|pluralize }}</span>
+          {% else %}
+            <span style="color: var(--text-muted);">0</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if c.websites_count > 0 %}
+            <span class="badge" style="background: rgba(34,197,94,0.1); color: #22c55e; font-size: 0.72rem;">{{ c.websites_count }} site{{ c.websites_count|pluralize }}</span>
+          {% else %}
+            <span style="color: var(--text-muted);">0</span>
+          {% endif %}
+        </td>
+        <td>{{ c.orders_count }}</td>
+        <td>
+          {% if c.is_active %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Active</span>
+          {% else %}
+            <span style="color: #EF4444; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-lost"></span>Suspended</span>
+          {% endif %}
+        </td>
+        <td style="font-size: 0.78rem; color: var(--text-muted);">{{ c.date_joined|date:"M d, Y" }}</td>
+        <td style="text-align: right;">
+          <a href="{% url 'operations:customer_detail' c.id %}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">Details →</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          No customers found matching the criteria.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if customers.has_other_pages %}
+<div class="ops-pagination">
+  <div>
+    Page {{ customers.number }} of {{ customers.paginator.num_pages }}
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    {% if customers.has_previous %}
+      <a href="?page={{ customers.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}" class="btn btn-secondary btn-sm">← Previous</a>
+    {% endif %}
+    {% if customers.has_next %}
+      <a href="?page={{ customers.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}" class="btn btn-secondary btn-sm">Next →</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

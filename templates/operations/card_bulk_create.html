@@ -1,0 +1,60 @@
+{% extends 'operations/base_operations.html' %}
+{% load static %}
+
+{% block title %}Bulk Generate Cards — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Bulk Generate Smart Cards</h1>
+    <p class="dashboard-subtitle">Quickly batch-generate sequential unassigned card records with unique activation PINs and QR codes.</p>
+  </div>
+  <div>
+    <a href="{% url 'operations:cards_list' %}" class="btn btn-ghost btn-sm">← Back to Cards</a>
+  </div>
+</div>
+
+<div class="card" style="max-width: 600px;">
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-group" style="margin-bottom: 1.25rem;">
+      <label for="prefix" class="form-label" style="font-weight: 600;">Card Code Prefix *</label>
+      <input type="text" name="prefix" id="prefix" value="UZY-CARD-" required
+             class="form-control" style="font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Example: <code>UZY-CARD-</code> or <code>BR-</code>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+      <div class="form-group">
+        <label for="start_number" class="form-label" style="font-weight: 600;">Starting Number *</label>
+        <input type="number" name="start_number" id="start_number" value="{{ next_num|default:1 }}" min="1" required class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="count" class="form-label" style="font-weight: 600;">Quantity (Max 100) *</label>
+        <input type="number" name="count" id="count" value="20" min="1" max="100" required class="form-control">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 1.5rem;">
+      <label for="material" class="form-label" style="font-weight: 600;">Hardware Material Finish</label>
+      <select name="material" id="material" class="form-control">
+        {% for mat_key, mat_name in material_choices %}
+          <option value="{{ mat_key }}">{{ mat_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="background: rgba(163, 230, 53, 0.06); border: 1px solid rgba(163, 230, 53, 0.2); border-radius: var(--radius-xs); padding: 0.85rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+      💡 Each generated card will automatically receive a unique QR code, an unassigned inventory status, and an 8-character cryptographic activation PIN hash.
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <button type="submit" class="btn btn-primary" onclick="return confirm('Generate this batch of cards now?');">Generate Batch</button>
+      <a href="{% url 'operations:cards_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

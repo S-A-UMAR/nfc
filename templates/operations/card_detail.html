@@ -1,0 +1,290 @@
+{% extends 'operations/base_operations.html' %}
+{% load static %}
+
+{% block title %}Card: {{ card.card_code }} — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+      <h1 class="dashboard-title" style="font-family: 'JetBrains Mono', monospace;">{{ card.card_code }}</h1>
+      {% if card.status == 'ACTIVE' %}
+        <span class="badge" style="background: rgba(16,185,129,0.12); color: #10b981;">Active &amp; Linked</span>
+      {% elif card.status == 'UNASSIGNED' %}
+        <span class="badge badge-silver">Unassigned Stock</span>
+      {% elif card.status == 'SUSPENDED' %}
+        <span class="badge" style="background: rgba(245,158,11,0.12); color: #f59e0b;">Suspended</span>
+      {% elif card.status == 'LOST' %}
+        <span class="badge" style="background: rgba(239,68,68,0.12); color: #ef4444;">Reported Lost</span>
+      {% elif card.status == 'REPLACED' %}
+        <span class="badge" style="background: rgba(107,114,128,0.12); color: #9ca3af;">Replaced</span>
+      {% else %}
+        <span class="badge badge-silver">{{ card.get_status_display }}</span>
+      {% endif %}
+    </div>
+    <p class="dashboard-subtitle">
+      Hardware finish: <strong>{{ card.get_material_display }}</strong> · Created {{ card.created_at|date:"M d, Y H:i" }}
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <a href="{{ card.nfc_url_path }}" target="_blank" class="btn btn-secondary btn-sm">Test NFC Route ↗</a>
+    <a href="{% url 'operations:cards_list' %}" class="btn btn-ghost btn-sm">← Back to Cards</a>
+  </div>
+</div>
+
+<!-- =====================================================================
+     CARD SPECIFICATIONS & QR PREVIEW
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+
+  <!-- Hardware Details Block -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Hardware Specifications</h2>
+    </div>
+    <div style="display: flex; gap: 1.25rem; align-items: center; margin-bottom: 1rem;">
+      {% if card.qr_code_image %}
+        <div style="background: #ffffff; padding: 6px; border-radius: var(--radius-xs); border: 1px solid var(--border-primary);">
+          <img src="{{ card.qr_code_image.url }}" alt="QR Code" width="80" height="80" style="display:block;">
+        </div>
+      {% endif %}
+      <div style="font-size: 0.825rem; line-height: 1.6;">
+        <div>NFC Target: <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary);">{{ card.nfc_url_path }}</strong></div>
+        <div>Material: <strong>{{ card.get_material_display }}</strong></div>
+        <div>Activation PIN: 
+          {% if card.activation_code_hash %}
+            <span style="color: #10B981; font-weight: 600;">✓ Hashed &amp; Secured</span>
+          {% else %}
+            <span style="color: var(--text-muted);">None Set (Open)</span>
+          {% endif %}
+        </div>
+        <div>Activated At: <strong>{{ card.activated_at|date:"M d, Y H:i"|default:"Pending Customer Activation" }}</strong></div>
+      </div>
+    </div>
+
+    {% if card.replacement_for %}
+      <div style="background: rgba(107,114,128,0.1); border: 1px solid rgba(107,114,128,0.2); border-radius: var(--radius-xs); padding: 0.75rem; font-size: 0.8rem; margin-top: 0.75rem;">
+        ↳ This card is a replacement for: 
+        <a href="{% url 'operations:card_detail' card.replacement_for.id %}" style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--silver-steel);">
+          {{ card.replacement_for.card_code }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Ownership Block -->
+  <div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Assigned Customer</h2>
+      {% if card.user %}
+        <a href="{% url 'operations:customer_detail' card.user.id %}" style="font-size: 0.8rem; color: var(--silver-steel);">Customer Profile →</a>
+      {% endif %}
+    </div>
+    {% if card.user %}
+      <div style="font-size: 0.85rem; line-height: 1.8;">
+        <div>Customer: <strong style="color: var(--text-primary);">{{ card.user.display_name }}</strong></div>
+        <div>Email: <strong>{{ card.user.email }}</strong></div>
+        <div>Phone: <strong>{{ card.user.phone|default:"—" }}</strong></div>
+        <div>Digital Profile: 
+          {% if card.profile %}
+            <a href="{% url 'profiles:public_profile' card.profile.slug %}" target="_blank" style="font-family: 'JetBrains Mono', monospace; color: var(--silver-steel);">
+              /u/{{ card.profile.slug }}/ ↗
+            </a>
+          {% else %}
+            <span style="color: var(--text-muted);">None linked</span>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
+        <p style="margin: 0 0 0.5rem;">This card is currently <strong>UNASSIGNED</strong>.</p>
+        <p style="margin: 0; font-size: 0.8rem;">Allocate it to a customer below to activate NFC redirection.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- =====================================================================
+     OPERATIONAL CONTROLS & LIFECYCLE MUTATIONS
+     ===================================================================== -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div class="card-header">
+    <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Administrative Operations</h2>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding-top: 0.5rem;">
+
+    <!-- 1. Assignment / Allocation -->
+    {% if card.status == 'UNASSIGNED' or not card.user %}
+      <div class="ops-action-card">
+        <h3 style="font-size: 0.85rem; margin: 0 0 0.5rem; font-weight: 600; color: #10B981;">Assign to Customer</h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Binds this card to a customer's account and profile.
+        </p>
+        <form method="post" action="{% url 'operations:card_assign' card.id %}">
+          {% csrf_token %}
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <select name="user_id" required class="form-control" style="font-size: 0.8rem;">
+              <option value="">-- Select Customer --</option>
+              {% for u in customers %}
+                <option value="{{ u.id }}">{{ u.display_name }} ({{ u.email }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">Confirm Assignment</button>
+        </form>
+      </div>
+    {% else %}
+      <!-- Reassign to Another Customer -->
+      <div class="ops-action-card">
+        <h3 style="font-size: 0.85rem; margin: 0 0 0.5rem; font-weight: 600; color: #3B82F6;">Reassign Card</h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Transfer ownership from {{ card.user.display_name }} to another customer.
+        </p>
+        <form method="post" action="{% url 'operations:card_reassign' card.id %}" onsubmit="return confirm('WARNING: Are you sure you want to transfer ownership of this card?');">
+          {% csrf_token %}
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <select name="new_user_id" required class="form-control" style="font-size: 0.8rem;">
+              <option value="">-- Select New Customer --</option>
+              {% for u in customers %}
+                {% if u.id != card.user.id %}
+                  <option value="{{ u.id }}">{{ u.display_name }} ({{ u.email }})</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <label style="font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.35rem;">
+              <input type="checkbox" name="confirm_reassign" value="yes" required>
+              I confirm changing card ownership.
+            </label>
+          </div>
+          <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%;">Reassign Card</button>
+        </form>
+      </div>
+    {% endif %}
+
+    <!-- 2. Status Controls: Suspend & Restore -->
+    <div class="ops-action-card">
+      <h3 style="font-size: 0.85rem; margin: 0 0 0.5rem; font-weight: 600; color: #F59E0B;">Status Lifecycle</h3>
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+        Temporarily disable or restore public redirection.
+      </p>
+      {% if card.status == 'ACTIVE' %}
+        <form method="post" action="{% url 'operations:card_suspend' card.id %}" onsubmit="return confirm('Suspend this card? Public taps will show a suspended screen.');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%; color: #f59e0b; border-color: rgba(245,158,11,0.3); margin-bottom: 0.5rem;">
+            Suspend Card
+          </button>
+        </form>
+      {% elif card.status == 'SUSPENDED' %}
+        <form method="post" action="{% url 'operations:card_restore' card.id %}" onsubmit="return confirm('Restore this card back to active status?');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-bottom: 0.5rem;">
+            Restore to Active
+          </button>
+        </form>
+      {% endif %}
+
+      {% if card.status != 'LOST' and card.status != 'REPLACED' %}
+        <form method="post" action="{% url 'operations:card_mark_lost' card.id %}" onsubmit="return confirm('Mark this card as LOST? This will block all further taps.');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost btn-sm" style="width: 100%; color: #ef4444;">
+            Report Card Lost
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+    <!-- 3. Replacement Card Workflow -->
+    {% if card.user and card.status != 'REPLACED' %}
+      <div class="ops-action-card">
+        <h3 style="font-size: 0.85rem; margin: 0 0 0.5rem; font-weight: 600; color: #9CA3AF;">Issue Replacement Card</h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Supersede this card with a new unassigned card while preserving customer's profile.
+        </p>
+        {% if unassigned_cards %}
+          <form method="post" action="{% url 'operations:card_replace' card.id %}" onsubmit="return confirm('Issue replacement card? The old card will be marked REPLACED.');">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+              <select name="replacement_card_id" required class="form-control" style="font-size: 0.8rem;">
+                <option value="">-- Choose New Card from Stock --</option>
+                {% for nc in unassigned_cards %}
+                  <option value="{{ nc.id }}">{{ nc.card_code }} ({{ nc.get_material_display }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%;">Issue Replacement</button>
+          </form>
+        {% else %}
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            No unassigned cards in inventory. <a href="{% url 'operations:card_create' %}" style="color: var(--silver-steel);">Add cards first →</a>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- =====================================================================
+     CARD EVENT HISTORY & AUDIT TRAIL
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+
+  <!-- Hardware NFC/QR Taps -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Hardware Tap Log (Last 25)</h2>
+    </div>
+    {% if card_events %}
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for evt in card_events %}
+        <div style="padding: 0.6rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span class="badge badge-silver" style="font-size: 0.68rem;">{{ evt.get_event_type_display }}</span>
+            <span style="color: var(--text-muted); font-size: 0.72rem; margin-left: 0.35rem;">{{ evt.user_agent|truncatechars:45 }}</span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">
+            {{ evt.created_at|date:"M d, H:i:s" }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No physical taps or scans recorded on this card yet.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Administrative Audit Log for This Card -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Audit Trail</h2>
+    </div>
+    {% if audit_trail %}
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for log in audit_trail %}
+        <div style="padding: 0.6rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+            <span class="badge badge-silver" style="font-size: 0.68rem;">{{ log.get_action_display }}</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">{{ log.created_at|date:"M d, H:i" }}</span>
+          </div>
+          <div style="color: var(--text-primary); font-size: 0.78rem;">{{ log.details|default:log.target_repr }}</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+            By: {{ log.staff_user.email|default:"System" }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No administrative changes logged for this card yet.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

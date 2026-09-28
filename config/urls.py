@@ -22,6 +22,9 @@ urlpatterns = [
     # Unified Customer Dashboard
     path('dashboard/', include('apps.core.dashboard_urls', namespace='dashboard')),
 
+    # Internal Staff Operations Portal
+    path('operations/', include('apps.core.operations_urls', namespace='operations')),
+
     # NFC Redirect Hub: /c/<card_code>/
     path('', include('apps.cards.urls', namespace='cards')),
 

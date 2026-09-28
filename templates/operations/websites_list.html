@@ -1,0 +1,124 @@
+{% extends 'operations/base_operations.html' %}
+{% load static %}
+
+{% block title %}Websites Management — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Customer Websites</h1>
+    <p class="dashboard-subtitle">Monitor and oversee customer websites built with the UZYRA self-serve builder.</p>
+  </div>
+  <div style="font-size: 0.85rem; color: var(--text-muted);">
+    Total: <strong style="color: var(--text-primary);">{{ total_count }}</strong> websites
+  </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="ops-filter-bar">
+  <form method="get" class="ops-search-box">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by website title, slug, owner..." class="form-control" style="font-size: 0.85rem;">
+    {% if status_filter != 'all' %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+    <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+    {% if search_query or status_filter != 'all' %}
+      <a href="{% url 'operations:websites_list' %}" class="btn btn-ghost btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Status:</span>
+    <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?status=published{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'published' %}badge-silver{% endif %}" style="text-decoration:none;">Published</a>
+    <a href="?status=draft{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'draft' %}badge-silver{% endif %}" style="text-decoration:none;">Draft</a>
+    <a href="?status=unpublished{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'unpublished' %}badge-silver{% endif %}" style="text-decoration:none;">Unpublished</a>
+  </div>
+</div>
+
+<!-- Websites Table -->
+<div class="ops-table-container">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th scope="col">Website</th>
+        <th scope="col">Slug / Route</th>
+        <th scope="col">Owner</th>
+        <th scope="col">Template</th>
+        <th scope="col">Status</th>
+        <th scope="col">Created</th>
+        <th scope="col" style="text-align: right;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for site in websites %}
+      <tr>
+        <td style="font-weight: 600; color: var(--text-primary);">
+          {{ site.title }}
+        </td>
+        <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+          /site/{{ site.slug }}/
+        </td>
+        <td>
+          <a href="{% url 'operations:customer_detail' site.user.id %}" style="color: var(--text-primary); text-decoration: none; font-weight: 600;">
+            {{ site.user.display_name }}
+          </a>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">{{ site.user.email }}</div>
+        </td>
+        <td style="font-size: 0.8rem; color: var(--text-secondary);">
+          {{ site.get_template_choice_display|default:site.template_choice }}
+        </td>
+        <td>
+          {% if site.status == 'published' %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Published</span>
+          {% elif site.status == 'draft' %}
+            <span style="color: #F59E0B; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-suspended"></span>Draft</span>
+          {% else %}
+            <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>{{ site.get_status_display }}</span>
+          {% endif %}
+        </td>
+        <td style="font-size: 0.78rem; color: var(--text-muted);">
+          {{ site.created_at|date:"M d, Y" }}
+        </td>
+        <td style="text-align: right; white-space: nowrap;">
+          <div style="display: inline-flex; gap: 0.4rem; align-items: center;">
+            {% if site.status == 'published' %}
+              <a href="{% url 'public_website' site.slug %}" target="_blank" class="btn btn-ghost btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Live ↗</a>
+              <form method="post" action="{% url 'operations:website_toggle_publish' site.id %}" style="display:inline;" onsubmit="return confirm('Unpublish website {{ site.title }}?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; color: #f59e0b;">Unpublish</button>
+              </form>
+            {% else %}
+              <form method="post" action="{% url 'operations:website_toggle_publish' site.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Publish</button>
+              </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          No customer websites found matching criteria.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if websites.has_other_pages %}
+<div class="ops-pagination">
+  <div>Page {{ websites.number }} of {{ websites.paginator.num_pages }}</div>
+  <div style="display: flex; gap: 0.5rem;">
+    {% if websites.has_previous %}
+      <a href="?page={{ websites.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}" class="btn btn-secondary btn-sm">← Previous</a>
+    {% endif %}
+    {% if websites.has_next %}
+      <a href="?page={{ websites.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}" class="btn btn-secondary btn-sm">Next →</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

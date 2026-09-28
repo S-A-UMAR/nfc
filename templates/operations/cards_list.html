@@ -1,0 +1,159 @@
+{% extends 'operations/base_operations.html' %}
+{% load static %}
+
+{% block title %}NFC Card Inventory — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Smart Card Inventory</h1>
+    <p class="dashboard-subtitle">Manage physical NFC hardware, batch allocations, customer assignments, and status lifecycles.</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <a href="{% url 'operations:card_create' %}" class="btn btn-secondary btn-sm">+ Add Single Card</a>
+    <a href="{% url 'operations:card_bulk_create' %}" class="btn btn-primary btn-sm">+ Bulk Batch Generate</a>
+  </div>
+</div>
+
+<!-- Status Chips Summary -->
+<div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    Total: <strong>{{ status_counts.total }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-unassigned"></span>Unassigned: <strong>{{ status_counts.unassigned }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-active"></span>Active: <strong>{{ status_counts.active }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-suspended"></span>Suspended: <strong>{{ status_counts.suspended }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-lost"></span>Lost: <strong>{{ status_counts.lost }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-replaced"></span>Replaced: <strong>{{ status_counts.replaced }}</strong>
+  </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="ops-filter-bar">
+  <form method="get" class="ops-search-box">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search card ID, customer name, email..." class="form-control" style="font-size: 0.85rem;">
+    {% if status_filter != 'all' %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+    {% if material_filter != 'all' %}<input type="hidden" name="material" value="{{ material_filter }}">{% endif %}
+    <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+    {% if search_query or status_filter != 'all' or material_filter != 'all' %}
+      <a href="{% url 'operations:cards_list' %}" class="btn btn-ghost btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Status:</span>
+    <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?status=UNASSIGNED{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'UNASSIGNED' %}badge-silver{% endif %}" style="text-decoration:none;">Unassigned</a>
+    <a href="?status=ACTIVE{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'ACTIVE' %}badge-silver{% endif %}" style="text-decoration:none;">Active</a>
+    <a href="?status=SUSPENDED{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'SUSPENDED' %}badge-silver{% endif %}" style="text-decoration:none;">Suspended</a>
+    <a href="?status=LOST{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'LOST' %}badge-silver{% endif %}" style="text-decoration:none;">Lost</a>
+    <a href="?status=REPLACED{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'REPLACED' %}badge-silver{% endif %}" style="text-decoration:none;">Replaced</a>
+  </div>
+</div>
+
+<!-- Cards Table -->
+<div class="ops-table-container">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th scope="col">Card ID</th>
+        <th scope="col">Status</th>
+        <th scope="col">Material</th>
+        <th scope="col">Assigned Customer</th>
+        <th scope="col">Profile</th>
+        <th scope="col">NFC URL</th>
+        <th scope="col">Activated Date</th>
+        <th scope="col" style="text-align: right;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for card in cards %}
+      <tr>
+        <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-primary);">
+          {{ card.card_code }}
+        </td>
+        <td>
+          {% if card.status == 'ACTIVE' %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Active</span>
+          {% elif card.status == 'UNASSIGNED' %}
+            <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Unassigned</span>
+          {% elif card.status == 'RESERVED' %}
+            <span style="color: #3B82F6; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-reserved"></span>Reserved</span>
+          {% elif card.status == 'SUSPENDED' %}
+            <span style="color: #F59E0B; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-suspended"></span>Suspended</span>
+          {% elif card.status == 'LOST' %}
+            <span style="color: #EF4444; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-lost"></span>Lost</span>
+          {% elif card.status == 'REPLACED' %}
+            <span style="color: #6B7280; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-replaced"></span>Replaced</span>
+          {% else %}
+            <span class="badge badge-silver">{{ card.get_status_display }}</span>
+          {% endif %}
+        </td>
+        <td style="font-size: 0.8rem; color: var(--text-secondary);">{{ card.get_material_display }}</td>
+        <td>
+          {% if card.user %}
+            <a href="{% url 'operations:customer_detail' card.user.id %}" style="font-weight: 600; color: var(--text-primary); text-decoration: none;">
+              {{ card.user.display_name }}
+            </a>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">{{ card.user.email }}</div>
+          {% else %}
+            <span style="color: var(--text-muted); font-size: 0.8rem;">— In Stock —</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if card.profile %}
+            <a href="{% url 'profiles:public_profile' card.profile.slug %}" target="_blank" style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--silver-steel);">
+              /u/{{ card.profile.slug }}/ ↗
+            </a>
+          {% else %}
+            <span style="color: var(--text-muted);">—</span>
+          {% endif %}
+        </td>
+        <td style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+          {{ card.nfc_url_path }}
+        </td>
+        <td style="font-size: 0.78rem; color: var(--text-muted);">
+          {{ card.activated_at|date:"M d, Y"|default:"Not Activated" }}
+        </td>
+        <td style="text-align: right;">
+          <a href="{% url 'operations:card_detail' card.id %}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">Manage →</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          No cards found matching the criteria.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if cards.has_other_pages %}
+<div class="ops-pagination">
+  <div>
+    Page {{ cards.number }} of {{ cards.paginator.num_pages }}
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    {% if cards.has_previous %}
+      <a href="?page={{ cards.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}" class="btn btn-secondary btn-sm">← Previous</a>
+    {% endif %}
+    {% if cards.has_next %}
+      <a href="?page={{ cards.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}" class="btn btn-secondary btn-sm">Next →</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

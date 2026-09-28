@@ -1,0 +1,245 @@
+{% extends 'operations/base_operations.html' %}
+{% load static humanize %}
+
+{% block title %}Customer: {{ customer.display_name }} — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+      <h1 class="dashboard-title">{{ customer.display_name }}</h1>
+      {% if customer.is_active %}
+        <span class="badge" style="background: rgba(16,185,129,0.12); color: #10b981;">Active Account</span>
+      {% else %}
+        <span class="badge" style="background: rgba(239,68,68,0.12); color: #ef4444;">Suspended Account</span>
+      {% endif %}
+      {% if customer.is_staff %}<span class="ops-badge-staff">STAFF OPERATOR</span>{% endif %}
+    </div>
+    <p class="dashboard-subtitle">{{ customer.email }} · Customer ID #{{ customer.id }} · Joined {{ customer.date_joined|date:"M d, Y" }}</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; align-items: center;">
+    {% if customer.id != request.user.id %}
+      <form method="post" action="{% url 'operations:customer_toggle_status' customer.id %}" onsubmit="return confirm('Are you sure you want to change this customer account status?');">
+        {% csrf_token %}
+        {% if customer.is_active %}
+          <button type="submit" class="btn btn-secondary btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">Suspend Account</button>
+        {% else %}
+          <button type="submit" class="btn btn-primary btn-sm">Restore Account</button>
+        {% endif %}
+      </form>
+    {% endif %}
+    <a href="{% url 'operations:customers_list' %}" class="btn btn-ghost btn-sm">← Back to Directory</a>
+  </div>
+</div>
+
+<!-- =====================================================================
+     GRID: PROFILE & ANALYTICS
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+  
+  <!-- Profile Block -->
+  <div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Digital Profile</h2>
+      {% if profile %}
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" style="font-size: 0.8rem; color: var(--silver-steel);">Live View ↗</a>
+      {% endif %}
+    </div>
+    {% if profile %}
+      <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; overflow: hidden; background: var(--bg-surface); border: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.25rem;">
+          {% if profile.profile_image %}
+            <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+          {% else %}
+            {{ profile.full_name|make_list|first|upper }}
+          {% endif %}
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 1.05rem;">{{ profile.full_name }}</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">{{ profile.title|default:"No title specified" }}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">/u/{{ profile.slug }}/</div>
+        </div>
+      </div>
+      {% if profile.bio %}
+        <div style="font-size: 0.825rem; color: var(--text-secondary); line-height: 1.5; background: var(--bg-primary); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-primary);">
+          {{ profile.bio|truncatechars:180 }}
+        </div>
+      {% endif %}
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No profile created yet.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Analytics Summary Block -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Lifetime Analytics Overview</h2>
+    </div>
+    {% if analytics_summary %}
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center; padding-top: 0.5rem;">
+        <div style="background: var(--bg-primary); padding: 1rem 0.5rem; border-radius: var(--radius-xs); border: 1px solid var(--border-primary);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: #10B981;">{{ analytics_summary.taps|default:0 }}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">NFC Taps / Scans</div>
+        </div>
+        <div style="background: var(--bg-primary); padding: 1rem 0.5rem; border-radius: var(--radius-xs); border: 1px solid var(--border-primary);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">{{ analytics_summary.views|default:0 }}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Profile Views</div>
+        </div>
+        <div style="background: var(--bg-primary); padding: 1rem 0.5rem; border-radius: var(--radius-xs); border: 1px solid var(--border-primary);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: #a3e635;">{{ analytics_summary.clicks|default:0 }}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Contact Clicks</div>
+        </div>
+      </div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; text-align: right;">
+        Data sourced from real <code>AnalyticsEvent</code> records.
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No analytics recorded for this customer yet.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- =====================================================================
+     LINKED SMART CARDS
+     ===================================================================== -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Linked Smart Cards ({{ cards.count }})</h2>
+    {% if unassigned_cards %}
+      <form method="post" action="{% url 'operations:card_assign' unassigned_cards.first.id %}" style="display: flex; gap: 0.5rem; align-items: center;">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value="{{ customer.id }}">
+        <select name="card_to_assign" class="form-control" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: auto;" onchange="this.form.action='/operations/cards/' + this.value + '/assign/';">
+          <option value="">-- Quick Assign Unassigned Card --</option>
+          {% for ucard in unassigned_cards %}
+            <option value="{{ ucard.id }}">{{ ucard.card_code }} ({{ ucard.get_material_display }})</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">Assign Card</button>
+      </form>
+    {% endif %}
+  </div>
+  {% if cards %}
+    <div class="ops-table-container">
+      <table class="ops-table">
+        <thead>
+          <tr>
+            <th scope="col">Card ID</th>
+            <th scope="col">Status</th>
+            <th scope="col">Material</th>
+            <th scope="col">NFC URL</th>
+            <th scope="col">Activated Date</th>
+            <th scope="col" style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for card in cards %}
+          <tr>
+            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">{{ card.card_code }}</td>
+            <td>
+              {% if card.status == 'ACTIVE' %}
+                <span style="color: #10B981; font-weight: 600;"><span class="ops-status-dot ops-dot-active"></span>Active</span>
+              {% elif card.status == 'SUSPENDED' %}
+                <span style="color: #F59E0B; font-weight: 600;"><span class="ops-status-dot ops-dot-suspended"></span>Suspended</span>
+              {% elif card.status == 'LOST' %}
+                <span style="color: #EF4444; font-weight: 600;"><span class="ops-status-dot ops-dot-lost"></span>Reported Lost</span>
+              {% elif card.status == 'REPLACED' %}
+                <span style="color: #6B7280; font-weight: 600;"><span class="ops-status-dot ops-dot-replaced"></span>Replaced</span>
+              {% else %}
+                <span class="badge badge-silver">{{ card.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td>{{ card.get_material_display }}</td>
+            <td style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;">{{ card.nfc_url_path }}</td>
+            <td style="font-size: 0.78rem; color: var(--text-muted);">{{ card.activated_at|date:"M d, Y"|default:"Pending Activation" }}</td>
+            <td style="text-align: right;">
+              <a href="{% url 'operations:card_detail' card.id %}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Manage Card →</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+      No smart cards currently linked to this customer account.
+    </div>
+  {% endif %}
+</div>
+
+<!-- =====================================================================
+     WEBSITES & ORDERS GRID
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+
+  <!-- Websites -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Customer Websites ({{ websites.count }})</h2>
+    </div>
+    {% if websites %}
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for site in websites %}
+        <div style="padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 600;">{{ site.title }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">/site/{{ site.slug }}/</div>
+          </div>
+          <div style="text-align: right;">
+            {% if site.status == 'published' %}
+              <span class="badge" style="background: rgba(34,197,94,0.12); color: #22c55e; font-size: 0.7rem;">Published</span>
+            {% else %}
+              <span class="badge badge-silver" style="font-size: 0.7rem;">{{ site.get_status_display }}</span>
+            {% endif %}
+            <div style="margin-top: 0.25rem;">
+              <a href="{% url 'public_website' site.slug %}" target="_blank" style="font-size: 0.75rem; color: var(--silver-steel);">Visit ↗</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No websites created by this customer yet.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Orders -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Orders History ({{ orders.count }})</h2>
+    </div>
+    {% if orders %}
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for o in orders %}
+        <div style="padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 600; font-family: 'JetBrains Mono', monospace;">#{{ o.order_number }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ o.package.name }} · ₦{{ o.amount|intcomma }}</div>
+          </div>
+          <div style="text-align: right;">
+            {% if o.payment_status == 'paid' %}
+              <span class="badge" style="background: rgba(34,197,94,0.12); color: #22c55e; font-size: 0.7rem;">Paid</span>
+            {% else %}
+              <span class="badge badge-silver" style="font-size: 0.7rem;">{{ o.get_payment_status_display }}</span>
+            {% endif %}
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">{{ o.get_order_status_display }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        No orders placed yet.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
