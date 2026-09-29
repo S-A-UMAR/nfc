@@ -479,6 +479,7 @@ input[type="search"],
 select,
 textarea {
   width: 100%;
+  box-sizing: border-box;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-primary);
   color: var(--text-primary);
@@ -515,6 +516,14 @@ select {
   background-position: right 1rem center;
   padding-right: 2.5rem;
   cursor: pointer;
+}
+
+input[type="file"] {
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  box-sizing: border-box;
 }
 
 /* ── Responsive Refinements ──────────────────────────────────────────────── */

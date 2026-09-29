@@ -78,6 +78,8 @@
   border-radius: var(--radius-md);
   padding: 1.5rem;
   margin-bottom: 2rem;
+  min-width: 0;
+  max-width: 100%;
 }
 .chart-section__title {
   font-size: 0.875rem;
@@ -91,7 +93,11 @@
   gap: 3px;
   height: 120px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
   padding-bottom: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
 }
 .chart-bar-wrap {
   display: flex;
@@ -125,6 +131,22 @@
   transform: rotate(-45deg);
   transform-origin: top center;
   margin-top: 6px;
+}
+
+@media (max-width: 480px) {
+  .analytics-stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr));
+    gap: 0.65rem;
+  }
+  .chart-section {
+    padding: 1.25rem 0.85rem;
+  }
+  .analytics-stat-card {
+    padding: 1rem 0.75rem;
+  }
+  .analytics-stat-card__value {
+    font-size: 1.6rem;
+  }
 }
 
 /* ── Breakdown Tables ───────────────────────────────────────────────── */
@@ -349,7 +371,7 @@
     <h2 id="card-breakdown-title" style="font-size: 0.9rem; margin: 0; font-weight: 600;">Smart Card Breakdown</h2>
   </div>
   {% if card_breakdown %}
-  <div style="overflow-x: auto;">
+  <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
     <table class="breakdown-table">
       <thead>
         <tr>
@@ -385,7 +407,7 @@
   <div class="card-header">
     <h2 id="website-breakdown-title" style="font-size: 0.9rem; margin: 0; font-weight: 600;">Website Breakdown</h2>
   </div>
-  <div style="overflow-x: auto;">
+  <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
     <table class="breakdown-table">
       <thead>
         <tr>

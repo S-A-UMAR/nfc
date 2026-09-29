@@ -839,3 +839,16 @@
     gap: 1rem;
   }
 }
+
+/* ── Width Safety & Child Containment ────────────────────────────────────── */
+.card,
+.card-header,
+.dashboard-header,
+.profile-status-banner,
+.stat-card,
+.dash-card-mockup,
+.dash-empty-box {
+  min-width: 0;
+  max-width: 100%;
+}
+

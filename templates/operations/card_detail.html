@@ -241,7 +241,7 @@
     {% if card_events %}
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
         {% for evt in card_events %}
-        <div style="padding: 0.6rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 0.6rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.35rem;">
           <div>
             <span class="badge badge-silver" style="font-size: 0.68rem;">{{ evt.get_event_type_display }}</span>
             <span style="color: var(--text-muted); font-size: 0.72rem; margin-left: 0.35rem;">{{ evt.user_agent|truncatechars:45 }}</span>

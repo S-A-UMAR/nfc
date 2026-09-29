@@ -108,10 +108,10 @@
      LINKED SMART CARDS
      ===================================================================== -->
 <div class="card" style="margin-bottom: 1.5rem;">
-  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
     <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Linked Smart Cards ({{ cards.count }})</h2>
     {% if unassigned_cards %}
-      <form method="post" action="{% url 'operations:card_assign' unassigned_cards.first.id %}" style="display: flex; gap: 0.5rem; align-items: center;">
+      <form method="post" action="{% url 'operations:card_assign' unassigned_cards.first.id %}" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
         {% csrf_token %}
         <input type="hidden" name="user_id" value="{{ customer.id }}">
         <select name="card_to_assign" class="form-control" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: auto;" onchange="this.form.action='/operations/cards/' + this.value + '/assign/';">
@@ -185,7 +185,7 @@
     {% if websites %}
       <div style="display: flex; flex-direction: column; gap: 0.75rem;">
         {% for site in websites %}
-        <div style="padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
           <div>
             <div style="font-weight: 600;">{{ site.title }}</div>
             <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">/site/{{ site.slug }}/</div>
@@ -218,7 +218,7 @@
     {% if orders %}
       <div style="display: flex; flex-direction: column; gap: 0.75rem;">
         {% for o in orders %}
-        <div style="padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
           <div>
             <div style="font-weight: 600; font-family: 'JetBrains Mono', monospace;">#{{ o.order_number }}</div>
             <div style="font-size: 0.75rem; color: var(--text-muted);">{{ o.package.name }} · ₦{{ o.amount|intcomma }}</div>
