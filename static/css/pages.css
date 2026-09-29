@@ -1646,7 +1646,7 @@
     padding: var(--space-6) var(--space-4);
   }
   .hero-section {
-    padding: var(--space-10) 0 var(--space-16);
+    padding: calc(var(--navbar-height) + var(--space-8)) 0 var(--space-16);
     min-height: auto;
   }
   .hero-card-object {
