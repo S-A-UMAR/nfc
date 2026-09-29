@@ -4,6 +4,16 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load local environment variables from .env if present
+env_file = BASE_DIR / '.env'
+if env_file.is_file():
+    with open(env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, _, value = line.partition('=')
+                os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-nfc-smart-card-platform-luxury-graphite-2026')
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')

@@ -26,7 +26,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-primary); padding-top: 0.75rem; margin-top: 0.75rem;">
           <span style="font-family: var(--font-heading); font-weight: 600; color: var(--text-primary);">Total Amount:</span>
-          <span style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #FFFFFF;">₦{{ order.amount|floatformat:"0" }}</span>
+          <span style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #FFFFFF;">&#8358;{{ order.amount|floatformat:"0" }}</span>
         </div>
       </div>
 
@@ -43,6 +43,31 @@
           Simulate Successful Payment (Test Mode)
         </button>
       </form>
+      {% else %}
+      {# Live Paystack inline payment popup #}
+      <script src="https://js.paystack.co/v1/inline.js"></script>
+      <button id="paystack-btn" class="btn btn-primary btn-block btn-lg" style="margin-bottom: 0.75rem;">
+        Pay &#8358;{{ order.amount|floatformat:"0" }} with Paystack
+      </button>
+      <script>
+        document.getElementById('paystack-btn').addEventListener('click', function() {
+          var handler = PaystackPop.setup({
+            key: '{{ paystack_public_key }}',
+            email: '{{ user.email }}',
+            amount: {{ order.amount }} * 100,
+            currency: 'NGN',
+            ref: '{{ reference }}',
+            onClose: function() {
+              // User closed the popup without completing payment — no action
+            },
+            callback: function(response) {
+              // Redirect to server-side verification with the transaction reference
+              window.location.href = '{% url "payments:verify" %}?reference=' + response.reference;
+            }
+          });
+          handler.openIframe();
+        });
+      </script>
       {% endif %}
 
       <div style="text-align: center; margin-top: 1rem;">
