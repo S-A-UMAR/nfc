@@ -1214,13 +1214,19 @@
   }
 }
 
-@media (max-width: 860px) {
+/* ── DEF-08 fix: Align navbar collapse with sidebar collapse at 992px ─────── */
+/* Previously .nav-menu hid at 860px while .dashboard-sidebar hid at 992px,  */
+/* creating a hybrid zone (861px–992px) with full nav links but mobile pills. */
+@media (max-width: 992px) {
   .nav-menu, .nav-actions .nav-hide-mobile {
     display: none;
   }
   .nav-toggle {
     display: inline-flex;
   }
+}
+
+@media (max-width: 860px) {
   .navbar-wrapper {
     padding: 10px var(--space-3);
   }

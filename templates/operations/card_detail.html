@@ -35,7 +35,7 @@
 <!-- =====================================================================
      CARD SPECIFICATIONS & QR PREVIEW
      ===================================================================== -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
 
   <!-- Hardware Details Block -->
   <div class="card">
@@ -113,7 +113,7 @@
     <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Administrative Operations</h2>
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding-top: 0.5rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.25rem; padding-top: 0.5rem;">
 
     <!-- 1. Assignment / Allocation -->
     {% if card.status == 'UNASSIGNED' or not card.user %}
@@ -231,7 +231,7 @@
 <!-- =====================================================================
      CARD EVENT HISTORY & AUDIT TRAIL
      ===================================================================== -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.5rem;">
 
   <!-- Hardware NFC/QR Taps -->
   <div class="card">

@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+    <div class="grid-2" style="margin-bottom: 1.25rem;">
       <div class="form-group">
         <label for="start_number" class="form-label" style="font-weight: 600;">Starting Number *</label>
         <input type="number" name="start_number" id="start_number" value="{{ next_num|default:1 }}" min="1" required class="form-control">
@@ -51,7 +51,7 @@
       💡 Each generated card will automatically receive a unique QR code, an unassigned inventory status, and an 8-character cryptographic activation PIN hash.
     </div>
 
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
       <button type="submit" class="btn btn-primary" onclick="return confirm('Generate this batch of cards now?');">Generate Batch</button>
       <a href="{% url 'operations:cards_list' %}" class="btn btn-secondary">Cancel</a>
     </div>

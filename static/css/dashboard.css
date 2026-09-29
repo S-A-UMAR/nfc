@@ -275,20 +275,35 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.40);
   padding: 0.65rem 1rem;
-  overflow-x: auto;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  /* allow horizontal scroll while clipping the ::after fade overlay */
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .dashboard-mobile-nav::-webkit-scrollbar {
   display: none;
 }
 
+.dashboard-mobile-nav::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3.5rem;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(14, 15, 19, 0.92));
+  pointer-events: none;
+  z-index: 1;
+}
+
 .mobile-nav-inner {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding-right: 2.5rem; /* leave room so last pill isn't hidden by the fade */
 }
 
 .mobile-nav-pill {
@@ -751,5 +766,76 @@
     width: 100%;
     min-height: 44px;
     justify-content: center;
+  }
+}
+
+/* ── DEF-04: Dashboard Header Vertical Stacking (320px – 640px) ──────────── */
+/* The 992px block already stacks the header; this ensures Actions fill full  */
+/* width on narrow phones where they were wrapping haphazardly.               */
+@media (max-width: 640px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .dashboard-header > div:first-child {
+    flex: 1;
+  }
+  /* Buttons inside header d-flex wrappers go full-width */
+  .dashboard-header > .d-flex,
+  .dashboard-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+  .dashboard-header > .d-flex .btn,
+  .dashboard-header > .d-flex > a.btn,
+  .dashboard-header-actions .btn {
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+  }
+}
+
+/* ── DEF-09: Touch Target Expansion ─────────────────────────────────────── */
+/* Expand hit-areas for compact utility controls on touch screens via         */
+/* transparent ::after pseudo-element padding, keeping visual size unchanged. */
+@media (max-width: 992px) {
+  /* Pagination links */
+  .ops-pagination a,
+  .ops-pagination button {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Table action pills (btn-sm inside ops-table) */
+  .ops-table .btn-sm {
+    min-height: 36px;
+    padding: 0.35rem 0.75rem;
+    position: relative;
+  }
+  .ops-table .btn-sm::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+  /* Filter / status badge pills inside filter bars */
+  .ops-filter-bar .badge,
+  .ops-filter-bar a.badge {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+  }
+}
+
+/* ── DEF-10: Profile Edit Form – prevent uneven 2-column at 768px ────────── */
+@media (max-width: 768px) {
+  /* Force profile form grid-2 rows to single column at tablet portrait      */
+  .card .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
