@@ -1585,6 +1585,10 @@
 }
 
 @media (max-width: 992px) {
+  .hero-section {
+    min-height: auto;
+    padding: calc(var(--navbar-height) + var(--space-8)) 0 var(--space-12);
+  }
   .hero-layout {
     grid-template-columns: 1fr;
     gap: var(--space-8);
