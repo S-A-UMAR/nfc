@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from apps.profiles.models import Profile
@@ -112,6 +112,7 @@ class PlatformCoreTests(TestCase):
         self.assertIsNotNone(new_user.profile)
         self.assertEqual(new_user.profile.full_name, 'New Customer')
 
+    @override_settings(PAYSTACK_TEST_MODE=True)
     def test_order_creation_and_payment_simulation(self):
         self.client.force_login(self.user)
         checkout_data = {
