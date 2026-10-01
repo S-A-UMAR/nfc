@@ -105,7 +105,7 @@ class BrevoEmailService:
         sender = cls.get_sender()
 
         # Development / Testing fallback
-        if not api_key or api_key == 'test_brevo_api_key' or getattr(settings, 'EMAIL_BACKEND', '').endswith('console.EmailBackend'):
+        if not api_key or api_key == 'test_brevo_api_key' or getattr(settings, 'EMAIL_BACKEND', '').endswith(('console.EmailBackend', 'locmem.EmailBackend')):
             logger.info(
                 f"[SIMULATED EMAIL via Brevo] To: {to_email} | Subject: '{subject}' | Sender: {sender['email']}"
             )
@@ -357,3 +357,81 @@ class BrevoEmailService:
             cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/settings/"
         )
         return cls.send_transactional_email(user.email, f"Security Alert: {alert_type} — UZYRA", html, user.display_name)
+
+    # -------------------------------------------------------------------------
+    # 10. Business Inquiry — Customer Confirmation
+    # -------------------------------------------------------------------------
+    @classmethod
+    def send_business_inquiry_confirmation(cls, inquiry):
+        """Confirmation email sent to the customer after submitting a business inquiry."""
+        name = inquiry.full_name.split()[0] if inquiry.full_name else "there"
+        service_label = inquiry.get_service_type_display()
+        body = f"""
+        <p>Hello {name},</p>
+        <p>Thank you for reaching out to UZYRA. We've received your inquiry about <strong>{service_label}</strong> and will get back to you within <strong>24–48 hours</strong>.</p>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
+            <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">Your Inquiry Summary</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
+                <tr><td style="padding: 6px 0; color: #8E95A3; width: 40%;">Solution Requested</td><td style="padding: 6px 0;">{service_label}</td></tr>
+                {"<tr><td style='padding: 6px 0; color: #8E95A3;'>Company</td><td style='padding: 6px 0;'>" + inquiry.company_name + "</td></tr>" if inquiry.company_name else ""}
+                {"<tr><td style='padding: 6px 0; color: #8E95A3;'>Est. Card Quantity</td><td style='padding: 6px 0;'>" + inquiry.estimated_card_quantity + "</td></tr>" if inquiry.estimated_card_quantity else ""}
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Website Required</td><td style="padding: 6px 0;">{"Yes" if inquiry.needs_website else "No"}</td></tr>
+            </table>
+        </div>
+        <p>In the meantime, if you need to speak with us directly, you can reach us on WhatsApp.</p>
+        """
+        html = _render_email_template(
+            title="We've Received Your Inquiry",
+            subtitle="A member of the UZYRA team will contact you shortly.",
+            body_html=body,
+            cta_text="WhatsApp Us",
+            cta_url="https://wa.me/2348000000000?text=Hello+UZYRA%2C+I+submitted+a+business+inquiry."
+        )
+        return cls.send_transactional_email(
+            inquiry.email,
+            f"Your UZYRA Business Inquiry — {service_label}",
+            html,
+            inquiry.full_name,
+        )
+
+    # -------------------------------------------------------------------------
+    # 11. Business Inquiry — Internal Admin Alert
+    # -------------------------------------------------------------------------
+    @classmethod
+    def send_business_inquiry_admin_alert(cls, inquiry):
+        """Internal alert email sent to UZYRA staff when a new business inquiry arrives."""
+        service_label = inquiry.get_service_type_display()
+        admin_email = getattr(settings, 'BREVO_SENDER_EMAIL', 'contact@uzyra.com')
+        body = f"""
+        <p>A new business inquiry has been submitted on the UZYRA platform.</p>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
+            <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">Inquiry Details</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
+                <tr><td style="padding: 6px 0; color: #8E95A3; width: 40%;">Name</td><td style="padding: 6px 0;">{inquiry.full_name}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Company</td><td style="padding: 6px 0;">{inquiry.company_name or "—"}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Email</td><td style="padding: 6px 0;">{inquiry.email}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Phone</td><td style="padding: 6px 0;">{inquiry.phone or "—"}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Service</td><td style="padding: 6px 0;">{service_label}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Est. Cards</td><td style="padding: 6px 0;">{inquiry.estimated_card_quantity or "—"}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Needs Website</td><td style="padding: 6px 0;">{"Yes" if inquiry.needs_website else "No"}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">IP Address</td><td style="padding: 6px 0;">{inquiry.ip_address or "—"}</td></tr>
+            </table>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
+                <div style="font-size: 12px; color: #8E95A3; margin-bottom: 6px;">MESSAGE</div>
+                <div style="font-size: 13px; color: #D4D4D8; line-height: 1.6;">{inquiry.message}</div>
+            </div>
+        </div>
+        """
+        html = _render_email_template(
+            title="New Business Inquiry",
+            subtitle=f"{inquiry.full_name} — {service_label}",
+            body_html=body,
+            cta_text="View in Operations Portal",
+            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + f"/ops/inquiries/{inquiry.id}/"
+        )
+        return cls.send_transactional_email(
+            admin_email,
+            f"[UZYRA] New Business Inquiry — {service_label} from {inquiry.full_name}",
+            html,
+            "UZYRA Operations",
+        )

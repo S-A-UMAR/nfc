@@ -775,3 +775,102 @@ def operations_audit_logs_view(request):
         'action_choices': AdminAuditLog.ACTION_CHOICES,
         'total_count': paginator.count,
     })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BUSINESS INQUIRIES — Phase 14
+# ─────────────────────────────────────────────────────────────────────────────
+
+from .models import BusinessInquiry
+
+
+@staff_required
+def operations_inquiries_list_view(request):
+    """Paginated, searchable, filterable list of business inquiries."""
+    q = request.GET.get('q', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+    service_filter = request.GET.get('service', '').strip()
+
+    qs = BusinessInquiry.objects.select_related('assigned_staff').order_by('-created_at')
+
+    if q:
+        qs = qs.filter(
+            Q(full_name__icontains=q) |
+            Q(company_name__icontains=q) |
+            Q(email__icontains=q) |
+            Q(phone__icontains=q)
+        )
+    if status_filter:
+        qs = qs.filter(status=status_filter)
+    if service_filter:
+        qs = qs.filter(service_type=service_filter)
+
+    paginator = Paginator(qs, 25)
+    page = request.GET.get('page')
+    try:
+        inquiries = paginator.page(page)
+    except PageNotAnInteger:
+        inquiries = paginator.page(1)
+    except EmptyPage:
+        inquiries = paginator.page(paginator.num_pages)
+
+    # Status summary counts via a single aggregate query
+    counts_map = dict(BusinessInquiry.objects.values_list('status').annotate(c=Count('id')))
+    status_summary = [
+        {
+            'key': sc[0],
+            'label': sc[1],
+            'count': counts_map.get(sc[0], 0),
+        }
+        for sc in BusinessInquiry.STATUS_CHOICES
+    ]
+
+    return render(request, 'operations/inquiries_list.html', {
+        'inquiries': inquiries,
+        'search_query': q,
+        'status_filter': status_filter,
+        'service_filter': service_filter,
+        'status_choices': BusinessInquiry.STATUS_CHOICES,
+        'service_choices': BusinessInquiry.SERVICE_CHOICES,
+        'status_summary': status_summary,
+        'total_count': paginator.count,
+    })
+
+
+@staff_required
+def operations_inquiry_detail_view(request, inquiry_id):
+    """Detail view: shows all inquiry fields, pipeline status, and staff notes. Handles note/save POST."""
+    inquiry = get_object_or_404(BusinessInquiry, id=inquiry_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'save_notes':
+            inquiry.admin_notes = request.POST.get('admin_notes', '').strip()
+            inquiry.save(update_fields=['admin_notes', 'updated_at'])
+            messages.success(request, "Notes saved.")
+        return redirect('operations:inquiry_detail', inquiry_id=inquiry_id)
+
+    return render(request, 'operations/inquiry_detail.html', {
+        'inquiry': inquiry,
+        'status_choices': BusinessInquiry.STATUS_CHOICES,
+    })
+
+
+@staff_required
+@require_POST
+def operations_inquiry_update_status_view(request, inquiry_id):
+    """POST-only: changes pipeline status of a business inquiry."""
+    inquiry = get_object_or_404(BusinessInquiry, id=inquiry_id)
+    new_status = request.POST.get('status', '').strip()
+    valid_statuses = [s[0] for s in BusinessInquiry.STATUS_CHOICES]
+    if new_status in valid_statuses:
+        old_status = inquiry.get_status_display()
+        inquiry.status = new_status
+        inquiry.save(update_fields=['status', 'updated_at'])
+        messages.success(
+            request,
+            f"Status updated: {old_status} → {inquiry.get_status_display()}"
+        )
+    else:
+        messages.error(request, "Invalid status.")
+    return redirect('operations:inquiry_detail', inquiry_id=inquiry_id)

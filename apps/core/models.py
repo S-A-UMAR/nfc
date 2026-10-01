@@ -90,3 +90,112 @@ class AdminAuditLog(models.Model):
             details=details,
             ip_address=ip_address,
         )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Business Inquiry Model — Phase 14
+# ─────────────────────────────────────────────────────────────────────────────
+
+class BusinessInquiry(models.Model):
+    """
+    Lightweight inquiry record for businesses and organisations requesting
+    custom NFC / digital solutions from UZYRA.
+
+    Intentionally lean — no automatic provisioning, quotations or contracts.
+    Future: may be linked to a formal Business/Account entity once demand exists.
+    """
+
+    # ── Service Categories ──────────────────────────────────────────────────
+    SERVICE_COMPANY_TEAM  = 'company_team'
+    SERVICE_EVENT         = 'event'
+    SERVICE_EVENT_CENTER  = 'event_center'
+    SERVICE_SECURITY      = 'security'
+    SERVICE_CUSTOM_CARD   = 'custom_card'
+    SERVICE_CARD_WEBSITE  = 'card_website'
+    SERVICE_OTHER         = 'other'
+
+    SERVICE_CHOICES = (
+        (SERVICE_COMPANY_TEAM,  'Company & Team NFC Cards'),
+        (SERVICE_EVENT,         'Event NFC Solutions'),
+        (SERVICE_EVENT_CENTER,  'Event Center Solutions'),
+        (SERVICE_SECURITY,      'Security Personnel Cards'),
+        (SERVICE_CUSTOM_CARD,   'Custom Branded NFC Cards'),
+        (SERVICE_CARD_WEBSITE,  'NFC Card + Website'),
+        (SERVICE_OTHER,         'Other Custom Solution'),
+    )
+
+    # ── Pipeline Statuses ───────────────────────────────────────────────────
+    STATUS_NEW          = 'new'
+    STATUS_CONTACTED    = 'contacted'
+    STATUS_CONSULTATION = 'consultation'
+    STATUS_PROPOSAL     = 'proposal'
+    STATUS_WON          = 'won'
+    STATUS_CLOSED       = 'closed'
+
+    STATUS_CHOICES = (
+        (STATUS_NEW,          'New'),
+        (STATUS_CONTACTED,    'Contacted'),
+        (STATUS_CONSULTATION, 'In Consultation'),
+        (STATUS_PROPOSAL,     'Proposal Sent'),
+        (STATUS_WON,          'Won'),
+        (STATUS_CLOSED,       'Closed'),
+    )
+
+    # ── Inquiry Fields ──────────────────────────────────────────────────────
+    full_name               = models.CharField(max_length=150)
+    company_name            = models.CharField(max_length=200, blank=True)
+    email                   = models.EmailField()
+    phone                   = models.CharField(max_length=50, blank=True)
+    service_type            = models.CharField(max_length=30, choices=SERVICE_CHOICES, default=SERVICE_OTHER)
+    estimated_card_quantity = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="e.g. 50, 100–200, 500+"
+    )
+    needs_website           = models.BooleanField(default=False)
+    message                 = models.TextField()
+
+    # ── Pipeline / Staff Fields ─────────────────────────────────────────────
+    status         = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_NEW, db_index=True)
+    admin_notes    = models.TextField(blank=True, help_text="Internal staff notes — not visible to customer.")
+    assigned_staff = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'is_staff': True},
+        related_name='assigned_inquiries',
+    )
+
+    # ── Metadata ─────────────────────────────────────────────────────────────
+    ip_address  = models.GenericIPAddressField(null=True, blank=True)
+    created_at  = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at  = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering         = ['-created_at']
+        verbose_name     = 'Business Inquiry'
+        verbose_name_plural = 'Business Inquiries'
+        indexes = [
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['email']),
+        ]
+
+    def __str__(self):
+        company = f" ({self.company_name})" if self.company_name else ""
+        return f"[{self.get_status_display()}] {self.full_name}{company} — {self.get_service_type_display()}"
+
+    @property
+    def display_quantity(self):
+        return self.estimated_card_quantity or 'Not specified'
+
+    @property
+    def status_badge_class(self):
+        return {
+            self.STATUS_NEW:          'badge-info',
+            self.STATUS_CONTACTED:    'badge-warning',
+            self.STATUS_CONSULTATION: 'badge-warning',
+            self.STATUS_PROPOSAL:     'badge-silver',
+            self.STATUS_WON:          'badge-success',
+            self.STATUS_CLOSED:       'badge-danger',
+        }.get(self.status, 'badge-silver')

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ContactMessage, AdminAuditLog
+from .models import ContactMessage, AdminAuditLog, BusinessInquiry
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
@@ -7,6 +7,30 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_filter = ('is_resolved', 'created_at')
     search_fields = ('subject', 'full_name', 'email', 'message')
     list_editable = ('is_resolved',)
+
+
+@admin.register(BusinessInquiry)
+class BusinessInquiryAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'company_name', 'email', 'service_type', 'estimated_card_quantity', 'needs_website', 'status', 'created_at')
+    list_filter = ('status', 'service_type', 'needs_website', 'created_at')
+    search_fields = ('full_name', 'company_name', 'email', 'phone', 'message')
+    list_editable = ('status',)
+    readonly_fields = ('ip_address', 'created_at', 'updated_at')
+    fieldsets = (
+        ('Contact Details', {
+            'fields': ('full_name', 'company_name', 'email', 'phone'),
+        }),
+        ('Inquiry Details', {
+            'fields': ('service_type', 'estimated_card_quantity', 'needs_website', 'message'),
+        }),
+        ('Pipeline', {
+            'fields': ('status', 'admin_notes', 'assigned_staff'),
+        }),
+        ('Metadata', {
+            'fields': ('ip_address', 'created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
 
 
 @admin.register(AdminAuditLog)

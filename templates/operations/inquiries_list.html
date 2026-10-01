@@ -1,0 +1,136 @@
+{% extends 'operations/base_operations.html' %}
+
+{% block title %}Business Inquiries — Operations{% endblock %}
+
+{% block operations_content %}
+<div class="dashboard-header">
+  <div>
+    <h1 class="dashboard-title">Business &amp; Custom Solutions Inquiries</h1>
+    <p class="dashboard-subtitle">Review, track, and manage custom NFC consultation and B2B requests.</p>
+  </div>
+  <div style="font-size: 0.85rem; color: var(--text-muted);">
+    Total: <strong style="color: var(--text-primary);">{{ total_count }}</strong> inquir{{ total_count|pluralize:"y,ies" }}
+  </div>
+</div>
+
+<!-- Status Summary Cards -->
+<div class="ops-stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+  {% for item in status_summary %}
+  <a href="?status={{ item.key }}{% if search_query %}&q={{ search_query }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}" class="card" style="text-decoration: none; padding: 0.875rem 1rem; border-color: {% if status_filter == item.key %}var(--silver-steel){% else %}var(--border-primary){% endif %}; transition: border-color var(--transition-fast);">
+    <div style="font-size: 1.25rem; font-weight: 700; color: {% if item.count > 0 %}var(--text-primary){% else %}var(--text-muted){% endif %};">{{ item.count }}</div>
+    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">{{ item.label }}</div>
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Filters -->
+<div class="ops-filter-bar" style="margin-bottom: var(--space-6);">
+  <form method="get" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end;">
+    <div style="flex: 1; min-width: 220px;">
+      <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Search</label>
+      <input
+        type="text"
+        name="q"
+        value="{{ search_query }}"
+        class="form-control"
+        placeholder="Name, company, email, phone…"
+        style="font-size: 0.85rem; padding: 0.5rem 0.75rem;"
+      >
+    </div>
+    <div style="min-width: 180px;">
+      <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Status</label>
+      <select name="status" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+        <option value="">All Statuses</option>
+        {% for key, label in status_choices %}
+          <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="min-width: 200px;">
+      <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Service</label>
+      <select name="service" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+        <option value="">All Services</option>
+        {% for key, label in service_choices %}
+          <option value="{{ key }}" {% if service_filter == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.5rem 1rem;">Filter</button>
+    {% if search_query or status_filter or service_filter %}
+      <a href="{% url 'operations:inquiries_list' %}" class="btn btn-ghost btn-sm" style="padding: 0.5rem 1rem;">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Table -->
+<div class="ops-table-container">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Contact</th>
+        <th>Company</th>
+        <th>Service</th>
+        <th>Cards</th>
+        <th>Website</th>
+        <th>Status</th>
+        <th>Received</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inq in inquiries %}
+      <tr>
+        <td style="color: var(--text-muted); font-size: 0.8rem;">{{ inq.id }}</td>
+        <td>
+          <div style="font-weight: 600; font-size: 0.875rem;">{{ inq.full_name }}</div>
+          <div style="font-size: 0.775rem; color: var(--text-muted);">{{ inq.email }}</div>
+          {% if inq.phone %}<div style="font-size: 0.775rem; color: var(--text-muted);">{{ inq.phone }}</div>{% endif %}
+        </td>
+        <td style="font-size: 0.85rem; color: var(--text-secondary);">{{ inq.company_name|default:"—" }}</td>
+        <td style="font-size: 0.8rem;">{{ inq.get_service_type_display }}</td>
+        <td style="font-size: 0.8rem; color: var(--text-secondary);">{{ inq.display_quantity }}</td>
+        <td style="font-size: 0.8rem;">
+          {% if inq.needs_website %}
+            <span class="badge badge-info" style="font-size: 0.7rem;">Yes</span>
+          {% else %}
+            <span style="color: var(--text-muted);">No</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="badge {{ inq.status_badge_class }}" style="font-size: 0.7rem; white-space: nowrap;">{{ inq.get_status_display }}</span>
+        </td>
+        <td style="font-size: 0.775rem; color: var(--text-muted); white-space: nowrap;">{{ inq.created_at|date:"d M Y" }}</td>
+        <td>
+          <a href="{% url 'operations:inquiry_detail' inq.id %}" class="btn btn-ghost btn-sm" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">View</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="9" style="text-align: center; padding: var(--space-12); color: var(--text-muted);">
+          {% if search_query or status_filter or service_filter %}
+            No inquiries match your filters.
+          {% else %}
+            No business inquiries yet. They will appear here once someone submits the inquiry form.
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if inquiries.has_other_pages %}
+<div class="ops-pagination" style="margin-top: var(--space-6);">
+  {% if inquiries.has_previous %}
+    <a href="?page={{ inquiries.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}" class="btn btn-ghost btn-sm">← Previous</a>
+  {% endif %}
+  <span style="font-size: 0.85rem; color: var(--text-secondary);">Page {{ inquiries.number }} of {{ inquiries.paginator.num_pages }}</span>
+  {% if inquiries.has_next %}
+    <a href="?page={{ inquiries.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}" class="btn btn-ghost btn-sm">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

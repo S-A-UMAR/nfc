@@ -35,4 +35,9 @@ urlpatterns = [
 
     # Audit Logs
     path('audit-logs/', views.operations_audit_logs_view, name='audit_logs'),
+
+    # Business Inquiries
+    path('inquiries/', views.operations_inquiries_list_view, name='inquiries_list'),
+    path('inquiries/<int:inquiry_id>/', views.operations_inquiry_detail_view, name='inquiry_detail'),
+    path('inquiries/<int:inquiry_id>/update-status/', views.operations_inquiry_update_status_view, name='inquiry_update_status'),
 ]

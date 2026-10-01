@@ -6,6 +6,7 @@ from apps.cards.models import Card, CardEvent
 from apps.orders.models import ProductPackage, Order
 from apps.payments.models import Payment
 from apps.analytics.models import AnalyticsEvent
+from apps.core.models import BusinessInquiry
 
 User = get_user_model()
 
@@ -157,3 +158,189 @@ class PlatformCoreTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(AnalyticsEvent.objects.filter(profile=self.profile, event_type='whatsapp_click').exists())
+
+
+class BusinessInquiryTests(TestCase):
+    """
+    Phase 14 — Comprehensive test suite for Business & Custom Solutions inquiry system.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.staff_user = User.objects.create_user(
+            email='staff@uzyra.com',
+            password='StaffPassword123!',
+            first_name='Operations',
+            last_name='Admin',
+            is_staff=True
+        )
+        self.regular_user = User.objects.create_user(
+            email='customer@example.com',
+            password='CustomerPassword123!',
+            first_name='Regular',
+            last_name='Customer',
+            is_staff=False
+        )
+        self.inquiry = BusinessInquiry.objects.create(
+            full_name='Amina Yusuf',
+            company_name='Apex Security Ltd',
+            email='amina@apexsec.ng',
+            phone='+2348031234567',
+            service_type=BusinessInquiry.SERVICE_SECURITY,
+            estimated_card_quantity='50-100',
+            needs_website=True,
+            message='We need NFC cards for our patrol officers across Abuja.',
+            ip_address='127.0.0.1'
+        )
+
+    def test_business_page_renders_cleanly(self):
+        response = self.client.get(reverse('core:business'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Built for more')
+        self.assertContains(response, 'Company &amp; Teams')
+        self.assertContains(response, 'Talk to UZYRA')
+        self.assertContains(response, 'Prefer WhatsApp?')
+
+    def test_business_inquiry_submission_success(self):
+        post_data = {
+            'full_name': 'Chidi Okafor',
+            'company_name': 'Horizon Events',
+            'email': 'chidi@horizonevents.ng',
+            'phone': '+2348098765432',
+            'service_type': BusinessInquiry.SERVICE_EVENT,
+            'estimated_card_quantity': '200+',
+            'needs_website': 'on',
+            'message': 'We manage a tech conference and need NFC attendee badges.',
+            'website_url_hp': '',  # Empty honeypot
+        }
+        response = self.client.post(reverse('core:business'), post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        inquiry = BusinessInquiry.objects.filter(email='chidi@horizonevents.ng').first()
+        self.assertIsNotNone(inquiry)
+        self.assertEqual(inquiry.full_name, 'Chidi Okafor')
+        self.assertEqual(inquiry.company_name, 'Horizon Events')
+        self.assertEqual(inquiry.service_type, BusinessInquiry.SERVICE_EVENT)
+        self.assertTrue(inquiry.needs_website)
+        self.assertEqual(inquiry.status, BusinessInquiry.STATUS_NEW)
+
+    def test_business_inquiry_honeypot_trap(self):
+        """Bots that fill the honeypot should be trapped with fake success without creating a record."""
+        initial_count = BusinessInquiry.objects.count()
+        post_data = {
+            'full_name': 'Spam Bot',
+            'company_name': 'Spam Corp',
+            'email': 'bot@spammer.com',
+            'phone': '+1234567890',
+            'service_type': BusinessInquiry.SERVICE_OTHER,
+            'estimated_card_quantity': '10',
+            'message': 'Buy cheap crypto now!',
+            'website_url_hp': 'http://spam-site.com',  # Honeypot filled!
+        }
+        response = self.client.post(reverse('core:business'), post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(BusinessInquiry.objects.count(), initial_count)
+        self.assertFalse(BusinessInquiry.objects.filter(email='bot@spammer.com').exists())
+
+    def test_business_inquiry_rate_limiting(self):
+        """Should throttle when an IP makes more than 4 submissions in window."""
+        post_data = {
+            'full_name': 'Spammer Rate',
+            'email': 'rate@example.com',
+            'service_type': BusinessInquiry.SERVICE_OTHER,
+            'message': 'Test rate limit message.',
+        }
+        # First 4 allowed (including earlier in test or loop)
+        for i in range(4):
+            self.client.post(reverse('core:business'), post_data, REMOTE_ADDR='198.51.100.55')
+
+        # 5th submission should trigger rate limit message
+        response = self.client.post(reverse('core:business'), post_data, REMOTE_ADDR='198.51.100.55', follow=True)
+        self.assertContains(response, 'Too many submissions')
+
+    def test_model_methods_and_properties(self):
+        self.assertIn('Amina Yusuf', str(self.inquiry))
+        self.assertEqual(self.inquiry.display_quantity, '50-100')
+        self.assertEqual(self.inquiry.status_badge_class, 'badge-info')
+
+        blank_inquiry = BusinessInquiry(full_name='Test', email='t@t.com', estimated_card_quantity='')
+        self.assertEqual(blank_inquiry.display_quantity, 'Not specified')
+
+    def test_operations_inquiries_list_permissions(self):
+        url = reverse('operations:inquiries_list')
+
+        # Anonymous -> redirect to login
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        # Non-staff user -> 403 Forbidden
+        self.client.force_login(self.regular_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Staff user -> 200 OK
+        self.client.force_login(self.staff_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Amina Yusuf')
+        self.assertContains(response, 'Apex Security Ltd')
+
+    def test_operations_inquiries_search_and_filters(self):
+        self.client.force_login(self.staff_user)
+        url = reverse('operations:inquiries_list')
+
+        # Search by company
+        response = self.client.get(f"{url}?q=Apex")
+        self.assertContains(response, 'Amina Yusuf')
+
+        # Search non-matching
+        response = self.client.get(f"{url}?q=NonExistentCompany")
+        self.assertNotContains(response, 'Amina Yusuf')
+
+        # Status filter
+        response = self.client.get(f"{url}?status=new")
+        self.assertContains(response, 'Amina Yusuf')
+        response = self.client.get(f"{url}?status=closed")
+        self.assertNotContains(response, 'Amina Yusuf')
+
+    def test_operations_inquiry_detail_and_notes(self):
+        self.client.force_login(self.staff_user)
+        detail_url = reverse('operations:inquiry_detail', kwargs={'inquiry_id': self.inquiry.id})
+
+        response = self.client.get(detail_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Amina Yusuf')
+        self.assertContains(response, 'Apex Security Ltd')
+
+        # Save staff notes
+        post_data = {
+            'action': 'save_notes',
+            'admin_notes': 'Called customer. Scheduled demo for Friday 2pm.'
+        }
+        response = self.client.post(detail_url, post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.inquiry.refresh_from_db()
+        self.assertEqual(self.inquiry.admin_notes, 'Called customer. Scheduled demo for Friday 2pm.')
+
+    def test_operations_inquiry_update_status(self):
+        self.client.force_login(self.staff_user)
+        update_url = reverse('operations:inquiry_update_status', kwargs={'inquiry_id': self.inquiry.id})
+
+        # GET request not allowed (require_POST)
+        get_response = self.client.get(update_url)
+        self.assertEqual(get_response.status_code, 405)
+
+        # POST valid status update
+        response = self.client.post(update_url, {'status': BusinessInquiry.STATUS_CONSULTATION}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.inquiry.refresh_from_db()
+        self.assertEqual(self.inquiry.status, BusinessInquiry.STATUS_CONSULTATION)
+
+    def test_email_service_business_notifications(self):
+        from apps.core.services.email_service import BrevoEmailService
+        confirm_result = BrevoEmailService.send_business_inquiry_confirmation(self.inquiry)
+        self.assertTrue(confirm_result.get('success'))
+
+        alert_result = BrevoEmailService.send_business_inquiry_admin_alert(self.inquiry)
+        self.assertTrue(alert_result.get('success'))
+
