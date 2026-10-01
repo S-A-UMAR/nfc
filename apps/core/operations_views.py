@@ -790,6 +790,7 @@ def operations_inquiries_list_view(request):
     q = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '').strip()
     service_filter = request.GET.get('service', '').strip()
+    business_type_filter = request.GET.get('business_type', '').strip()
 
     qs = BusinessInquiry.objects.select_related('assigned_staff').order_by('-created_at')
 
@@ -804,6 +805,8 @@ def operations_inquiries_list_view(request):
         qs = qs.filter(status=status_filter)
     if service_filter:
         qs = qs.filter(service_type=service_filter)
+    if business_type_filter:
+        qs = qs.filter(business_type=business_type_filter)
 
     paginator = Paginator(qs, 25)
     page = request.GET.get('page')
@@ -830,8 +833,10 @@ def operations_inquiries_list_view(request):
         'search_query': q,
         'status_filter': status_filter,
         'service_filter': service_filter,
+        'business_type_filter': business_type_filter,
         'status_choices': BusinessInquiry.STATUS_CHOICES,
         'service_choices': BusinessInquiry.SERVICE_CHOICES,
+        'business_type_choices': BusinessInquiry.BUSINESS_TYPE_CHOICES,
         'status_summary': status_summary,
         'total_count': paginator.count,
     })

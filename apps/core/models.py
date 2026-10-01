@@ -124,6 +124,27 @@ class BusinessInquiry(models.Model):
         (SERVICE_OTHER,         'Other Custom Solution'),
     )
 
+    # ── Business Types ──────────────────────────────────────────────────────
+    TYPE_CORPORATE    = 'corporate'
+    TYPE_EVENT        = 'event'
+    TYPE_EVENT_CENTER = 'event_center'
+    TYPE_SECURITY     = 'security'
+    TYPE_ORGANIZATION = 'organization'
+    TYPE_AGENCY       = 'agency'
+    TYPE_RETAIL       = 'retail'
+    TYPE_OTHER        = 'other'
+
+    BUSINESS_TYPE_CHOICES = (
+        (TYPE_CORPORATE,    'Company / Business'),
+        (TYPE_EVENT,        'Event / Conference'),
+        (TYPE_EVENT_CENTER, 'Event Center / Venue'),
+        (TYPE_SECURITY,     'Security Firm'),
+        (TYPE_ORGANIZATION, 'Organization / NGO'),
+        (TYPE_AGENCY,       'Agency / Creative Studio'),
+        (TYPE_RETAIL,       'Retail / Hospitality'),
+        (TYPE_OTHER,        'Other'),
+    )
+
     # ── Pipeline Statuses ───────────────────────────────────────────────────
     STATUS_NEW          = 'new'
     STATUS_CONTACTED    = 'contacted'
@@ -146,6 +167,7 @@ class BusinessInquiry(models.Model):
     company_name            = models.CharField(max_length=200, blank=True)
     email                   = models.EmailField()
     phone                   = models.CharField(max_length=50, blank=True)
+    business_type           = models.CharField(max_length=30, choices=BUSINESS_TYPE_CHOICES, blank=True, default='')
     service_type            = models.CharField(max_length=30, choices=SERVICE_CHOICES, default=SERVICE_OTHER)
     estimated_card_quantity = models.CharField(
         max_length=50,

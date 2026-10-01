@@ -215,15 +215,26 @@
             </div>
           </div>
 
-          <!-- Service Type -->
-          <div class="form-group" style="margin-bottom: var(--space-4);">
-            <label for="{{ form.service_type.id_for_label }}" class="form-label">
-              Solution You Need <span style="color: var(--color-error);" aria-hidden="true">*</span>
-            </label>
-            {{ form.service_type }}
-            {% if form.service_type.errors %}
-              <div class="form-error" role="alert">{{ form.service_type.errors.0 }}</div>
-            {% endif %}
+          <!-- Business Type & Service Type -->
+          <div class="form-row-2col" style="margin-bottom: var(--space-4);">
+            <div class="form-group">
+              <label for="{{ form.business_type.id_for_label }}" class="form-label">
+                Business / Entity Type <span style="color: var(--text-muted); font-weight: 400;">(optional)</span>
+              </label>
+              {{ form.business_type }}
+              {% if form.business_type.errors %}
+                <div class="form-error" role="alert">{{ form.business_type.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.service_type.id_for_label }}" class="form-label">
+                Solution You Need <span style="color: var(--color-error);" aria-hidden="true">*</span>
+              </label>
+              {{ form.service_type }}
+              {% if form.service_type.errors %}
+                <div class="form-error" role="alert">{{ form.service_type.errors.0 }}</div>
+              {% endif %}
+            </div>
           </div>
 
           <!-- Quantity + Needs Website -->

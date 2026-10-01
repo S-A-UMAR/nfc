@@ -11,8 +11,8 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(BusinessInquiry)
 class BusinessInquiryAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'company_name', 'email', 'service_type', 'estimated_card_quantity', 'needs_website', 'status', 'created_at')
-    list_filter = ('status', 'service_type', 'needs_website', 'created_at')
+    list_display = ('full_name', 'company_name', 'email', 'business_type', 'service_type', 'estimated_card_quantity', 'needs_website', 'status', 'created_at')
+    list_filter = ('status', 'service_type', 'business_type', 'needs_website', 'created_at')
     search_fields = ('full_name', 'company_name', 'email', 'phone', 'message')
     list_editable = ('status',)
     readonly_fields = ('ip_address', 'created_at', 'updated_at')
@@ -21,7 +21,7 @@ class BusinessInquiryAdmin(admin.ModelAdmin):
             'fields': ('full_name', 'company_name', 'email', 'phone'),
         }),
         ('Inquiry Details', {
-            'fields': ('service_type', 'estimated_card_quantity', 'needs_website', 'message'),
+            'fields': ('business_type', 'service_type', 'estimated_card_quantity', 'needs_website', 'message'),
         }),
         ('Pipeline', {
             'fields': ('status', 'admin_notes', 'assigned_staff'),

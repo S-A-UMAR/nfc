@@ -37,7 +37,7 @@ class BusinessInquiryForm(forms.ModelForm):
         model = BusinessInquiry
         fields = [
             'full_name', 'company_name', 'email', 'phone',
-            'service_type', 'estimated_card_quantity', 'needs_website', 'message',
+            'business_type', 'service_type', 'estimated_card_quantity', 'needs_website', 'message',
         ]
         widgets = {
             'full_name': forms.TextInput(attrs={
@@ -60,6 +60,7 @@ class BusinessInquiryForm(forms.ModelForm):
                 'placeholder': '+234 800 000 0000',
                 'autocomplete': 'tel',
             }),
+            'business_type': forms.Select(attrs={'class': 'form-control'}),
             'service_type': forms.Select(attrs={'class': 'form-control'}),
             'estimated_card_quantity': forms.TextInput(attrs={
                 'class': 'form-control',

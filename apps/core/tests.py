@@ -186,6 +186,7 @@ class BusinessInquiryTests(TestCase):
             company_name='Apex Security Ltd',
             email='amina@apexsec.ng',
             phone='+2348031234567',
+            business_type=BusinessInquiry.TYPE_SECURITY,
             service_type=BusinessInquiry.SERVICE_SECURITY,
             estimated_card_quantity='50-100',
             needs_website=True,
@@ -207,6 +208,7 @@ class BusinessInquiryTests(TestCase):
             'company_name': 'Horizon Events',
             'email': 'chidi@horizonevents.ng',
             'phone': '+2348098765432',
+            'business_type': BusinessInquiry.TYPE_EVENT,
             'service_type': BusinessInquiry.SERVICE_EVENT,
             'estimated_card_quantity': '200+',
             'needs_website': 'on',
@@ -220,6 +222,7 @@ class BusinessInquiryTests(TestCase):
         self.assertIsNotNone(inquiry)
         self.assertEqual(inquiry.full_name, 'Chidi Okafor')
         self.assertEqual(inquiry.company_name, 'Horizon Events')
+        self.assertEqual(inquiry.business_type, BusinessInquiry.TYPE_EVENT)
         self.assertEqual(inquiry.service_type, BusinessInquiry.SERVICE_EVENT)
         self.assertTrue(inquiry.needs_website)
         self.assertEqual(inquiry.status, BusinessInquiry.STATUS_NEW)
@@ -301,6 +304,12 @@ class BusinessInquiryTests(TestCase):
         response = self.client.get(f"{url}?status=new")
         self.assertContains(response, 'Amina Yusuf')
         response = self.client.get(f"{url}?status=closed")
+        self.assertNotContains(response, 'Amina Yusuf')
+
+        # Business type filter
+        response = self.client.get(f"{url}?business_type=security")
+        self.assertContains(response, 'Amina Yusuf')
+        response = self.client.get(f"{url}?business_type=retail")
         self.assertNotContains(response, 'Amina Yusuf')
 
     def test_operations_inquiry_detail_and_notes(self):

@@ -85,6 +85,10 @@
     </div>
     <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.875rem;">
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-primary); padding-bottom: 0.5rem;">
+        <span style="color: var(--text-muted);">Business Type</span>
+        <span style="color: var(--text-secondary);">{{ inquiry.get_business_type_display|default:"—" }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-primary); padding-bottom: 0.5rem;">
         <span style="color: var(--text-muted);">Service Requested</span>
         <span style="font-weight: 600; color: var(--text-primary);">{{ inquiry.get_service_type_display }}</span>
       </div>

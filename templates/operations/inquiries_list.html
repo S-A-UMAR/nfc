@@ -46,7 +46,7 @@
         {% endfor %}
       </select>
     </div>
-    <div style="min-width: 200px;">
+    <div style="min-width: 180px;">
       <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Service</label>
       <select name="service" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
         <option value="">All Services</option>
@@ -55,8 +55,17 @@
         {% endfor %}
       </select>
     </div>
+    <div style="min-width: 170px;">
+      <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Business Type</label>
+      <select name="business_type" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+        <option value="">All Types</option>
+        {% for key, label in business_type_choices %}
+          <option value="{{ key }}" {% if business_type_filter == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.5rem 1rem;">Filter</button>
-    {% if search_query or status_filter or service_filter %}
+    {% if search_query or status_filter or service_filter or business_type_filter %}
       <a href="{% url 'operations:inquiries_list' %}" class="btn btn-ghost btn-sm" style="padding: 0.5rem 1rem;">Clear</a>
     {% endif %}
   </form>
@@ -70,6 +79,7 @@
         <th>#</th>
         <th>Contact</th>
         <th>Company</th>
+        <th>Type</th>
         <th>Service</th>
         <th>Cards</th>
         <th>Website</th>
@@ -88,6 +98,7 @@
           {% if inq.phone %}<div style="font-size: 0.775rem; color: var(--text-muted);">{{ inq.phone }}</div>{% endif %}
         </td>
         <td style="font-size: 0.85rem; color: var(--text-secondary);">{{ inq.company_name|default:"—" }}</td>
+        <td style="font-size: 0.8rem; color: var(--text-muted);">{{ inq.get_business_type_display|default:"—" }}</td>
         <td style="font-size: 0.8rem;">{{ inq.get_service_type_display }}</td>
         <td style="font-size: 0.8rem; color: var(--text-secondary);">{{ inq.display_quantity }}</td>
         <td style="font-size: 0.8rem;">
@@ -107,8 +118,8 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="9" style="text-align: center; padding: var(--space-12); color: var(--text-muted);">
-          {% if search_query or status_filter or service_filter %}
+        <td colspan="10" style="text-align: center; padding: var(--space-12); color: var(--text-muted);">
+          {% if search_query or status_filter or service_filter or business_type_filter %}
             No inquiries match your filters.
           {% else %}
             No business inquiries yet. They will appear here once someone submits the inquiry form.
@@ -124,11 +135,11 @@
 {% if inquiries.has_other_pages %}
 <div class="ops-pagination" style="margin-top: var(--space-6);">
   {% if inquiries.has_previous %}
-    <a href="?page={{ inquiries.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}" class="btn btn-ghost btn-sm">← Previous</a>
+    <a href="?page={{ inquiries.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}{% if business_type_filter %}&business_type={{ business_type_filter }}{% endif %}" class="btn btn-ghost btn-sm">← Previous</a>
   {% endif %}
   <span style="font-size: 0.85rem; color: var(--text-secondary);">Page {{ inquiries.number }} of {{ inquiries.paginator.num_pages }}</span>
   {% if inquiries.has_next %}
-    <a href="?page={{ inquiries.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}" class="btn btn-ghost btn-sm">Next →</a>
+    <a href="?page={{ inquiries.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if service_filter %}&service={{ service_filter }}{% endif %}{% if business_type_filter %}&business_type={{ business_type_filter }}{% endif %}" class="btn btn-ghost btn-sm">Next →</a>
   {% endif %}
 </div>
 {% endif %}
