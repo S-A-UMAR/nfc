@@ -3,6 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ProductPackage, Order, OrderRequirement
 from .forms import CheckoutForm, OrderRequirementForm
+from apps.core.services.email_service import BrevoEmailService
+import logging
+
+logger = logging.getLogger('uzyra.orders')
 
 @login_required
 def checkout_view(request, package_code):
@@ -20,6 +24,12 @@ def checkout_view(request, package_code):
             order.payment_status = Order.PAYMENT_PENDING
             order.order_status = Order.STATUS_RECEIVED
             order.save()
+
+            # Dispatch order confirmation email (failure must not break checkout)
+            try:
+                BrevoEmailService.send_order_confirmation_email(order)
+            except Exception as exc:
+                logger.error("Failed to send order confirmation email for #%s: %s", order.order_number, exc)
 
             messages.success(request, f"Order #{order.order_number} created successfully.")
             return redirect('payments:initialize', order_number=order.order_number)

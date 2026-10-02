@@ -32,6 +32,8 @@ urlpatterns = [
 
     # Orders
     path('orders/', views.operations_orders_list_view, name='orders_list'),
+    path('orders/<str:order_number>/', views.operations_order_detail_view, name='order_detail'),
+    path('orders/<str:order_number>/update-status/', views.operations_order_update_status_view, name='order_update_status'),
 
     # Audit Logs
     path('audit-logs/', views.operations_audit_logs_view, name='audit_logs'),

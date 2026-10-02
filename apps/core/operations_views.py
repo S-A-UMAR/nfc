@@ -739,6 +739,96 @@ def operations_orders_list_view(request):
     })
 
 
+
+@staff_required
+def operations_order_detail_view(request, order_number):
+    """Full order detail view for staff. Shows all customer, payment, fulfillment, and card info."""
+    order = get_object_or_404(
+        Order.objects.select_related('user', 'package', 'card_assigned'),
+        order_number=order_number,
+    )
+    requirement = getattr(order, 'requirement', None)
+    payments = order.payments.all().order_by('-created_at') if hasattr(order, 'payments') else []
+
+    # Card assignment options
+    unassigned_cards = Card.objects.filter(status=Card.STATUS_UNASSIGNED).order_by('card_code')[:100]
+
+    # Timeline index for display
+    timeline_keys = [step[0] for step in Order.TIMELINE_STEPS]
+    try:
+        current_step_idx = timeline_keys.index(order.order_status)
+    except ValueError:
+        current_step_idx = 0
+
+    return render(request, 'operations/order_detail.html', {
+        'order': order,
+        'requirement': requirement,
+        'payments': payments,
+        'unassigned_cards': unassigned_cards,
+        'timeline_steps': Order.TIMELINE_STEPS,
+        'current_step_idx': current_step_idx,
+        'order_status_choices': Order.ORDER_STATUS_CHOICES,
+        'payment_status_choices': Order.PAYMENT_STATUS_CHOICES,
+    })
+
+
+@staff_required
+@require_POST
+def operations_order_update_status_view(request, order_number):
+    """Update order_status or payment_status from the operations portal."""
+    order = get_object_or_404(Order, order_number=order_number)
+
+    new_order_status = request.POST.get('order_status', '').strip()
+    new_payment_status = request.POST.get('payment_status', '').strip()
+
+    valid_order_statuses = [c[0] for c in Order.ORDER_STATUS_CHOICES]
+    valid_payment_statuses = [c[0] for c in Order.PAYMENT_STATUS_CHOICES]
+
+    changed = []
+
+    if new_order_status and new_order_status != order.order_status:
+        if new_order_status not in valid_order_statuses:
+            messages.error(request, "Invalid order status.")
+            return redirect('operations:order_detail', order_number=order.order_number)
+        old_status = order.get_order_status_display()
+        order.order_status = new_order_status
+        changed.append(f"Order status: {old_status} → {order.get_order_status_display()}")
+
+    if new_payment_status and new_payment_status != order.payment_status:
+        if new_payment_status not in valid_payment_statuses:
+            messages.error(request, "Invalid payment status.")
+            return redirect('operations:order_detail', order_number=order.order_number)
+        old_pstatus = order.get_payment_status_display()
+        order.payment_status = new_payment_status
+        changed.append(f"Payment status: {old_pstatus} → {order.get_payment_status_display()}")
+
+    # Assign card
+    assign_card_id = request.POST.get('assign_card_id', '').strip()
+    if assign_card_id:
+        try:
+            card = Card.objects.select_for_update().get(id=assign_card_id, status=Card.STATUS_UNASSIGNED)
+            order.card_assigned = card
+            changed.append(f"Card assigned: {card.card_code}")
+        except Card.DoesNotExist:
+            messages.error(request, "Card not found or no longer unassigned.")
+            return redirect('operations:order_detail', order_number=order.order_number)
+
+    if changed:
+        with transaction.atomic():
+            order.save()
+            AdminAuditLog.log(
+                action=AdminAuditLog.ACTION_ORDER_STATUS,
+                staff_user=request.user,
+                target_repr=f"Order #{order.order_number}",
+                details="; ".join(changed),
+            )
+        messages.success(request, f"Order #{order.order_number} updated: {'; '.join(changed)}")
+    else:
+        messages.info(request, "No changes were made.")
+
+    return redirect('operations:order_detail', order_number=order.order_number)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. AUDIT LOGS
 # ─────────────────────────────────────────────────────────────────────────────

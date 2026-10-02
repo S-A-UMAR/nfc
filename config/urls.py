@@ -2,13 +2,26 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
 from apps.accounts import views as account_views
 from apps.cards import views as card_views
 from apps.profiles import views as profile_views
 from apps.websites import views as web_views
+from apps.core.sitemaps import StaticViewSitemap, ProfileSitemap, WebsiteSitemap
+from apps.core.views import robots_txt_view
+
+SITEMAPS = {
+    "static": StaticViewSitemap,
+    "profiles": ProfileSitemap,
+    "websites": WebsiteSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # SEO
+    path('robots.txt', robots_txt_view, name='robots_txt'),
+    path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='django.contrib.sitemaps.views.sitemap'),
 
     # Shortcuts for Authentication
     path('login/', account_views.login_view, name='login'),

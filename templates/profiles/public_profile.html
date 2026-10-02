@@ -4,18 +4,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}</title>
+  <title>{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %} | UZYRA</title>
   {% if not profile.is_search_indexed %}<meta name="robots" content="noindex, nofollow">{% endif %}
   <meta name="description" content="{{ profile.bio|default:profile.full_name|truncatechars:155 }}">
   <meta name="theme-color" content="#09090B">
-  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
   <!-- Open Graph / Meta for Social Sharing -->
+  <meta property="og:site_name" content="UZYRA">
+  <meta property="og:type" content="profile">
   <meta property="og:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
   <meta property="og:description" content="{{ profile.bio|default:'Connect with me on UZYRA Smart Digital Identity.'|truncatechars:155 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
   {% if profile.profile_image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+  {% else %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/uzyra-og-default.png' %}">
   {% endif %}
-  
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
+  <meta name="twitter:description" content="{{ profile.bio|default:'Connect with me on UZYRA.'|truncatechars:155 }}">
+  {% if profile.profile_image %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+  {% endif %}
+
+  <!-- Structured Data: Person -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "{{ profile.full_name|escapejs }}",
+    {% if profile.title %}"jobTitle": "{{ profile.title|escapejs }}",{% endif %}
+    {% if profile.business_name %}"worksFor": {"@type": "Organization", "name": "{{ profile.business_name|escapejs }}"},{% endif %}
+    {% if profile.email %}"email": "{{ profile.email|escapejs }}",{% endif %}
+    {% if profile.phone %}"telephone": "{{ profile.phone|escapejs }}",{% endif %}
+    {% if profile.location %}"address": "{{ profile.location|escapejs }}",{% endif %}
+    "url": "{{ request.build_absolute_uri }}"
+  }
+  </script>
+
   <!-- Typography: Sora (Headings), Inter (Body) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

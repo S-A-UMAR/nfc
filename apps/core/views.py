@@ -176,3 +176,37 @@ def business_view(request):
         'whatsapp_number': '+2348000000000',
         'whatsapp_message': 'Hello UZYRA, I would like to discuss a custom NFC solution for my business.',
     })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SEO
+# ─────────────────────────────────────────────────────────────────────────────
+from django.http import HttpResponse
+
+def robots_txt_view(request):
+    """
+    Serve robots.txt to guide search engine crawlers.
+    Private/internal areas are blocked; public profiles and websites are allowed.
+    """
+    lines = [
+        "User-agent: *",
+        "",
+        "# Private areas — do not index",
+        "Disallow: /dashboard/",
+        "Disallow: /operations/",
+        "Disallow: /admin/",
+        "Disallow: /accounts/",
+        "Disallow: /payments/",
+        "Disallow: /orders/",
+        "Disallow: /analytics/",
+        "Disallow: /site/preview/",
+        "",
+        "# Public areas — allowed",
+        "Allow: /u/",
+        "Allow: /site/",
+        "Allow: /c/",
+        "",
+        "# Sitemap",
+        f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")

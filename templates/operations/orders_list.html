@@ -53,7 +53,7 @@
       {% for o in orders %}
       <tr>
         <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-primary);">
-          #{{ o.order_number }}
+          <a href="{% url 'operations:order_detail' o.order_number %}" style="color: var(--silver-steel); text-decoration: none;">#{{ o.order_number }}</a>
         </td>
         <td>
           <a href="{% url 'operations:customer_detail' o.user.id %}" style="color: var(--text-primary); text-decoration: none; font-weight: 600;">
