@@ -60,8 +60,9 @@
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
   <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile_themes.css' %}">
 </head>
-<body class="profile-body">
+<body class="profile-body" data-theme="{{ profile.theme|default:'graphite' }}" data-layout="{{ profile.profile_layout|default:'classic' }}">
 
 <div class="profile-viewport">
   <main class="profile-card">

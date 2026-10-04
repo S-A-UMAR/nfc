@@ -1,0 +1,446 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}Profile Appearance — UZYRA{% endblock %}
+
+{% block dashboard_content %}
+<div class="appearance-page">
+
+  <!-- ── Page Header ──────────────────────────────────────────────────────── -->
+  <div class="dash-page-header">
+    <div>
+      <h1 class="dash-page-title">Profile Appearance</h1>
+      <p class="dash-page-subtitle">Choose your profile type, layout, and colour theme. Every change is live on your public profile.</p>
+    </div>
+    {% if profile.slug %}
+    <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Preview Live Profile
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="appearance-messages" style="margin-bottom:1.25rem;">
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}" style="margin-bottom:0.5rem;">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'dashboard:appearance' %}" id="appearance-form">
+    {% csrf_token %}
+    {{ form.profile_type }}
+    {{ form.theme }}
+    {{ form.profile_layout }}
+
+    <!-- ── STEP 1: Profile Type ──────────────────────────────────────────── -->
+    <section class="appearance-section glass">
+      <div class="appearance-section-header">
+        <div class="appearance-step-badge">1</div>
+        <div>
+          <h2 class="appearance-section-title">Profile Type</h2>
+          <p class="appearance-section-desc">Personal or Business — changes the available layouts and themes.</p>
+        </div>
+      </div>
+      <div class="appearance-type-grid">
+        <button type="button"
+          class="appearance-type-card {% if profile.profile_type == 'personal' %}active{% endif %}"
+          data-value="personal" data-field="profile_type">
+          <div class="appearance-type-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="appearance-type-label">Personal</div>
+          <div class="appearance-type-desc">Human · Modern · Social · Premium</div>
+          <div class="appearance-type-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </button>
+
+        <button type="button"
+          class="appearance-type-card {% if profile.profile_type == 'business' %}active{% endif %}"
+          data-value="business" data-field="profile_type">
+          <div class="appearance-type-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div class="appearance-type-label">Business</div>
+          <div class="appearance-type-desc">Professional · Structured · Brand-focused</div>
+          <div class="appearance-type-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── STEP 2: Layout ────────────────────────────────────────────────── -->
+    <section class="appearance-section glass">
+      <div class="appearance-section-header">
+        <div class="appearance-step-badge">2</div>
+        <div>
+          <h2 class="appearance-section-title">Profile Layout</h2>
+          <p class="appearance-section-desc">Controls how your content is arranged. Layouts are independent from your theme.</p>
+        </div>
+      </div>
+
+      <!-- Personal layouts (shown when type = personal) -->
+      <div class="appearance-layout-group" data-for-type="personal" {% if profile.profile_type == 'business' %}style="display:none"{% endif %}>
+        <div class="appearance-layout-grid">
+          {% for layout in personal_layouts %}
+          <button type="button"
+            class="appearance-layout-card {% if profile.profile_layout == layout.key and profile.profile_type == 'personal' %}active{% elif layout.key == 'classic' and profile.profile_layout == 'classic' %}active{% endif %}"
+            data-value="{{ layout.key }}" data-field="profile_layout" data-type="personal">
+            <div class="appearance-layout-icon">{{ layout.icon }}</div>
+            <div class="appearance-layout-label">{{ layout.label }}</div>
+            <div class="appearance-layout-desc">{{ layout.desc }}</div>
+            <div class="appearance-type-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Business layouts (shown when type = business) -->
+      <div class="appearance-layout-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
+        <div class="appearance-layout-grid">
+          {% for layout in business_layouts %}
+          <button type="button"
+            class="appearance-layout-card {% if profile.profile_layout == layout.key and profile.profile_type == 'business' %}active{% elif layout.key == 'executive_layout' and profile.profile_type == 'business' and profile.profile_layout not in 'executive_layout brand_header business_card business_catalog' %}active{% endif %}"
+            data-value="{{ layout.key }}" data-field="profile_layout" data-type="business">
+            <div class="appearance-layout-icon">{{ layout.icon }}</div>
+            <div class="appearance-layout-label">{{ layout.label }}</div>
+            <div class="appearance-layout-desc">{{ layout.desc }}</div>
+            <div class="appearance-type-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STEP 3: Colour Theme ──────────────────────────────────────────── -->
+    <section class="appearance-section glass">
+      <div class="appearance-section-header">
+        <div class="appearance-step-badge">3</div>
+        <div>
+          <h2 class="appearance-section-title">Colour Theme</h2>
+          <p class="appearance-section-desc">Curated premium colour systems. Works independently from your layout.</p>
+        </div>
+      </div>
+
+      <!-- Personal themes -->
+      <div class="appearance-themes-group" data-for-type="personal" {% if profile.profile_type == 'business' %}style="display:none"{% endif %}>
+        <div class="appearance-themes-grid">
+          {% for theme in personal_themes %}
+          <button type="button"
+            class="appearance-theme-card {% if profile.theme == theme.key %}active{% endif %}"
+            data-value="{{ theme.key }}" data-field="theme"
+            data-type="personal"
+            style="--theme-bg: {{ theme.bg }}; --theme-accent: {{ theme.accent }}; --theme-text: {{ theme.text }};">
+            <div class="appearance-theme-preview">
+              <div class="appearance-theme-swatch" style="background: {{ theme.bg }};"></div>
+              <div class="appearance-theme-accent-strip" style="background: {{ theme.accent }};"></div>
+            </div>
+            <div class="appearance-theme-info">
+              <div class="appearance-theme-name">{{ theme.label }}</div>
+              <div class="appearance-theme-desc">{{ theme.desc }}</div>
+            </div>
+            <div class="appearance-type-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Business themes -->
+      <div class="appearance-themes-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
+        <div class="appearance-themes-grid">
+          {% for theme in business_themes %}
+          <button type="button"
+            class="appearance-theme-card {% if profile.theme == theme.key %}active{% endif %}"
+            data-value="{{ theme.key }}" data-field="theme"
+            data-type="business"
+            style="--theme-bg: {{ theme.bg }}; --theme-accent: {{ theme.accent }}; --theme-text: {{ theme.text }};">
+            <div class="appearance-theme-preview">
+              <div class="appearance-theme-swatch" style="background: {{ theme.bg }};"></div>
+              <div class="appearance-theme-accent-strip" style="background: {{ theme.accent }};"></div>
+            </div>
+            <div class="appearance-theme-info">
+              <div class="appearance-theme-name">{{ theme.label }}</div>
+              <div class="appearance-theme-desc">{{ theme.desc }}</div>
+            </div>
+            <div class="appearance-type-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Save Bar ──────────────────────────────────────────────────────── -->
+    <div class="appearance-save-bar glass">
+      <div class="appearance-save-summary">
+        <span>Profile Type: <strong id="summary-type">{{ profile.get_profile_type_display }}</strong></span>
+        <span class="appearance-save-sep">·</span>
+        <span>Layout: <strong id="summary-layout">{{ profile.get_profile_layout_display }}</strong></span>
+        <span class="appearance-save-sep">·</span>
+        <span>Theme: <strong id="summary-theme">{{ profile.get_theme_display }}</strong></span>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Appearance
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<style>
+/* ── Appearance Page Layout ─────────────────────────────────────────────── */
+.appearance-page { max-width: 780px; padding-bottom: 6rem; }
+.dash-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.dash-page-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.25rem; }
+.dash-page-subtitle { color: var(--text-muted); font-size: 0.875rem; margin: 0; }
+
+.appearance-section {
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.appearance-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+.appearance-step-badge {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gradient-btn-primary);
+  color: #09090B;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.appearance-section-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.2rem; }
+.appearance-section-desc { color: var(--text-muted); font-size: 0.8125rem; margin: 0; }
+
+/* ── Profile Type Cards ─────────────────────────────────────────────────── */
+.appearance-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+.appearance-type-card {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-spring);
+  color: var(--text-primary);
+}
+.appearance-type-card:hover { border-color: var(--glass-border); background: var(--glass-bg-hover); }
+.appearance-type-card.active {
+  border-color: rgba(255,255,255,0.55);
+  background: var(--glass-bg-strong);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 8px 24px rgba(0,0,0,0.35);
+}
+.appearance-type-icon { color: var(--text-muted); margin-bottom: 0.75rem; }
+.appearance-type-card.active .appearance-type-icon { color: var(--silver-highlight); }
+.appearance-type-label { font-family: var(--font-heading); font-size: 0.975rem; font-weight: 600; margin-bottom: 0.25rem; }
+.appearance-type-desc { font-size: 0.775rem; color: var(--text-muted); line-height: 1.4; }
+.appearance-type-check {
+  position: absolute; top: 0.75rem; right: 0.75rem;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gradient-btn-primary);
+  color: #09090B;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity var(--transition-fast);
+}
+.appearance-type-card.active .appearance-type-check { opacity: 1; }
+
+/* ── Layout Cards ───────────────────────────────────────────────────────── */
+.appearance-layout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+.appearance-layout-card {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-spring);
+  color: var(--text-primary);
+}
+.appearance-layout-card:hover { border-color: var(--glass-border); }
+.appearance-layout-card.active {
+  border-color: rgba(255,255,255,0.50);
+  background: var(--glass-bg-strong);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
+}
+.appearance-layout-icon { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: -0.05em; }
+.appearance-layout-card.active .appearance-layout-icon { color: var(--silver-highlight); }
+.appearance-layout-label { font-family: var(--font-heading); font-size: 0.875rem; font-weight: 600; margin-bottom: 0.2rem; }
+.appearance-layout-desc { font-size: 0.725rem; color: var(--text-muted); line-height: 1.35; }
+
+/* ── Theme Cards ────────────────────────────────────────────────────────── */
+.appearance-themes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.75rem; }
+.appearance-theme-card {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-spring);
+  overflow: hidden;
+  color: var(--text-primary);
+}
+.appearance-theme-card:hover { border-color: var(--glass-border); transform: translateY(-2px); }
+.appearance-theme-card.active {
+  border-color: rgba(255,255,255,0.55);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 8px 24px rgba(0,0,0,0.45);
+  transform: translateY(-2px);
+}
+.appearance-theme-preview {
+  height: 52px;
+  position: relative;
+  overflow: hidden;
+}
+.appearance-theme-swatch {
+  position: absolute; inset: 0;
+}
+.appearance-theme-accent-strip {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+  opacity: 0.85;
+}
+.appearance-theme-info { padding: 0.625rem 0.75rem 0.75rem; }
+.appearance-theme-name { font-family: var(--font-heading); font-size: 0.825rem; font-weight: 600; margin-bottom: 0.2rem; }
+.appearance-theme-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.35; }
+
+/* ── Save Bar ───────────────────────────────────────────────────────────── */
+.appearance-save-bar {
+  position: fixed;
+  bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 740px;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  z-index: 120;
+  flex-wrap: wrap;
+}
+.appearance-save-summary { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8125rem; color: var(--text-muted); }
+.appearance-save-summary strong { color: var(--text-primary); }
+.appearance-save-sep { color: var(--border-primary); }
+
+/* Responsive */
+@media (max-width: 540px) {
+  .appearance-type-grid { grid-template-columns: 1fr; }
+  .appearance-layout-grid { grid-template-columns: repeat(2, 1fr); }
+  .appearance-themes-grid { grid-template-columns: repeat(2, 1fr); }
+  .appearance-save-bar { bottom: 0; left: 0; right: 0; width: 100%; transform: none; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .appearance-save-summary { font-size: 0.75rem; }
+}
+</style>
+
+<script>
+(function() {
+  // Human-readable labels for summary bar
+  const typeLabels   = { personal: 'Personal', business: 'Business' };
+  const layoutLabels = {
+    classic: 'Classic', centered: 'Centered', minimal_layout: 'Minimal',
+    social: 'Social', card: 'Card',
+    executive_layout: 'Executive', brand_header: 'Brand Header',
+    business_card: 'Business Card', business_catalog: 'Business Catalog'
+  };
+  const themeLabels  = {
+    graphite: 'UZYRA Default', midnight: 'Midnight', ocean: 'Ocean',
+    violet: 'Violet', emerald: 'Emerald', rose: 'Rose', arctic: 'Arctic',
+    sand: 'Sand', executive: 'Executive', navy: 'Navy',
+    emerald_business: 'Emerald Business', royal: 'Royal', burgundy: 'Burgundy',
+    luxury: 'Luxury', platinum: 'Platinum'
+  };
+
+  const form          = document.getElementById('appearance-form');
+  const typeInput     = form.querySelector('input[name="profile_type"]');
+  const layoutInput   = form.querySelector('input[name="profile_layout"]');
+  const themeInput    = form.querySelector('input[name="theme"]');
+  const summaryType   = document.getElementById('summary-type');
+  const summaryLayout = document.getElementById('summary-layout');
+  const summaryTheme  = document.getElementById('summary-theme');
+
+  function updateSummary() {
+    if (summaryType)   summaryType.textContent   = typeLabels[typeInput.value]     || typeInput.value;
+    if (summaryLayout) summaryLayout.textContent = layoutLabels[layoutInput.value] || layoutInput.value;
+    if (summaryTheme)  summaryTheme.textContent  = themeLabels[themeInput.value]   || themeInput.value;
+  }
+
+  function setActive(cards, value) {
+    cards.forEach(c => c.classList.toggle('active', c.dataset.value === value));
+  }
+
+  function switchType(type) {
+    typeInput.value = type;
+    // Show/hide layout & theme groups
+    document.querySelectorAll('.appearance-layout-group').forEach(g => {
+      g.style.display = g.dataset.forType === type ? '' : 'none';
+    });
+    document.querySelectorAll('.appearance-themes-group').forEach(g => {
+      g.style.display = g.dataset.forType === type ? '' : 'none';
+    });
+    // Auto-select first layout for the type
+    const firstLayout = type === 'personal' ? 'classic' : 'executive_layout';
+    layoutInput.value = firstLayout;
+    document.querySelectorAll('.appearance-layout-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.value === firstLayout && c.dataset.type === type);
+    });
+    // Auto-select graphite theme (UZYRA Default) for both types
+    themeInput.value = 'graphite';
+    document.querySelectorAll('.appearance-theme-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.value === 'graphite' && c.dataset.type === type);
+    });
+    updateSummary();
+  }
+
+  // Profile type buttons
+  document.querySelectorAll('.appearance-type-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.appearance-type-card').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      switchType(btn.dataset.value);
+    });
+  });
+
+  // Layout buttons
+  document.querySelectorAll('.appearance-layout-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = typeInput.value;
+      document.querySelectorAll(`.appearance-layout-card[data-type="${type}"]`).forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      layoutInput.value = btn.dataset.value;
+      updateSummary();
+    });
+  });
+
+  // Theme buttons
+  document.querySelectorAll('.appearance-theme-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = typeInput.value;
+      document.querySelectorAll(`.appearance-theme-card[data-type="${type}"]`).forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      themeInput.value = btn.dataset.value;
+      updateSummary();
+    });
+  });
+
+  updateSummary();
+})();
+</script>
+{% endblock %}

@@ -38,7 +38,7 @@ class Website(models.Model):
     slug = models.SlugField(max_length=150, unique=True, blank=True, null=True)
     domain = models.CharField(max_length=150, blank=True, help_text="e.g. www.ahmedphones.com or ahmed.ulva.io")
     live_url = models.URLField(blank=True, help_text="Full external live link")
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_DRAFT)
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
     
     # Section Toggles
     show_hero = models.BooleanField(default=True)
@@ -55,8 +55,46 @@ class Website(models.Model):
     secondary_color = models.CharField(max_length=20, default="#ffffff")
     button_style = models.CharField(max_length=20, choices=[('solid', 'Solid'), ('outline', 'Outline'), ('rounded', 'Rounded')], default='solid')
     
+    # Hero & Content Customization
+    headline = models.CharField(max_length=150, blank=True, default='', help_text="Hero main headline (defaults to business/profile name if blank)")
+    tagline = models.TextField(blank=True, default='', help_text="Hero description / subtitle (defaults to bio if blank)")
+    cta_button_text = models.CharField(max_length=50, blank=True, default='Chat on WhatsApp', help_text="Primary hero button label")
+    cta_button_url = models.CharField(max_length=255, blank=True, default='', help_text="Optional custom URL for primary hero button")
+    secondary_cta_text = models.CharField(max_length=50, blank=True, default='Contact Us', help_text="Secondary hero button label")
+    secondary_cta_url = models.CharField(max_length=255, blank=True, default='', help_text="Optional custom URL for secondary button")
+
+    # About Section
+    about_heading = models.CharField(max_length=100, blank=True, default='About Us')
+    about_text = models.TextField(blank=True, default='', help_text="Custom story / description for About section")
+
+    # Contact & Direct Ordering
+    contact_email = models.EmailField(blank=True, default='', help_text="Public inquiry email (defaults to profile email if blank)")
+    contact_phone = models.CharField(max_length=50, blank=True, default='', help_text="Public phone number (defaults to profile phone if blank)")
+    contact_whatsapp = models.CharField(max_length=50, blank=True, default='', help_text="WhatsApp orders / chat number with country code")
+    contact_address = models.TextField(blank=True, default='', help_text="Physical location or business address")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def clean_whatsapp(self):
+        """Sanitized numeric string for wa.me links."""
+        number = self.contact_whatsapp
+        if not number and hasattr(self.user, 'profile') and self.user.profile:
+            number = self.user.profile.whatsapp
+        if not number:
+            return ""
+        return "".join([c for c in number if c.isdigit()])
+
+    @property
+    def clean_phone(self):
+        """Sanitized string for tel: links."""
+        number = self.contact_phone
+        if not number and hasattr(self.user, 'profile') and self.user.profile:
+            number = self.user.profile.phone
+        if not number:
+            return ""
+        return "".join([c for c in number if c.isdigit() or c == '+'])
 
     class Meta:
         ordering = ['-created_at']

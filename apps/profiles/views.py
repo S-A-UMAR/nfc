@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from .models import Profile, SocialLink, CustomLink
-from .forms import ProfileForm, SocialLinkForm, CustomLinkForm
+from .forms import ProfileForm, SocialLinkForm, CustomLinkForm, ProfileAppearanceForm
 from apps.analytics.models import AnalyticsEvent
 
 def public_profile_view(request, slug):
@@ -231,3 +231,92 @@ def toggle_custom_link_view(request, link_id):
     status_str = "enabled" if link.is_active else "disabled"
     messages.info(request, f"Button '{link.title}' {status_str}.")
     return redirect('dashboard:links_manage')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROFILE APPEARANCE / CUSTOMIZATION (V2)
+# Dashboard route: /dashboard/appearance/
+# Controls: profile_type, theme, profile_layout — nothing else.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Theme metadata used by the appearance template to render visual cards.
+PERSONAL_THEMES = [
+    {'key': 'graphite',  'label': 'UZYRA Default', 'desc': 'Dark obsidian · Platinum silver · Glass',
+     'bg': '#09090B', 'accent': '#BFC5CF', 'text': '#F5F5F7'},
+    {'key': 'midnight',  'label': 'Midnight',      'desc': 'Deep dark · Cool blue accents',
+     'bg': '#0a0e1a', 'accent': '#3B82F6', 'text': '#E2E8F0'},
+    {'key': 'ocean',     'label': 'Ocean',          'desc': 'Deep blue · Cyan premium palette',
+     'bg': '#020d1a', 'accent': '#06B6D4', 'text': '#E0F7FA'},
+    {'key': 'violet',    'label': 'Violet',         'desc': 'Deep violet · Soft purple',
+     'bg': '#0d0a1a', 'accent': '#8B5CF6', 'text': '#EDE9FE'},
+    {'key': 'emerald',   'label': 'Emerald',        'desc': 'Deep green · Muted emerald',
+     'bg': '#071a0e', 'accent': '#10B981', 'text': '#D1FAE5'},
+    {'key': 'rose',      'label': 'Rose',           'desc': 'Dark neutral · Sophisticated rose',
+     'bg': '#13090d', 'accent': '#F43F5E', 'text': '#FFE4E6'},
+    {'key': 'arctic',    'label': 'Arctic',         'desc': 'Dark slate · Ice blue',
+     'bg': '#091318', 'accent': '#BAE6FD', 'text': '#F0F9FF'},
+    {'key': 'sand',      'label': 'Sand',           'desc': 'Warm dark · Warm amber gold',
+     'bg': '#14100a', 'accent': '#D97706', 'text': '#FEF3C7'},
+]
+
+BUSINESS_THEMES = [
+    {'key': 'executive', 'label': 'Executive',       'desc': 'Charcoal · Warm gold authority',
+     'bg': '#0f0f0f', 'accent': '#C9A84C', 'text': '#F5F0E8'},
+    {'key': 'navy',      'label': 'Navy',            'desc': 'Deep navy · Crisp white',
+     'bg': '#020918', 'accent': '#FFFFFF', 'text': '#F1F5F9'},
+    {'key': 'emerald_business', 'label': 'Emerald Business', 'desc': 'Corporate green · Light',
+     'bg': '#051a0d', 'accent': '#34D399', 'text': '#ECFDF5'},
+    {'key': 'royal',     'label': 'Royal',           'desc': 'Midnight navy · Royal gold',
+     'bg': '#05091f', 'accent': '#F59E0B', 'text': '#FFF8E1'},
+    {'key': 'burgundy',  'label': 'Burgundy',        'desc': 'Deep wine · Silver',
+     'bg': '#12040a', 'accent': '#D1D5DB', 'text': '#FDF2F8'},
+    {'key': 'luxury',    'label': 'Luxury',          'desc': 'Black marble · Rose gold',
+     'bg': '#090909', 'accent': '#E8B4B8', 'text': '#FFF5F5'},
+    {'key': 'platinum',  'label': 'Platinum',        'desc': 'Ultra dark · Platinum sheen',
+     'bg': '#0a0a0a', 'accent': '#E2E8F0', 'text': '#F8FAFC'},
+]
+
+PERSONAL_LAYOUTS = [
+    {'key': 'classic',       'label': 'Classic',       'desc': 'Current UZYRA default layout',          'icon': '◼◼'},
+    {'key': 'centered',      'label': 'Centered',      'desc': 'Centered symmetrical identity',          'icon': '◈◈'},
+    {'key': 'minimal_layout','label': 'Minimal',       'desc': 'Ultra-clean typographic focus',          'icon': '▬▬'},
+    {'key': 'social',        'label': 'Social',        'desc': 'Social-first with large link grid',      'icon': '⊞⊞'},
+    {'key': 'card',          'label': 'Card',          'desc': 'Compact card with contact strip',        'icon': '▣▣'},
+]
+
+BUSINESS_LAYOUTS = [
+    {'key': 'executive_layout',   'label': 'Executive',       'desc': 'Structured authority layout',           'icon': '▤▤'},
+    {'key': 'brand_header',       'label': 'Brand Header',    'desc': 'Logo-first brand statement',            'icon': '◧◧'},
+    {'key': 'business_card',      'label': 'Business Card',   'desc': 'Traditional card inspired',             'icon': '▥▥'},
+    {'key': 'business_catalog',   'label': 'Business Catalog','desc': 'Products & services prominence',        'icon': '▦▦'},
+]
+
+
+@login_required
+def profile_appearance_view(request):
+    """
+    Dashboard appearance customizer — /dashboard/appearance/
+    Saves: profile_type, theme, profile_layout ONLY.
+    Full IDOR protection: always uses request.user.profile.
+    """
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        form = ProfileAppearanceForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Appearance settings saved. Your public profile has been updated.")
+        else:
+            messages.error(request, "Could not save appearance. Please try again.")
+        return redirect('dashboard:appearance')
+
+    form = ProfileAppearanceForm(instance=profile)
+
+    return render(request, 'dashboard/appearance.html', {
+        'profile': profile,
+        'form': form,
+        'personal_themes': PERSONAL_THEMES,
+        'business_themes': BUSINESS_THEMES,
+        'personal_layouts': PERSONAL_LAYOUTS,
+        'business_layouts': BUSINESS_LAYOUTS,
+    })

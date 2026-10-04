@@ -35,14 +35,17 @@ def website_manage_view(request):
     else:
         form = WebsiteBuilderForm(instance=website)
 
-    services = website.services.all()
-    products = website.products.all()
+    services = website.services.all().order_by('display_order', 'id')
+    products = website.products.all().order_by('display_order', 'id')
     
     return render(request, 'dashboard/website_manage.html', {
         'website': website,
         'form': form,
         'services': services,
         'products': products,
+        'service_form': ServiceForm(),
+        'product_form': ProductForm(),
+        'profile': getattr(request.user, 'profile', None),
     })
 
 @login_required
@@ -53,7 +56,7 @@ def website_publish_toggle(request, website_id):
         messages.info(request, "Website has been unpublished and is now private.")
     else:
         website.status = Website.STATUS_PUBLISHED
-        messages.success(request, "Website is now live and published!")
+        messages.success(request, "Congratulations! Your website is now live.")
     website.save()
     return redirect('dashboard:website_manage')
 
@@ -68,7 +71,10 @@ def service_create_view(request, website_id):
             service = form.save(commit=False)
             service.website = website
             service.save()
-            messages.success(request, "Service added.")
+            messages.success(request, f"Service '{service.name}' added successfully.")
+        else:
+            errors = "; ".join([f"{f}: {err[0]}" for f, err in form.errors.items()])
+            messages.error(request, f"Could not add service: {errors}")
     return redirect('dashboard:website_manage')
 
 @login_required
@@ -78,15 +84,29 @@ def service_edit_view(request, service_id):
         form = ServiceForm(request.POST, request.FILES, instance=service)
         if form.is_valid():
             form.save()
-            messages.success(request, "Service updated.")
+            messages.success(request, f"Service '{service.name}' updated successfully.")
+        else:
+            errors = "; ".join([f"{f}: {err[0]}" for f, err in form.errors.items()])
+            messages.error(request, f"Could not update service: {errors}")
+    return redirect('dashboard:website_manage')
+
+@login_required
+@require_POST
+def service_toggle_active_view(request, service_id):
+    service = get_object_or_404(Service, id=service_id, website__user=request.user)
+    service.is_active = not service.is_active
+    service.save()
+    status_label = "visible" if service.is_active else "hidden"
+    messages.success(request, f"Service '{service.name}' is now {status_label} on your website.")
     return redirect('dashboard:website_manage')
 
 @login_required
 def service_delete_view(request, service_id):
     service = get_object_or_404(Service, id=service_id, website__user=request.user)
     if request.method == 'POST':
+        name = service.name
         service.delete()
-        messages.success(request, "Service deleted.")
+        messages.success(request, f"Service '{name}' was deleted.")
     return redirect('dashboard:website_manage')
 
 
@@ -100,7 +120,10 @@ def product_create_view(request, website_id):
             product = form.save(commit=False)
             product.website = website
             product.save()
-            messages.success(request, "Product added.")
+            messages.success(request, f"Product '{product.name}' added successfully.")
+        else:
+            errors = "; ".join([f"{f}: {err[0]}" for f, err in form.errors.items()])
+            messages.error(request, f"Could not add product: {errors}")
     return redirect('dashboard:website_manage')
 
 @login_required
@@ -110,15 +133,29 @@ def product_edit_view(request, product_id):
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
-            messages.success(request, "Product updated.")
+            messages.success(request, f"Product '{product.name}' updated successfully.")
+        else:
+            errors = "; ".join([f"{f}: {err[0]}" for f, err in form.errors.items()])
+            messages.error(request, f"Could not update product: {errors}")
+    return redirect('dashboard:website_manage')
+
+@login_required
+@require_POST
+def product_toggle_active_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id, website__user=request.user)
+    product.is_active = not product.is_active
+    product.save()
+    status_label = "visible" if product.is_active else "hidden"
+    messages.success(request, f"Product '{product.name}' is now {status_label} on your website.")
     return redirect('dashboard:website_manage')
 
 @login_required
 def product_delete_view(request, product_id):
     product = get_object_or_404(Product, id=product_id, website__user=request.user)
     if request.method == 'POST':
+        name = product.name
         product.delete()
-        messages.success(request, "Product deleted.")
+        messages.success(request, f"Product '{name}' was deleted.")
     return redirect('dashboard:website_manage')
 
 
@@ -139,6 +176,8 @@ def template_preview_view(request, template_code):
 
 from apps.analytics.models import AnalyticsEvent
 
+VALID_TEMPLATES = {'modern_business', 'luxury_atelier', 'creator_portfolio', 'retail_showcase'}
+
 def public_website_view(request, slug):
     """The live public website rendered for visitors."""
     website = get_object_or_404(Website, slug=slug, status=Website.STATUS_PUBLISHED)
@@ -153,11 +192,12 @@ def public_website_view(request, slug):
         referer=request.META.get('HTTP_REFERER', '')[:255]
     )
     
-    return render(request, f'websites/templates/{website.template_choice}.html', {
+    template_choice = website.template_choice if website.template_choice in VALID_TEMPLATES else 'modern_business'
+    return render(request, f'websites/templates/{template_choice}.html', {
         'website': website,
         'profile': profile,
-        'services': website.services.filter(is_active=True),
-        'products': website.products.filter(is_active=True),
+        'services': website.services.filter(is_active=True).order_by('display_order', 'id'),
+        'products': website.products.filter(is_active=True).order_by('display_order', 'id'),
         'social_links': profile.social_links.filter(is_active=True),
         'is_preview': False,
     })
@@ -168,11 +208,12 @@ def preview_website_view(request, slug):
     website = get_object_or_404(Website, slug=slug, user=request.user)
     profile = website.user.profile
     
-    return render(request, f'websites/templates/{website.template_choice}.html', {
+    template_choice = website.template_choice if website.template_choice in VALID_TEMPLATES else 'modern_business'
+    return render(request, f'websites/templates/{template_choice}.html', {
         'website': website,
         'profile': profile,
-        'services': website.services.filter(is_active=True),
-        'products': website.products.filter(is_active=True),
+        'services': website.services.filter(is_active=True).order_by('display_order', 'id'),
+        'products': website.products.filter(is_active=True).order_by('display_order', 'id'),
         'social_links': profile.social_links.filter(is_active=True),
         'is_preview': True,
     })

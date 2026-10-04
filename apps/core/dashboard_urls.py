@@ -28,10 +28,13 @@ urlpatterns = [
     path('website/<int:website_id>/publish/', web_views.website_publish_toggle, name='website_publish'),
     path('website/<int:website_id>/service/add/', web_views.service_create_view, name='service_add'),
     path('website/service/<int:service_id>/edit/', web_views.service_edit_view, name='service_edit'),
+    path('website/service/<int:service_id>/toggle/', web_views.service_toggle_active_view, name='service_toggle'),
     path('website/service/<int:service_id>/delete/', web_views.service_delete_view, name='service_delete'),
     path('website/<int:website_id>/product/add/', web_views.product_create_view, name='product_add'),
     path('website/product/<int:product_id>/edit/', web_views.product_edit_view, name='product_edit'),
+    path('website/product/<int:product_id>/toggle/', web_views.product_toggle_active_view, name='product_toggle'),
     path('website/product/<int:product_id>/delete/', web_views.product_delete_view, name='product_delete'),
     path('analytics/', ana_views.analytics_dashboard_view, name='analytics_view'),
+    path('appearance/', prof_views.profile_appearance_view, name='appearance'),
     path('settings/', acc_dash.settings_view, name='settings_view'),
 ]

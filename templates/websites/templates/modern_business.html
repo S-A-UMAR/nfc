@@ -14,7 +14,7 @@
   {% endif %}
 
   {# Meta Description #}
-  <meta name="description" content="{{ profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta name="description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
   <meta name="theme-color" content="{{ website.primary_color|default:'#000000' }}">
 
   {# Canonical URL (only for published websites) #}
@@ -26,7 +26,7 @@
   <meta property="og:site_name" content="{{ website.title }}">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ website.title }}{% if profile.business_name %} — {{ profile.business_name }}{% endif %}">
-  <meta property="og:description" content="{{ profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta property="og:description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   {% if profile.business_logo %}
   <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
@@ -37,7 +37,7 @@
   {# Twitter Card #}
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ website.title }}">
-  <meta name="twitter:description" content="{{ profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta name="twitter:description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
   {% if profile.business_logo %}
   <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
   {% elif profile.profile_image %}
@@ -50,28 +50,30 @@
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "{{ profile.business_name|default:website.title|escapejs }}",
-    {% if profile.business_description %}"description": "{{ profile.business_description|escapejs }}",{% endif %}
-    {% if profile.phone %}"telephone": "{{ profile.phone|escapejs }}",{% endif %}
-    {% if profile.email %}"email": "{{ profile.email|escapejs }}",{% endif %}
-    {% if profile.address %}"address": "{{ profile.address|escapejs }}",{% endif %}
+    "description": "{{ website.tagline|default:profile.business_description|escapejs }}",
+    {% if website.contact_phone or profile.phone %}"telephone": "{{ website.contact_phone|default:profile.phone|escapejs }}",{% endif %}
+    {% if website.contact_email or profile.email %}"email": "{{ website.contact_email|default:profile.email|escapejs }}",{% endif %}
+    {% if website.contact_address or profile.address %}"address": "{{ website.contact_address|default:profile.address|escapejs }}",{% endif %}
     "url": "{{ request.build_absolute_uri }}"
   }
   </script>
 
-  {# Custom Site Colours #}
+  {# Custom Site Colours & Modern Business Theme #}
   <style>
     :root {
-      --site-primary: {{ website.primary_color|default:'#000000' }};
+      --site-primary: {{ website.primary_color|default:'#0f172a' }};
       --site-secondary: {{ website.secondary_color|default:'#ffffff' }};
+      --site-accent: #2563eb;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: var(--site-secondary); color: #1a1a1a; line-height: 1.6; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--site-secondary); color: #1e293b; line-height: 1.6; }
     a { color: var(--site-primary); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    h1, h2, h3 { font-family: 'Sora', system-ui, sans-serif; line-height: 1.2; }
+    h1, h2, h3, h4 { font-family: 'Sora', system-ui, sans-serif; line-height: 1.25; color: #0f172a; }
     img { max-width: 100%; height: auto; display: block; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-    .container-narrow { max-width: 720px; margin: 0 auto; padding: 0 1.5rem; }
+    .container-narrow { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
     .text-center { text-align: center; }
     .d-flex { display: flex; }
     .justify-between { justify-content: space-between; }
@@ -80,37 +82,77 @@
     .site-btn-primary {
       background: var(--site-primary);
       color: var(--site-secondary);
-      border: none;
-      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% else %}border-radius: 8px;{% endif %}
-      {% if website.button_style == 'outline' %}background: transparent; border: 2px solid var(--site-primary); color: var(--site-primary);{% endif %}
-      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--site-primary);
+      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% elif website.button_style == 'outline' %}border-radius: 8px; background: transparent; color: var(--site-primary); border: 2px solid var(--site-primary);{% else %}border-radius: 8px;{% endif %}
+      padding: 0.75rem 1.6rem;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.2s;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
     }
-    .site-btn-primary:hover { opacity: 0.85; text-decoration: none; }
-    .site-header { padding: 1.25rem 0; border-bottom: 1px solid #e5e7eb; }
-    .site-header nav a { margin-left: 1.5rem; color: #6b7280; font-weight: 500; }
+    .site-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); text-decoration: none; }
+
+    .site-btn-secondary {
+      background: transparent;
+      color: var(--site-primary);
+      border: 1.5px solid #cbd5e1;
+      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% else %}border-radius: 8px;{% endif %}
+      padding: 0.75rem 1.6rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .site-btn-secondary:hover { border-color: var(--site-primary); text-decoration: none; }
+
+    .site-header { padding: 1.25rem 0; border-bottom: 1px solid #e2e8f0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+    .site-header nav a { margin-left: 1.75rem; color: #475569; font-weight: 500; font-size: 0.95rem; }
     .site-header nav a:hover { color: var(--site-primary); text-decoration: none; }
-    .site-hero { padding: 6rem 1rem; text-align: center; background: #f9fafb; }
-    .site-section { padding: 4rem 1rem; }
-    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-    .service-card, .product-card { border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 12px; background: #fff; }
-    .site-footer { padding: 3rem 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb; text-align: center; }
-    .lead { font-size: 1.2rem; color: #4b5563; }
+
+    .site-hero { padding: 6.5rem 1rem; text-align: center; background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); }
+    .site-hero h1 { font-size: clamp(2.2rem, 5.5vw, 3.8rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+    .lead { font-size: 1.2rem; color: #475569; line-height: 1.7; }
+
+    .site-section { padding: 5rem 1rem; }
+    .section-tag { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.35rem 0.85rem; border-radius: 9999px; background: #e2e8f0; color: #334155; margin-bottom: 0.75rem; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 2.5rem; }
+    
+    .card-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); }
+    .card-img { width: 100%; height: 210px; object-fit: cover; border-radius: 10px; margin-bottom: 1.25rem; }
+    .card-title { font-size: 1.25rem; margin-bottom: 0.5rem; font-weight: 700; }
+    .card-desc { color: #64748b; font-size: 0.95rem; margin-bottom: 1.25rem; flex-grow: 1; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 1rem; }
+    .card-price { font-weight: 800; font-size: 1.15rem; color: var(--site-primary); }
+
+    .site-footer { padding: 3.5rem 1rem; border-top: 1px solid #e2e8f0; background: #f8fafc; text-align: center; }
 
     @media (max-width: 640px) {
       .site-header nav { display: none; }
-      .site-hero { padding: 4rem 1rem; }
-      .site-section { padding: 3rem 1rem; }
+      .site-hero { padding: 4.5rem 1rem; }
+      .site-section { padding: 3.5rem 1rem; }
+      .grid-cards { grid-template-columns: 1fr; }
     }
   </style>
 
-  {# Google Fonts — loaded only for standalone customer websites #}
+  {# Google Fonts #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -118,20 +160,19 @@
 <body>
 
 {% if is_preview %}
-<div style="background: #dc2626; color: white; text-align: center; padding: 0.6rem; font-weight: bold; font-size: 0.85rem; position: sticky; top: 0; z-index: 9999; letter-spacing: 0.05em;">
-  ⚠ PREVIEW MODE — This page is not publicly visible
+<div style="background: #dc2626; color: white; text-align: center; padding: 0.65rem; font-weight: bold; font-size: 0.85rem; position: sticky; top: 0; z-index: 9999; letter-spacing: 0.05em;">
+  ⚠ PREVIEW MODE &mdash; This site is not visible to public visitors
 </div>
 {% endif %}
 
 <!-- Header -->
 <header class="site-header">
   <div class="container d-flex justify-between items-center">
-    <div style="font-size: 1.4rem; font-weight: 800; color: #111;">
+    <div style="font-size: 1.4rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.75rem;">
       {% if profile.business_logo %}
-        <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="max-height: 44px;">
-      {% else %}
-        {{ website.title }}
+        <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="max-height: 42px; border-radius: 6px;">
       {% endif %}
+      <span>{{ website.title }}</span>
     </div>
     <nav>
       {% if website.show_about %}<a href="#about">About</a>{% endif %}
@@ -142,53 +183,75 @@
   </div>
 </header>
 
-<!-- Hero -->
+<!-- Hero Section -->
 {% if website.show_hero %}
 <section class="site-hero">
   <div class="container-narrow">
-    <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1.5rem; font-weight: 800; color: #111;">
-      {{ profile.title|default:profile.business_name|default:website.title }}
-    </h1>
-    <p class="lead" style="margin-bottom: 2rem;">{{ profile.bio|default:profile.business_description }}</p>
+    <h1>{{ website.headline|default:profile.title|default:profile.business_name|default:website.title }}</h1>
+    <p class="lead" style="margin-bottom: 2.25rem;">{{ website.tagline|default:profile.bio|default:profile.business_description }}</p>
     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      {% if profile.whatsapp %}
-        <a href="https://wa.me/{{ profile.clean_whatsapp }}" class="site-btn-primary">Chat on WhatsApp</a>
+      {% if website.cta_button_url %}
+        <a href="{{ website.cta_button_url }}" class="site-btn-primary">{{ website.cta_button_text|default:'Learn More' }}</a>
+      {% elif website.clean_whatsapp %}
+        <a href="https://wa.me/{{ website.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20would%20like%20to%20connect." class="site-btn-primary" target="_blank">{{ website.cta_button_text|default:'Chat on WhatsApp' }}</a>
+      {% elif profile.clean_whatsapp %}
+        <a href="https://wa.me/{{ profile.clean_whatsapp }}" class="site-btn-primary" target="_blank">{{ website.cta_button_text|default:'Chat on WhatsApp' }}</a>
       {% endif %}
-      {% if website.show_contact and profile.email %}
-        <a href="#contact" class="site-btn-primary" style="background: transparent; border: 2px solid var(--site-primary); color: var(--site-primary);">Contact Us</a>
+
+      {% if website.show_contact %}
+        {% if website.secondary_cta_url %}
+          <a href="{{ website.secondary_cta_url }}" class="site-btn-secondary">{{ website.secondary_cta_text|default:'Contact Us' }}</a>
+        {% else %}
+          <a href="#contact" class="site-btn-secondary">{{ website.secondary_cta_text|default:'Contact Us' }}</a>
+        {% endif %}
       {% endif %}
     </div>
   </div>
 </section>
 {% endif %}
 
-<!-- About -->
-{% if website.show_about and profile.business_description %}
+<!-- About Section -->
+{% if website.show_about %}
+{% with about_body=website.about_text|default:profile.business_description|default:profile.bio %}
+{% if about_body %}
 <section id="about" class="site-section">
   <div class="container-narrow text-center">
-    <h2 style="font-size: 2rem; margin-bottom: 1.5rem; color: #111;">About Us</h2>
-    <p style="font-size: 1.1rem; line-height: 1.8; color: #4b5563;">{{ profile.business_description }}</p>
+    <span class="section-tag">About</span>
+    <h2 style="font-size: 2.2rem; margin-bottom: 1.5rem;">{{ website.about_heading|default:'About Us' }}</h2>
+    <p style="font-size: 1.15rem; line-height: 1.8; color: #475569;">{{ about_body }}</p>
   </div>
 </section>
 {% endif %}
+{% endwith %}
+{% endif %}
 
-<!-- Services -->
+<!-- Services Section -->
 {% if website.show_services and services %}
-<section id="services" class="site-section" style="background: #f9fafb;">
+<section id="services" class="site-section" style="background: #f8fafc;">
   <div class="container">
-    <h2 class="text-center" style="font-size: 2rem; margin-bottom: 0.75rem; color: #111;">Our Services</h2>
-    <p class="text-center" style="color: #6b7280; margin-bottom: 2.5rem;">What we offer to our clients</p>
+    <div class="text-center">
+      <span class="section-tag">Services</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;">What We Offer</h2>
+      <p style="color: #64748b;">Comprehensive solutions tailored to your requirements</p>
+    </div>
     <div class="grid-cards">
       {% for svc in services %}
-      <div class="service-card">
-        {% if svc.image %}
-          <img src="{{ svc.image.url }}" alt="{{ svc.name }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
-        {% endif %}
-        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: #111;">{{ svc.name }}</h3>
-        <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.95rem;">{{ svc.description }}</p>
-        {% if svc.price %}
-          <div style="font-weight: 700; color: var(--site-primary);">{{ svc.price }}</div>
-        {% endif %}
+      <div class="card-item">
+        <div>
+          {% if svc.image %}
+            <img src="{{ svc.image.url }}" alt="{{ svc.name }}" class="card-img">
+          {% endif %}
+          <h3 class="card-title">{{ svc.name }}</h3>
+          <p class="card-desc">{{ svc.description }}</p>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">{{ svc.price }}</div>
+          {% if website.clean_whatsapp or profile.clean_whatsapp %}
+            <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20am%20interested%20in%20your%20service:%20{{ svc.name|urlencode }}" class="site-btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;" target="_blank">Book / Inquire</a>
+          {% else %}
+            <a href="#contact" class="site-btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;">Inquire</a>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
@@ -196,23 +259,33 @@
 </section>
 {% endif %}
 
-<!-- Products -->
+<!-- Products Catalog Section -->
 {% if website.show_products and products %}
 <section id="products" class="site-section">
   <div class="container">
-    <h2 class="text-center" style="font-size: 2rem; margin-bottom: 0.75rem; color: #111;">Products</h2>
-    <p class="text-center" style="color: #6b7280; margin-bottom: 2.5rem;">Browse our product range</p>
+    <div class="text-center">
+      <span class="section-tag">Products</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Product Catalog</h2>
+      <p style="color: #64748b;">Explore our curated selection</p>
+    </div>
     <div class="grid-cards">
       {% for prod in products %}
-      <div class="product-card">
-        {% if prod.image %}
-          <img src="{{ prod.image.url }}" alt="{{ prod.name }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
-        {% endif %}
-        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: #111;">{{ prod.name }}</h3>
-        <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.95rem;">{{ prod.description }}</p>
-        {% if prod.price %}
-          <div style="font-weight: 700; color: var(--site-primary);">{{ prod.price }}</div>
-        {% endif %}
+      <div class="card-item">
+        <div>
+          {% if prod.image %}
+            <img src="{{ prod.image.url }}" alt="{{ prod.name }}" class="card-img">
+          {% endif %}
+          <h3 class="card-title">{{ prod.name }}</h3>
+          <p class="card-desc">{{ prod.description }}</p>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">{{ prod.price }}</div>
+          {% if website.clean_whatsapp or profile.clean_whatsapp %}
+            <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20would%20like%20to%20order:%20{{ prod.name|urlencode }}{% if prod.price %}%20({{ prod.price|urlencode }}){% endif %}" class="site-btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;" target="_blank">Order on WhatsApp</a>
+          {% else %}
+            <a href="#contact" class="site-btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;">Inquire</a>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
@@ -220,23 +293,31 @@
 </section>
 {% endif %}
 
-<!-- Contact -->
+<!-- Contact Section -->
 {% if website.show_contact %}
-<section id="contact" class="site-section" style="background: #f9fafb;">
+<section id="contact" class="site-section" style="background: #f8fafc;">
   <div class="container-narrow text-center">
-    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: #111;">Get in Touch</h2>
-    <p style="color: #6b7280; margin-bottom: 2rem;">We'd love to hear from you</p>
+    <span class="section-tag">Contact</span>
+    <h2 style="font-size: 2.2rem; margin-bottom: 1rem;">Get in Touch</h2>
+    <p style="color: #64748b; margin-bottom: 2.5rem;">Have questions or ready to work together? Connect with us directly.</p>
+    
     <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
-      {% if profile.whatsapp %}
-        <a href="https://wa.me/{{ profile.clean_whatsapp }}" class="site-btn-primary">WhatsApp</a>
+      {% if website.clean_whatsapp or profile.clean_whatsapp %}
+        <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}" class="site-btn-primary" target="_blank">💬 WhatsApp</a>
       {% endif %}
-      {% if profile.email %}
-        <a href="mailto:{{ profile.email }}" class="site-btn-primary" style="background: transparent; border: 2px solid var(--site-primary); color: var(--site-primary);">{{ profile.email }}</a>
+      {% if website.contact_email or profile.email %}
+        <a href="mailto:{{ website.contact_email|default:profile.email }}" class="site-btn-secondary">✉ {{ website.contact_email|default:profile.email }}</a>
       {% endif %}
-      {% if profile.phone %}
-        <a href="tel:{{ profile.phone }}" class="site-btn-primary" style="background: transparent; border: 2px solid var(--site-primary); color: var(--site-primary);">{{ profile.phone }}</a>
+      {% if website.clean_phone or profile.clean_phone %}
+        <a href="tel:{{ website.clean_phone|default:profile.clean_phone }}" class="site-btn-secondary">📞 {{ website.contact_phone|default:profile.phone }}</a>
       {% endif %}
     </div>
+
+    {% if website.contact_address or profile.address %}
+      <div style="margin-top: 2rem; color: #64748b; font-size: 0.95rem;">
+        📍 {{ website.contact_address|default:profile.address }}
+      </div>
+    {% endif %}
   </div>
 </section>
 {% endif %}
@@ -246,16 +327,15 @@
 <footer class="site-footer">
   <div class="container-narrow">
     {% if website.show_social and social_links %}
-      <div style="display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+      <div style="display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1.75rem; flex-wrap: wrap;">
         {% for link in social_links %}
-          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="color: #6b7280; font-weight: 500;">{{ link.get_platform_display }}</a>
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="color: #64748b; font-weight: 500;">{{ link.get_platform_display }}</a>
         {% endfor %}
       </div>
     {% endif %}
-    <div style="color: #9ca3af; font-size: 0.875rem;">
-      {% if profile.address %}<p>{{ profile.address }}</p>{% endif %}
+    <div style="color: #94a3b8; font-size: 0.875rem;">
       <p>&copy; {% now "Y" %} {{ website.title }}. All rights reserved.</p>
-      <p style="margin-top: 0.5rem; font-size: 0.8rem;">Powered by <a href="https://uzyra.com" style="color: #9ca3af;">UZYRA</a></p>
+      <p style="margin-top: 0.5rem; font-size: 0.8rem;">Powered by <a href="https://uzyra.com" style="color: #64748b; font-weight: 600;">UZYRA</a></p>
     </div>
   </div>
 </footer>

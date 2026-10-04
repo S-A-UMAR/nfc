@@ -17,7 +17,7 @@ class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
     reference = models.CharField(max_length=100, unique=True, db_index=True)
     amount = models.PositiveIntegerField(help_text="Amount in NGN")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
     provider = models.CharField(max_length=50, default='paystack')
     
     paystack_access_code = models.CharField(max_length=100, blank=True)

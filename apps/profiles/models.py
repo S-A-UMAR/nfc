@@ -9,10 +9,40 @@ class Profile(models.Model):
         ('business', 'Business Profile'),
     )
 
+    # ── Personal themes ──────────────────────────────────────────────────────
+    # ── Business themes ──────────────────────────────────────────────────────
     THEME_CHOICES = (
-        ('graphite', 'Graphite Luxury (Dark)'),
-        ('light', 'Clean Light'),
-        ('minimal', 'Monochrome Minimal'),
+        # Personal
+        ('graphite',  'UZYRA Default'),
+        ('midnight',  'Midnight'),
+        ('ocean',     'Ocean'),
+        ('violet',    'Violet'),
+        ('emerald',   'Emerald'),
+        ('rose',      'Rose'),
+        ('arctic',    'Arctic'),
+        ('sand',      'Sand'),
+        # Business
+        ('executive', 'Executive'),
+        ('navy',      'Navy'),
+        ('emerald_business', 'Emerald Business'),
+        ('royal',     'Royal'),
+        ('burgundy',  'Burgundy'),
+        ('luxury',    'Luxury'),
+        ('platinum',  'Platinum'),
+    )
+
+    LAYOUT_CHOICES = (
+        # Personal layouts
+        ('classic',     'Classic'),
+        ('centered',    'Centered'),
+        ('minimal_layout', 'Minimal'),
+        ('social',      'Social'),
+        ('card',        'Card'),
+        # Business layouts
+        ('executive_layout', 'Executive'),
+        ('brand_header', 'Brand Header'),
+        ('business_card', 'Business Card'),
+        ('business_catalog', 'Business Catalog'),
     )
 
     user = models.OneToOneField(
@@ -45,7 +75,8 @@ class Profile(models.Model):
     address = models.TextField(blank=True)
     
     # Design & Visibility
-    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default='graphite')
+    theme = models.CharField(max_length=25, choices=THEME_CHOICES, default='graphite')
+    profile_layout = models.CharField(max_length=25, choices=LAYOUT_CHOICES, default='classic')
     is_search_indexed = models.BooleanField(default=True, help_text="Allow search engines to index profile")
     
     created_at = models.DateTimeField(auto_now_add=True)

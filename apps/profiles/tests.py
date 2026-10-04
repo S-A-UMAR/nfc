@@ -44,6 +44,7 @@ class Phase3ProfileTests(TestCase):
             'email': 'usera@example.com',
             'profile_type': 'personal',
             'theme': 'graphite',
+            'profile_layout': 'classic',
             'is_search_indexed': 'on'
         }
         
@@ -70,6 +71,7 @@ class Phase3ProfileTests(TestCase):
             'email': 'usera@example.com',
             'profile_type': 'personal',
             'theme': 'graphite',
+            'profile_layout': 'classic',
             'is_search_indexed': 'on'
         }
         
@@ -99,6 +101,7 @@ class Phase3ProfileTests(TestCase):
             'email': 'usera@example.com',
             'profile_type': 'business',
             'theme': 'graphite',
+            'profile_layout': 'classic',
             'is_search_indexed': 'on'
         }
         self.client_a.post(self.profile_url, post_data, follow=True)
@@ -131,7 +134,8 @@ class Phase3ProfileTests(TestCase):
             'title': 'Hacker Title',
             'email': 'hacked@example.com',
             'profile_type': 'personal',
-            'theme': 'graphite'
+            'theme': 'graphite',
+            'profile_layout': 'classic',
         }
         self.client_a.post(self.profile_url, post_data)
         
@@ -371,3 +375,399 @@ class Phase5PublicProfileTests(TestCase):
         resp_b = self.client.get(url_b)
         self.assertContains(resp_b, 'Head of Hardware Engineering')
         self.assertNotContains(resp_b, 'VP of Digital Strategy')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROFILE CUSTOMIZATION V2 TESTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ProfileCustomizationV2Tests(TestCase):
+    """
+    Tests for the UZYRA Profile Customization V2 system.
+    Covers: model defaults, appearance save, IDOR, all themes render,
+    all layouts render, analytics still fires, type/layout/theme persistence.
+    """
+
+    def setUp(self):
+        self.client_a = Client()
+        self.client_b = Client()
+
+        self.user_a = User.objects.create_user(
+            email='appear_a@example.com',
+            password='Password123!',
+            first_name='Appear',
+            last_name='UserA'
+        )
+        self.user_b = User.objects.create_user(
+            email='appear_b@example.com',
+            password='Password123!',
+            first_name='Appear',
+            last_name='UserB'
+        )
+        self.profile_a = self.user_a.profile
+        self.profile_b = self.user_b.profile
+
+        self.appearance_url = reverse('dashboard:appearance')
+
+    # ── 1. Model defaults ───────────────────────────────────────────────────
+
+    def test_new_profile_defaults_to_graphite_classic_personal(self):
+        """New profiles should default to graphite theme, classic layout, personal type."""
+        self.assertEqual(self.profile_a.theme, 'graphite')
+        self.assertEqual(self.profile_a.profile_layout, 'classic')
+        self.assertEqual(self.profile_a.profile_type, 'personal')
+
+    # ── 2. Appearance dashboard access ──────────────────────────────────────
+
+    def test_appearance_page_requires_login(self):
+        """Unauthenticated users are redirected away from /dashboard/appearance/."""
+        response = self.client.get(self.appearance_url)
+        self.assertNotEqual(response.status_code, 200)
+        self.assertIn(response.status_code, [301, 302])
+
+    def test_appearance_page_loads_for_authenticated_user(self):
+        """Authenticated user can load the appearance page."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.appearance_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Profile Appearance')
+        self.assertContains(response, 'profile_type')
+        self.assertContains(response, 'profile_layout')
+        self.assertContains(response, 'theme')
+
+    def test_appearance_page_shows_all_personal_themes(self):
+        """All 8 personal theme keys appear in the appearance template."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.appearance_url)
+        for key in ['graphite', 'midnight', 'ocean', 'violet', 'emerald', 'rose', 'arctic', 'sand']:
+            self.assertContains(response, key, msg_prefix=f"Missing personal theme: {key}")
+
+    def test_appearance_page_shows_all_business_themes(self):
+        """All 7 business theme keys appear in the appearance template."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.appearance_url)
+        for key in ['executive', 'navy', 'emerald_business', 'royal', 'burgundy', 'luxury', 'platinum']:
+            self.assertContains(response, key, msg_prefix=f"Missing business theme: {key}")
+
+    def test_appearance_page_shows_all_personal_layouts(self):
+        """All 5 personal layout keys appear in the appearance template."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.appearance_url)
+        for key in ['classic', 'centered', 'minimal_layout', 'social', 'card']:
+            self.assertContains(response, key, msg_prefix=f"Missing personal layout: {key}")
+
+    def test_appearance_page_shows_all_business_layouts(self):
+        """All 4 business layout keys appear in the appearance template."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.appearance_url)
+        for key in ['executive_layout', 'brand_header', 'business_card', 'business_catalog']:
+            self.assertContains(response, key, msg_prefix=f"Missing business layout: {key}")
+
+    # ── 3. Appearance save (real DB persistence) ────────────────────────────
+
+    def test_save_personal_ocean_centered_persists_to_db(self):
+        """POST personal/ocean/centered → saves to database."""
+        self.client_a.force_login(self.user_a)
+        resp = self.client_a.post(self.appearance_url, {
+            'profile_type': 'personal',
+            'theme': 'ocean',
+            'profile_layout': 'centered',
+        }, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.profile_type, 'personal')
+        self.assertEqual(self.profile_a.theme, 'ocean')
+        self.assertEqual(self.profile_a.profile_layout, 'centered')
+
+    def test_save_business_executive_layout_navy_persists_to_db(self):
+        """POST business/navy/executive_layout → saves to database."""
+        self.client_a.force_login(self.user_a)
+        resp = self.client_a.post(self.appearance_url, {
+            'profile_type': 'business',
+            'theme': 'navy',
+            'profile_layout': 'executive_layout',
+        }, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.profile_type, 'business')
+        self.assertEqual(self.profile_a.theme, 'navy')
+        self.assertEqual(self.profile_a.profile_layout, 'executive_layout')
+
+    def test_appearance_saves_all_personal_themes(self):
+        """Every personal theme value is accepted and saved by the view."""
+        self.client_a.force_login(self.user_a)
+        for theme_key in ['graphite', 'midnight', 'ocean', 'violet', 'emerald', 'rose', 'arctic', 'sand']:
+            resp = self.client_a.post(self.appearance_url, {
+                'profile_type': 'personal',
+                'theme': theme_key,
+                'profile_layout': 'classic',
+            })
+            self.assertIn(resp.status_code, [200, 302], msg=f"Theme {theme_key} POST failed")
+            self.profile_a.refresh_from_db()
+            self.assertEqual(self.profile_a.theme, theme_key, msg=f"Theme {theme_key} not saved")
+
+    def test_appearance_saves_all_business_themes(self):
+        """Every business theme value is accepted and saved by the view."""
+        self.client_a.force_login(self.user_a)
+        for theme_key in ['executive', 'navy', 'emerald_business', 'royal', 'burgundy', 'luxury', 'platinum']:
+            resp = self.client_a.post(self.appearance_url, {
+                'profile_type': 'business',
+                'theme': theme_key,
+                'profile_layout': 'executive_layout',
+            })
+            self.assertIn(resp.status_code, [200, 302], msg=f"Theme {theme_key} POST failed")
+            self.profile_a.refresh_from_db()
+            self.assertEqual(self.profile_a.theme, theme_key, msg=f"Theme {theme_key} not saved")
+
+    def test_appearance_saves_all_personal_layouts(self):
+        """Every personal layout value is accepted and saved."""
+        self.client_a.force_login(self.user_a)
+        for layout in ['classic', 'centered', 'minimal_layout', 'social', 'card']:
+            resp = self.client_a.post(self.appearance_url, {
+                'profile_type': 'personal',
+                'theme': 'graphite',
+                'profile_layout': layout,
+            })
+            self.assertIn(resp.status_code, [200, 302], msg=f"Layout {layout} POST failed")
+            self.profile_a.refresh_from_db()
+            self.assertEqual(self.profile_a.profile_layout, layout, msg=f"Layout {layout} not saved")
+
+    def test_appearance_saves_all_business_layouts(self):
+        """Every business layout value is accepted and saved."""
+        self.client_a.force_login(self.user_a)
+        for layout in ['executive_layout', 'brand_header', 'business_card', 'business_catalog']:
+            resp = self.client_a.post(self.appearance_url, {
+                'profile_type': 'business',
+                'theme': 'executive',
+                'profile_layout': layout,
+            })
+            self.assertIn(resp.status_code, [200, 302], msg=f"Layout {layout} POST failed")
+            self.profile_a.refresh_from_db()
+            self.assertEqual(self.profile_a.profile_layout, layout, msg=f"Layout {layout} not saved")
+
+    # ── 4. IDOR security ─────────────────────────────────────────────────────
+
+    def test_idor_user_b_cannot_change_user_a_appearance(self):
+        """
+        User B POSTing to /dashboard/appearance/ must only affect User B's profile.
+        User A's profile must remain unchanged.
+        """
+        # Set user A's profile to a distinct state
+        self.profile_a.theme = 'violet'
+        self.profile_a.profile_layout = 'social'
+        self.profile_a.profile_type = 'personal'
+        self.profile_a.save()
+
+        # User B logs in and saves their own appearance
+        self.client_b.force_login(self.user_b)
+        self.client_b.post(self.appearance_url, {
+            'profile_type': 'business',
+            'theme': 'navy',
+            'profile_layout': 'executive_layout',
+        })
+
+        # User A's profile must be untouched
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.theme, 'violet')
+        self.assertEqual(self.profile_a.profile_layout, 'social')
+        self.assertEqual(self.profile_a.profile_type, 'personal')
+
+        # User B's profile must be updated
+        self.profile_b.refresh_from_db()
+        self.assertEqual(self.profile_b.theme, 'navy')
+        self.assertEqual(self.profile_b.profile_layout, 'executive_layout')
+        self.assertEqual(self.profile_b.profile_type, 'business')
+
+    def test_appearance_endpoint_ignores_other_profile_fields(self):
+        """
+        The appearance endpoint must NEVER save full_name, bio, phone or other
+        non-appearance fields — even if they are submitted in the POST body.
+        """
+        self.profile_a.full_name = 'Appear UserA'
+        self.profile_a.bio = 'Original bio.'
+        self.profile_a.save()
+
+        self.client_a.force_login(self.user_a)
+        self.client_a.post(self.appearance_url, {
+            'profile_type': 'personal',
+            'theme': 'emerald',
+            'profile_layout': 'centered',
+            # Attacker injects extra fields
+            'full_name': 'HACKED NAME',
+            'bio': 'Injected bio.',
+            'phone': '+9999999999',
+        })
+
+        self.profile_a.refresh_from_db()
+        # Appearance fields saved correctly
+        self.assertEqual(self.profile_a.theme, 'emerald')
+        # Non-appearance fields must NOT be modified
+        self.assertEqual(self.profile_a.full_name, 'Appear UserA')
+        self.assertEqual(self.profile_a.bio, 'Original bio.')
+        self.assertEqual(self.profile_a.phone, '')
+
+    # ── 5. Public profile renders theme + layout data-attributes ────────────
+
+    def test_public_profile_renders_theme_data_attribute(self):
+        """Public profile template must emit data-theme with the saved value."""
+        self.profile_a.theme = 'violet'
+        self.profile_a.save()
+        url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+        response = Client().get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-theme="violet"')
+
+    def test_public_profile_renders_layout_data_attribute(self):
+        """Public profile template must emit data-layout with the saved value."""
+        self.profile_a.profile_layout = 'centered'
+        self.profile_a.save()
+        url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+        response = Client().get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-layout="centered"')
+
+    def test_public_profile_default_graphite_classic(self):
+        """Default profile should render data-theme=graphite, data-layout=classic."""
+        url = reverse('profiles:public_profile', kwargs={'slug': self.profile_b.slug})
+        response = Client().get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-theme="graphite"')
+        self.assertContains(response, 'data-layout="classic"')
+
+    def test_all_personal_themes_render_on_public_profile(self):
+        """Every personal theme value produces a 200 on the public profile."""
+        for theme_key in ['graphite', 'midnight', 'ocean', 'violet', 'emerald', 'rose', 'arctic', 'sand']:
+            self.profile_a.theme = theme_key
+            self.profile_a.save()
+            url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+            response = Client().get(url)
+            self.assertEqual(response.status_code, 200, msg=f"Theme {theme_key} caused non-200")
+            self.assertContains(response, f'data-theme="{theme_key}"')
+
+    def test_all_business_themes_render_on_public_profile(self):
+        """Every business theme value produces a 200 on the public profile."""
+        for theme_key in ['executive', 'navy', 'emerald_business', 'royal', 'burgundy', 'luxury', 'platinum']:
+            self.profile_a.theme = theme_key
+            self.profile_a.save()
+            url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+            response = Client().get(url)
+            self.assertEqual(response.status_code, 200, msg=f"Business theme {theme_key} caused non-200")
+            self.assertContains(response, f'data-theme="{theme_key}"')
+
+    def test_all_personal_layouts_render_on_public_profile(self):
+        """Every personal layout value produces a 200 on the public profile."""
+        for layout in ['classic', 'centered', 'minimal_layout', 'social', 'card']:
+            self.profile_a.profile_layout = layout
+            self.profile_a.save()
+            url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+            response = Client().get(url)
+            self.assertEqual(response.status_code, 200, msg=f"Layout {layout} caused non-200")
+            self.assertContains(response, f'data-layout="{layout}"')
+
+    def test_all_business_layouts_render_on_public_profile(self):
+        """Every business layout value produces a 200 on the public profile."""
+        for layout in ['executive_layout', 'brand_header', 'business_card', 'business_catalog']:
+            self.profile_a.profile_layout = layout
+            self.profile_a.save()
+            url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+            response = Client().get(url)
+            self.assertEqual(response.status_code, 200, msg=f"Layout {layout} caused non-200")
+            self.assertContains(response, f'data-layout="{layout}"')
+
+    # ── 6. Analytics still fires on public profile ───────────────────────────
+
+    def test_analytics_event_created_on_public_profile_view_with_theme(self):
+        """
+        Loading a public profile with a non-default theme still creates an
+        analytics TYPE_PROFILE_VIEW event — theme system must not break analytics.
+        """
+        from apps.analytics.models import AnalyticsEvent
+        self.profile_a.theme = 'midnight'
+        self.profile_a.profile_layout = 'social'
+        self.profile_a.save()
+
+        initial_count = AnalyticsEvent.objects.filter(
+            profile=self.profile_a,
+            event_type=AnalyticsEvent.TYPE_PROFILE_VIEW
+        ).count()
+
+        url = reverse('profiles:public_profile', kwargs={'slug': self.profile_a.slug})
+        Client().get(url)
+
+        final_count = AnalyticsEvent.objects.filter(
+            profile=self.profile_a,
+            event_type=AnalyticsEvent.TYPE_PROFILE_VIEW
+        ).count()
+        self.assertEqual(final_count, initial_count + 1)
+
+    # ── 7. Persistence across logout/login ───────────────────────────────────
+
+    def test_appearance_persists_after_logout_login(self):
+        """Theme and layout survive user logout and re-login."""
+        self.client_a.force_login(self.user_a)
+        self.client_a.post(self.appearance_url, {
+            'profile_type': 'personal',
+            'theme': 'rose',
+            'profile_layout': 'minimal_layout',
+        })
+
+        # Log out
+        self.client_a.get(reverse('accounts:logout'))
+
+        # Re-login
+        self.client_a.post(reverse('accounts:login'), {
+            'username': 'appear_a@example.com',
+            'password': 'Password123!'
+        })
+
+        # Re-check from DB
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.theme, 'rose')
+        self.assertEqual(self.profile_a.profile_layout, 'minimal_layout')
+
+    # ── 8. Invalid theme/layout values are rejected ──────────────────────────
+
+    def test_invalid_theme_value_not_saved(self):
+        """An invalid theme value must not be saved (form validation rejects it)."""
+        self.client_a.force_login(self.user_a)
+        original_theme = self.profile_a.theme
+        self.client_a.post(self.appearance_url, {
+            'profile_type': 'personal',
+            'theme': 'hacker_injection_theme',
+            'profile_layout': 'classic',
+        })
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.theme, original_theme)
+
+    def test_invalid_layout_value_not_saved(self):
+        """An invalid layout value must not be saved (form validation rejects it)."""
+        self.client_a.force_login(self.user_a)
+        original_layout = self.profile_a.profile_layout
+        self.client_a.post(self.appearance_url, {
+            'profile_type': 'personal',
+            'theme': 'graphite',
+            'profile_layout': 'xss_injection_layout',
+        })
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.profile_layout, original_layout)
+
+    # ── 9. Website Builder Coming Soon ───────────────────────────────────────
+
+    def test_website_builder_shows_coming_soon_banner(self):
+        """Website Builder dashboard must display the Coming Soon notice."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(reverse('dashboard:website_manage'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Coming Soon')
+
+    # ── 10. Mobile responsive — appearance page loads without error ───────────
+
+    def test_appearance_page_contains_responsive_css_classes(self):
+        """Appearance page should contain key CSS classes for responsive grid."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.appearance_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'appearance-type-grid')
+        self.assertContains(response, 'appearance-layout-grid')
+        self.assertContains(response, 'appearance-themes-grid')
+        self.assertContains(response, 'appearance-save-bar')

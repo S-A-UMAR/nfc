@@ -1,0 +1,351 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+  {# Title #}
+  <title>{{ website.title }}{% if profile.business_name %} — {{ profile.business_name }}{% endif %}</title>
+
+  {# Noindex for preview / non-published states #}
+  {% if is_preview or website.status != 'published' %}
+  <meta name="robots" content="noindex, nofollow">
+  {% endif %}
+
+  {# Meta Description #}
+  <meta name="description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta name="theme-color" content="{{ website.primary_color|default:'#09090b' }}">
+
+  {# Canonical URL #}
+  {% if not is_preview and website.status == 'published' %}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  {% endif %}
+
+  {# Open Graph #}
+  <meta property="og:site_name" content="{{ website.title }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ website.title }}{% if profile.business_name %} — {{ profile.business_name }}{% endif %}">
+  <meta property="og:description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if profile.business_logo %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
+  {% elif profile.profile_image %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+  {% endif %}
+
+  {# Twitter Card #}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ website.title }}">
+  <meta name="twitter:description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+
+  {# LocalBusiness Structured Data #}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "{{ profile.business_name|default:website.title|escapejs }}",
+    "description": "{{ website.tagline|default:profile.business_description|escapejs }}",
+    {% if website.contact_phone or profile.phone %}"telephone": "{{ website.contact_phone|default:profile.phone|escapejs }}",{% endif %}
+    {% if website.contact_email or profile.email %}"email": "{{ website.contact_email|default:profile.email|escapejs }}",{% endif %}
+    {% if website.contact_address or profile.address %}"address": "{{ website.contact_address|default:profile.address|escapejs }}",{% endif %}
+    "url": "{{ request.build_absolute_uri }}"
+  }
+  </script>
+
+  {# Luxury Atelier Theme Styling #}
+  <style>
+    :root {
+      --site-primary: {{ website.primary_color|default:'#d4af37' }};
+      --site-secondary: {{ website.secondary_color|default:'#09090b' }};
+      --gold-accent: #d4af37;
+      --gold-dim: rgba(212, 175, 55, 0.15);
+      --gold-border: rgba(212, 175, 55, 0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Cinzel', 'Playfair Display', Georgia, serif; background: var(--site-secondary); color: #e2e8f0; line-height: 1.7; }
+    .body-font { font-family: 'Inter', system-ui, sans-serif; }
+    a { color: var(--site-primary); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: #fef08a; text-decoration: none; }
+    h1, h2, h3, h4 { font-family: 'Cinzel', 'Playfair Display', Georgia, serif; letter-spacing: 0.08em; text-transform: uppercase; color: #f8fafc; }
+    img { max-width: 100%; height: auto; display: block; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .container-narrow { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+    .text-center { text-align: center; }
+    .d-flex { display: flex; }
+    .justify-between { justify-content: space-between; }
+    .items-center { align-items: center; }
+
+    .atelier-btn-primary {
+      background: linear-gradient(135deg, var(--site-primary) 0%, #b8972e 100%);
+      color: #09090b;
+      border: 1px solid var(--site-primary);
+      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% elif website.button_style == 'outline' %}border-radius: 4px; background: transparent; color: var(--site-primary); border: 1.5px solid var(--site-primary);{% else %}border-radius: 4px;{% endif %}
+      padding: 0.85rem 2rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
+    .atelier-btn-primary:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35); }
+
+    .atelier-btn-secondary {
+      background: transparent;
+      color: #cbd5e1;
+      border: 1px solid var(--gold-border);
+      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% else %}border-radius: 4px;{% endif %}
+      padding: 0.85rem 2rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .atelier-btn-secondary:hover { border-color: var(--site-primary); color: #ffffff; background: var(--gold-dim); }
+
+    .site-header { padding: 1.75rem 0; border-bottom: 1px solid var(--gold-border); background: rgba(9, 9, 11, 0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .site-header nav a { margin-left: 2rem; color: #94a3b8; font-family: 'Inter', sans-serif; font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; }
+    .site-header nav a:hover { color: var(--site-primary); }
+
+    .site-hero { padding: 8rem 1rem 7rem; text-align: center; position: relative; background: radial-gradient(ellipse at 50% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+    .site-hero h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 500; letter-spacing: 0.08em; margin-bottom: 1.75rem; text-transform: uppercase; }
+    .lead { font-family: 'Inter', sans-serif; font-size: 1.15rem; color: #94a3b8; line-height: 1.8; font-weight: 300; }
+
+    .site-section { padding: 6rem 1rem; position: relative; }
+    .section-eyebrow { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; color: var(--site-primary); margin-bottom: 1rem; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin-top: 3.5rem; }
+    
+    .atelier-card {
+      border: 1px solid var(--gold-border);
+      border-radius: 6px;
+      background: rgba(18, 18, 22, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+    .atelier-card:hover { border-color: var(--site-primary); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+    .card-img { width: 100%; height: 230px; object-fit: cover; border-radius: 4px; margin-bottom: 1.5rem; filter: brightness(0.95); }
+    .card-title { font-size: 1.25rem; margin-bottom: 0.75rem; font-weight: 600; color: #ffffff; }
+    .card-desc { font-family: 'Inter', sans-serif; color: #94a3b8; font-size: 0.92rem; margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.6; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gold-border); padding-top: 1.25rem; }
+    .card-price { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--site-primary); letter-spacing: 0.05em; }
+
+    .site-footer { padding: 4rem 1rem; border-top: 1px solid var(--gold-border); background: #060608; text-align: center; font-family: 'Inter', sans-serif; }
+
+    @media (max-width: 640px) {
+      .site-header nav { display: none; }
+      .site-hero { padding: 5rem 1rem 4rem; }
+      .site-section { padding: 4rem 1rem; }
+      .grid-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  {# Google Fonts #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+{% if is_preview %}
+<div style="background: #991b1b; color: #fecaca; text-align: center; padding: 0.65rem; font-family: 'Inter', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; position: sticky; top: 0; z-index: 9999;">
+  ✦ PREVIEW CONCIERGE &mdash; Unsaved / Private Mode ✦
+</div>
+{% endif %}
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container d-flex justify-between items-center">
+    <div style="font-size: 1.35rem; font-weight: 700; color: #ffffff; letter-spacing: 0.12em; display: flex; align-items: center; gap: 0.85rem;">
+      {% if profile.business_logo %}
+        <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="max-height: 40px; border-radius: 4px;">
+      {% endif %}
+      <span>{{ website.title }}</span>
+    </div>
+    <nav>
+      {% if website.show_about %}<a href="#about">The Atelier</a>{% endif %}
+      {% if website.show_services and services %}<a href="#services">Services</a>{% endif %}
+      {% if website.show_products and products %}<a href="#products">Collection</a>{% endif %}
+      {% if website.show_contact %}<a href="#contact">Concierge</a>{% endif %}
+    </nav>
+  </div>
+</header>
+
+<!-- Hero Section -->
+{% if website.show_hero %}
+<section class="site-hero">
+  <div class="container-narrow">
+    <span class="section-eyebrow">Haute Craftsmanship &amp; Distinction</span>
+    <h1>{{ website.headline|default:profile.title|default:profile.business_name|default:website.title }}</h1>
+    <p class="lead" style="margin-bottom: 2.5rem;">{{ website.tagline|default:profile.bio|default:profile.business_description }}</p>
+    <div style="display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap;">
+      {% if website.cta_button_url %}
+        <a href="{{ website.cta_button_url }}" class="atelier-btn-primary">{{ website.cta_button_text|default:'Discover More' }}</a>
+      {% elif website.clean_whatsapp %}
+        <a href="https://wa.me/{{ website.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20wish%20to%20inquire%20about%20your%20bespoke%20services." class="atelier-btn-primary" target="_blank">{{ website.cta_button_text|default:'Private Consultation' }}</a>
+      {% elif profile.clean_whatsapp %}
+        <a href="https://wa.me/{{ profile.clean_whatsapp }}" class="atelier-btn-primary" target="_blank">{{ website.cta_button_text|default:'Private Consultation' }}</a>
+      {% endif %}
+
+      {% if website.show_contact %}
+        {% if website.secondary_cta_url %}
+          <a href="{{ website.secondary_cta_url }}" class="atelier-btn-secondary">{{ website.secondary_cta_text|default:'Inquire' }}</a>
+        {% else %}
+          <a href="#contact" class="atelier-btn-secondary">{{ website.secondary_cta_text|default:'Inquire' }}</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- About Section -->
+{% if website.show_about %}
+{% with about_body=website.about_text|default:profile.business_description|default:profile.bio %}
+{% if about_body %}
+<section id="about" class="site-section">
+  <div class="container-narrow text-center">
+    <span class="section-eyebrow">Heritage &amp; Philosophy</span>
+    <h2 style="font-size: 2.2rem; margin-bottom: 1.75rem;">{{ website.about_heading|default:'The Atelier' }}</h2>
+    <p class="body-font" style="font-size: 1.15rem; line-height: 1.9; color: #cbd5e1; font-weight: 300;">{{ about_body }}</p>
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+{% endif %}
+
+<!-- Services Section -->
+{% if website.show_services and services %}
+<section id="services" class="site-section" style="background: rgba(14, 14, 18, 0.85);">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-eyebrow">Bespoke Offerings</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.75rem;">Bespoke Services</h2>
+      <p class="body-font" style="color: #94a3b8; font-size: 0.95rem;">Curated individually to perfection</p>
+    </div>
+    <div class="grid-cards">
+      {% for svc in services %}
+      <div class="atelier-card">
+        <div>
+          {% if svc.image %}
+            <img src="{{ svc.image.url }}" alt="{{ svc.name }}" class="card-img">
+          {% endif %}
+          <h3 class="card-title">{{ svc.name }}</h3>
+          <p class="card-desc">{{ svc.description }}</p>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">{{ svc.price }}</div>
+          {% if website.clean_whatsapp or profile.clean_whatsapp %}
+            <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20am%20interested%20in%20arranging:%20{{ svc.name|urlencode }}" class="atelier-btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.75rem;" target="_blank">Book Service</a>
+          {% else %}
+            <a href="#contact" class="atelier-btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.75rem;">Inquire</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Products Catalog Section -->
+{% if website.show_products and products %}
+<section id="products" class="site-section">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-eyebrow">Exclusive Catalog</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.75rem;">The Curated Collection</h2>
+      <p class="body-font" style="color: #94a3b8; font-size: 0.95rem;">Limited and signature pieces</p>
+    </div>
+    <div class="grid-cards">
+      {% for prod in products %}
+      <div class="atelier-card">
+        <div>
+          {% if prod.image %}
+            <img src="{{ prod.image.url }}" alt="{{ prod.name }}" class="card-img">
+          {% endif %}
+          <h3 class="card-title">{{ prod.name }}</h3>
+          <p class="card-desc">{{ prod.description }}</p>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">{{ prod.price }}</div>
+          {% if website.clean_whatsapp or profile.clean_whatsapp %}
+            <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20would%20like%20to%20order%20the%20piece:%20{{ prod.name|urlencode }}{% if prod.price %}%20({{ prod.price|urlencode }}){% endif %}" class="atelier-btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.75rem;" target="_blank">Order on WhatsApp</a>
+          {% else %}
+            <a href="#contact" class="atelier-btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.75rem;">Inquire</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Contact Section -->
+{% if website.show_contact %}
+<section id="contact" class="site-section" style="background: rgba(14, 14, 18, 0.85);">
+  <div class="container-narrow text-center">
+    <span class="section-eyebrow">Private Concierge</span>
+    <h2 style="font-size: 2.2rem; margin-bottom: 1rem;">Direct Inquiries</h2>
+    <p class="body-font" style="color: #94a3b8; margin-bottom: 2.75rem;">Connect with our atelier for tailored commissions and private appointments.</p>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center;">
+      {% if website.clean_whatsapp or profile.clean_whatsapp %}
+        <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}" class="atelier-btn-primary" target="_blank">💬 WhatsApp Concierge</a>
+      {% endif %}
+      {% if website.contact_email or profile.email %}
+        <a href="mailto:{{ website.contact_email|default:profile.email }}" class="atelier-btn-secondary">✉ {{ website.contact_email|default:profile.email }}</a>
+      {% endif %}
+      {% if website.clean_phone or profile.clean_phone %}
+        <a href="tel:{{ website.clean_phone|default:profile.clean_phone }}" class="atelier-btn-secondary">📞 {{ website.contact_phone|default:profile.phone }}</a>
+      {% endif %}
+    </div>
+
+    {% if website.contact_address or profile.address %}
+      <div class="body-font" style="margin-top: 2.5rem; color: #94a3b8; font-size: 0.95rem; letter-spacing: 0.05em;">
+        📍 {{ website.contact_address|default:profile.address }}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Footer -->
+{% if website.show_footer %}
+<footer class="site-footer">
+  <div class="container-narrow">
+    {% if website.show_social and social_links %}
+      <div style="display: flex; gap: 2rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
+        {% for link in social_links %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase;">{{ link.get_platform_display }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div style="color: #64748b; font-size: 0.85rem; letter-spacing: 0.05em;">
+      <p>&copy; {% now "Y" %} {{ website.title }}. All rights reserved.</p>
+      <p style="margin-top: 0.65rem; font-size: 0.78rem;">Powered by <a href="https://uzyra.com" style="color: var(--site-primary);">UZYRA</a></p>
+    </div>
+  </div>
+</footer>
+{% endif %}
+
+</body>
+</html>

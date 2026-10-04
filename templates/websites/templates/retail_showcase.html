@@ -1,0 +1,381 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+  {# Title #}
+  <title>{{ website.title }}{% if profile.business_name %} — {{ profile.business_name }}{% endif %}</title>
+
+  {# Noindex for preview / non-published states #}
+  {% if is_preview or website.status != 'published' %}
+  <meta name="robots" content="noindex, nofollow">
+  {% endif %}
+
+  {# Meta Description #}
+  <meta name="description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta name="theme-color" content="{{ website.primary_color|default:'#059669' }}">
+
+  {# Canonical URL #}
+  {% if not is_preview and website.status == 'published' %}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  {% endif %}
+
+  {# Open Graph #}
+  <meta property="og:site_name" content="{{ website.title }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ website.title }}{% if profile.business_name %} — {{ profile.business_name }}{% endif %}">
+  <meta property="og:description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if profile.business_logo %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
+  {% elif profile.profile_image %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+  {% endif %}
+
+  {# Twitter Card #}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ website.title }}">
+  <meta name="twitter:description" content="{{ website.tagline|default:profile.business_description|default:profile.bio|default:website.title|truncatechars:155 }}">
+
+  {# LocalBusiness Structured Data #}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "{{ profile.business_name|default:website.title|escapejs }}",
+    "description": "{{ website.tagline|default:profile.business_description|escapejs }}",
+    {% if website.contact_phone or profile.phone %}"telephone": "{{ website.contact_phone|default:profile.phone|escapejs }}",{% endif %}
+    {% if website.contact_email or profile.email %}"email": "{{ website.contact_email|default:profile.email|escapejs }}",{% endif %}
+    {% if website.contact_address or profile.address %}"address": "{{ website.contact_address|default:profile.address|escapejs }}",{% endif %}
+    "url": "{{ request.build_absolute_uri }}"
+  }
+  </script>
+
+  {# Retail Showcase Theme Styling #}
+  <style>
+    :root {
+      --site-primary: {{ website.primary_color|default:'#059669' }};
+      --site-secondary: {{ website.secondary_color|default:'#ffffff' }};
+      --store-accent: #10b981;
+      --store-badge-bg: #ecfdf5;
+      --store-badge-text: #065f46;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--site-secondary); color: #1e293b; line-height: 1.6; }
+    a { color: var(--site-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; line-height: 1.25; color: #0f172a; font-weight: 800; }
+    img { max-width: 100%; height: auto; display: block; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .container-narrow { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+    .text-center { text-align: center; }
+    .d-flex { display: flex; }
+    .justify-between { justify-content: space-between; }
+    .items-center { align-items: center; }
+
+    .retail-btn-primary {
+      background: var(--site-primary);
+      color: #ffffff;
+      border: 1px solid var(--site-primary);
+      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% elif website.button_style == 'outline' %}border-radius: 8px; background: transparent; color: var(--site-primary); border: 2px solid var(--site-primary);{% else %}border-radius: 8px;{% endif %}
+      padding: 0.75rem 1.6rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+    }
+    .retail-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35); text-decoration: none; }
+
+    .retail-btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      {% if website.button_style == 'rounded' %}border-radius: 9999px;{% else %}border-radius: 8px;{% endif %}
+      padding: 0.75rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .retail-btn-secondary:hover { background: #e2e8f0; text-decoration: none; }
+
+    .top-announcement { background: #0f172a; color: #f8fafc; font-size: 0.8rem; font-weight: 600; text-align: center; padding: 0.5rem 1rem; letter-spacing: 0.04em; }
+    .site-header { padding: 1.25rem 0; border-bottom: 1px solid #e2e8f0; background: #ffffff; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    .site-header nav a { margin-left: 1.75rem; color: #475569; font-weight: 600; font-size: 0.95rem; }
+    .site-header nav a:hover { color: var(--site-primary); text-decoration: none; }
+
+    .site-hero { padding: 5rem 1rem 4.5rem; text-align: center; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%); }
+    .site-hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); margin-bottom: 1.25rem; letter-spacing: -0.02em; }
+    .lead { font-size: 1.2rem; color: #475569; line-height: 1.7; max-width: 650px; margin: 0 auto 2rem; }
+
+    .feature-strip { padding: 2rem 1rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; background: #fafafa; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: center; }
+    .feature-item { padding: 1rem; }
+    .feature-title { font-weight: 700; font-size: 0.95rem; margin-top: 0.5rem; color: #0f172a; }
+    .feature-sub { font-size: 0.82rem; color: #64748b; margin-top: 0.25rem; }
+
+    .site-section { padding: 5rem 1rem; }
+    .section-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.35rem 0.85rem; border-radius: 9999px; background: var(--store-badge-bg); color: var(--store-badge-text); margin-bottom: 0.75rem; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-top: 2.5rem; }
+    
+    .product-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .product-box:hover { border-color: #cbd5e1; transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); }
+    .product-img { width: 100%; height: 230px; object-fit: cover; border-radius: 10px; margin-bottom: 1rem; }
+    .product-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; color: #0f172a; }
+    .product-desc { color: #64748b; font-size: 0.9rem; margin-bottom: 1.25rem; flex-grow: 1; }
+    .product-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 1rem; }
+    .product-price { font-weight: 800; font-size: 1.25rem; color: var(--site-primary); }
+
+    .site-footer { padding: 3.5rem 1rem; border-top: 1px solid #e2e8f0; background: #f8fafc; text-align: center; }
+
+    @media (max-width: 640px) {
+      .site-header nav { display: none; }
+      .site-hero { padding: 3.5rem 1rem; }
+      .site-section { padding: 3.5rem 1rem; }
+      .grid-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  {# Google Fonts #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+{% if is_preview %}
+<div style="background: #dc2626; color: white; text-align: center; padding: 0.65rem; font-weight: bold; font-size: 0.85rem; position: sticky; top: 0; z-index: 9999; letter-spacing: 0.05em;">
+  ⚠ STORE PREVIEW MODE &mdash; Customers cannot see this version yet
+</div>
+{% endif %}
+
+<div class="top-announcement">
+  ✨ Instant Order &amp; Delivery via WhatsApp &bull; Fast Nationwide Dispatch
+</div>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container d-flex justify-between items-center">
+    <div style="font-size: 1.4rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.75rem;">
+      {% if profile.business_logo %}
+        <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="max-height: 42px; border-radius: 6px;">
+      {% endif %}
+      <span>{{ website.title }}</span>
+    </div>
+    <nav>
+      {% if website.show_products and products %}<a href="#products">Products</a>{% endif %}
+      {% if website.show_services and services %}<a href="#services">Services</a>{% endif %}
+      {% if website.show_about %}<a href="#about">About Store</a>{% endif %}
+      {% if website.show_contact %}<a href="#contact">Order Help</a>{% endif %}
+    </nav>
+  </div>
+</header>
+
+<!-- Hero Section -->
+{% if website.show_hero %}
+<section class="site-hero">
+  <div class="container-narrow">
+    <span class="section-badge">Verified Quality &amp; Fast Dispatch</span>
+    <h1>{{ website.headline|default:profile.title|default:profile.business_name|default:website.title }}</h1>
+    <p class="lead">{{ website.tagline|default:profile.bio|default:profile.business_description }}</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      {% if website.show_products and products %}
+        <a href="#products" class="retail-btn-primary">Browse Products</a>
+      {% elif website.cta_button_url %}
+        <a href="{{ website.cta_button_url }}" class="retail-btn-primary">{{ website.cta_button_text|default:'Shop Now' }}</a>
+      {% elif website.clean_whatsapp %}
+        <a href="https://wa.me/{{ website.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20would%20like%20to%20place%20an%20order." class="retail-btn-primary" target="_blank">{{ website.cta_button_text|default:'Order via WhatsApp' }}</a>
+      {% endif %}
+
+      {% if website.show_contact %}
+        <a href="#contact" class="retail-btn-secondary">Contact Store</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Trust / Features Bar -->
+<div class="feature-strip">
+  <div class="container">
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div style="font-size: 1.5rem;">🚚</div>
+        <div class="feature-title">Fast Delivery</div>
+        <div class="feature-sub">Direct to your doorstep</div>
+      </div>
+      <div class="feature-item">
+        <div style="font-size: 1.5rem;">💬</div>
+        <div class="feature-title">WhatsApp Orders</div>
+        <div class="feature-sub">Instant response &amp; confirmation</div>
+      </div>
+      <div class="feature-item">
+        <div style="font-size: 1.5rem;">⭐</div>
+        <div class="feature-title">100% Guaranteed</div>
+        <div class="feature-sub">Verified authentic quality</div>
+      </div>
+      <div class="feature-item">
+        <div style="font-size: 1.5rem;">🔒</div>
+        <div class="feature-title">Secure Service</div>
+        <div class="feature-sub">Pay safely on invoice</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Products Catalog Section (Primary for Retail) -->
+{% if website.show_products and products %}
+<section id="products" class="site-section">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-badge">Featured Store Items</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Available Products</h2>
+      <p style="color: #64748b;">Tap any item to order immediately via WhatsApp</p>
+    </div>
+    <div class="grid-cards">
+      {% for prod in products %}
+      <div class="product-box">
+        <div>
+          {% if prod.image %}
+            <img src="{{ prod.image.url }}" alt="{{ prod.name }}" class="product-img">
+          {% endif %}
+          <h3 class="product-title">{{ prod.name }}</h3>
+          <p class="product-desc">{{ prod.description }}</p>
+        </div>
+        <div class="product-footer">
+          <div class="product-price">{{ prod.price }}</div>
+          {% if website.clean_whatsapp or profile.clean_whatsapp %}
+            <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20would%20like%20to%20order:%20{{ prod.name|urlencode }}{% if prod.price %}%20({{ prod.price|urlencode }}){% endif %}" class="retail-btn-primary" style="padding: 0.5rem 1.15rem; font-size: 0.85rem;" target="_blank">
+              Order on WhatsApp
+            </a>
+          {% else %}
+            <a href="#contact" class="retail-btn-primary" style="padding: 0.5rem 1.15rem; font-size: 0.85rem;">Inquire</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Services Section (Additional Support / Customization) -->
+{% if website.show_services and services %}
+<section id="services" class="site-section" style="background: #f8fafc;">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-badge">Additional Services</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Services &amp; Custom Work</h2>
+      <p style="color: #64748b;">Specialized requests, tailoring, and corporate solutions</p>
+    </div>
+    <div class="grid-cards">
+      {% for svc in services %}
+      <div class="product-box">
+        <div>
+          {% if svc.image %}
+            <img src="{{ svc.image.url }}" alt="{{ svc.name }}" class="product-img">
+          {% endif %}
+          <h3 class="product-title">{{ svc.name }}</h3>
+          <p class="product-desc">{{ svc.description }}</p>
+        </div>
+        <div class="product-footer">
+          <div class="product-price">{{ svc.price }}</div>
+          {% if website.clean_whatsapp or profile.clean_whatsapp %}
+            <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20am%20inquiring%20about%20the%20service:%20{{ svc.name|urlencode }}" class="retail-btn-primary" style="padding: 0.5rem 1.15rem; font-size: 0.85rem;" target="_blank">Book Service</a>
+          {% else %}
+            <a href="#contact" class="retail-btn-primary" style="padding: 0.5rem 1.15rem; font-size: 0.85rem;">Inquire</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- About Section -->
+{% if website.show_about %}
+{% with about_body=website.about_text|default:profile.business_description|default:profile.bio %}
+{% if about_body %}
+<section id="about" class="site-section">
+  <div class="container-narrow text-center">
+    <span class="section-badge">Store Story</span>
+    <h2 style="font-size: 2.2rem; margin-bottom: 1.5rem;">{{ website.about_heading|default:'About Our Store' }}</h2>
+    <p style="font-size: 1.15rem; line-height: 1.8; color: #475569;">{{ about_body }}</p>
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+{% endif %}
+
+<!-- Contact & Order Support Section -->
+{% if website.show_contact %}
+<section id="contact" class="site-section" style="background: #f8fafc;">
+  <div class="container-narrow text-center">
+    <span class="section-badge">Customer Support</span>
+    <h2 style="font-size: 2.2rem; margin-bottom: 1rem;">Order Support &amp; Enquiries</h2>
+    <p style="color: #64748b; margin-bottom: 2.5rem;">Our sales team is active and ready to take your order or answer any questions.</p>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+      {% if website.clean_whatsapp or profile.clean_whatsapp %}
+        <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}" class="retail-btn-primary" target="_blank">💬 WhatsApp Order Line</a>
+      {% endif %}
+      {% if website.contact_email or profile.email %}
+        <a href="mailto:{{ website.contact_email|default:profile.email }}" class="retail-btn-secondary">✉ {{ website.contact_email|default:profile.email }}</a>
+      {% endif %}
+      {% if website.clean_phone or profile.clean_phone %}
+        <a href="tel:{{ website.clean_phone|default:profile.clean_phone }}" class="retail-btn-secondary">📞 {{ website.contact_phone|default:profile.phone }}</a>
+      {% endif %}
+    </div>
+
+    {% if website.contact_address or profile.address %}
+      <div style="margin-top: 2rem; color: #64748b; font-size: 0.95rem;">
+        📍 Store Location: {{ website.contact_address|default:profile.address }}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Footer -->
+{% if website.show_footer %}
+<footer class="site-footer">
+  <div class="container-narrow">
+    {% if website.show_social and social_links %}
+      <div style="display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1.75rem; flex-wrap: wrap;">
+        {% for link in social_links %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="color: #64748b; font-weight: 500;">{{ link.get_platform_display }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div style="color: #94a3b8; font-size: 0.875rem;">
+      <p>&copy; {% now "Y" %} {{ website.title }}. All rights reserved.</p>
+      <p style="margin-top: 0.5rem; font-size: 0.8rem;">Powered by <a href="https://uzyra.com" style="color: var(--site-primary); font-weight: 600;">UZYRA</a></p>
+    </div>
+  </div>
+</footer>
+{% endif %}
+
+</body>
+</html>

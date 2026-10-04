@@ -3,18 +3,46 @@
 {% block title %}Website Builder — UZYRA{% endblock %}
 
 {% block dashboard_content %}
-<div class="dashboard-header">
+
+<!-- ── Website Builder — Coming Soon Notice ──────────────────────────────── -->
+<div style="
+  background: linear-gradient(135deg, rgba(245,158,11,0.10) 0%, rgba(245,158,11,0.04) 100%);
+  border: 1px solid rgba(245,158,11,0.28);
+  border-radius: 12px;
+  padding: 1.125rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: flex-start; gap: 0.875rem;
+">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <div>
+    <div style="font-family:var(--font-heading);font-weight:600;color:#F59E0B;font-size:0.9rem;margin-bottom:0.25rem;">Website Builder — Coming Soon</div>
+    <div style="color:var(--text-muted);font-size:0.8125rem;line-height:1.5;">
+      The Website Builder is currently under active development and is not yet production-ready.
+      Your data is preserved, but this feature will be fully enabled in a future release.
+      Your <strong style="color:var(--text-secondary);">Digital Profile</strong> and <strong style="color:var(--text-secondary);">Appearance</strong> settings are live now.
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-header" style="margin-bottom: 1.5rem;">
   <div>
     <h1 class="dashboard-title">Website Builder</h1>
-    <p class="dashboard-subtitle">Manage your personal or corporate website.</p>
+    <p class="dashboard-subtitle">Build, customize, and publish your professional standalone website.</p>
   </div>
   {% if website %}
-    <div class="d-flex gap-2">
-      <a href="{% url 'preview_website' website.slug %}" target="_blank" class="btn btn-secondary btn-sm">Preview</a>
+    <div class="d-flex gap-2 items-center flex-wrap">
+      <a href="{% url 'preview_website' website.slug %}" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+        <span>👁 Preview</span>
+      </a>
+      {% if website.status == 'published' %}
+        <a href="{% url 'public_website' website.slug %}" target="_blank" class="btn btn-ghost btn-sm" style="color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <span>↗ View Live</span>
+        </a>
+      {% endif %}
       <form method="post" action="{% url 'dashboard:website_publish' website.id %}" style="display:inline;">
         {% csrf_token %}
         <button type="submit" class="btn {% if website.status == 'published' %}btn-danger{% else %}btn-primary{% endif %} btn-sm">
-          {% if website.status == 'published' %}Unpublish{% else %}Publish Live{% endif %}
+          {% if website.status == 'published' %}Unpublish Site{% else %}🚀 Publish Live{% endif %}
         </button>
       </form>
     </div>
@@ -23,145 +51,1126 @@
 
 {% if not website %}
   <!-- Empty State -->
-  <div class="card text-center p-8">
-    <div class="empty-state-icon" style="width: 68px; height: 68px; margin: 0 auto var(--space-4);">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+  <div class="card text-center p-8 glass" style="max-width: 640px; margin: 3rem auto; padding: 3.5rem 2rem;">
+    <div class="empty-state-icon" style="width: 72px; height: 72px; margin: 0 auto 1.5rem; background: rgba(255,255,255,0.04); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-primary);">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="color: var(--silver-base);"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
     </div>
-    <h2 class="font-heading font-bold text-primary mb-2">No Website Created Yet</h2>
-    <p class="text-secondary max-w-sm mb-6" style="font-size: 0.9375rem; line-height: 1.6;">
-      Deploy a professional website connected to your UZYRA digital profile.
+    <h2 class="font-heading font-bold text-primary mb-2" style="font-size: 1.5rem;">Launch Your Custom Website</h2>
+    <p class="text-secondary mb-6" style="font-size: 0.95rem; line-height: 1.6; max-width: 440px; margin-left: auto; margin-right: auto;">
+      Create a high-converting, mobile-optimized standalone website directly connected to your UZYRA smart identity.
     </p>
     <form method="post" class="d-flex justify-center gap-3 flex-wrap">
       {% csrf_token %}
-      <input type="text" name="title" class="form-control" placeholder="Business Name" required style="max-width: 260px; min-width: 180px; width: 100%;">
-      <button type="submit" class="btn btn-primary">Create Your Website</button>
+      <input type="text" name="title" class="form-control" placeholder="Business or Brand Name" required style="max-width: 280px;">
+      <button type="submit" class="btn btn-primary">Create Website</button>
     </form>
   </div>
 {% else %}
-  
-  <div class="alert alert-{% if website.status == 'published' %}success{% else %}warning{% endif %} mb-6">
-    Status: <strong>{{ website.get_status_display }}</strong>
+
+  <!-- Top Status & Live URL Banner -->
+  <div class="glass" style="border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-left: 4px solid {% if website.status == 'published' %}#10b981{% else %}#f59e0b{% endif %};">
+    <div>
+      <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.25rem;">
+        Status: <strong style="color: {% if website.status == 'published' %}#10b981{% else %}#f59e0b{% endif %};">{{ website.get_status_display }}</strong>
+      </div>
+      <div style="font-size: 1.05rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        {% if website.status == 'published' %}
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span>Live URL:</span>
+          <a href="{% url 'public_website' website.slug %}" target="_blank" style="color: var(--silver-steel); font-family: monospace; font-size: 0.95rem;">
+            {{ request.get_host }}/site/{{ website.slug }}/
+          </a>
+        {% else %}
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span>
+          <span style="color: var(--text-secondary); font-size: 0.95rem;">Website is currently in private draft mode.</span>
+        {% endif %}
+      </div>
+    </div>
     {% if website.status == 'published' %}
-      &mdash; Live at <a href="{% url 'public_website' website.slug %}" target="_blank" class="font-bold">{{ request.get_host }}/site/{{ website.slug }}/</a>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="copyLiveUrl('{{ request.scheme }}://{{ request.get_host }}/site/{{ website.slug }}/');">
+        📋 Copy Public Link
+      </button>
     {% endif %}
   </div>
 
-  <div class="grid-2">
-    <!-- Left Column: Settings -->
-    <div>
-      <form method="post" action="{% url 'dashboard:website_manage' %}">
-        {% csrf_token %}
-        <input type="hidden" name="update_website" value="1">
-        
+  <!-- Custom Builder Navigation Tabs -->
+  <div class="builder-nav-tabs" style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-primary); margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem;">
+    <button type="button" class="tab-btn active" onclick="switchBuilderTab('tab-branding');" id="btn-tab-branding">
+      🎨 Design &amp; Branding
+    </button>
+    <button type="button" class="tab-btn" onclick="switchBuilderTab('tab-hero');" id="btn-tab-hero">
+      ✍️ Hero &amp; Content
+    </button>
+    <button type="button" class="tab-btn" onclick="switchBuilderTab('tab-sections');" id="btn-tab-sections">
+      🧩 Section Toggles
+    </button>
+    <button type="button" class="tab-btn" onclick="switchBuilderTab('tab-services');" id="btn-tab-services">
+      🛠️ Services <span class="badge badge-silver" style="font-size: 0.7rem; margin-left: 0.35rem;">{{ services.count }}</span>
+    </button>
+    <button type="button" class="tab-btn" onclick="switchBuilderTab('tab-products');" id="btn-tab-products">
+      📦 Products <span class="badge badge-silver" style="font-size: 0.7rem; margin-left: 0.35rem;">{{ products.count }}</span>
+    </button>
+    <button type="button" class="tab-btn" onclick="switchBuilderTab('tab-contact');" id="btn-tab-contact">
+      📞 Contact &amp; Orders
+    </button>
+  </div>
+
+  <!-- MAIN BUILDER FORM -->
+  <form method="post" action="{% url 'dashboard:website_manage' %}" id="website-settings-form">
+    {% csrf_token %}
+    <input type="hidden" name="update_website" value="1">
+
+    <!-- TAB 1: DESIGN & BRANDING -->
+    <div id="tab-branding" class="builder-tab-panel">
+      <div class="grid-2">
+        <!-- Site Identity -->
         <div class="card mb-6">
-          <div class="card-header"><h2 class="card-title">General Settings</h2></div>
-          <div class="form-group"><label class="form-label">Title</label>{{ form.title }}</div>
-          <div class="form-group"><label class="form-label">URL Slug</label>{{ form.slug }}<div class="form-hint">e.g. your-brand-name</div></div>
-          <div class="form-group"><label class="form-label">Template</label>{{ form.template_choice }}</div>
-          <div class="grid-2">
-            <div class="form-group"><label class="form-label">Primary Color</label>{{ form.primary_color }}</div>
-            <div class="form-group"><label class="form-label">Secondary Color</label>{{ form.secondary_color }}</div>
+          <div class="card-header"><h2 class="card-title">Identity &amp; URL Address</h2></div>
+          <div class="form-group mb-4">
+            <label class="form-label">Website Name / Title</label>
+            {{ form.title }}
+            <div class="form-hint">Displayed in the browser tab and page header.</div>
           </div>
-          <div class="form-group"><label class="form-label">Button Style</label>{{ form.button_style }}</div>
+          <div class="form-group mb-4">
+            <label class="form-label">URL Slug</label>
+            {{ form.slug }}
+            <div class="form-hint" style="color: var(--silver-steel); font-family: monospace;">
+              Preview: {{ request.get_host }}/site/<span id="slug-preview">{{ website.slug }}</span>/
+            </div>
+          </div>
+          <div class="form-group mb-2">
+            <label class="form-label">Website Type</label>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); padding: 0.5rem 0.75rem; background: var(--bg-surface); border-radius: 6px;">
+              {{ website.get_website_type_display }}
+            </div>
+          </div>
         </div>
 
+        <!-- Color Customizer -->
         <div class="card mb-6">
-          <div class="card-header"><h2 class="card-title">Section Toggles</h2></div>
-          <div class="grid-2">
-            <label class="form-check">{{ form.show_hero }} Show Hero</label>
-            <label class="form-check">{{ form.show_about }} Show About</label>
-            <label class="form-check">{{ form.show_services }} Show Services</label>
-            <label class="form-check">{{ form.show_products }} Show Products</label>
-            <label class="form-check">{{ form.show_social }} Show Social Links</label>
-            <label class="form-check">{{ form.show_footer }} Show Footer</label>
+          <div class="card-header"><h2 class="card-title">Brand Colors &amp; Styling</h2></div>
+          
+          <!-- Designer Color Presets -->
+          <div class="form-group mb-4">
+            <label class="form-label" style="font-size: 0.8rem; text-transform: uppercase;">Quick Preset Palettes</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+              <button type="button" class="preset-btn" onclick="applyPreset('#0f172a', '#ffffff', 'solid');" title="Modern Corporate Slate">
+                <span class="preset-dot" style="background: #0f172a;"></span> Slate Minimal
+              </button>
+              <button type="button" class="preset-btn" onclick="applyPreset('#d4af37', '#09090b', 'solid');" title="Luxury Obsidian & Gold">
+                <span class="preset-dot" style="background: #d4af37;"></span> Obsidian Gold
+              </button>
+              <button type="button" class="preset-btn" onclick="applyPreset('#059669', '#ffffff', 'rounded');" title="Emerald Storefront">
+                <span class="preset-dot" style="background: #059669;"></span> Emerald Luxe
+              </button>
+              <button type="button" class="preset-btn" onclick="applyPreset('#6366f1', '#0f172a', 'rounded');" title="Creator Indigo">
+                <span class="preset-dot" style="background: #6366f1;"></span> Indigo Creator
+              </button>
+              <button type="button" class="preset-btn" onclick="applyPreset('#1e40af', '#ffffff', 'solid');" title="Sapphire Corporate">
+                <span class="preset-dot" style="background: #1e40af;"></span> Sapphire Blue
+              </button>
+              <button type="button" class="preset-btn" onclick="applyPreset('#18181b', '#f8fafc', 'outline');" title="Clean Monochrome">
+                <span class="preset-dot" style="background: #18181b;"></span> Monochrome
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Inputs with Swatches -->
+          <div class="grid-2 mb-4">
+            <div class="form-group">
+              <label class="form-label">Primary Color (Accent / Buttons)</label>
+              <div class="color-picker-group">
+                <input type="color" id="primary_color_picker" value="{{ website.primary_color|default:'#0f172a' }}" class="color-swatch-box" oninput="syncColorInput(this, 'id_primary_color');">
+                {{ form.primary_color }}
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secondary / Background Color</label>
+              <div class="color-picker-group">
+                <input type="color" id="secondary_color_picker" value="{{ website.secondary_color|default:'#ffffff' }}" class="color-swatch-box" oninput="syncColorInput(this, 'id_secondary_color');">
+                {{ form.secondary_color }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Button Style Preview -->
+          <div class="form-group mb-2">
+            <label class="form-label">Button Style</label>
+            {{ form.button_style }}
+            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-surface); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Button Preview:</span>
+              <button type="button" id="btn-live-preview" class="btn" style="background: {{ website.primary_color }}; color: #ffffff; pointer-events: none;">
+                Sample Action Button
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Visual Template Selector -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <h2 class="card-title">Template Selection</h2>
+          <p class="card-subtitle">Choose from our 4 professionally engineered website themes. Instant layout and typographic styling.</p>
+        </div>
         
-        <button type="submit" class="btn btn-primary btn-lg btn-block mb-6">Save Website Settings</button>
-      </form>
+        <div style="display: none;">{{ form.template_choice }}</div>
+
+        <div class="template-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+          
+          <!-- Template 1: Modern Business -->
+          <div class="template-card {% if website.template_choice == 'modern_business' %}selected{% endif %}" onclick="selectTemplate('modern_business', this);">
+            <div class="template-badge">Template 01</div>
+            <div class="template-icon">🏢</div>
+            <h3 class="template-title">Modern Business</h3>
+            <p class="template-desc">High-tech corporate layout for agencies, consultants, firms, and service enterprises.</p>
+            <div class="template-features">
+              <span>Structured Grid</span> &bull; <span>Quote Requests</span> &bull; <span>Clean Badges</span>
+            </div>
+          </div>
+
+          <!-- Template 2: Luxury Atelier -->
+          <div class="template-card {% if website.template_choice == 'luxury_atelier' %}selected{% endif %}" onclick="selectTemplate('luxury_atelier', this);">
+            <div class="template-badge" style="background: rgba(212, 175, 55, 0.2); color: #fef08a;">Template 02</div>
+            <div class="template-icon">👑</div>
+            <h3 class="template-title">Luxury Atelier</h3>
+            <p class="template-desc">High-fashion dark aesthetic with gold accents, serif typography, and bespoke VIP consultation booking.</p>
+            <div class="template-features">
+              <span>Haute Editorial</span> &bull; <span>Gold Accents</span> &bull; <span>Concierge Orders</span>
+            </div>
+          </div>
+
+          <!-- Template 3: Creator Portfolio -->
+          <div class="template-card {% if website.template_choice == 'creator_portfolio' %}selected{% endif %}" onclick="selectTemplate('creator_portfolio', this);">
+            <div class="template-badge" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe;">Template 03</div>
+            <div class="template-icon">⚡</div>
+            <h3 class="template-title">Creator Portfolio</h3>
+            <p class="template-desc">Bold dynamic branding for creators, photographers, influencers, developers, and artists.</p>
+            <div class="template-features">
+              <span>Social Dock</span> &bull; <span>Digital Store</span> &bull; <span>Direct Collabs</span>
+            </div>
+          </div>
+
+          <!-- Template 4: Retail Showcase -->
+          <div class="template-card {% if website.template_choice == 'retail_showcase' %}selected{% endif %}" onclick="selectTemplate('retail_showcase', this);">
+            <div class="template-badge" style="background: rgba(5, 150, 105, 0.2); color: #a7f3d0;">Template 04</div>
+            <div class="template-icon">🛍️</div>
+            <h3 class="template-title">Retail Showcase</h3>
+            <p class="template-desc">E-commerce storefront designed for direct product ordering with instant WhatsApp cart routing.</p>
+            <div class="template-features">
+              <span>Product Catalog</span> &bull; <span>Instant WhatsApp Checkout</span> &bull; <span>Trust Bar</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
-    <!-- Right Column: Content Management -->
-    <div>
-      <!-- SERVICES -->
+    <!-- TAB 2: HERO & CONTENT -->
+    <div id="tab-hero" class="builder-tab-panel" style="display: none;">
       <div class="card mb-6">
-        <div class="card-header d-flex justify-between items-center">
-          <h2 class="card-title">Services</h2>
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('service-add').style.display='block';">Add New</button>
+        <div class="card-header"><h2 class="card-title">Hero Section (Main Banner)</h2></div>
+        <div class="form-group mb-4">
+          <label class="form-label">Headline</label>
+          {{ form.headline }}
+          <div class="form-hint">Leave blank to use your profile title / business name ({{ profile.business_name|default:profile.full_name }}).</div>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Subtitle / Value Proposition</label>
+          {{ form.tagline }}
+          <div class="form-hint">A 1–2 sentence description of your mission, products, or core value offer.</div>
+        </div>
+
+        <div class="grid-2 mb-4">
+          <div class="form-group">
+            <label class="form-label">Primary Button Text</label>
+            {{ form.cta_button_text }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Button Link (Optional)</label>
+            {{ form.cta_button_url }}
+            <div class="form-hint">Leave blank to automatically connect to WhatsApp.</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Secondary Button Text</label>
+            {{ form.secondary_cta_text }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Secondary Button Link</label>
+            {{ form.secondary_cta_url }}
+            <div class="form-hint">e.g. #products, #services, or #contact.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <div class="card-header"><h2 class="card-title">About Us Section</h2></div>
+        <div class="form-group mb-4">
+          <label class="form-label">Section Heading</label>
+          {{ form.about_heading }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Story / Detailed Description</label>
+          {{ form.about_text }}
+          <div class="form-hint">Explain your company history, values, awards, or process. Falls back to your profile description if left blank.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SECTION TOGGLES -->
+    <div id="tab-sections" class="builder-tab-panel" style="display: none;">
+      <div class="card mb-6">
+        <div class="card-header">
+          <h2 class="card-title">Website Sections</h2>
+          <p class="card-subtitle">Enable or disable individual sections to tailor the website to your exact needs.</p>
         </div>
         
-        <div id="service-add" style="display:none; padding:1rem; background:var(--bg-secondary); border-radius:var(--radius-sm); margin-bottom:1rem;">
-          <form method="post" action="{% url 'dashboard:service_add' website.id %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-control" required></div>
-            <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="2"></textarea></div>
-            <div class="form-group"><label class="form-label">Price</label><input type="text" name="price" class="form-control"></div>
-            <div class="form-group"><label class="form-label">Image</label><input type="file" name="image" class="form-control"></div>
-            <div class="d-flex gap-2 flex-wrap mt-3">
-              <button type="submit" class="btn btn-primary btn-sm">Save Service</button>
-              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('service-add').style.display='none';">Cancel</button>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">🌟 Hero Banner</strong>
+              {{ form.show_hero }}
             </div>
-          </form>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Big introductory banner with headline and main CTA buttons.</div>
+          </label>
+
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">📖 About Us</strong>
+              {{ form.show_about }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Brand story, background, and company biography.</div>
+          </label>
+
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">🛠️ Services Grid</strong>
+              {{ form.show_services }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">List of your professional packages and offerings with price tags.</div>
+          </label>
+
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">📦 Product Catalog</strong>
+              {{ form.show_products }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Store items with photos, prices, and direct WhatsApp checkout.</div>
+          </label>
+
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">🌐 Social Media Links</strong>
+              {{ form.show_social }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Display Instagram, LinkedIn, X, and other channels.</div>
+          </label>
+
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">📞 Contact Hub</strong>
+              {{ form.show_contact }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Direct phone, email, WhatsApp, and location address.</div>
+          </label>
+
+          <label class="toggle-switch-card">
+            <div class="d-flex justify-between items-center mb-1">
+              <strong style="font-size: 1rem; color: #ffffff;">⚓ Footer</strong>
+              {{ form.show_footer }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Copyright, disclaimer, and attribution at the bottom of the page.</div>
+          </label>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: SERVICES MANAGEMENT -->
+    <div id="tab-services" class="builder-tab-panel" style="display: none;">
+      <div class="card mb-6">
+        <div class="card-header d-flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <h2 class="card-title">Services &amp; Packages</h2>
+            <p class="card-subtitle">Add the services your clients can book or request quotes for.</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openModal('modal-add-service');">
+            + Add New Service
+          </button>
         </div>
 
         {% if services %}
-          <div class="d-flex flex-column gap-2">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
             {% for svc in services %}
-            <div class="link-item" style="border:1px solid var(--border-primary); padding:1rem; border-radius:var(--radius-sm);">
-              <div class="font-bold">{{ svc.name }} <span class="text-caption text-silver">{{ svc.price }}</span></div>
-              <div class="text-sm text-secondary">{{ svc.description|truncatechars:50 }}</div>
-              <form method="post" action="{% url 'dashboard:service_delete' svc.id %}" class="mt-2 text-right">
-                {% csrf_token %}
-                <button type="submit" class="text-danger" style="background:none; border:none; font-size:0.8rem; cursor:pointer;">Delete</button>
-              </form>
+            <div class="glass" style="border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                  {% if svc.image %}
+                    <img src="{{ svc.image.url }}" alt="{{ svc.name }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-primary);">
+                  {% else %}
+                    <div style="width: 70px; height: 70px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
+                      🛠️
+                    </div>
+                  {% endif %}
+                  <div style="flex-grow: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                      <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.25rem;">{{ svc.name }}</h4>
+                      <span class="badge {% if svc.is_active %}badge-silver{% else %}badge-outline{% endif %}" style="font-size: 0.7rem;">
+                        {% if svc.is_active %}Active{% else %}Hidden{% endif %}
+                      </span>
+                    </div>
+                    {% if svc.price %}
+                      <div style="font-weight: 700; color: var(--silver-steel); font-size: 0.95rem;">{{ svc.price }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                  {{ svc.description|truncatechars:120 }}
+                </p>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-primary); padding-top: 0.75rem; margin-top: 0.5rem;">
+                <form method="post" action="{% url 'dashboard:service_toggle' svc.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-ghost btn-sm" style="font-size: 0.75rem;">
+                    {% if svc.is_active %}Hide{% else %}Show{% endif %}
+                  </button>
+                </form>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openEditServiceModal({{ svc.id }}, '{{ svc.name|escapejs }}', '{{ svc.price|escapejs }}', '{{ svc.description|escapejs }}', {{ svc.display_order|default:0 }}, {% if svc.is_active %}true{% else %}false{% endif %});">
+                    Edit
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('delete-svc-{{ svc.id }}', '{{ svc.name|escapejs }}');">
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="text-center text-muted p-4">No services added yet.</div>
+          <div class="text-center p-8" style="color: var(--text-muted); padding: 3rem 1rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛠️</div>
+            <h3 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.5rem;">No services listed yet</h3>
+            <p style="max-width: 400px; margin: 0 auto 1.5rem; font-size: 0.9rem;">Add packages, consultations, or bespoke services for your clients.</p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openModal('modal-add-service');">Add Your First Service</button>
+          </div>
         {% endif %}
       </div>
+    </div>
 
-      <!-- PRODUCTS -->
+    <!-- TAB 5: PRODUCTS MANAGEMENT -->
+    <div id="tab-products" class="builder-tab-panel" style="display: none;">
       <div class="card mb-6">
-        <div class="card-header d-flex justify-between items-center">
-          <h2 class="card-title">Products</h2>
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('product-add').style.display='block';">Add New</button>
-        </div>
-        
-        <div id="product-add" style="display:none; padding:1rem; background:var(--bg-secondary); border-radius:var(--radius-sm); margin-bottom:1rem;">
-          <form method="post" action="{% url 'dashboard:product_add' website.id %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-control" required></div>
-            <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="2"></textarea></div>
-            <div class="form-group"><label class="form-label">Price</label><input type="text" name="price" class="form-control"></div>
-            <div class="form-group"><label class="form-label">Image</label><input type="file" name="image" class="form-control"></div>
-            <div class="d-flex gap-2 flex-wrap mt-3">
-              <button type="submit" class="btn btn-primary btn-sm">Save Product</button>
-              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('product-add').style.display='none';">Cancel</button>
-            </div>
-          </form>
+        <div class="card-header d-flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <h2 class="card-title">Products &amp; Inventory</h2>
+            <p class="card-subtitle">Showcase items with high-resolution imagery and direct WhatsApp order links.</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openModal('modal-add-product');">
+            + Add New Product
+          </button>
         </div>
 
         {% if products %}
-          <div class="d-flex flex-column gap-2">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
             {% for prod in products %}
-            <div class="link-item" style="border:1px solid var(--border-primary); padding:1rem; border-radius:var(--radius-sm);">
-              <div class="font-bold">{{ prod.name }} <span class="text-caption text-silver">{{ prod.price }}</span></div>
-              <div class="text-sm text-secondary">{{ prod.description|truncatechars:50 }}</div>
-              <form method="post" action="{% url 'dashboard:product_delete' prod.id %}" class="mt-2 text-right">
-                {% csrf_token %}
-                <button type="submit" class="text-danger" style="background:none; border:none; font-size:0.8rem; cursor:pointer;">Delete</button>
-              </form>
+            <div class="glass" style="border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                  {% if prod.image %}
+                    <img src="{{ prod.image.url }}" alt="{{ prod.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-primary);">
+                  {% else %}
+                    <div style="width: 80px; height: 80px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                      📦
+                    </div>
+                  {% endif %}
+                  <div style="flex-grow: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                      <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.25rem;">{{ prod.name }}</h4>
+                      <span class="badge {% if prod.is_active %}badge-silver{% else %}badge-outline{% endif %}" style="font-size: 0.7rem;">
+                        {% if prod.is_active %}In Stock{% else %}Hidden{% endif %}
+                      </span>
+                    </div>
+                    {% if prod.price %}
+                      <div style="font-weight: 800; color: #10b981; font-size: 1.05rem;">{{ prod.price }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                  {{ prod.description|truncatechars:120 }}
+                </p>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-primary); padding-top: 0.75rem; margin-top: 0.5rem;">
+                <form method="post" action="{% url 'dashboard:product_toggle' prod.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-ghost btn-sm" style="font-size: 0.75rem;">
+                    {% if prod.is_active %}Hide{% else %}Show{% endif %}
+                  </button>
+                </form>
+                <div style="display: flex; gap: 0.5rem;">
+                  {% if website.clean_whatsapp or profile.clean_whatsapp %}
+                    <a href="https://wa.me/{{ website.clean_whatsapp|default:profile.clean_whatsapp }}?text=Hello%20{{ website.title|urlencode }},%20I%20would%20like%20to%20order:%20{{ prod.name|urlencode }}" target="_blank" class="btn btn-ghost btn-sm" style="color: #10b981;" title="Test WhatsApp order link">
+                      💬 Test Order
+                    </a>
+                  {% endif %}
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openEditProductModal({{ prod.id }}, '{{ prod.name|escapejs }}', '{{ prod.price|escapejs }}', '{{ prod.description|escapejs }}', {{ prod.display_order|default:0 }}, {% if prod.is_active %}true{% else %}false{% endif %});">
+                    Edit
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('delete-prod-{{ prod.id }}', '{{ prod.name|escapejs }}');">
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="text-center text-muted p-4">No products added yet.</div>
+          <div class="text-center p-8" style="color: var(--text-muted); padding: 3rem 1rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛍️</div>
+            <h3 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.5rem;">No products in store yet</h3>
+            <p style="max-width: 400px; margin: 0 auto 1.5rem; font-size: 0.9rem;">Add items with photos and prices. Customers can tap them to order immediately on WhatsApp.</p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openModal('modal-add-product');">Add Your First Product</button>
+          </div>
         {% endif %}
       </div>
-      
+    </div>
+
+    <!-- TAB 6: CONTACT & ORDERS -->
+    <div id="tab-contact" class="builder-tab-panel" style="display: none;">
+      <div class="card mb-6">
+        <div class="card-header"><h2 class="card-title">Contact Channels &amp; Ordering Phone</h2></div>
+        
+        <div class="grid-2 mb-4">
+          <div class="form-group">
+            <label class="form-label">WhatsApp Ordering Number</label>
+            {{ form.contact_whatsapp }}
+            <div class="form-hint">Used when customers tap "Order on WhatsApp" or "Book Consultation". Include country code (e.g. +234 812 345 6789).</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Public Email</label>
+            {{ form.contact_email }}
+            <div class="form-hint">Displayed in the contact section and footer.</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            {{ form.contact_phone }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Physical Address / Store Location</label>
+            {{ form.contact_address }}
+          </div>
+        </div>
+
+        <div style="padding: 1rem 1.25rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-primary); margin-top: 1rem;">
+          <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.25rem;">🔗 Social Channels Sync</div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            Your website automatically displays the social media links configured in your UZYRA Profile.
+          </p>
+          <a href="{% url 'dashboard:links_manage' %}" class="btn btn-ghost btn-sm" style="color: var(--silver-steel);">Manage Social Links &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- STICKY ACTION BAR -->
+    <div class="sticky-save-bar">
+      <div class="container d-flex justify-between items-center">
+        <div style="font-size: 0.88rem; color: var(--text-secondary);" class="hide-mobile">
+          Make sure to preview your site after saving changes.
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'preview_website' website.slug %}" target="_blank" class="btn btn-secondary">
+            Live Preview
+          </a>
+          <button type="submit" class="btn btn-primary" style="box-shadow: 0 4px 15px rgba(255,255,255,0.15);">
+            💾 Save Website Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- HIDDEN DELETE FORMS -->
+  {% for svc in services %}
+    <form id="delete-svc-{{ svc.id }}" method="post" action="{% url 'dashboard:service_delete' svc.id %}" style="display:none;">
+      {% csrf_token %}
+    </form>
+  {% endfor %}
+  {% for prod in products %}
+    <form id="delete-prod-{{ prod.id }}" method="post" action="{% url 'dashboard:product_delete' prod.id %}" style="display:none;">
+      {% csrf_token %}
+    </form>
+  {% endfor %}
+
+  <!-- ========================================================================= -->
+  <!-- MODALS -->
+  <!-- ========================================================================= -->
+
+  <!-- ADD SERVICE MODAL -->
+  <div id="modal-add-service" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-header">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0;">Add New Service</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-add-service');">&times;</button>
+      </div>
+      <form method="post" action="{% url 'dashboard:service_add' website.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+          <div class="form-group mb-3">
+            <label class="form-label">Service Name *</label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. VIP Consultation &amp; Strategy" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Price / Rate</label>
+            <input type="text" name="price" class="form-control" placeholder="e.g. ₦50,000 or Contact for quote">
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Explain what is included in this service..."></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Cover Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="display_order" class="form-control" value="0" min="0">
+          </div>
+          <div class="form-check mt-2">
+            <input type="checkbox" name="is_active" id="id_svc_active_new" class="form-check-input" checked>
+            <label for="id_svc_active_new" class="form-check-label" style="color: #ffffff;">Make visible on website</label>
+          </div>
+        </div>
+        <div class="custom-modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('modal-add-service');">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Service</button>
+        </div>
+      </form>
     </div>
   </div>
+
+  <!-- EDIT SERVICE MODAL -->
+  <div id="modal-edit-service" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-header">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0;">Edit Service</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-edit-service');">&times;</button>
+      </div>
+      <form id="edit-service-form" method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+          <div class="form-group mb-3">
+            <label class="form-label">Service Name *</label>
+            <input type="text" name="name" id="edit_svc_name" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Price / Rate</label>
+            <input type="text" name="price" id="edit_svc_price" class="form-control">
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" id="edit_svc_description" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Replace Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+            <div class="form-hint">Leave blank to keep current photo.</div>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="display_order" id="edit_svc_order" class="form-control" min="0">
+          </div>
+          <div class="form-check mt-2">
+            <input type="checkbox" name="is_active" id="edit_svc_active" class="form-check-input">
+            <label for="edit_svc_active" class="form-check-label" style="color: #ffffff;">Make visible on website</label>
+          </div>
+        </div>
+        <div class="custom-modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('modal-edit-service');">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Service</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT MODAL -->
+  <div id="modal-add-product" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-header">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0;">Add New Product</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-add-product');">&times;</button>
+      </div>
+      <form method="post" action="{% url 'dashboard:product_add' website.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+          <div class="form-group mb-3">
+            <label class="form-label">Product Name *</label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Signature Leather Smart Card" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Price *</label>
+            <input type="text" name="price" class="form-control" placeholder="e.g. ₦35,000" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Description / Specifications</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Materials, dimensions, delivery details..."></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Product Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="display_order" class="form-control" value="0" min="0">
+          </div>
+          <div class="form-check mt-2">
+            <input type="checkbox" name="is_active" id="id_prod_active_new" class="form-check-input" checked>
+            <label for="id_prod_active_new" class="form-check-label" style="color: #ffffff;">Make visible in store catalog</label>
+          </div>
+        </div>
+        <div class="custom-modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('modal-add-product');">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT PRODUCT MODAL -->
+  <div id="modal-edit-product" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-header">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0;">Edit Product</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-edit-product');">&times;</button>
+      </div>
+      <form id="edit-product-form" method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+          <div class="form-group mb-3">
+            <label class="form-label">Product Name *</label>
+            <input type="text" name="name" id="edit_prod_name" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Price *</label>
+            <input type="text" name="price" id="edit_prod_price" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Description / Specifications</label>
+            <textarea name="description" id="edit_prod_description" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Replace Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+            <div class="form-hint">Leave blank to keep current photo.</div>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="display_order" id="edit_prod_order" class="form-control" min="0">
+          </div>
+          <div class="form-check mt-2">
+            <input type="checkbox" name="is_active" id="edit_prod_active" class="form-check-input">
+            <label for="edit_prod_active" class="form-check-label" style="color: #ffffff;">Make visible in store catalog</label>
+          </div>
+        </div>
+        <div class="custom-modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('modal-edit-product');">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 {% endif %}
+
+<!-- Scoped CSS for Builder -->
+<style>
+  .builder-nav-tabs .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .builder-nav-tabs .tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .builder-nav-tabs .tab-btn.active {
+    color: #ffffff;
+    border-bottom-color: var(--silver-steel);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .preset-btn {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .preset-btn:hover {
+    border-color: var(--silver-steel);
+    color: #ffffff;
+  }
+  .preset-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+  }
+
+  .color-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .color-swatch-box {
+    width: 44px;
+    height: 42px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .template-card {
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: var(--bg-surface);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .template-card:hover {
+    border-color: var(--silver-steel);
+    transform: translateY(-2px);
+  }
+  .template-card.selected {
+    border-color: var(--silver-steel);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.15);
+  }
+  .template-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--silver-steel);
+  }
+  .template-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .template-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.35rem;
+  }
+  .template-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+  .template-features {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-primary);
+    padding-top: 0.75rem;
+  }
+
+  .toggle-switch-card {
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    background: var(--bg-surface);
+    cursor: pointer;
+    display: block;
+    transition: border-color 0.2s;
+  }
+  .toggle-switch-card:hover {
+    border-color: var(--silver-steel);
+  }
+
+  .sticky-save-bar {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 90;
+    background: rgba(18, 18, 22, 0.95);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Modals */
+  .custom-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .custom-modal-dialog {
+    background: #141419;
+    border: 1px solid var(--border-primary);
+    border-radius: 14px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  }
+  .custom-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .custom-modal-body {
+    padding: 1.5rem;
+  }
+  .custom-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+  .modal-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal-close-btn:hover {
+    color: #ffffff;
+  }
+
+  @media (max-width: 640px) {
+    .hide-mobile { display: none !important; }
+    .sticky-save-bar { bottom: 0.5rem; padding: 0.75rem 1rem; }
+    .sticky-save-bar .btn { flex-grow: 1; justify-content: center; }
+  }
+</style>
+
+<!-- Scoped JavaScript for Interactive Builder -->
+<script>
+  function switchBuilderTab(tabId) {
+    document.querySelectorAll('.builder-tab-panel').forEach(function(el) {
+      el.style.display = 'none';
+    });
+    document.querySelectorAll('.tab-btn').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    
+    var panel = document.getElementById(tabId);
+    if (panel) panel.style.display = 'block';
+
+    var btn = document.getElementById('btn-' + tabId);
+    if (btn) btn.classList.add('active');
+  }
+
+  function selectTemplate(code, el) {
+    var select = document.getElementById('id_template_choice');
+    if (select) {
+      select.value = code;
+    }
+    document.querySelectorAll('.template-card').forEach(function(card) {
+      card.classList.remove('selected');
+    });
+    if (el) {
+      el.classList.add('selected');
+    }
+  }
+
+  function applyPreset(primary, secondary, btnStyle) {
+    var primInput = document.getElementById('id_primary_color');
+    var primPicker = document.getElementById('primary_color_picker');
+    var secInput = document.getElementById('id_secondary_color');
+    var secPicker = document.getElementById('secondary_color_picker');
+    var btnSelect = document.getElementById('id_button_style');
+
+    if (primInput) primInput.value = primary;
+    if (primPicker) primPicker.value = primary;
+    if (secInput) secInput.value = secondary;
+    if (secPicker) secPicker.value = secondary;
+    if (btnSelect && btnStyle) btnSelect.value = btnStyle;
+
+    updateLiveBtnPreview();
+  }
+
+  function syncColorInput(pickerEl, textInputId) {
+    var textInput = document.getElementById(textInputId);
+    if (textInput) {
+      textInput.value = pickerEl.value;
+    }
+    updateLiveBtnPreview();
+  }
+
+  function updateLiveBtnPreview() {
+    var prim = document.getElementById('id_primary_color');
+    var btn = document.getElementById('btn-live-preview');
+    var styleSelect = document.getElementById('id_button_style');
+    if (!btn || !prim) return;
+
+    var color = prim.value || '#0f172a';
+    btn.style.background = color;
+    btn.style.borderColor = color;
+
+    if (styleSelect) {
+      if (styleSelect.value === 'rounded') {
+        btn.style.borderRadius = '9999px';
+        btn.style.background = color;
+        btn.style.color = '#ffffff';
+      } else if (styleSelect.value === 'outline') {
+        btn.style.borderRadius = '8px';
+        btn.style.background = 'transparent';
+        btn.style.border = '2px solid ' + color;
+        btn.style.color = color;
+      } else {
+        btn.style.borderRadius = '8px';
+        btn.style.background = color;
+        btn.style.border = 'none';
+        btn.style.color = '#ffffff';
+      }
+    }
+  }
+
+  // Modals handling
+  function openModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
+  }
+
+  function openEditServiceModal(id, name, price, desc, order, active) {
+    var form = document.getElementById('edit-service-form');
+    if (form) form.action = '/dashboard/website/service/' + id + '/edit/';
+
+    document.getElementById('edit_svc_name').value = name;
+    document.getElementById('edit_svc_price').value = price;
+    document.getElementById('edit_svc_description').value = desc;
+    document.getElementById('edit_svc_order').value = order;
+    document.getElementById('edit_svc_active').checked = active;
+
+    openModal('modal-edit-service');
+  }
+
+  function openEditProductModal(id, name, price, desc, order, active) {
+    var form = document.getElementById('edit-product-form');
+    if (form) form.action = '/dashboard/website/product/' + id + '/edit/';
+
+    document.getElementById('edit_prod_name').value = name;
+    document.getElementById('edit_prod_price').value = price;
+    document.getElementById('edit_prod_description').value = desc;
+    document.getElementById('edit_prod_order').value = order;
+    document.getElementById('edit_prod_active').checked = active;
+
+    openModal('modal-edit-product');
+  }
+
+  function confirmDelete(formId, itemName) {
+    if (confirm("Are you sure you want to delete '" + itemName + "'? This action cannot be undone.")) {
+      var f = document.getElementById(formId);
+      if (f) f.submit();
+    }
+  }
+
+  function copyLiveUrl(url) {
+    navigator.clipboard.writeText(url).then(function() {
+      if (window.showToast) {
+        window.showToast("Public website link copied to clipboard!", "success");
+      } else {
+        alert("Public website link copied to clipboard!");
+      }
+    }).catch(function() {
+      prompt("Copy your website link:", url);
+    });
+  }
+
+  // Listen for slug input changes to update preview
+  document.addEventListener('DOMContentLoaded', function() {
+    var slugInput = document.getElementById('id_slug');
+    var slugPreview = document.getElementById('slug-preview');
+    if (slugInput && slugPreview) {
+      slugInput.addEventListener('input', function() {
+        slugPreview.textContent = this.value || 'your-slug';
+      });
+    }
+
+    var primText = document.getElementById('id_primary_color');
+    var primPicker = document.getElementById('primary_color_picker');
+    if (primText && primPicker) {
+      primText.addEventListener('input', function() {
+        if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+          primPicker.value = this.value;
+        }
+        updateLiveBtnPreview();
+      });
+    }
+
+    var secText = document.getElementById('id_secondary_color');
+    var secPicker = document.getElementById('secondary_color_picker');
+    if (secText && secPicker) {
+      secText.addEventListener('input', function() {
+        if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+          secPicker.value = this.value;
+        }
+      });
+    }
+
+    var btnStyleSelect = document.getElementById('id_button_style');
+    if (btnStyleSelect) {
+      btnStyleSelect.addEventListener('change', updateLiveBtnPreview);
+    }
+    updateLiveBtnPreview();
+  });
+</script>
 {% endblock %}

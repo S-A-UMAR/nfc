@@ -5,7 +5,7 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'full_name', 'title', 'bio', 'profile_type', 'theme',
+            'full_name', 'title', 'bio', 'profile_type', 'theme', 'profile_layout',
             'profile_image', 'cover_image',
             'phone', 'whatsapp', 'email', 'website_url', 'location', 'address',
             'business_name', 'business_category', 'business_description', 'business_logo',
@@ -17,6 +17,7 @@ class ProfileForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'Tell visitors about what you do...'}),
             'profile_type': forms.Select(attrs={'class': 'form-select'}),
             'theme': forms.Select(attrs={'class': 'form-select'}),
+            'profile_layout': forms.Select(attrs={'class': 'form-select'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+234 800 000 0000'}),
             'whatsapp': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+234 800 000 0000 (WhatsApp)'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contact@example.com'}),
@@ -93,3 +94,20 @@ class CustomLinkForm(forms.ModelForm):
         if url:
             validate_safe_url(url, allow_relative=True)
         return url
+
+
+class ProfileAppearanceForm(forms.ModelForm):
+    """
+    Dedicated form for the /dashboard/appearance/ endpoint.
+    Only saves profile_type, theme, and profile_layout — nothing else.
+    This prevents accidental mass-assignment of other profile fields through
+    the appearance endpoint.
+    """
+    class Meta:
+        model = Profile
+        fields = ['profile_type', 'theme', 'profile_layout']
+        widgets = {
+            'profile_type': forms.HiddenInput(),
+            'theme': forms.HiddenInput(),
+            'profile_layout': forms.HiddenInput(),
+        }

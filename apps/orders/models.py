@@ -89,8 +89,8 @@ class Order(models.Model):
     package = models.ForeignKey(ProductPackage, on_delete=models.PROTECT, related_name='orders')
     amount = models.PositiveIntegerField(help_text="Final price paid in NGN")
     
-    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_PENDING)
-    order_status = models.CharField(max_length=30, choices=ORDER_STATUS_CHOICES, default=STATUS_RECEIVED)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_PENDING, db_index=True)
+    order_status = models.CharField(max_length=30, choices=ORDER_STATUS_CHOICES, default=STATUS_RECEIVED, db_index=True)
     
     card_assigned = models.ForeignKey(Card, on_delete=models.SET_NULL, null=True, blank=True, related_name='order_assignments')
     

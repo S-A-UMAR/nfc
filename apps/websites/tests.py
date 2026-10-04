@@ -131,3 +131,105 @@ class WebsiteBuilderTests(TestCase):
         response = self.client.post(reverse('dashboard:service_delete', args=[service.id]))
         self.assertEqual(Service.objects.count(), 0)
 
+    def test_service_edit_and_toggle(self):
+        website = Website.objects.create(user=self.user, title="Site", status=Website.STATUS_DRAFT)
+        service = Service.objects.create(website=website, name="Initial Name", price="100", is_active=True)
+        self.client.login(email="builder@uzyra.com", password="password123")
+
+        # Edit
+        response = self.client.post(reverse('dashboard:service_edit', args=[service.id]), {
+            'name': 'Updated Service',
+            'price': '₦75,000',
+            'description': 'Premium service',
+            'is_active': True,
+            'display_order': 2,
+        })
+        self.assertEqual(response.status_code, 302)
+        service.refresh_from_db()
+        self.assertEqual(service.name, 'Updated Service')
+        self.assertEqual(service.price, '₦75,000')
+
+        # Toggle Active
+        response = self.client.post(reverse('dashboard:service_toggle', args=[service.id]))
+        self.assertEqual(response.status_code, 302)
+        service.refresh_from_db()
+        self.assertFalse(service.is_active)
+
+    def test_product_crud_and_toggle(self):
+        website = Website.objects.create(user=self.user, title="Site", status=Website.STATUS_DRAFT)
+        self.client.login(email="builder@uzyra.com", password="password123")
+
+        # Create Product
+        response = self.client.post(reverse('dashboard:product_add', args=[website.id]), {
+            'name': 'Luxury Smart Card',
+            'price': '₦35,000',
+            'description': 'Matte black metal card',
+            'is_active': True,
+            'display_order': 1,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Product.objects.count(), 1)
+        product = Product.objects.first()
+        self.assertEqual(product.name, 'Luxury Smart Card')
+
+        # Edit Product
+        response = self.client.post(reverse('dashboard:product_edit', args=[product.id]), {
+            'name': 'Gold Smart Card',
+            'price': '₦50,000',
+            'description': '24K gold plated',
+            'is_active': True,
+            'display_order': 1,
+        })
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.name, 'Gold Smart Card')
+
+        # Toggle Active
+        response = self.client.post(reverse('dashboard:product_toggle', args=[product.id]))
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertFalse(product.is_active)
+
+        # Delete Product IDOR defense
+        self.client.login(email="other@uzyra.com", password="password123")
+        response = self.client.post(reverse('dashboard:product_delete', args=[product.id]))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Product.objects.count(), 1)
+
+        # Owner Delete Product
+        self.client.login(email="builder@uzyra.com", password="password123")
+        response = self.client.post(reverse('dashboard:product_delete', args=[product.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Product.objects.count(), 0)
+
+    def test_all_templates_render_successfully(self):
+        """Ensure all 4 template choices render properly without TemplateDoesNotExist."""
+        self.client.login(email="builder@uzyra.com", password="password123")
+        templates = ['modern_business', 'luxury_atelier', 'creator_portfolio', 'retail_showcase']
+
+        for tmpl in templates:
+            website = Website.objects.create(
+                user=self.user,
+                title=f"Site {tmpl}",
+                slug=f"site-{tmpl}",
+                template_choice=tmpl,
+                status=Website.STATUS_PUBLISHED,
+                headline=f"Headline {tmpl}",
+                tagline=f"Tagline {tmpl}",
+            )
+            # Add a sample service and product
+            Service.objects.create(website=website, name=f"Service for {tmpl}", price="₦10,000", is_active=True)
+            Product.objects.create(website=website, name=f"Product for {tmpl}", price="₦20,000", is_active=True)
+
+            # Public render
+            resp = self.client.get(reverse('public_website', args=[website.slug]))
+            self.assertEqual(resp.status_code, 200, f"Template {tmpl} failed public render")
+            self.assertContains(resp, f"Site {tmpl}")
+            self.assertContains(resp, f"Service for {tmpl}")
+            self.assertContains(resp, f"Product for {tmpl}")
+
+            # Preview render
+            prev_resp = self.client.get(reverse('preview_website', args=[website.slug]))
+            self.assertEqual(prev_resp.status_code, 200, f"Template {tmpl} failed preview render")
+            self.assertContains(prev_resp, f"Site {tmpl}")
+
