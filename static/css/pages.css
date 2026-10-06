@@ -462,7 +462,8 @@
     0 0 40px rgba(241, 241, 241, 0.09);
 }
 
-.value-icon-box {
+.value-icon-box,
+.step-icon-box {
   width: 50px;
   height: 50px;
   background:
@@ -2729,10 +2730,10 @@ html, body {
   margin-bottom: 4rem;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 768px) {
   .websites-tier-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 }
 

@@ -1,61 +1,428 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Personal & Business Websites — {{ BRAND_NAME }}{% endblock %}
+{% block title %}Professional Websites — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}UZYRA designs and hosts brand websites, personal portfolio sites, business catalogues, and static landing pages — all connected to your smart NFC card.{% endblock %}
 
 {% block content %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 1: HERO
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="smart-card-hero" aria-label="Websites Hero">
+  <div aria-hidden="true" class="smart-card-watermark">WEB</div>
+  <div class="container">
+    <div style="text-align: center; max-width: 760px; margin: 0 auto; padding: calc(var(--navbar-height) + var(--space-16)) 0 var(--space-16);">
+      <span class="badge badge-silver" style="margin-bottom: 1rem;">BESPOKE WEB DESIGN</span>
+      <h1 style="margin-bottom: var(--space-5); line-height: 1.08; letter-spacing: -0.03em;">
+        Your Card.<br>
+        <span style="background: linear-gradient(135deg, #BFC5CF 0%, #F1F1F1 50%, #8E95A3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Your Website. Your Brand.</span>
+      </h1>
+      <p class="lead" style="max-width: 620px; margin: 0 auto var(--space-8);">
+        Go beyond a digital card. UZYRA designs, hosts, and maintains professional websites — personal brands, business catalogues, static landing pages, and full hosting solutions — all linked to one tap of your smart card.
+      </p>
+      <div class="hero-actions" style="justify-content: center;">
+        <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-lg btn-glow">
+          <span>View Packages & Pricing</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="{% url 'core:contact' %}" class="btn btn-secondary btn-lg">
+          <span>Talk to Us</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 2: WHAT WEBSITE TYPES WE BUILD
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section class="section-py" style="border-bottom: 1px solid var(--border-primary);">
   <div class="container">
-    <div style="text-align: center; max-width: 700px; margin: 0 auto 4rem;">
-      <span class="badge badge-silver" style="margin-bottom: 0.75rem;">BESPOKE WEB DESIGN</span>
-      <h1>Your Card. Your Website. Your Brand.</h1>
-      <p class="lead">
-        Go beyond a standard digital card. We design, host, and maintain high-converting personal and business websites built around your enterprise.
-      </p>
+    <div style="text-align: center; max-width: 680px; margin: 0 auto var(--space-14);">
+      <div class="label-overline mb-2">What We Build</div>
+      <h2 style="margin-bottom: var(--space-4);">Every Website Type. One Platform.</h2>
+      <p class="text-secondary">From a single-page personal brand to a full multi-page business website with hosting — UZYRA handles everything end-to-end.</p>
     </div>
 
-    <!-- 2 Main Website Tiers -->
-    <div class="websites-tier-grid">
-      <!-- Personal Brand Website -->
+    <!-- 4 Website Types Grid -->
+    <div class="websites-tier-grid" style="grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-bottom: 0;">
+
+      <!-- 1. Personal Brand Website -->
       <div class="card card-carbon" style="padding: 2.5rem;">
-        <span class="badge badge-silver" style="margin-bottom: 1rem;">PERSONAL BRAND</span>
-        <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.75rem;">Personal & Creator Website</h2>
-        <p style="margin-bottom: 1.5rem;">Ideal for consultants, developers, executives, lawyers, and public speakers who need an authoritative online home.</p>
-        
-        <ul style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; margin-bottom: 2rem;">
-          <li>✓ Custom Bio & Career Accomplishments</li>
-          <li>✓ Interactive Portfolio / Case Studies</li>
-          <li>✓ Services & Consultation Booking Integration</li>
-          <li>✓ Smart NFC Card Included in Package</li>
-          <li>✓ Custom Domain Connection & SSL Security</li>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="badge badge-silver">PERSONAL BRAND</span>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;">Personal & Creator Website</h3>
+        <p class="text-secondary" style="margin-bottom: 1.5rem; font-size: 0.9rem;">For consultants, developers, executives, lawyers, speakers, and creators who need an authoritative online presence that converts visitors into clients.</p>
+
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.875rem; margin-bottom: 2rem; list-style: none; padding: 0;">
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Custom Bio, Career Story & Accomplishments</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Portfolio & Case Study Gallery</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Services Page & Consultation Booking Link</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Custom Domain + SSL Security</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Linked to Your UZYRA NFC Smart Card</span></li>
         </ul>
 
         <div class="websites-tier-actions d-flex gap-3 flex-wrap">
-          <a href="{% url 'websites:template_preview' 'creator-portfolio' %}" class="btn btn-secondary">Live Template Preview</a>
+          <a href="{% url 'websites:template_preview' 'creator-portfolio' %}" class="btn btn-secondary">Live Preview</a>
           <a href="{% url 'core:pricing' %}" class="btn btn-primary">Choose Package</a>
         </div>
       </div>
 
-      <!-- Business Website -->
+      <!-- 2. Corporate & Business Website -->
       <div class="card card-carbon" style="padding: 2.5rem;">
-        <span class="badge badge-silver" style="margin-bottom: 1rem;">ENTERPRISE & RETAIL</span>
-        <h2 class="h3" style="font-size: 1.25rem; margin-bottom: 0.75rem;">Corporate & Business Website</h2>
-        <p style="margin-bottom: 1.5rem;">For stores, agencies, consultancies, and commercial companies requiring a comprehensive web catalog and lead engine.</p>
-        
-        <ul style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; margin-bottom: 2rem;">
-          <li>✓ Full Multi-Page Layout (Home, About, Services, Products, Contact)</li>
-          <li>✓ Product / Catalogue Showcase with Direct WhatsApp Ordering</li>
-          <li>✓ Interactive Location Map & Inquiry Lead Capture Form</li>
-          <li>✓ Smart NFC Card Included in Package</li>
-          <li>✓ Dedicated Engineering Maintenance & Updates</li>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>
+          </div>
+          <span class="badge badge-silver">ENTERPRISE & RETAIL</span>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;">Corporate & Business Website</h3>
+        <p class="text-secondary" style="margin-bottom: 1.5rem; font-size: 0.9rem;">For stores, agencies, consultancies, and commercial companies needing a comprehensive digital catalogue, lead engine, and ordering system.</p>
+
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.875rem; margin-bottom: 2rem; list-style: none; padding: 0;">
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Full Multi-Page Layout (Home, About, Services, Products, Contact)</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Product & Service Catalogue with WhatsApp Ordering</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Location Map & Lead Inquiry Capture Form</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Smart NFC Card Included in Package</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Ongoing Engineering Maintenance & Updates</span></li>
         </ul>
 
         <div class="websites-tier-actions d-flex gap-3 flex-wrap">
-          <a href="{% url 'websites:template_preview' 'modern-business' %}" class="btn btn-secondary">Live Template Preview</a>
+          <a href="{% url 'websites:template_preview' 'modern-business' %}" class="btn btn-secondary">Live Preview</a>
           <a href="{% url 'core:pricing' %}" class="btn btn-primary">Choose Package</a>
+        </div>
+      </div>
+
+      <!-- 3. Brand / Static Landing Page -->
+      <div class="card card-carbon" style="padding: 2.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+          <span class="badge badge-silver">STATIC & LANDING</span>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;">Brand & Static Landing Page</h3>
+        <p class="text-secondary" style="margin-bottom: 1.5rem; font-size: 0.9rem;">Perfect for product launches, event invitations, campaign microsites, and coming-soon pages. Fast, focused, and beautifully designed.</p>
+
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.875rem; margin-bottom: 2rem; list-style: none; padding: 0;">
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Single-Page Conversion-Optimised Design</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Hero Section, Features, Testimonials, CTA</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Lightning-Fast Page Load (sub 1s)</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Mobile-First, SEO Ready</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Custom Domain & Free SSL Hosting Included</span></li>
+        </ul>
+
+        <div class="websites-tier-actions d-flex gap-3 flex-wrap">
+          <a href="{% url 'core:contact' %}" class="btn btn-secondary">Enquire</a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary">View Pricing</a>
+        </div>
+      </div>
+
+      <!-- 4. Luxury / Retail Showcase -->
+      <div class="card card-carbon" style="padding: 2.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <span class="badge badge-silver">LUXURY & RETAIL</span>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;">Luxury & Retail Showcase</h3>
+        <p class="text-secondary" style="margin-bottom: 1.5rem; font-size: 0.9rem;">For fashion brands, ateliers, high-end restaurants, salons, and premium retailers who want an elevated digital storefront that matches their brand quality.</p>
+
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.875rem; margin-bottom: 2rem; list-style: none; padding: 0;">
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Premium Visual Design & Brand Identity</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Photo Gallery, Collections & Lookbook</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>WhatsApp Ordering & Reservation System</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Smooth Scroll Animations & Luxury UX</span></li>
+          <li style="display: flex; align-items: flex-start; gap: 0.6rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg><span>Multi-Card Fleet for Staff + Brand NFC Card</span></li>
+        </ul>
+
+        <div class="websites-tier-actions d-flex gap-3 flex-wrap">
+          <a href="{% url 'websites:template_preview' 'luxury-atelier' %}" class="btn btn-secondary">Live Preview</a>
+          <a href="{% url 'core:contact' %}" class="btn btn-primary">Custom Quote</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 3: HOSTING & WHAT'S INCLUDED
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="section-py" style="border-bottom: 1px solid var(--border-primary); background: radial-gradient(900px 500px at 50% 50%, rgba(245, 247, 250, 0.055) 0%, transparent 70%), #09090B;">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto var(--space-14);">
+      <div class="label-overline mb-2">Hosting & Infrastructure</div>
+      <h2 style="margin-bottom: var(--space-4);">Everything Included. Nothing Extra.</h2>
+      <p class="text-secondary">Every website we build is deployed on enterprise-grade cloud infrastructure with zero server management on your end.</p>
+    </div>
+
+    <div class="value-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+      <div class="value-card">
+        <div class="value-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="value-card-title">Free SSL & HTTPS</div>
+        <p class="value-card-desc">Every site ships with a free SSL certificate and automatic HTTPS redirection. Your visitors always see a trusted, secure padlock.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div class="value-card-title">Global CDN Hosting</div>
+        <p class="value-card-desc">Content is distributed across global edge nodes. Whether your visitor is in Lagos, London, or New York — your site loads in under a second.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="value-card-title">Custom Domain Setup</div>
+        <p class="value-card-desc">We handle the DNS configuration, A-record mapping, and domain verification for any domain you own — so you're live immediately.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <div class="value-card-title">Fully Mobile Responsive</div>
+        <p class="value-card-desc">Every design is built mobile-first from the ground up. Pixel-perfect on iOS, Android, and all screen sizes — no compromise.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="value-card-title">SEO Optimised</div>
+        <p class="value-card-desc">Semantic HTML, structured meta tags, Open Graph, sitemap, and fast page speed — all pre-configured so Google can discover and rank your site.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        </div>
+        <div class="value-card-title">Easy Content Updates</div>
+        <p class="value-card-desc">Need to update your prices, add a product, or change your bio? Send us a message and changes go live within one business day.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 4: NFC CARD + WEBSITE = ONE ECOSYSTEM
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="suite-section" aria-label="NFC + Website Ecosystem">
+  <div class="container">
+    <div class="suite-card">
+      <div>
+        <div class="label-overline mb-2">The Complete Ecosystem</div>
+        <h2 class="mb-3">Smart Card + Profile + Website.<br>One Tap. Everything.</h2>
+        <p class="text-secondary mb-4">
+          When someone taps your UZYRA smart card, they can land on your full website instantly — not just a link page. Your card, your digital profile, and your website are all connected and managed from one dashboard.
+        </p>
+
+        <div class="suite-features">
+          <div class="suite-feature-item">
+            <svg class="suite-icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>NFC Card tap opens your website directly — no app needed</span>
+          </div>
+          <div class="suite-feature-item">
+            <svg class="suite-icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Update your website anytime — card never needs replacing</span>
+          </div>
+          <div class="suite-feature-item">
+            <svg class="suite-icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Dashboard analytics: see who visited, tapped, and contacted you</span>
+          </div>
+          <div class="suite-feature-item">
+            <svg class="suite-icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Unified brand — same domain on your card, site, email signature, and socials</span>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary">View All Packages</a>
+          <a href="{% url 'core:contact' %}" class="btn btn-secondary">
+            <span>Talk to Us</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="card card-carbon d-flex flex-column justify-center items-center text-center p-6">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="1.5" class="mb-3" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-1);">One Brand. Every Surface.</h3>
+        <p class="text-caption">NFC Card · Digital Profile · Business Website — all managed from your UZYRA dashboard.</p>
+        <div style="margin-top: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); width: 100%;">
+          <div style="display: flex; align-items: center; gap: var(--space-2); padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div class="dot dot-active" style="width: 6px; height: 6px;"></div>
+            <span>yourname.com — Website Live</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-2); padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div class="dot dot-active" style="width: 6px; height: 6px;"></div>
+            <span>uzyra.com/u/yourname — Profile Live</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-2); padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: rgba(255,200,50,0.8); flex-shrink: 0;"></div>
+            <span>NFC Card → tap to open site</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 5: WHO IT'S FOR
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="section-py" style="border-bottom: 1px solid var(--border-primary);">
+  <div class="container">
+    <div style="text-align: center; max-width: 600px; margin: 0 auto var(--space-12);">
+      <div class="label-overline mb-2">Who It's For</div>
+      <h2 style="margin-bottom: var(--space-4);">Built for Every Professional.</h2>
+      <p class="text-secondary">Whether you work solo or lead a team — UZYRA websites are tailored to your industry.</p>
+    </div>
+
+    <div class="grid-4">
+      {% for persona in personas %}
+        <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+          <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">{{ persona.emoji }}</div>
+          <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">{{ persona.title }}</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ persona.desc }}</div>
+        </div>
+      {% empty %}
+        {% for item in "12345678" %}
+          {% if forloop.counter == 1 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">👔</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Executives & CEOs</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Command attention with a premium personal brand site.</div>
+          </div>
+          {% elif forloop.counter == 2 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">💼</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Lawyers & Consultants</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Build trust instantly with a credible practice website.</div>
+          </div>
+          {% elif forloop.counter == 3 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">🛍️</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Retail & Boutiques</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Showcase products and take WhatsApp orders 24/7.</div>
+          </div>
+          {% elif forloop.counter == 4 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">🎨</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Creatives & Designers</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Portfolio and client booking all on your website.</div>
+          </div>
+          {% elif forloop.counter == 5 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">🏥</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Healthcare & Clinics</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Patient info, services, and appointment booking.</div>
+          </div>
+          {% elif forloop.counter == 6 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">🍽️</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Restaurants & Cafés</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Digital menu, location map, and online reservations.</div>
+          </div>
+          {% elif forloop.counter == 7 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">💻</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Tech & Agencies</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Full-stack web presence for modern digital companies.</div>
+          </div>
+          {% elif forloop.counter == 8 %}
+          <div style="padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.025);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.6rem;">🏗️</div>
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.3rem;">Contractors & Trades</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Showcase your work and generate leads from NFC taps.</div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 6: HOW IT WORKS (3-STEP PROCESS)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="how-section" aria-label="How It Works">
+  <div class="container">
+    <div style="text-align: center; max-width: 600px; margin: 0 auto var(--space-14);">
+      <div class="label-overline mb-2">Simple Process</div>
+      <h2 style="margin-bottom: var(--space-4);">From Order to Live in Days.</h2>
+      <p class="text-secondary">No technical knowledge required. We handle everything from design to deployment.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="step-title">Choose Your Package</div>
+        <p class="step-desc">Select the website type that fits your brand — Personal, Business, Static, or Luxury. Or contact us for a custom quote.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+        <div class="step-title">Share Your Brand Info</div>
+        <p class="step-desc">Tell us about yourself — your services, products, images, and preferred style. We'll gather everything through a simple onboarding form.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon-box" style="margin-bottom: var(--space-4);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="step-title">Go Live — Card + Site</div>
+        <p class="step-desc">Your website goes live on your custom domain. Your NFC card tap is pointed to it — ready to share at your next meeting or event.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 7: FINAL CTA
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="cta-section" aria-label="Final Call to Action">
+  <div class="container">
+    <div class="cta-box">
+      <h2 class="cta-title">Ready to Launch Your Website?</h2>
+      <p class="cta-desc">Get a custom professional website paired with your UZYRA smart card. Start receiving leads from the first tap.</p>
+      <div class="hero-actions" style="justify-content: center; margin-top: var(--space-6);">
+        {% if user.is_authenticated %}
+          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-lg btn-glow">
+            <span>View Packages & Pricing</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="{% url 'core:contact' %}" class="btn btn-secondary btn-lg">Contact Us</a>
+        {% else %}
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
+            <span>Get Started Free</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="{% url 'core:contact' %}" class="btn btn-secondary btn-lg">Contact Us</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
 {% endblock %}
