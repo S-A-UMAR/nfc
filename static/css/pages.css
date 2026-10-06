@@ -390,9 +390,9 @@
   padding: var(--space-20) 0;
   border-bottom: 1px solid var(--border-primary);
   background:
-    radial-gradient(1000px 520px at 50% 50%, rgba(245, 247, 250, 0.16) 0%, rgba(191, 197, 207, 0.08) 45%, transparent 75%),
-    radial-gradient(650px 380px at 15% 40%, rgba(241, 241, 241, 0.12) 0%, transparent 60%),
-    radial-gradient(650px 380px at 85% 60%, rgba(191, 197, 207, 0.12) 0%, transparent 60%),
+    radial-gradient(1000px 520px at 50% 50%, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 45%, transparent 75%),
+    radial-gradient(650px 380px at 15% 40%, rgba(241, 241, 241, 0.04) 0%, transparent 60%),
+    radial-gradient(650px 380px at 85% 60%, rgba(191, 197, 207, 0.04) 0%, transparent 60%),
     #09090B;
   position: relative;
   overflow: hidden;
@@ -527,9 +527,9 @@
   padding: var(--space-20) 0;
   border-bottom: 1px solid var(--border-primary);
   background:
-    radial-gradient(1100px 550px at 50% 50%, rgba(245, 247, 250, 0.16) 0%, rgba(191, 197, 207, 0.08) 45%, transparent 75%),
-    radial-gradient(700px 400px at 85% 30%, rgba(191, 197, 207, 0.12) 0%, transparent 60%),
-    radial-gradient(700px 400px at 15% 70%, rgba(241, 241, 241, 0.10) 0%, transparent 60%),
+    radial-gradient(1100px 550px at 50% 50%, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 45%, transparent 75%),
+    radial-gradient(700px 400px at 85% 30%, rgba(191, 197, 207, 0.04) 0%, transparent 60%),
+    radial-gradient(700px 400px at 15% 70%, rgba(241, 241, 241, 0.035) 0%, transparent 60%),
     #09090B;
   position: relative;
   overflow: hidden;
@@ -809,9 +809,9 @@
   padding: var(--space-20) 0;
   border-bottom: 1px solid var(--border-primary);
   background:
-    radial-gradient(1100px 550px at 50% 50%, rgba(245, 247, 250, 0.16) 0%, rgba(191, 197, 207, 0.08) 45%, transparent 75%),
-    radial-gradient(700px 400px at 15% 30%, rgba(191, 197, 207, 0.12) 0%, transparent 60%),
-    radial-gradient(700px 400px at 85% 70%, rgba(241, 241, 241, 0.10) 0%, transparent 60%),
+    radial-gradient(1100px 550px at 50% 50%, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 45%, transparent 75%),
+    radial-gradient(700px 400px at 15% 30%, rgba(191, 197, 207, 0.04) 0%, transparent 60%),
+    radial-gradient(700px 400px at 85% 70%, rgba(241, 241, 241, 0.035) 0%, transparent 60%),
     #09090B;
   position: relative;
   overflow: hidden;
@@ -893,9 +893,9 @@
   padding: var(--space-20) 0;
   border-bottom: 1px solid var(--border-primary);
   background:
-    radial-gradient(1200px 650px at 50% 50%, rgba(245, 247, 250, 0.16) 0%, rgba(191, 197, 207, 0.08) 45%, transparent 75%),
-    radial-gradient(750px 420px at 80% 40%, rgba(191, 197, 207, 0.12) 0%, transparent 60%),
-    radial-gradient(750px 420px at 20% 60%, rgba(241, 241, 241, 0.10) 0%, transparent 60%),
+    radial-gradient(1200px 650px at 50% 50%, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 45%, transparent 75%),
+    radial-gradient(750px 420px at 80% 40%, rgba(191, 197, 207, 0.04) 0%, transparent 60%),
+    radial-gradient(750px 420px at 20% 60%, rgba(241, 241, 241, 0.035) 0%, transparent 60%),
     #09090B;
   position: relative;
   overflow: hidden;
@@ -964,9 +964,9 @@
   padding: var(--space-20) 0;
   border-bottom: 1px solid var(--border-primary);
   background:
-    radial-gradient(1100px 550px at 50% 50%, rgba(245, 247, 250, 0.16) 0%, rgba(191, 197, 207, 0.08) 45%, transparent 75%),
-    radial-gradient(700px 400px at 85% 30%, rgba(191, 197, 207, 0.12) 0%, transparent 60%),
-    radial-gradient(700px 400px at 15% 70%, rgba(241, 241, 241, 0.10) 0%, transparent 60%),
+    radial-gradient(1100px 550px at 50% 50%, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 45%, transparent 75%),
+    radial-gradient(700px 400px at 85% 30%, rgba(191, 197, 207, 0.04) 0%, transparent 60%),
+    radial-gradient(700px 400px at 15% 70%, rgba(241, 241, 241, 0.035) 0%, transparent 60%),
     #09090B;
   position: relative;
   overflow: hidden;
@@ -1049,9 +1049,9 @@
   padding-bottom: var(--space-24);
   border-bottom: 1px solid var(--border-primary);
   background:
-    radial-gradient(1200px 650px at 50% 30%, rgba(245, 247, 250, 0.18) 0%, rgba(191, 197, 207, 0.09) 45%, transparent 75%),
-    radial-gradient(750px 420px at 15% 50%, rgba(241, 241, 241, 0.12) 0%, transparent 60%),
-    radial-gradient(750px 420px at 85% 50%, rgba(191, 197, 207, 0.12) 0%, transparent 60%),
+    radial-gradient(1200px 650px at 50% 30%, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 45%, transparent 75%),
+    radial-gradient(750px 420px at 15% 50%, rgba(241, 241, 241, 0.04) 0%, transparent 60%),
+    radial-gradient(750px 420px at 85% 50%, rgba(191, 197, 207, 0.04) 0%, transparent 60%),
     #09090B;
   overflow: hidden;
 }
@@ -1064,7 +1064,7 @@
   transform: translateX(-50%);
   width: 1000px;
   height: 500px;
-  background: radial-gradient(ellipse at center, rgba(245, 247, 250, 0.11) 0%, rgba(191, 197, 207, 0.07) 45%, transparent 75%);
+  background: radial-gradient(ellipse at center, rgba(245, 247, 250, 0.06) 0%, rgba(191, 197, 207, 0.03) 45%, transparent 75%);
   filter: blur(80px);
   pointer-events: none;
   z-index: 0;
@@ -1712,7 +1712,7 @@
   transform: translateX(-50%);
   width: 1000px;
   height: 650px;
-  background: radial-gradient(ellipse at center, rgba(245, 247, 250, 0.14) 0%, rgba(191, 197, 207, 0.08) 40%, rgba(142, 149, 163, 0.03) 70%, transparent 85%);
+  background: radial-gradient(ellipse at center, rgba(245, 247, 250, 0.07) 0%, rgba(191, 197, 207, 0.035) 40%, rgba(142, 149, 163, 0.015) 70%, transparent 85%);
   filter: blur(80px);
   pointer-events: none;
   z-index: 0;

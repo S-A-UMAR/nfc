@@ -8,45 +8,11 @@ from apps.profiles.models import Profile
 
 @login_required
 def website_manage_view(request):
-    """Customer Dashboard Website Builder."""
-    website = Website.objects.filter(user=request.user).first()
-    
-    if not website:
-        # Empty state: Create website
-        if request.method == 'POST':
-            profile = getattr(request.user, 'profile', None)
-            title = request.POST.get('title', f"{request.user.display_name}'s Website")
-            website = Website.objects.create(
-                user=request.user,
-                title=title,
-                status=Website.STATUS_DRAFT
-            )
-            messages.success(request, "Website created! You can now customize it.")
-            return redirect('dashboard:website_manage')
-        return render(request, 'dashboard/website_create.html')
+    """Customer Dashboard Website Builder — Coming Soon."""
+    # Website Builder is not yet available. Redirect all access.
+    messages.info(request, "Website Builder is coming soon. We'll notify you when it's ready.")
+    return redirect('dashboard:overview')
 
-    # Website exists, show builder
-    if request.method == 'POST' and 'update_website' in request.POST:
-        form = WebsiteBuilderForm(request.POST, instance=website)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Website settings saved successfully.")
-            return redirect('dashboard:website_manage')
-    else:
-        form = WebsiteBuilderForm(instance=website)
-
-    services = website.services.all().order_by('display_order', 'id')
-    products = website.products.all().order_by('display_order', 'id')
-    
-    return render(request, 'dashboard/website_manage.html', {
-        'website': website,
-        'form': form,
-        'services': services,
-        'products': products,
-        'service_form': ServiceForm(),
-        'product_form': ProductForm(),
-        'profile': getattr(request.user, 'profile', None),
-    })
 
 @login_required
 def website_publish_toggle(request, website_id):

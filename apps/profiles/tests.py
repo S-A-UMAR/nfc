@@ -42,9 +42,6 @@ class Phase3ProfileTests(TestCase):
             'title': 'Senior Managing Director & VP',
             'bio': 'Initial bio string',
             'email': 'usera@example.com',
-            'profile_type': 'personal',
-            'theme': 'graphite',
-            'profile_layout': 'classic',
             'is_search_indexed': 'on'
         }
         
@@ -69,9 +66,6 @@ class Phase3ProfileTests(TestCase):
             'title': 'Senior Managing Director & VP',
             'bio': 'Pioneering technology executive with over 15 years experience leading cross-functional engineering teams.',
             'email': 'usera@example.com',
-            'profile_type': 'personal',
-            'theme': 'graphite',
-            'profile_layout': 'classic',
             'is_search_indexed': 'on'
         }
         
@@ -99,9 +93,6 @@ class Phase3ProfileTests(TestCase):
             'bio': 'Persistent profile data test bio.',
             'business_name': 'A-Tech Solutions Ltd',
             'email': 'usera@example.com',
-            'profile_type': 'business',
-            'theme': 'graphite',
-            'profile_layout': 'classic',
             'is_search_indexed': 'on'
         }
         self.client_a.post(self.profile_url, post_data, follow=True)
@@ -133,9 +124,6 @@ class Phase3ProfileTests(TestCase):
             'full_name': 'Attempted Hacked Name',
             'title': 'Hacker Title',
             'email': 'hacked@example.com',
-            'profile_type': 'personal',
-            'theme': 'graphite',
-            'profile_layout': 'classic',
         }
         self.client_a.post(self.profile_url, post_data)
         
@@ -754,11 +742,15 @@ class ProfileCustomizationV2Tests(TestCase):
     # ── 9. Website Builder Coming Soon ───────────────────────────────────────
 
     def test_website_builder_shows_coming_soon_banner(self):
-        """Website Builder dashboard must display the Coming Soon notice."""
+        """Website Builder is locked — accessing the URL redirects to dashboard overview."""
         self.client_a.force_login(self.user_a)
         response = self.client_a.get(reverse('dashboard:website_manage'))
+        # Locked with redirect — Coming Soon
+        self.assertEqual(response.status_code, 302)
+        # Follow redirect — lands on dashboard (still 200)
+        response = self.client_a.get(reverse('dashboard:website_manage'), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Coming Soon')
+
 
     # ── 10. Mobile responsive — appearance page loads without error ───────────
 

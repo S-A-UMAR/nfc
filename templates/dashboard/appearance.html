@@ -201,21 +201,21 @@
 
 <style>
 /* ── Appearance Page Layout ─────────────────────────────────────────────── */
-.appearance-page { max-width: 780px; padding-bottom: 6rem; }
+.appearance-page { max-width: 1080px; padding-bottom: 6rem; }
 .dash-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
 .dash-page-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.25rem; }
 .dash-page-subtitle { color: var(--text-muted); font-size: 0.875rem; margin: 0; }
 
 .appearance-section {
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 1.75rem;
   margin-bottom: 1.25rem;
 }
 .appearance-section-header {
   display: flex;
   align-items: flex-start;
   gap: 0.875rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 .appearance-step-badge {
   width: 28px; height: 28px; border-radius: 50%;
@@ -233,6 +233,7 @@
 
 /* ── Profile Type Cards ─────────────────────────────────────────────────── */
 .appearance-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+@media (min-width: 860px) { .appearance-type-grid { grid-template-columns: repeat(4, 1fr); } }
 .appearance-type-card {
   position: relative;
   background: var(--glass-bg);
@@ -265,13 +266,14 @@
 .appearance-type-card.active .appearance-type-check { opacity: 1; }
 
 /* ── Layout Cards ───────────────────────────────────────────────────────── */
-.appearance-layout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+.appearance-layout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+@media (min-width: 860px) { .appearance-layout-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
 .appearance-layout-card {
   position: relative;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border-subtle);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-spring);
@@ -290,6 +292,7 @@
 
 /* ── Theme Cards ────────────────────────────────────────────────────────── */
 .appearance-themes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.75rem; }
+@media (min-width: 860px) { .appearance-themes-grid { grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); } }
 .appearance-theme-card {
   position: relative;
   background: var(--glass-bg);
@@ -309,7 +312,7 @@
   transform: translateY(-2px);
 }
 .appearance-theme-preview {
-  height: 52px;
+  height: 60px;
   position: relative;
   overflow: hidden;
 }
@@ -320,7 +323,7 @@
   position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
   opacity: 0.85;
 }
-.appearance-theme-info { padding: 0.625rem 0.75rem 0.75rem; }
+.appearance-theme-info { padding: 0.75rem 0.875rem 0.875rem; }
 .appearance-theme-name { font-family: var(--font-heading); font-size: 0.825rem; font-weight: 600; margin-bottom: 0.2rem; }
 .appearance-theme-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.35; }
 
@@ -329,9 +332,9 @@
   position: fixed;
   bottom: 1.5rem; left: 50%; transform: translateX(-50%);
   width: calc(100% - 3rem);
-  max-width: 740px;
+  max-width: 900px;
   border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem;
+  padding: 1rem 1.5rem;
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   z-index: 120;
   flex-wrap: wrap;
@@ -342,10 +345,10 @@
 
 /* Responsive */
 @media (max-width: 540px) {
-  .appearance-type-grid { grid-template-columns: 1fr; }
+  .appearance-type-grid { grid-template-columns: 1fr 1fr; }
   .appearance-layout-grid { grid-template-columns: repeat(2, 1fr); }
   .appearance-themes-grid { grid-template-columns: repeat(2, 1fr); }
-  .appearance-save-bar { bottom: 0; left: 0; right: 0; width: 100%; transform: none; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .appearance-save-bar { bottom: 0; left: 0; right: 0; width: 100%; transform: none; border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 0.875rem 1rem; }
   .appearance-save-summary { font-size: 0.75rem; }
 }
 </style>

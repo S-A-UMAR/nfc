@@ -76,106 +76,11 @@ def error_500_view(request):
 
 def business_view(request):
     """
-    Public Business & Custom Solutions page.
-    Renders service categories and handles the business inquiry form submission.
+    Business & Custom Solutions page — Coming Soon.
+    Redirects all access until the feature is ready for public launch.
     """
-    from apps.core.security import check_rate_limit, get_client_ip
-    from apps.core.models import BusinessInquiry
-    from apps.core.services.email_service import BrevoEmailService
-    import logging
-    logger = logging.getLogger(__name__)
-
-    if request.method == 'POST':
-        ip = get_client_ip(request)
-
-        # Rate limit: 4 inquiries per IP per 10 minutes
-        allowed, remaining, retry_after = check_rate_limit(f"business_inquiry:{ip}", limit=4, window_seconds=600)
-        if not allowed:
-            messages.error(request, f"Too many submissions. Please wait {retry_after} seconds before trying again.")
-            return redirect('core:business')
-
-        form = BusinessInquiryForm(request.POST)
-        if form.is_valid():
-            # Honeypot already validated inside the form; safe to save
-            inquiry = form.save(commit=False)
-            inquiry.ip_address = ip
-            inquiry.save()
-
-            # Send confirmation to customer
-            try:
-                BrevoEmailService.send_business_inquiry_confirmation(inquiry)
-            except Exception as e:
-                logger.warning(f"Business inquiry confirmation email failed: {e}")
-
-            # Send internal alert to UZYRA team
-            try:
-                BrevoEmailService.send_business_inquiry_admin_alert(inquiry)
-            except Exception as e:
-                logger.warning(f"Business inquiry admin alert email failed: {e}")
-
-            messages.success(
-                request,
-                "Thank you! Your inquiry has been received. We'll be in touch within 24–48 hours."
-            )
-            return redirect('core:business')
-        elif 'website_url_hp' in form.errors:
-            # Bot trap triggered: silently discard and pretend success to prevent bot adaptation
-            logger.info(f"Bot detected and trapped on business inquiry form from IP {ip}")
-            messages.success(
-                request,
-                "Thank you! Your inquiry has been received. We'll be in touch within 24–48 hours."
-            )
-            return redirect('core:business')
-        # Form invalid for human reasons — fall through to re-render with errors
-    else:
-        form = BusinessInquiryForm()
-
-    # Service category data for the template cards
-    services = [
-        {
-            'key': 'company_team',
-            'title': 'Company & Teams',
-            'icon': 'briefcase',
-            'description': 'Branded NFC cards for every member of your team. One tap, instant digital identity.',
-        },
-        {
-            'key': 'event',
-            'title': 'Event Solutions',
-            'icon': 'calendar',
-            'description': 'NFC-powered event check-ins, exhibitor profiles, and attendee networking.',
-        },
-        {
-            'key': 'event_center',
-            'title': 'Event Centers',
-            'icon': 'star',
-            'description': 'Permanent NFC installations for venues — directories, info points, and more.',
-        },
-        {
-            'key': 'security',
-            'title': 'Security Personnel',
-            'icon': 'shield',
-            'description': 'Durable, custom NFC ID cards for guards and security staff.',
-        },
-        {
-            'key': 'custom_card',
-            'title': 'Custom NFC Cards',
-            'icon': 'credit-card',
-            'description': 'Fully custom-designed NFC cards matching your brand — any shape, any finish.',
-        },
-        {
-            'key': 'card_website',
-            'title': 'Card + Website',
-            'icon': 'globe',
-            'description': 'Combine a premium NFC card with a custom-built digital presence for your business.',
-        },
-    ]
-
-    return render(request, 'core/business.html', {
-        'form': form,
-        'services': services,
-        'whatsapp_number': '+2348000000000',
-        'whatsapp_message': 'Hello UZYRA, I would like to discuss a custom NFC solution for my business.',
-    })
+    messages.info(request, "Our Business & Custom Solutions page is coming soon. Contact us on WhatsApp in the meantime.")
+    return redirect('core:home')
 
 
 # ─────────────────────────────────────────────────────────────────────────────

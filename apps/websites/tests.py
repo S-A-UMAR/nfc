@@ -1,3 +1,5 @@
+import unittest
+
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -14,25 +16,28 @@ class WebsiteBuilderTests(TestCase):
         self.other_user = User.objects.create_user(email="other@uzyra.com", password="password123")
         self.other_profile = self.other_user.profile
 
-    def test_website_manage_empty_state_get(self):
+    def test_website_manage_redirects_coming_soon(self):
+        """Website Builder is locked Coming Soon — manage URL should redirect to dashboard."""
         self.client.login(email="builder@uzyra.com", password="password123")
         response = self.client.get(reverse('dashboard:website_manage'))
+        self.assertEqual(response.status_code, 302)
+        # Follow — lands on dashboard overview
+        response = self.client.get(reverse('dashboard:website_manage'), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No Website Created Yet")
 
+    @unittest.skip("Website Builder Coming Soon — creation endpoint temporarily disabled")
     def test_create_website(self):
         self.client.login(email="builder@uzyra.com", password="password123")
         response = self.client.post(reverse('dashboard:website_manage'), {'title': 'My New Website'})
         self.assertEqual(response.status_code, 302)
-        
         website = Website.objects.get(user=self.user)
         self.assertEqual(website.title, 'My New Website')
         self.assertEqual(website.status, Website.STATUS_DRAFT)
 
+    @unittest.skip("Website Builder Coming Soon — settings endpoint temporarily disabled")
     def test_update_website_settings(self):
         website = Website.objects.create(user=self.user, title="Initial", status=Website.STATUS_DRAFT)
         self.client.login(email="builder@uzyra.com", password="password123")
-        
         response = self.client.post(reverse('dashboard:website_manage'), {
             'update_website': '1',
             'title': 'Updated Title',
@@ -49,6 +54,8 @@ class WebsiteBuilderTests(TestCase):
         self.assertEqual(website.title, 'Updated Title')
         self.assertEqual(website.slug, 'updated-slug')
         self.assertEqual(website.primary_color, '#ff0000')
+
+
 
     def test_website_publish_toggle(self):
         website = Website.objects.create(user=self.user, title="To Publish", status=Website.STATUS_DRAFT)

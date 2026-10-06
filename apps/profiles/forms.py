@@ -5,7 +5,7 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'full_name', 'title', 'bio', 'profile_type', 'theme', 'profile_layout',
+            'full_name', 'title', 'bio',
             'profile_image', 'cover_image',
             'phone', 'whatsapp', 'email', 'website_url', 'location', 'address',
             'business_name', 'business_category', 'business_description', 'business_logo',
@@ -15,9 +15,6 @@ class ProfileForm(forms.ModelForm):
             'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Full Name'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Founder | Software Engineer'}),
             'bio': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'Tell visitors about what you do...'}),
-            'profile_type': forms.Select(attrs={'class': 'form-select'}),
-            'theme': forms.Select(attrs={'class': 'form-select'}),
-            'profile_layout': forms.Select(attrs={'class': 'form-select'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+234 800 000 0000'}),
             'whatsapp': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+234 800 000 0000 (WhatsApp)'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contact@example.com'}),
