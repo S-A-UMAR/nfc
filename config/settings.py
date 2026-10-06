@@ -171,16 +171,29 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise — compressed static file storage for production
-# Uses Brotli/gzip compression and long-lived cache headers automatically
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-    },
-    'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    },
-}
+# Static file storage:
+# - Production (DEBUG=False): WhiteNoise CompressedManifestStaticFilesStorage
+#   → generates hashed filenames + Brotli/gzip compression; requires collectstatic
+# - Development/tests (DEBUG=True): standard StaticFilesStorage
+#   → no manifest required; works without running collectstatic first
+if DEBUG:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        },
+    }
+else:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
 
 # Media files (User uploads, QR codes, logos)
 # NOTE: On Render's free tier, media files are stored on an ephemeral filesystem.

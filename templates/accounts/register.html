@@ -83,7 +83,7 @@
         <div class="form-group">
           <label for="id_password" class="form-label">Password</label>
           {{ form.password }}
-          <div class="form-hint">Minimum 6 characters</div>
+          <div class="form-hint">Min. 8 chars · uppercase · number · special character (e.g. !@#$)</div>
           {% if form.password.errors %}
             <div class="form-error" role="alert">
               <span>{{ form.password.errors|first }}</span>
