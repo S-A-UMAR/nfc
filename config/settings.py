@@ -18,16 +18,26 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-nfc-smart-card
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
+# ALLOWED_HOSTS — always read from environment in production
+# In DEBUG mode, fallback to wildcard for convenience
 allowed_hosts_env = os.environ.get('DJANGO_ALLOWED_HOSTS')
 if allowed_hosts_env:
     ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
 else:
-    ALLOWED_HOSTS = ['*'] if DEBUG else ['uzyra.com', 'www.uzyra.com', '127.0.0.1', 'localhost', 'testserver']
+    ALLOWED_HOSTS = ['*'] if DEBUG else ['127.0.0.1', 'localhost', 'testserver']
 
-# ⚠️  TEMPORARY — NFC testing via Cloudflare Tunnel — REMOVE AFTER TESTING
-CSRF_TRUSTED_ORIGINS = [
-    'https://deal-computing-sent-bias.trycloudflare.com',
-]
+# CSRF Trusted Origins — read from environment so it works on any domain
+# For Render: set DJANGO_CSRF_TRUSTED_ORIGINS=https://your-app-name.onrender.com
+csrf_origins_env = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '')
+if csrf_origins_env:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_origins_env.split(',') if o.strip()]
+else:
+    # Development fallback
+    CSRF_TRUSTED_ORIGINS = []
+
+# Render reverse proxy — required so Django knows requests arrive via HTTPS
+# Render terminates SSL and forwards requests as HTTP internally
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Security Headers & Browser Protections
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -86,6 +96,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise serves static files efficiently in production.
+    # Must be placed directly after SecurityMiddleware and before all others.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,6 +132,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # NOTE: SQLite on Render's free tier uses an ephemeral filesystem.
+        # Data WILL be lost when the service restarts or redeploys.
+        # This is acceptable for temporary staging/testing.
+        # Migrate to PostgreSQL before any real user data is at stake.
     }
 }
 
@@ -154,7 +171,21 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# WhiteNoise — compressed static file storage for production
+# Uses Brotli/gzip compression and long-lived cache headers automatically
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
 # Media files (User uploads, QR codes, logos)
+# NOTE: On Render's free tier, media files are stored on an ephemeral filesystem.
+# Uploaded profile images, QR codes, etc. will be LOST on redeploy/restart.
+# For production, configure cloud storage (e.g. AWS S3, Cloudinary) before launch.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -165,7 +196,8 @@ LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'dashboard:overview'
 LOGOUT_REDIRECT_URL = 'core:home'
 
-# Site Domain URL for absolute links
+# Site Domain URL for absolute links (NFC redirects, email links, vCard, etc.)
+# Set this to your actual Render URL: https://your-app-name.onrender.com
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
 
 # Brand Customization
@@ -180,7 +212,7 @@ BREVO_SENDER_EMAIL = os.environ.get('BREVO_SENDER_EMAIL', 'contact@uzyra.com')
 BREVO_SENDER_NAME = os.environ.get('BREVO_SENDER_NAME', 'UZYRA')
 
 # Paystack Config
-PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY', 'pk_test_sample_public_key')
-PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY', 'sk_test_sample_secret_key')
+# Use TEST keys (pk_test_... / sk_test_...) for this staging deployment
+PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY', '')
+PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY', '')
 PAYSTACK_TEST_MODE = os.environ.get('PAYSTACK_TEST_MODE', 'True').lower() in ('true', '1')
-

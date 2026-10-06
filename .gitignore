@@ -9,6 +9,16 @@ build/
 .eggs/
 *.so
 
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Scratch / audit scripts (local development only)
+audit_responsive.py
+audit_results.json
+run_audit.py
+inspect_details.py
+
 # Django
 *.log
 local_settings.py
