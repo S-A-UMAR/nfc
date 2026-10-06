@@ -25,7 +25,7 @@
   {% endif %}
 </div>
 
-<form method="post" enctype="multipart/form-data" novalidate>
+<form method="post" action="{% url 'dashboard:profile_edit' %}" enctype="multipart/form-data" novalidate>
   {% csrf_token %}
 
   {% if form.non_field_errors %}

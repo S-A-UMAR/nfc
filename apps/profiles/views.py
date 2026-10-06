@@ -98,6 +98,8 @@ def profile_edit_view(request):
             form.save()
             messages.success(request, "Your digital profile has been updated successfully.")
             return redirect('dashboard:profile_edit')
+        else:
+            messages.error(request, "Please check the form below. Some required fields or formats need attention.")
     else:
         form = ProfileForm(instance=profile)
 
