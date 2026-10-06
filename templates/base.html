@@ -85,7 +85,7 @@
           <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-sm nav-hide-mobile">Sign Out</a>
         {% else %}
           <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm nav-hide-mobile">Sign In</a>
-          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm nav-btn-pill">Get Started</a>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm nav-btn-pill">Create Profile</a>
         {% endif %}
 
         <!-- Mobile Menu Toggle Button -->
@@ -200,7 +200,7 @@
         <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-block" style="color: var(--text-muted);">Sign Out</a>
       {% else %}
         <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-block">Sign In</a>
-        <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-block">Get Started</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-block">Create Digital Profile</a>
       {% endif %}
     </div>
   </aside>

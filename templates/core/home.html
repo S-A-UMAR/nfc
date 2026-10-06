@@ -32,13 +32,23 @@
         </p>
 
         <div class="hero-actions">
-          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-lg btn-glow">
-            <span>Get Your Smart Card</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-          <a href="{% url 'core:how_it_works' %}" class="btn btn-secondary btn-lg">
-            <span>How It Works</span>
-          </a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary btn-lg btn-glow">
+              <span>Go to Your Digital Profile</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
+              <span>Get Your Smart Card</span>
+            </a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
+              <span>Create Your Digital Profile</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
+              <span>Get Your Smart Card</span>
+            </a>
+          {% endif %}
         </div>
 
         <!-- Capability & Trust Strip: fills the space with luxury credibility -->
@@ -273,10 +283,17 @@
           </div>
         </div>
 
-        <a href="{% url 'core:pricing' %}" class="btn btn-primary">
-          <span>Create Your Profile</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary">
+            <span>Edit Your Profile</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        {% else %}
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+            <span>Create Your Profile</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -547,10 +564,25 @@
       <p class="cta-desc">
         Join forward-thinking professionals and businesses using UZYRA to build their modern digital identity and professional network.
       </p>
-      <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-lg">
-        <span>Get Your Smart Card Today</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </a>
+      <div class="hero-actions" style="justify-content: center; margin-top: var(--space-6);">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary btn-lg btn-glow">
+            <span>Manage Your Digital Profile</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
+            <span>Get Your Smart Card</span>
+          </a>
+        {% else %}
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
+            <span>Create Your Digital Profile</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
+            <span>Get Your Smart Card</span>
+          </a>
+        {% endif %}
+      </div>
     </div>
   </div>
 </section>
