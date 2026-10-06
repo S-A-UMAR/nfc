@@ -1045,7 +1045,8 @@
    ───────────────────────────────────────────────────────────────────────── */
 .pricing-section {
   position: relative;
-  padding-top: calc(var(--space-24) + 2.5rem);
+  margin-top: calc(-1 * var(--navbar-height));
+  padding-top: calc(var(--navbar-height) + var(--space-12));
   padding-bottom: var(--space-24);
   border-bottom: 1px solid var(--border-primary);
   background:
@@ -1699,7 +1700,8 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 .smart-card-hero {
   position: relative;
-  padding: var(--space-16) 0 var(--space-20);
+  margin-top: calc(-1 * var(--navbar-height));
+  padding: calc(var(--navbar-height) + var(--space-8)) 0 var(--space-20);
   border-bottom: 1px solid var(--border-primary);
   overflow: hidden;
 }
