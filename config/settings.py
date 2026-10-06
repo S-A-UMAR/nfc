@@ -1,6 +1,13 @@
 import os
 from pathlib import Path
 
+# TiDB / MySQL compatibility layer via pure-Python PyMySQL
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -91,6 +98,10 @@ INSTALLED_APPS = [
     'apps.payments.apps.PaymentsConfig',
     'apps.websites.apps.WebsitesConfig',
     'apps.analytics.apps.AnalyticsConfig',
+
+    # Cloudinary Persistent Media Storage
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -128,16 +139,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        # NOTE: SQLite on Render's free tier uses an ephemeral filesystem.
-        # Data WILL be lost when the service restarts or redeploys.
-        # This is acceptable for temporary staging/testing.
-        # Migrate to PostgreSQL before any real user data is at stake.
+# Database Configuration:
+# - When TIDB_HOST is provided (production / staging), connects to TiDB Serverless (MySQL protocol with SSL)
+# - Otherwise, falls back to local SQLite3 (local development & unit testing)
+TIDB_HOST = os.environ.get('TIDB_HOST')
+if TIDB_HOST:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django_tidb',
+            'NAME': os.environ.get('TIDB_DB_NAME', 'uzyra'),
+            'USER': os.environ.get('TIDB_USER', ''),
+            'PASSWORD': os.environ.get('TIDB_PASSWORD', ''),
+            'HOST': TIDB_HOST,
+            'PORT': int(os.environ.get('TIDB_PORT', 4000)),
+            'OPTIONS': {
+                'ssl': {
+                    'ssl_mode': 'REQUIRED'
+                },
+                'charset': 'utf8mb4',
+            }
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
@@ -171,15 +200,32 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Static file storage:
-# - Production (DEBUG=False): WhiteNoise CompressedManifestStaticFilesStorage
-#   → generates hashed filenames + Brotli/gzip compression; requires collectstatic
-# - Development/tests (DEBUG=True): standard StaticFilesStorage
-#   → no manifest required; works without running collectstatic first
+# Cloudinary Persistent Media Storage Configuration
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '').lstrip('@').strip()
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '').strip()
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '').strip()
+
+if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+    }
+    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
+    default_storage_backend = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    MEDIA_URL = '/media/'
+    default_storage_backend = 'django.core.files.storage.FileSystemStorage'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# File Storage Configuration:
+# - Media files: Cloudinary (persistent across Render redeploys) or local FileSystemStorage
+# - Static files: WhiteNoise CompressedManifestStaticFilesStorage in prod, StaticFilesStorage in debug
 if DEBUG:
     STORAGES = {
         'default': {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'BACKEND': default_storage_backend,
         },
         'staticfiles': {
             'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
@@ -188,19 +234,12 @@ if DEBUG:
 else:
     STORAGES = {
         'default': {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'BACKEND': default_storage_backend,
         },
         'staticfiles': {
             'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
         },
     }
-
-# Media files (User uploads, QR codes, logos)
-# NOTE: On Render's free tier, media files are stored on an ephemeral filesystem.
-# Uploaded profile images, QR codes, etc. will be LOST on redeploy/restart.
-# For production, configure cloud storage (e.g. AWS S3, Cloudinary) before launch.
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

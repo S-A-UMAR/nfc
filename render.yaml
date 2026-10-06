@@ -1,15 +1,11 @@
 # render.yaml — UZYRA Platform Render deployment configuration
-# Temporary staging with SQLite3 — NOT for production user data
-#
-# NOTE: SQLite on Render's free tier uses an ephemeral filesystem.
-# The database will be RESET on every redeploy or server restart.
-# This is acceptable for testing. Migrate to PostgreSQL before production.
+# Persistent TiDB Serverless Database + Cloudinary Persistent Media Storage
 
 services:
   - type: web
     name: uzyra
     runtime: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
     startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: DJANGO_SETTINGS_MODULE
@@ -19,15 +15,31 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
-        sync: false   # Set this to your-app-name.onrender.com after first deploy
+        sync: false   # e.g. uzyra.onrender.com
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        sync: false   # Set this to https://your-app-name.onrender.com after first deploy
+        sync: false   # e.g. https://uzyra.onrender.com
       - key: SITE_URL
-        sync: false   # Set this to https://your-app-name.onrender.com after first deploy
+        sync: false   # e.g. https://uzyra.onrender.com
       - key: DJANGO_SESSION_COOKIE_SECURE
         value: "True"
       - key: DJANGO_CSRF_COOKIE_SECURE
         value: "True"
+      - key: TIDB_HOST
+        sync: false
+      - key: TIDB_PORT
+        value: "4000"
+      - key: TIDB_USER
+        sync: false
+      - key: TIDB_PASSWORD
+        sync: false
+      - key: TIDB_DB_NAME
+        value: "uzyra"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
       - key: BREVO_API_KEY
         sync: false   # Secret — enter in Render dashboard manually
       - key: BREVO_SENDER_EMAIL
@@ -42,3 +54,4 @@ services:
         value: "True"
       - key: BRAND_NAME
         value: UZYRA
+
