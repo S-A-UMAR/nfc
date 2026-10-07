@@ -37,4 +37,5 @@ urlpatterns = [
     path('analytics/', ana_views.analytics_dashboard_view, name='analytics_view'),
     path('appearance/', prof_views.profile_appearance_view, name='appearance'),
     path('settings/', acc_dash.settings_view, name='settings_view'),
+    path('settings/delete-account/', acc_dash.delete_account_view, name='delete_account'),
 ]

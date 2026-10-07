@@ -60,4 +60,51 @@
     </form>
   </div>
 </div>
+
+<!-- Privacy & Data Controls (NDPA 2023) -->
+<div class="dashboard-settings-grid" style="margin-top: var(--space-8);">
+  <div class="card">
+    <div class="d-flex items-center gap-2 mb-3">
+      <span class="badge badge-silver">NDPA 2023</span>
+      <h2 style="font-size: 1rem; margin: 0;">Privacy &amp; Data Rights</h2>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+      Under the Nigeria Data Protection Act 2023, you have the right to access, rectify, or request deletion of your personal data at any time.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+      {% if request.user.profile and request.user.profile.slug %}
+        <a href="{% url 'profiles:download_vcard' request.user.profile.slug %}" class="btn btn-secondary btn-sm" style="justify-content: flex-start; gap: 0.5rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Export My Contact Card (.vcf)</span>
+        </a>
+      {% endif %}
+
+      <a href="{% url 'legal:complaints' %}?category=privacy" class="btn btn-secondary btn-sm" style="justify-content: flex-start; gap: 0.5rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Submit Formal NDPA Data Request</span>
+      </a>
+
+      <a href="{% url 'legal:privacy' %}" class="btn btn-ghost btn-sm" style="justify-content: flex-start; gap: 0.5rem;">
+        <span>Read Full Privacy Policy &rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="card" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.03);">
+    <div class="d-flex items-center gap-2 mb-3">
+      <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4);">DANGER ZONE</span>
+      <h2 style="font-size: 1rem; color: #EF4444; margin: 0;">Account Deletion</h2>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+      Permanently delete your user account, public digital profile, and unbind your physical smart cards. This action is non-reversible.
+    </p>
+
+    <a href="{% url 'dashboard:delete_account' %}" class="btn btn-secondary btn-sm" style="color: #EF4444; border-color: rgba(239, 68, 68, 0.4);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      <span>Delete My Account...</span>
+    </a>
+  </div>
+</div>
 {% endblock %}

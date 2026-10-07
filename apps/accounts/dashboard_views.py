@@ -79,11 +79,13 @@ def settings_view(request):
     """Customer Account Settings & Password change with email alerts and safe email updates."""
     from apps.core.services.email_service import BrevoEmailService
 
+    user_form = UserUpdateForm(instance=request.user)
+    password_form = PasswordChangeForm(request.user)
+
     if request.method == 'POST':
         if 'update_account' in request.POST:
             old_email = request.user.email
             user_form = UserUpdateForm(request.POST, instance=request.user)
-            password_form = PasswordChangeForm(request.user)
             if user_form.is_valid():
                 user = user_form.save()
                 if user.email != old_email:
@@ -96,7 +98,6 @@ def settings_view(request):
                 messages.success(request, "Account details updated successfully.")
                 return redirect('dashboard:settings_view')
         elif 'change_password' in request.POST:
-            user_form = UserUpdateForm(instance=request.user)
             password_form = PasswordChangeForm(request.user, request.POST)
             if password_form.is_valid():
                 user = password_form.save()
@@ -107,11 +108,59 @@ def settings_view(request):
                 return redirect('dashboard:settings_view')
             else:
                 messages.error(request, "Please correct the errors in the password form.")
-    else:
-        user_form = UserUpdateForm(instance=request.user)
-        password_form = PasswordChangeForm(request.user)
 
     return render(request, 'dashboard/settings.html', {
         'user_form': user_form,
         'password_form': password_form,
     })
+
+
+@login_required
+def delete_account_view(request):
+    """
+    Safe, verified Account Deletion flow conforming to NDPA 2023 (Right to Erasure).
+    Requires password verification to prevent unauthorized account destruction.
+    Sanitizes physical NFC cards, deletes profile, unpublishes websites, terminates session.
+    """
+    from django.contrib.auth import logout
+    from apps.cards.models import Card
+    from apps.websites.models import Website
+
+    user = request.user
+
+    if request.method == 'POST':
+        confirm_acknowledged = request.POST.get('confirm_acknowledgment') == 'on'
+        if not confirm_acknowledged:
+            messages.error(request, "Please check the box confirming you understand the permanent consequences of deletion.")
+            return render(request, 'dashboard/delete_account.html')
+
+        # Password or email verification
+        if user.has_usable_password():
+            password = request.POST.get('confirm_password', '')
+            if not password or not user.check_password(password):
+                messages.error(request, "Incorrect password. For your security, account deletion has been cancelled.")
+                return render(request, 'dashboard/delete_account.html')
+        else:
+            confirm_email = request.POST.get('confirm_email', '').strip().lower()
+            if confirm_email != user.email.lower():
+                messages.error(request, "Email verification did not match your account email address.")
+                return render(request, 'dashboard/delete_account.html')
+
+        # 1. Sanitize physical NFC cards: decouple from user/profile and reset to unassigned
+        Card.objects.filter(user=user).update(
+            user=None,
+            profile=None,
+            status=Card.STATUS_UNASSIGNED
+        )
+
+        # 2. Invalidate active session
+        logout(request)
+
+        # 3. Permanently delete user record (cascades profile, links, websites)
+        user.delete()
+
+        messages.success(request, "Your account and personal profile have been permanently deleted.")
+        return redirect('core:home')
+
+    return render(request, 'dashboard/delete_account.html')
+

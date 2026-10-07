@@ -1,10 +1,41 @@
 from django.contrib import admin
 from .models import ContactMessage, AdminAuditLog, BusinessInquiry
 
+class InquiryCategoryFilter(admin.SimpleListFilter):
+    title = 'Inquiry / Legal Category'
+    parameter_name = 'category'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('privacy', 'Data Privacy Requests (NDPA)'),
+            ('copyright', 'Copyright & IP Notices'),
+            ('abuse', 'Abuse & Impersonation'),
+            ('hardware', 'NFC Hardware & Delivery'),
+            ('billing', 'Billing & Refunds'),
+            ('general', 'General Inquiries'),
+        )
+
+    def queryset(self, request, queryset):
+        val = self.value()
+        if val == 'privacy':
+            return queryset.filter(subject__icontains='[Data Privacy Request]')
+        if val == 'copyright':
+            return queryset.filter(subject__icontains='[IP / Copyright')
+        if val == 'abuse':
+            return queryset.filter(subject__icontains='[Abuse Report]')
+        if val == 'hardware':
+            return queryset.filter(subject__icontains='[NFC Hardware]')
+        if val == 'billing':
+            return queryset.filter(subject__icontains='[Payment / Billing]')
+        if val == 'general':
+            return queryset.exclude(subject__startswith='[')
+        return queryset
+
+
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ('subject', 'full_name', 'email', 'phone', 'is_resolved', 'created_at')
-    list_filter = ('is_resolved', 'created_at')
+    list_filter = (InquiryCategoryFilter, 'is_resolved', 'created_at')
     search_fields = ('subject', 'full_name', 'email', 'message')
     list_editable = ('is_resolved',)
 

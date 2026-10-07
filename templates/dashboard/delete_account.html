@@ -1,0 +1,80 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Delete Account — {{ BRAND_NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header">
+  <div>
+    <div class="d-flex items-center gap-2 mb-2">
+      <a href="{% url 'dashboard:settings_view' %}" class="text-muted" style="font-size: 0.85rem;">&larr; Back to Settings</a>
+    </div>
+    <h1 class="dashboard-title" style="color: #EF4444;">Delete Your Account</h1>
+    <p class="dashboard-subtitle">Permanently delete your personal profile, credentials, and digital presence.</p>
+  </div>
+</div>
+
+<div style="max-width: 680px;">
+  <!-- Warning Callout Card -->
+  <div class="card" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); margin-bottom: var(--space-6);">
+    <div class="d-flex items-center gap-3 mb-3">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: #EF4444; flex-shrink: 0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; color: #EF4444; margin: 0;">Warning: This action is permanent and non-reversible.</h2>
+    </div>
+
+    <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+      Under the <strong>Nigeria Data Protection Act 2023 (Right to Erasure)</strong>, deleting your account initiates the permanent removal of your personal digital identity from the {{ BRAND_NAME }} platform:
+    </p>
+
+    <ul style="font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4); padding-left: var(--space-5);">
+      <li><strong>Public Profile Deletion:</strong> Your digital profile URL (<code>/u/{{ request.user.profile.slug }}/</code>) will immediately go offline and be permanently deleted.</li>
+      <li><strong>Media &amp; Contact Records:</strong> Your uploaded profile photo, bio, WhatsApp routing, and custom button links will be purged.</li>
+      <li><strong>Physical NFC Smart Cards:</strong> Any physical cards linked to this account will be automatically decoupled and reset to <em>Unassigned</em>. Tapping the physical card will display an inactive card notice and will reveal zero personal data.</li>
+      <li><strong>Session Termination:</strong> Your active session will be invalidated and you will be signed out immediately.</li>
+      <li><strong>Statutory Invoices:</strong> Historical fiscal invoices and payment references are archived securely as mandated by Nigerian tax and accounting laws.</li>
+    </ul>
+  </div>
+
+  <!-- Confirmation Form -->
+  <div class="card card-carbon">
+    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-4);">Confirm Identity to Proceed</h3>
+
+    <form method="post" action="{% url 'dashboard:delete_account' %}">
+      {% csrf_token %}
+
+      {% if request.user.has_usable_password %}
+        <div class="form-group mb-4">
+          <label class="form-label" for="id_confirm_password">Enter Your Account Password <span style="color: #EF4444;">*</span></label>
+          <input type="password" name="confirm_password" id="id_confirm_password" class="form-control" placeholder="Enter current password" required autocomplete="current-password">
+          <div class="form-hint">Please enter your password to confirm you are the authorized owner of this account.</div>
+        </div>
+      {% else %}
+        <div class="form-group mb-4">
+          <label class="form-label" for="id_confirm_email">Confirm Your Email Address <span style="color: #EF4444;">*</span></label>
+          <input type="email" name="confirm_email" id="id_confirm_email" class="form-control" placeholder="{{ request.user.email }}" required>
+          <div class="form-hint">Type your exact account email (<code>{{ request.user.email }}</code>) to confirm.</div>
+        </div>
+      {% endif %}
+
+      <div class="form-group mb-6">
+        <label class="form-check" style="align-items: flex-start; gap: 0.75rem;">
+          <input type="checkbox" name="confirm_acknowledgment" class="form-check-input" required style="margin-top: 3px;">
+          <span style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+            I confirm that I want to permanently delete my account, my public profile, and all associated personal data. I understand that physical smart cards will be deactivated and that this action cannot be undone.
+          </span>
+        </label>
+      </div>
+
+      <div class="d-flex items-center gap-3 flex-wrap">
+        <button type="submit" class="btn btn-primary" style="background: #DC2626; border-color: #EF4444; color: #FFFFFF;">
+          <span>Permanently Delete My Account</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </button>
+        <a href="{% url 'dashboard:settings_view' %}" class="btn btn-secondary">Cancel and Return</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
