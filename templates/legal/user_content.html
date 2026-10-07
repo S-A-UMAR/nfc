@@ -1,0 +1,74 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}User-Generated Content Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official User-Generated Content (UGC) Policy of {{ BRAND_NAME }}. Learn the rules governing uploaded photos, business descriptions, links, and profile materials.{% endblock %}
+
+{% block legal_title %}User-Generated Content Policy{% endblock %}
+{% block legal_summary %}
+This policy defines the standards, user responsibilities, and moderation rules governing all user-submitted content published on {{ BRAND_NAME }} public digital profiles, website templates, and custom links.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Creator Responsibility:</strong> When you publish photos, company logos, biographical text, and links on your {{ BRAND_NAME }} profile, you represent and warrant that you own or possess legal rights to that material. You are solely responsible for all content published through your account.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="scope">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Scope of User-Generated Content</h2>
+    <p>User-Generated Content ("UGC") encompasses all data, media, and text you provide or upload to the platform, including:</p>
+    <ul>
+      <li>Profile and avatar photographs uploaded to Cloudinary;</li>
+      <li>Full name, display name, job titles, company names, and professional bios;</li>
+      <li>Custom links, external social URLs, portfolio links, and WhatsApp routing numbers;</li>
+      <li>Services, product catalog titles, descriptions, and imagery created within our platform;</li>
+      <li>Physical contact addresses and location descriptions.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="standards">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Content Standards & Warranties</h2>
+    <p>By publishing any UGC on {{ BRAND_NAME }}, you expressly represent and warrant that:</p>
+    <ul>
+      <li><strong>Legal Ownership & Authorization:</strong> You own the copyright to the uploaded photographs and text, or you have obtained valid written licenses from the copyright or trademark owners.</li>
+      <li><strong>Truthful Identity:</strong> Your biographical information, qualifications, employment claims, and corporate affiliations are accurate, truthful, and not deceptive.</li>
+      <li><strong>No Infringement:</strong> The content does not violate any third party's trademark, trade secret, privacy rights, publicity rights, or intellectual property rights.</li>
+      <li><strong>Compliance with Law:</strong> The content complies with all applicable laws of the Federal Republic of Nigeria and the jurisdiction in which you operate.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="prohibited-ugc">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Prohibited Content Categories</h2>
+    <p>The following categories of UGC are strictly prohibited and will be removed immediately upon detection:</p>
+    <ul>
+      <li><strong>Impersonation & Phishing:</strong> Profile photos or logos designed to mimic banks (e.g. GTBank, Zenith, Access), payment providers, regulatory agencies (e.g. CBN, EFCC, NAFDAC), or other individuals without documented authorization.</li>
+      <li><strong>False Professional Claims:</strong> Profiles deceptively claiming licensed professional status (e.g. Medical Doctor, Barrister/Legal Practitioner, Chartered Accountant, Licensed Aviation Pilot) without legitimate credentials.</li>
+      <li><strong>Explicit or Obscene Imagery:</strong> Nudity, pornography, sexually suggestive content, or graphic depictions of violence.</li>
+      <li><strong>Defamation & Malicious Attacks:</strong> Uploading content specifically designed to ruin an individual's reputation, dox private home addresses, or blackmail others.</li>
+      <li><strong>Illegal Goods & Services:</strong> Promoting unregistered pharmaceuticals, prohibited weapons, illicit narcotics, or fraudulent investment opportunities.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="moderation">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Moderation & Platform Rights</h2>
+    <p>While {{ BRAND_NAME }} does not review every uploaded image prior to publishing, we maintain active administrative rights:</p>
+    <ul>
+      <li><strong>Right to Inspect:</strong> We reserve the right (but assume no ongoing obligation) to review, monitor, and investigate UGC published on public URLs.</li>
+      <li><strong>Right to Remove or Edit:</strong> We reserve the right to remove, blur, edit, or restrict any UGC that, in our sole discretion, violates this policy, our <a href="{% url 'legal:acceptable_use' %}">Acceptable Use Policy</a>, or applicable law.</li>
+      <li><strong>Hardware Suspension:</strong> Where an offending profile is tied to a physical NFC card, we will immediately disable cloud redirection for that hardware card.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="reporting-ugc">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> How to Report Offensive or Infringing Content</h2>
+    <p>If you encounter an {{ BRAND_NAME }} profile displaying inappropriate, fraudulent, or infringing UGC, please submit a report with the profile link to our <a href="{% url 'legal:complaints' %}?category=abuse">Content Moderation &amp; Abuse Desk</a> or email <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a>. We review all verified complaints within <strong>twenty-four (24) business hours</strong>.</p>
+  </section>
+
+</div>
+{% endblock %}

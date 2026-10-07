@@ -1,0 +1,73 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Refund & Cancellation Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Refund and Cancellation Policy of {{ BRAND_NAME }}. Learn our policies on physical NFC card returns, hardware warranty, defective cards, and payment reversals.{% endblock %}
+
+{% block legal_title %}Refund & Cancellation Policy{% endblock %}
+{% block legal_summary %}
+This policy outlines the conditions under which orders for {{ BRAND_NAME }} physical NFC hardware cards and digital services may be cancelled, replaced, or refunded under Nigerian consumer protection standards (FCCPA 2018).
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Hardware Quality Assurance:</strong> Every {{ BRAND_NAME }} smart card undergoes electronic NTAG216 chip programming, radiofrequency reading verification, and optical QR inspection before dispatch. We stand behind the physical quality and durability of our hardware products.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="cancellation-before-dispatch">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Order Cancellation Before Production / Dispatch</h2>
+    <ul>
+      <li><strong>Standard Stock Cards:</strong> You may cancel your physical smart card order within <strong>twenty-four (24) hours</strong> of completing payment on Paystack, provided the order has not entered physical laser etching, programming, or packaging. In this case, you will receive a full 100% refund to your original payment method.</li>
+      <li><strong>Orders Already In Production:</strong> Once a smart card has been programmed with unique hardware security identifiers and prepared for dispatch, cancellation is subject to a 15% administrative and materials recovery fee.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="hardware-warranty">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Defective Hardware & Manufacturing Warranty</h2>
+    <p>We provide a <strong>thirty (30) day limited hardware warranty</strong> on all newly issued {{ BRAND_NAME }} physical NFC cards:</p>
+    <ul>
+      <li><strong>Defective NFC Chip:</strong> If an unactivated card's NFC microchip fails to register on supported NFC-enabled smartphones upon arrival, or if the laser QR code is unreadable by standard smartphone cameras, you are entitled to a <strong>free replacement card</strong>.</li>
+      <li><strong>Damaged in Transit:</strong> If your card package arrives crushed, cracked, or visibly damaged due to courier handling, you must report it within <strong>seven (7) calendar days</strong> of delivery.</li>
+      <li><strong>Verification Process:</strong> To claim a warranty replacement, submit a brief video showing the card tap attempt or clear photograph of the defect via our <a href="{% url 'legal:complaints' %}?category=card">Hardware Support Desk</a>. Once verified, we will program and dispatch a brand new replacement card at zero additional shipping cost.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="ineligibility">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Conditions Ineligible for Refund</h2>
+    <p>Refunds or free replacements cannot be granted under the following circumstances:</p>
+    <ul>
+      <li><strong>Normal Wear and Tear:</strong> Surface scratches, cosmetic scuffs, or discoloration resulting from regular everyday wallet wear.</li>
+      <li><strong>Physical Misuse / Force:</strong> Severe card bending, snapping, perforation, exposure to extreme heat, immersion in corrosive solvents, or intentional tampering with the antenna.</li>
+      <li><strong>Lost or Stolen Cards:</strong> If you misplace or lose your card after successful delivery, you can suspend the card immediately in your dashboard to prevent unauthorized taps. Replacement cards can be ordered at standard replacement pricing.</li>
+      <li><strong>Change of Mind After Delivery:</strong> Because {{ BRAND_NAME }} smart cards are serialized hardware products provisioned specifically to your customer profile, we cannot accept returns or issue cash refunds for change of mind once a functioning card has been delivered.</li>
+      <li><strong>Incorrect Delivery Details Provided:</strong> Failed or delayed delivery resulting from an inaccurate street address or unreachable recipient telephone number provided during checkout.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="payment-issues">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Duplicate Charges & Payment Processing Reversals</h2>
+    <ul>
+      <li><strong>Duplicate Billing:</strong> In the rare event that network latency or checkout retry causes a duplicate charge on Paystack, please contact us immediately with your transaction reference numbers. Upon verification, the duplicate charge will be reversed in full.</li>
+      <li><strong>Reversal Timeframes:</strong> Approved refunds processed through Paystack typically reflect in your Nigerian bank account or debit card within <strong>five (5) to ten (10) business days</strong>, depending on your commercial bank's interbank settlement timelines.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="how-to-request">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> How to Request a Refund or Replacement</h2>
+    <p>To initiate a cancellation, refund inquiry, or hardware replacement claim:</p>
+    <ol>
+      <li>Visit our online <a href="{% url 'legal:complaints' %}?category=refund">Refund &amp; Billing Inquiries Desk</a> or email <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a>.</li>
+      <li>Provide your <strong>Order Number</strong> (e.g. <code>ORD-...</code>), customer email address, and Paystack payment reference.</li>
+      <li>Describe the issue clearly and attach supporting photos or video if reporting hardware defects.</li>
+    </ol>
+    <p>Our operations team will review and respond with an official resolution within <strong>two (2) business days</strong>.</p>
+  </section>
+
+</div>
+{% endblock %}

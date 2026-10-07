@@ -1,0 +1,50 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Legal & Compliance Suite — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official legal, privacy, terms, compliance, shipping, and consumer protection documents governing the {{ BRAND_NAME }} platform in Nigeria.{% endblock %}
+
+{% block legal_title %}Legal &amp; Compliance Suite{% endblock %}
+{% block legal_summary %}
+Welcome to the {{ BRAND_NAME }} Trust &amp; Compliance Center. Here you will find the complete set of policies, customer protections, hardware terms, and technical disclosures governing our digital profile platform and physical smart cards in Nigeria.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Transparency & Accountability:</strong> {{ BRAND_NAME }} is committed to full compliance with Nigerian digital laws—including the Nigeria Data Protection Act 2023 (NDPA), the Copyright Act 2022, and the Federal Competition and Consumer Protection Act 2018 (FCCPA). Explore our specific policies below.
+  </div>
+
+  <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-6);">All Policies &amp; Documents</h2>
+
+  <div class="legal-hub-grid">
+    {% for item in legal_nav_items %}
+      <a href="{% url item.url_name %}" class="legal-hub-card">
+        <div>
+          <div class="legal-hub-card-title">
+            <span>{{ item.title }}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="legal-hub-card-desc">{{ item.desc }}</div>
+        </div>
+        <div class="legal-hub-card-link">
+          <span>Read Document</span>
+          &rarr;
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div style="margin-top: var(--space-12); padding: var(--space-6); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-primary); border-radius: var(--radius-md);">
+    <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: var(--space-2);">Need Assistance or Have a Dispute?</h3>
+    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-4);">
+      If you need to submit a data deletion request under NDPA, report trademark infringement, or discuss a hardware card warranty issue, our compliance officers are ready to assist you.
+    </p>
+    <div class="d-flex gap-3 flex-wrap">
+      <a href="{% url 'legal:complaints' %}" class="btn btn-primary btn-sm">Submit Formal Complaint</a>
+      <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}" class="btn btn-secondary btn-sm">Email Compliance Desk</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

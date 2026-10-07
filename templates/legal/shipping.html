@@ -1,0 +1,107 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Shipping & Delivery Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Shipping and Delivery Policy of {{ BRAND_NAME }}. Learn our nationwide delivery timelines across Nigeria, courier procedures, and address requirements.{% endblock %}
+
+{% block legal_title %}Shipping & Delivery Policy{% endblock %}
+{% block legal_summary %}
+This policy outlines the processing, fulfillment, and courier delivery procedures for {{ BRAND_NAME }} physical NFC smart cards across the Federal Republic of Nigeria.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Nationwide Nigeria Delivery:</strong> {{ BRAND_NAME }} ships physical smart cards to all thirty-six (36) states of Nigeria and the Federal Capital Territory (Abuja). Deliveries are coordinated via trusted commercial dispatch and courier logistics partners.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="coverage">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Geographic Coverage</h2>
+    <p>We currently fulfill and deliver physical smart card orders nationwide within Nigeria. International shipments outside Nigeria can be arranged on a bespoke basis by contacting our corporate enterprise team.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="timelines">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Order Processing & Fulfillment Timelines</h2>
+    <p>Each physical card order moves through two distinct stages:</p>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">Stage 1: Production & Programming (1–3 Business Days)</h3>
+    <p>Every individual card is individually encoded with a secure, unique chip identifier, linked to your cloud redirection profile, electronically tested for RF induction, and packed in luxury protective packaging.</p>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">Stage 2: Courier Transit Timelines</h3>
+    <div class="legal-table-wrapper">
+      <table class="legal-table">
+        <thead>
+          <tr>
+            <th>Destination Region</th>
+            <th>Estimated Courier Transit</th>
+            <th>Delivery Method</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Lagos State</strong></td>
+            <td>1 – 3 Business Days</td>
+            <td>Express Local Courier / Direct Dispatch</td>
+          </tr>
+          <tr>
+            <td><strong>Abuja (FCT)</strong></td>
+            <td>2 – 4 Business Days</td>
+            <td>Domestic Air Logistics / Inter-state Courier</td>
+          </tr>
+          <tr>
+            <td><strong>Major Commercial Hubs</strong> (PH, Kano, Ibadan, Enugu, Benin)</td>
+            <td>3 – 5 Business Days</td>
+            <td>Inter-state Interstate Freight Logistics</td>
+          </tr>
+          <tr>
+            <td><strong>Other State Capitals &amp; Regional Towns</strong></td>
+            <td>4 – 8 Business Days</td>
+            <td>Regional Courier Terminal / Doorstep Dispatch</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-muted);"><em>Note: Business days exclude weekends (Saturdays and Sundays) and statutory Nigerian public holidays. Unforeseen weather, transit checkpoints, or national fuel constraints may occasionally introduce slight delays.</em></p>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="customer-responsibility">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Customer Address & Contact Requirements</h2>
+    <p>To ensure prompt and successful doorstep delivery, you must provide:</p>
+    <ul>
+      <li><strong>Complete Street Address:</strong> Street name, house/building number, landmark or estate name, local government area (LGA), and state. Vague descriptions or P.O. Box addresses cannot be accepted.</li>
+      <li><strong>Active Telephone Number:</strong> A working Nigerian phone number that can receive phone calls from dispatch riders on the delivery day. Couriers will call before attempting doorstep drop-off.</li>
+      <li><strong>Authorized Receiver:</strong> If you will not be present at the delivery location, ensure a colleague, security personnel, or family member is authorized to inspect and sign for the package.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="failed-delivery">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Failed Deliveries & Redelivery Attempts</h2>
+    <p>Courier partners will attempt delivery up to two (2) times. If delivery fails because the recipient is repeatedly unreachable, the phone number is switched off, or the address is incorrect:</p>
+    <ul>
+      <li>The package will be held at the local courier distribution hub for forty-eight (48) hours.</li>
+      <li>Our operations team will contact you via email or WhatsApp to coordinate updated contact instructions.</li>
+      <li>If a package is returned to our central operations center due to unresponsiveness or inaccurate address, a re-dispatch fee will be charged to reship the package.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="lost-packages">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> Lost or Damaged Shipments</h2>
+    <ul>
+      <li><strong>Damaged Package:</strong> If the packaging arrives visibly crushed or torn, please take a photo before opening and inspect the card. Report any damage within seven (7) days under our <a href="{% url 'legal:refunds' %}">Refund Policy</a>.</li>
+      <li><strong>Lost in Transit:</strong> If your order exceeds the estimated transit window by more than seven (7) business days and tracking confirms the parcel is lost, {{ BRAND_NAME }} will manufacture and dispatch a free replacement card at zero cost to you.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="legal-section" id="inquiries">
+    <h2 class="legal-section-title"><span class="legal-section-number">06.</span> Delivery Inquiries & Order Tracking</h2>
+    <p>You can check your order fulfillment status at any time through your <a href="{% url 'dashboard:orders_list' %}">Customer Orders Dashboard</a>. For urgent delivery inquiries or address changes before dispatch, reach out to our logistics desk at <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> or via WhatsApp at {{ BRAND_SUPPORT_PHONE }}.</p>
+  </section>
+
+</div>
+{% endblock %}

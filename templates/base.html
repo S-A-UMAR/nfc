@@ -306,13 +306,32 @@
             {% endif %}
           </ul>
         </div>
+
+        <div>
+          <h2 class="footer-title">Legal &amp; Compliance</h2>
+          <ul class="footer-links">
+            <li><a href="{% url 'legal:privacy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'legal:terms' %}">Terms of Service</a></li>
+            <li><a href="{% url 'legal:cookies' %}">Cookie Policy</a></li>
+            <li><a href="{% url 'legal:acceptable_use' %}">Acceptable Use</a></li>
+            <li><a href="{% url 'legal:refunds' %}">Refund &amp; Cancellation</a></li>
+            <li><a href="{% url 'legal:shipping' %}">Shipping &amp; Delivery</a></li>
+            <li><a href="{% url 'legal:nfc_terms' %}">NFC Card Terms</a></li>
+            <li><a href="{% url 'legal:copyright' %}">IP &amp; Copyright</a></li>
+            <li><a href="{% url 'legal:user_content' %}">User Content Policy</a></li>
+            <li><a href="{% url 'legal:third_party' %}">Third-Party Disclosure</a></li>
+            <li><a href="{% url 'legal:complaints' %}">Complaints &amp; Inquiries</a></li>
+          </ul>
+        </div>
       </div>
 
       <div class="footer-bottom">
-        <div>&copy; 2026 UZYRA Platform. All rights reserved.</div>
-        <div class="d-flex gap-4">
-          <a href="{% url 'core:faq' %}">Security & Privacy</a>
-          <a href="{% url 'core:contact' %}">Support</a>
+        <div>&copy; 2026 {{ BRAND_NAME }} Platform. All rights reserved.</div>
+        <div class="d-flex gap-4 flex-wrap">
+          <a href="{% url 'legal:privacy' %}">Privacy Policy</a>
+          <a href="{% url 'legal:terms' %}">Terms of Service</a>
+          <a href="{% url 'legal:cookies' %}">Cookie Policy</a>
+          <a href="{% url 'legal:complaints' %}">Complaints &amp; Support</a>
         </div>
       </div>
     </div>

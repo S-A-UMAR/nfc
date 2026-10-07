@@ -1,0 +1,74 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}IP & Copyright Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Intellectual Property and Copyright Policy of {{ BRAND_NAME }}. Learn about copyright ownership, trademark protections, and notice-and-takedown procedures under the Nigerian Copyright Act 2022.{% endblock %}
+
+{% block legal_title %}IP & Copyright Policy{% endblock %}
+{% block legal_summary %}
+This policy outlines the intellectual property rights governing {{ BRAND_NAME }}, defines the ownership boundaries between platform assets and user-uploaded content, and establishes our formal notice-and-takedown procedure under the Nigerian Copyright Act 2022.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Nigerian Copyright Act 2022 Compliance:</strong> {{ BRAND_NAME }} respects the valid intellectual property rights of creators, businesses, and trademark owners. We maintain a swift, documented takedown process for infringing content reported on public profiles.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="uzyra-ip">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> UZYRA Proprietary Intellectual Property</h2>
+    <p>All rights, title, and interest in and to the {{ BRAND_NAME }} platform—including but not limited to:</p>
+    <ul>
+      <li>The {{ BRAND_NAME }} trade name, stylized wordmarks, shield emblem, and brand assets;</li>
+      <li>All source code, stylesheets, database schemas, scripts, algorithms, and application software;</li>
+      <li>Visual user interface layouts, graphic designs, typography hierarchies, and dark glass styling;</li>
+      <li>Physical NFC card visual design templates, typography arrangements, and packaging concepts;</li>
+      <li>Website copy, user manuals, and technical documentation;</li>
+    </ul>
+    <p>are the exclusive intellectual property of {{ BRAND_NAME }} and are protected by the Copyright Act 2022, the Trade Marks Act (Cap T13 LFN 2004), and applicable international intellectual property treaties. You may not copy, reproduce, decompile, reverse engineer, or commercially exploit any platform materials without our prior written consent.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="user-ip">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> User Ownership of Profile Content</h2>
+    <p>We believe creators and professionals must own their identity:</p>
+    <ul>
+      <li><strong>Retention of Ownership:</strong> You retain complete ownership and all intellectual property rights to the personal photographs, business logos, bio descriptions, case studies, and original text you upload to your digital profile.</li>
+      <li><strong>Limited Operating License:</strong> By uploading content to {{ BRAND_NAME }}, you grant us a worldwide, non-exclusive, royalty-free, transferable license solely to host, cache, format, scale, and transmit your content across digital networks to render your digital profile and smart card redirects. This license terminates when you delete your content or account.</li>
+      <li><strong>User Warranty of Rights:</strong> You represent and warrant that you own or have obtained all necessary licenses, permissions, and rights from third parties to publish all images, trademarks, and logos displayed on your profile.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="takedown-procedure">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Notice & Takedown Procedure (Copyright Infringement)</h2>
+    <p>If you are a copyright owner or an authorized agent and believe that content published on any {{ BRAND_NAME }} public profile (<code>/u/&lt;slug&gt;/</code>) infringes upon your copyright under the Nigerian Copyright Act 2022 or international law, you may submit a formal Infringement Notice containing:</p>
+    <ol>
+      <li><strong>Identification of the Work:</strong> A description of the copyrighted work that you claim has been infringed, including registration details or online proof of ownership.</li>
+      <li><strong>Identification of Infringing Content:</strong> The exact URL (e.g. <code>https://uzyra.onrender.com/u/example-slug/</code>) and specific image or text claimed to be infringing.</li>
+      <li><strong>Contact Information:</strong> Your full legal name, company name (if applicable), email address, physical address, and telephone number.</li>
+      <li><strong>Good Faith Statement:</strong> A statement that you hold a good faith belief that the disputed use of the material is not authorized by the copyright owner, its agent, or the law.</li>
+      <li><strong>Accuracy Statement & Signature:</strong> A statement made under penalty of perjury that the information in the notification is accurate and that you are the copyright owner or authorized to act on behalf of the owner, accompanied by an electronic or physical signature.</li>
+    </ol>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="how-to-submit">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Where to Submit Infringement Notices</h2>
+    <p>Please submit formal notices through our designated compliance channels:</p>
+    <ul>
+      <li><strong>Dedicated Online Portal:</strong> <a href="{% url 'legal:complaints' %}?category=copyright">Submit Copyright Infringement Notice</a></li>
+      <li><strong>Email:</strong> <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> (Subject: <em>Attn: Copyright &amp; IP Compliance Officer</em>)</li>
+    </ul>
+    <p>Upon receipt of a valid notice, {{ BRAND_NAME }} will expeditiously disable access to or remove the infringing material, notify the affected profile holder, and maintain audit records of the action taken.</p>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="counter-notice">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> Counter-Notification Procedure</h2>
+    <p>If a user believes in good faith that their content was removed or disabled as a result of mistake or misidentification, they may submit a Counter-Notification to our legal desk with proof of ownership or authorization. Upon receiving a valid counter-notice, {{ BRAND_NAME }} may restore the material in accordance with applicable statutory guidelines unless the complainant files a formal legal action.</p>
+  </section>
+
+</div>
+{% endblock %}

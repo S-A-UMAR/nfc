@@ -1,0 +1,71 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}NFC Card Terms — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Technical specifications, hardware architecture, and operational terms governing {{ BRAND_NAME }} physical NFC smart business cards.{% endblock %}
+
+{% block legal_title %}NFC Card Terms & Architecture{% endblock %}
+{% block legal_summary %}
+These hardware and technical terms govern the ownership, activation, physical care, and operational characteristics of {{ BRAND_NAME }} Near Field Communication (NFC) smart cards and optical QR code integrations.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Technical Security Architecture:</strong> An {{ BRAND_NAME }} smart card is an encrypted digital gateway, not a data storage vault. The physical NFC chip stores <em>only</em> a dynamic cloud redirect URL. It does NOT store passwords, banking PINs, biometric data, or private contact records on the physical silicon layer.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="chip-architecture">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Hardware Specifications & Operation</h2>
+    <p>{{ BRAND_NAME }} cards are engineered to international contactless standards:</p>
+    <ul>
+      <li><strong>Microchip Standard:</strong> Embedded with genuine NXP NTAG216 silicon operating at high-frequency 13.56 MHz in compliance with ISO/IEC 14443 Type A and NFC Forum Type 2 specifications.</li>
+      <li><strong>Passive Energy Induction:</strong> The card contains zero internal battery and emits zero electromagnetic radiation while idle. When placed within 2–4 centimeters of an NFC-enabled smartphone, the card's internal antenna harvests micro-power from the reading phone's magnetic field to transmit its redirect payload in under 50 milliseconds.</li>
+      <li><strong>Payload Architecture:</strong> The chip is encoded with a standardized NDEF (NFC Data Exchange Format) URI record pointing exclusively to our secure routing engine (e.g. <code>https://uzyra.onrender.com/c/UZY-CARD-XXXXXX/</code>).</li>
+      <li><strong>Optical QR Redundancy:</strong> The reverse side of every card features a high-contrast precision laser-printed QR code pointing to the identical cloud URL. This guarantees 100% compatibility when networking with older smartphones or devices with disabled NFC sensors.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="activation">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Card Activation & Profile Pairing</h2>
+    <ul>
+      <li><strong>Factory Inactive State:</strong> Newly manufactured smart cards are shipped in an unassigned, unlinked state to ensure complete supply chain security. If tapped before activation, the card displays an activation verification screen.</li>
+      <li><strong>Dashboard Activation:</strong> The purchasing customer must log into their {{ BRAND_NAME }} dashboard and enter the unique activation security code provided with the card packaging to link the physical hardware to their personal digital profile.</li>
+      <li><strong>Instant Dynamic Redirection:</strong> Once activated, changes made to your profile (phone number, WhatsApp link, social handles, job title) take effect immediately in the cloud. <strong>Your physical card never needs to be reprinted, reprogrammed, or physically replaced when your details change.</strong></li>
+    </ul>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="security-controls">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Lost, Stolen & Suspended Card Controls</h2>
+    <p>Physical card loss presents zero risk to your account credentials or stored information:</p>
+    <ul>
+      <li><strong>One-Click Remote Suspension:</strong> If your card is misplaced, lost, or stolen, navigate to your <a href="{% url 'dashboard:card_manage' %}">Smart Card Dashboard</a> and toggle the card status to <strong>"Suspended"</strong> or <strong>"Report Lost"</strong>.</li>
+      <li><strong>Suspended Behavior:</strong> Once suspended, our routing engine immediately blocks redirection. Anyone tapping the physical card will see an official "This card has been temporarily suspended by its owner" screen, revealing zero contact details, phone numbers, or links.</li>
+      <li><strong>Reactivation:</strong> If you recover a misplaced card that you marked as suspended, you can restore it back to "Active" status instantly from your dashboard.</li>
+      <li><strong>Replacement Cards:</strong> If a card is permanently lost, you can decouple it permanently and order an affordable replacement card linked seamlessly to your existing digital profile and analytics history.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="physical-care">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Physical Durability & Environmental Care</h2>
+    <p>{{ BRAND_NAME }} cards are constructed from industrial-grade matte polymer composite designed for regular wallet storage. To ensure maximum operational lifespan:</p>
+    <ul>
+      <li><strong>Water & Moisture:</strong> The microchip and antenna are hermetically sealed and rated water-resistant against normal moisture, rain, and humidity.</li>
+      <li><strong>Avoid Extreme Bending:</strong> Like any bank credit card with embedded internal copper antenna coils, severe bending, folding, or snapping can fracture the internal micro-antenna and render the NFC chip unresponsive.</li>
+      <li><strong>Avoid Extreme Heat:</strong> Do not leave the card on automotive dashboards exposed to prolonged direct sunlight or temperatures exceeding 60°C.</li>
+      <li><strong>Magnetic Fields:</strong> While passive NFC chips are resistant to everyday magnets, avoid placing the card directly against industrial demagnetizers or high-power electromagnetic induction burners.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="tampering">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> Microchip Tampering Prohibited</h2>
+    <p>You may not write malicious exploits, phishing payloads, or unauthorized URL schemes to an {{ BRAND_NAME }} card. Any attempt to re-encode the chip to deceive users, deliver malware, or harvest credentials will result in permanent hardware blacklisting and account termination under our <a href="{% url 'legal:acceptable_use' %}">Acceptable Use Policy</a>.</p>
+  </section>
+
+</div>
+{% endblock %}

@@ -47,7 +47,11 @@
             {{ form.customer_notes }}
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+          <div style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.5; margin: 1.25rem 0 0.75rem;">
+            By proceeding, you agree to our <a href="{% url 'legal:terms' %}" target="_blank" class="text-silver" style="text-decoration: underline;">Terms of Service</a>, <a href="{% url 'legal:nfc_terms' %}" target="_blank" class="text-silver" style="text-decoration: underline;">NFC Card Terms</a>, <a href="{% url 'legal:shipping' %}" target="_blank" class="text-silver" style="text-decoration: underline;">Shipping Policy</a>, and <a href="{% url 'legal:refunds' %}" target="_blank" class="text-silver" style="text-decoration: underline;">Refund Policy</a>.
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg">
             <span>Proceed to Payment</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>

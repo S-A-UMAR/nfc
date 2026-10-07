@@ -1,0 +1,93 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Cookie Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Cookie Policy of {{ BRAND_NAME }}. We use only strictly essential cookies for secure login and CSRF protection. Zero third-party advertising trackers.{% endblock %}
+
+{% block legal_title %}Cookie Policy{% endblock %}
+{% block legal_summary %}
+This Cookie Policy explains how {{ BRAND_NAME }} uses cookies and similar storage technologies. We operate on a privacy-first model: we employ only strictly essential cookies necessary for authentication and platform security, with zero third-party marketing tracking.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Privacy-First Cookie Architecture:</strong> {{ BRAND_NAME }} does NOT use third-party advertising cookies, behavioral tracking pixels, or cross-site profiling trackers. The only cookies stored on your device are strictly necessary for logging into your account, securing form submissions, and preventing fraud.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="what-are-cookies">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> What Are Cookies?</h2>
+    <p>Cookies are small alphanumeric text files placed on your computer, tablet, or smartphone by websites you visit. They are widely used to make web applications function efficiently, preserve authenticated user sessions, and provide essential security protections.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="cookie-inventory">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Complete Inventory of Cookies We Use</h2>
+    <p>Below is the transparent, comprehensive list of all cookies set by the {{ BRAND_NAME }} platform:</p>
+
+    <div class="legal-table-wrapper">
+      <table class="legal-table">
+        <thead>
+          <tr>
+            <th>Cookie Name</th>
+            <th>Category</th>
+            <th>Lifespan</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>sessionid</code></td>
+            <td><strong>Strictly Essential</strong></td>
+            <td>Session / 2 weeks</td>
+            <td>Maintains your authenticated customer session securely across dashboard pages. Marked <code>HttpOnly</code> to prevent access by malicious scripts.</td>
+          </tr>
+          <tr>
+            <td><code>csrftoken</code></td>
+            <td><strong>Strictly Essential</strong></td>
+            <td>1 Year</td>
+            <td>Provides Cross-Site Request Forgery (CSRF) protection. Ensures that requests submitted via web forms (such as profile edits and checkout) originate legitimately from you.</td>
+          </tr>
+          <tr>
+            <td><code>messages</code></td>
+            <td><strong>Strictly Essential</strong></td>
+            <td>Session</td>
+            <td>Temporary storage for system notifications and feedback alerts (e.g. "Your profile has been updated successfully"). Discarded once displayed.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="non-essential-cookies">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Non-Essential & Third-Party Trackers (None Deployed)</h2>
+    <p>Many web services load invasive third-party trackers. At {{ BRAND_NAME }}, we maintain strict technical boundaries:</p>
+    <ul>
+      <li><strong>No Advertising Cookies:</strong> We do not deploy Google AdSense, Meta/Facebook Pixel, TikTok Pixel, or ad retargeting cookies.</li>
+      <li><strong>No Third-Party Analytics Cookies:</strong> Our profile metrics (taps, link clicks, views) are logged server-side as first-party telemetry. We do not inject third-party analytics scripts that track you across other websites.</li>
+      <li><strong>No Selling of Visitor Profiles:</strong> We do not package or sell cookie data to third-party data brokers.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="browser-controls">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Managing & Disabling Cookies in Your Browser</h2>
+    <p>Because the cookies we set are strictly necessary for authentication and form security, disabling them in your browser will prevent you from logging into your customer dashboard or completing orders. However, if you wish to inspect or block cookies, you can do so through your browser settings:</p>
+    <ul>
+      <li><strong>Google Chrome:</strong> Settings &gt; Privacy and security &gt; Third-party cookies.</li>
+      <li><strong>Apple Safari:</strong> Settings / Preferences &gt; Privacy &gt; Manage Website Data.</li>
+      <li><strong>Mozilla Firefox:</strong> Settings &gt; Privacy &amp; Security &gt; Enhanced Tracking Protection.</li>
+      <li><strong>Microsoft Edge:</strong> Settings &gt; Cookies and site permissions &gt; Manage and delete cookies and site data.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="contact">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> Contacting Us About Cookies</h2>
+    <p>If you have any questions or concerns regarding our technical cookie usage, please reach out to our privacy desk at <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> or visit our <a href="{% url 'legal:complaints' %}">Complaints &amp; Inquiries page</a>.</p>
+  </section>
+
+</div>
+{% endblock %}

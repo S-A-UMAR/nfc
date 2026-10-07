@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- ── LEGAL HERO BANNER ────────────────────────────────────────────────── -->
+<section class="legal-hero" aria-label="Legal Document Header">
+  <div class="container">
+    <div style="max-width: 840px;">
+      <div class="d-flex items-center gap-3 mb-2 flex-wrap">
+        <span class="badge badge-silver">LEGAL &amp; COMPLIANCE</span>
+        <span class="badge badge-silver" style="opacity: 0.85;">FEDERAL REPUBLIC OF NIGERIA</span>
+      </div>
+      <h1 class="legal-hero-title">{% block legal_title %}Legal Document{% endblock %}</h1>
+      <p class="text-secondary mb-3" style="font-size: 1.05rem; line-height: 1.6; max-width: 720px;">
+        {% block legal_summary %}{% endblock %}
+      </p>
+      <div class="legal-hero-meta">
+        <span><strong>Effective Date:</strong> {% block legal_effective_date %}October 2026{% endblock %}</span>
+        <span>&bull;</span>
+        <span><strong>Version:</strong> 1.0</span>
+        <span>&bull;</span>
+        <span><strong>Entity:</strong> {{ BRAND_NAME }} Platform</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LEGAL MAIN LAYOUT: SIDEBAR + CONTENT ─────────────────────────────── -->
+<div class="container">
+  <div class="legal-layout">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="legal-sidebar" aria-label="Legal Documents Navigation">
+      <div class="legal-sidebar-title">Compliance Suite</div>
+      <nav class="legal-nav-list">
+        {% for item in legal_nav_items %}
+          <a href="{% url item.url_name %}" class="legal-nav-link {% if current_legal_code == item.code %}active{% endif %}">
+            <span>{{ item.title }}</span>
+            {% if current_legal_code == item.code %}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </nav>
+
+      <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-primary); font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;">
+        <p class="mb-2">Need a formal privacy or compliance consultation?</p>
+        <a href="{% url 'legal:complaints' %}" class="btn btn-secondary btn-sm btn-block">Submit Inquiry</a>
+      </div>
+    </aside>
+
+    <!-- Right Document Content Card -->
+    <main class="legal-content-card">
+      {% block legal_content %}{% endblock %}
+    </main>
+
+  </div>
+</div>
+{% endblock %}

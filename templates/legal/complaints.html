@@ -1,0 +1,132 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Complaints & Dispute Resolution — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Complaints, Dispute Resolution, and Data Subject Privacy Request intake for {{ BRAND_NAME }}. Learn how we handle disputes under Nigerian law.{% endblock %}
+
+{% block legal_title %}Complaints &amp; Inquiries{% endblock %}
+{% block legal_summary %}
+We are committed to fair, transparent, and prompt resolution of customer disputes, hardware warranty claims, privacy requests under the NDPA 2023, and content infringement reports.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Formal Dispute Escalation:</strong> Every inquiry or complaint submitted through this desk is logged with a timestamp and reviewed directly by our compliance and operations team. We acknowledge all formal submissions within <strong>twenty-four (24) to forty-eight (48) business hours</strong>.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="categories">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Categories of Inquiries Handled</h2>
+    <p>You can use this desk to submit formal notices and complaints across any of the following areas:</p>
+    <ul>
+      <li><strong>Data Subject Privacy Requests (NDPA 2023):</strong> Requests to access, correct, export, or permanently delete personal data held by {{ BRAND_NAME }}.</li>
+      <li><strong>IP &amp; Copyright Infringement Notices:</strong> Formal notifications regarding unauthorized use of copyrighted photos, trademarks, or brand assets on public profiles.</li>
+      <li><strong>Fraud &amp; Impersonation Reports:</strong> Urgent notifications regarding deceptive profiles mimicking banks, government officials, or corporate brands.</li>
+      <li><strong>NFC Hardware &amp; Delivery Disputes:</strong> Non-functional NFC chips, transit damages, or courier delivery delays across Nigeria.</li>
+      <li><strong>Billing &amp; Payment Inquiries:</strong> Payment verification, duplicate charge investigations, and refund requests processed via Paystack.</li>
+      <li><strong>General Platform Feedback:</strong> Technical bugs, service grievances, or general platform inquiries.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="procedure">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Resolution Procedure & Timelines</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin: var(--space-6) 0;">
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); padding: var(--space-4);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--silver-accent); margin-bottom: 0.25rem;">STEP 1: RECEIPT</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">24 – 48 Hours</div>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">Automated logging, assignment to a compliance officer, and formal email acknowledgment.</p>
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); padding: var(--space-4);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--silver-accent); margin-bottom: 0.25rem;">STEP 2: INVESTIGATION</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">3 – 5 Business Days</div>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">Technical log review, courier reconciliation, or content audit with internal operations.</p>
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); padding: var(--space-4);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--silver-accent); margin-bottom: 0.25rem;">STEP 3: RESOLUTION</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Within 10 Days</div>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">Final binding resolution, replacement card dispatch, content removal, or NDPA compliance notice.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: INTERACTIVE FORM -->
+  <section class="legal-section" id="submit-complaint">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Submit a Formal Complaint or Request</h2>
+    <p>Please complete the official compliance form below. Provide as much detail as possible to assist our investigation:</p>
+
+    <div class="card" style="margin-top: var(--space-6); padding: var(--space-6);">
+      <form method="post" action="{% url 'legal:complaints' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-error mb-4" role="alert">
+            <span>{{ form.non_field_errors|first }}</span>
+          </div>
+        {% endif %}
+
+        <div class="form-row-2col mb-4">
+          <div class="form-group mb-0">
+            <label class="form-label" for="id_full_name">Full Name <span style="color: #EF4444;">*</span></label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+              <div class="form-error"><span>{{ form.full_name.errors|first }}</span></div>
+            {% endif %}
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label" for="id_email">Email Address <span style="color: #EF4444;">*</span></label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="form-error"><span>{{ form.email.errors|first }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group mb-4">
+          <label class="form-label" for="id_phone">Telephone / WhatsApp Number <span class="form-label-hint">(Optional)</span></label>
+          {{ form.phone }}
+          {% if form.phone.errors %}
+            <div class="form-error"><span>{{ form.phone.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-4">
+          <label class="form-label" for="id_subject">Subject / Request Category <span style="color: #EF4444;">*</span></label>
+          {{ form.subject }}
+          <div class="form-hint">e.g. [Data Privacy Request], [Copyright Notice], [Hardware Defect], or [Billing Dispute]</div>
+          {% if form.subject.errors %}
+            <div class="form-error"><span>{{ form.subject.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-4">
+          <label class="form-label" for="id_message">Detailed Description of Complaint / Request <span style="color: #EF4444;">*</span></label>
+          {{ form.message }}
+          <div class="form-hint">Please include relevant URLs, order numbers, transaction references, or specific details.</div>
+          {% if form.message.errors %}
+            <div class="form-error"><span>{{ form.message.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block">
+          <span>Submit Formal Inquiry / Complaint</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DIRECT CHANNELS -->
+  <section class="legal-section" id="direct-contacts">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Alternative Direct Contacts</h2>
+    <p>You may also contact our compliance officers directly:</p>
+    <ul>
+      <li><strong>Official Compliance Email:</strong> <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a></li>
+      <li><strong>Telephone / WhatsApp Hotline:</strong> {{ BRAND_SUPPORT_PHONE }} (Monday to Friday, 9:00 AM – 5:00 PM West Africa Time)</li>
+      <li><strong>Statutory Authority Escalation:</strong> If you are dissatisfied with our resolution of a data protection matter, you may escalate to the <strong>Nigeria Data Protection Commission (NDPC)</strong> (<a href="https://ndpc.gov.ng" target="_blank" rel="noopener">ndpc.gov.ng</a>). For consumer protection disputes, complaints may also be directed to the <strong>Federal Competition and Consumer Protection Commission (FCCPC)</strong> (<a href="https://fccpc.gov.ng" target="_blank" rel="noopener">fccpc.gov.ng</a>).</li>
+    </ul>
+  </section>
+
+</div>
+{% endblock %}

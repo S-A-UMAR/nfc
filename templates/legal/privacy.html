@@ -1,0 +1,184 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Privacy Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Privacy Policy of {{ BRAND_NAME }}. Learn how we collect, protect, and process your data in compliance with the Nigeria Data Protection Act 2023 (NDPA).{% endblock %}
+
+{% block legal_title %}Privacy Policy{% endblock %}
+{% block legal_summary %}
+This Privacy Policy outlines how {{ BRAND_NAME }} collects, processes, stores, and protects personal data obtained through our website, digital business card platform, physical NFC cards, and related services, in strict accordance with the Nigeria Data Protection Act 2023 (NDPA).
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Nigeria Data Protection Act 2023 (NDPA) Notice:</strong> {{ BRAND_NAME }} operates as a designated Data Controller regarding account information and digital card services. We adhere to the foundational data protection principles: lawfulness, fairness, transparency, purpose limitation, data minimisation, accuracy, storage limitation, and confidentiality.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="overview">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Scope & Data Controller Information</h2>
+    <p>This Privacy Policy applies to all individuals accessing or using {{ BRAND_NAME }} ("we", "us", "our"), including registered account holders, visitors to public profile pages (<code>/u/&lt;slug&gt;/</code>), purchasers of physical NFC hardware cards, and individuals contacting our support desk.</p>
+    <p><strong>Designated Data Controller:</strong></p>
+    <ul>
+      <li><strong>Platform Name:</strong> {{ BRAND_NAME }} Platform</li>
+      <li><strong>Operating Jurisdiction:</strong> Federal Republic of Nigeria</li>
+      <li><strong>Privacy & Data Protection Desk:</strong> <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a></li>
+      <li><strong>Telephone Inquiries:</strong> {{ BRAND_SUPPORT_PHONE }}</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="data-collected">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Personal Data We Collect</h2>
+    <p>We strictly limit the collection of personal data to what is directly necessary for our services. Depending on your interactions with {{ BRAND_NAME }}, we collect the following categories of data:</p>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">A. Information You Voluntarily Provide</h3>
+    <ul>
+      <li><strong>Account Registration:</strong> First name, last name, email address, password hash, and optional telephone number.</li>
+      <li><strong>Digital Profile Information:</strong> Professional title, personal or corporate bio, physical work address, website URLs, WhatsApp numbers, direct phone numbers, and custom links you choose to publish on your digital profile.</li>
+      <li><strong>Profile Media:</strong> Avatar or profile photographs you upload to customize your card interface.</li>
+      <li><strong>Hardware Order & Delivery Details:</strong> Recipient name, street delivery address, delivery city, delivery state, recipient phone number for courier coordination, and packaging notes.</li>
+      <li><strong>Inquiries & Support Messages:</strong> Name, email address, telephone number, subject, and message content submitted through our contact and complaint forms.</li>
+    </ul>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">B. Automatically Collected Technical Data</h3>
+    <p>When you access our platform, public profile endpoints, or tap an NFC card redirect, our infrastructure records standard technical request logs:</p>
+    <ul>
+      <li><strong>Internet Protocol (IP) Address:</strong> Used strictly for rate-limiting, authentication security, fraud detection, and preventing automated abuse.</li>
+      <li><strong>Device & Browser Data:</strong> Browser User-Agent header (browser family, version, operating system) truncated and stored for responsive layout optimization.</li>
+      <li><strong>Referral Information:</strong> HTTP Referer URL indicating how you arrived at a profile or public page.</li>
+      <li><strong>Timestamps:</strong> Exact date and time of user actions, login sessions, and card interactions.</li>
+    </ul>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">C. Payment Data Handled by Paystack</h3>
+    <p>All financial payment transactions for physical NFC cards and services are handled directly by Paystack Payments Limited, a PCI-DSS Level 1 certified payment service provider regulated by the Central Bank of Nigeria (CBN). <strong>{{ BRAND_NAME }} never collects, processes, or stores your payment card numbers, CVV security codes, or bank account PINs on our servers.</strong> We receive only a cryptographic transaction reference token, transaction status, and amount paid to confirm your order.</p>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="analytics">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> First-Party Interaction Analytics</h2>
+    <p>{{ BRAND_NAME }} provides proprietary first-party interaction metrics to help card owners understand engagement with their digital profiles. Our analytics architecture operates on the following principles:</p>
+    <ul>
+      <li><strong>Events Recorded:</strong> Public profile page views, physical NFC card taps (via <code>/c/&lt;card_code&gt;/</code>), optical QR code scans, click-to-call phone initiations, WhatsApp chat activations, email link taps, social media outbound clicks, and vCard address book downloads.</li>
+      <li><strong>No Cross-Site Surveillance:</strong> We do NOT employ third-party advertising tracking networks (such as Meta Pixel or Google remarketing tags) to profile visitors across external websites.</li>
+      <li><strong>No Selling of Visitor Data:</strong> We do not sell, rent, or trade interaction analytics to third-party data brokers or marketing firms.</li>
+      <li><strong>Aggregated Dashboard Reporting:</strong> Metrics displayed in the customer dashboard show interaction totals and engagement frequency without revealing private personal dossiers of the tapping individuals.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="purposes">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Legal Basis & Purposes of Data Processing</h2>
+    <p>In accordance with Section 25 of the Nigeria Data Protection Act 2023, we process personal data under the following lawful bases:</p>
+    <ul>
+      <li><strong>Performance of a Contract:</strong> Creating and managing your customer account, provisioning your digital business profile, producing and dispatching physical NFC cards, delivering customer orders, and processing service transactions.</li>
+      <li><strong>Consent:</strong> When you voluntarily publish contact details, profile pictures, and links on your public profile URL (<code>/u/&lt;slug&gt;/</code>), or when you opt in to direct communications.</li>
+      <li><strong>Legitimate Interests:</strong> Monitoring platform performance, preventing distributed denial-of-service (DDoS) attacks, enforcing our Acceptable Use Policy, investigating fraudulent profiles, and securing our infrastructure.</li>
+      <li><strong>Legal & Regulatory Compliance:</strong> Retaining financial transaction records, tax reporting, and responding to lawful requests from Nigerian judicial or regulatory authorities.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="third-parties">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> Third-Party Service Providers & Cloud Processors</h2>
+    <p>To deliver a reliable cloud platform, we engage reputable third-party infrastructure providers who process data strictly on our instructions and under robust data processing agreements:</p>
+    <div class="legal-table-wrapper">
+      <table class="legal-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Service Provided</th>
+            <th>Data Processed</th>
+            <th>Location / Standards</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Paystack Payments Ltd</strong></td>
+            <td>Payment processing & checkout gateway</td>
+            <td>Payment reference, billing amount, customer email</td>
+            <td>Nigeria (CBN Regulated, PCI-DSS Level 1)</td>
+          </tr>
+          <tr>
+            <td><strong>Brevo (Sendinblue SAS)</strong></td>
+            <td>Transactional email & OTP dispatch</td>
+            <td>Email address, verification codes, delivery notices</td>
+            <td>EU / Global (GDPR / ISO 27001)</td>
+          </tr>
+          <tr>
+            <td><strong>TiDB Cloud (PingCAP, Inc.)</strong></td>
+            <td>Serverless relational database</td>
+            <td>Encrypted account, profile, card & order records</td>
+            <td>Frankfurt, Germany (AWS / TLS 1.3 Encryption)</td>
+          </tr>
+          <tr>
+            <td><strong>Cloudinary Ltd</strong></td>
+            <td>Persistent media asset hosting</td>
+            <td>User-uploaded profile photographs and media</td>
+            <td>Global CDN (SOC 2, ISO 27001)</td>
+          </tr>
+          <tr>
+            <td><strong>Render Services, Inc.</strong></td>
+            <td>Cloud application server infrastructure</td>
+            <td>Encrypted application runtime and server access logs</td>
+            <td>Global Cloud (SOC 2 Type II)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="legal-section" id="data-retention">
+    <h2 class="legal-section-title"><span class="legal-section-number">06.</span> Data Retention & Account Deletion</h2>
+    <p>We retain personal data only for as long as necessary to fulfill the purposes for which it was collected, or as required by statutory accounting and tax regulations:</p>
+    <ul>
+      <li><strong>Active Accounts:</strong> Profile data, social links, and card assignments remain accessible while your account is in good standing.</li>
+      <li><strong>Account Deletion:</strong> Upon a verified account deletion request, your public profile (<code>/u/&lt;slug&gt;/</code>) is immediately taken offline, associated physical cards are unlinked and deactivated, and personal profile information is removed from active production access.</li>
+      <li><strong>Accounting & Statutory Archival:</strong> Under Nigerian financial and tax regulations, order records, delivery invoices, and payment references are archived securely for a minimum statutory period (typically 6 years) before permanent purging.</li>
+      <li><strong>Security Logs:</strong> Technical IP address logs and authentication security logs are purged on rolling retention cycles (typically 90 days).</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section class="legal-section" id="user-rights">
+    <h2 class="legal-section-title"><span class="legal-section-number">07.</span> Your Rights Under the NDPA 2023</h2>
+    <p>As a data subject in Nigeria or visiting user, you hold recognized statutory rights regarding your personal data:</p>
+    <ul>
+      <li><strong>Right to Access:</strong> You may request a copy of the personal data {{ BRAND_NAME }} holds concerning you.</li>
+      <li><strong>Right to Rectification:</strong> You can correct, update, or edit your personal profile information directly through your customer dashboard at any time.</li>
+      <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> You may request the deletion of your account and personal data, subject to legitimate legal retention requirements.</li>
+      <li><strong>Right to Restrict Processing:</strong> You may request that we suspend active processing of your data while a dispute or objection is investigated.</li>
+      <li><strong>Right to Data Portability:</strong> You may request your core profile information in a structured, commonly used digital format (e.g., standard .vcf contact card).</li>
+      <li><strong>Right to Lodge a Complaint:</strong> You have the right to lodge a complaint with the <strong>Nigeria Data Protection Commission (NDPC)</strong> (<a href="https://ndpc.gov.ng" target="_blank" rel="noopener">ndpc.gov.ng</a>) if you believe your data protection rights have been infringed.</li>
+    </ul>
+    <p>To exercise any of these statutory rights, please submit a formal request via our <a href="{% url 'legal:complaints' %}">Complaints &amp; Data Rights Desk</a> or email <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a>. We respond to verified data subject requests within <strong>30 calendar days</strong> as required by law.</p>
+  </section>
+
+  <!-- SECTION 8 -->
+  <section class="legal-section" id="security">
+    <h2 class="legal-section-title"><span class="legal-section-number">08.</span> Technical & Operational Security</h2>
+    <p>{{ BRAND_NAME }} implements robust technical, organizational, and physical safeguards designed to protect personal data against unauthorized disclosure, accidental destruction, alteration, or unlawful access:</p>
+    <ul>
+      <li><strong>Transport Layer Security (TLS/HTTPS):</strong> All data transmitted between your device and {{ BRAND_NAME }} is encrypted using modern TLS cryptographic protocols with HSTS enforcement.</li>
+      <li><strong>Cryptographic Password Protection:</strong> Account passwords are never stored in plain text; they are hashed using secure cryptographic stretching algorithms (PBKDF2 with SHA-256).</li>
+      <li><strong>Hardened Session Cookies:</strong> Cookies are marked <code>HttpOnly</code> and <code>SameSite=Lax</code> to prevent Cross-Site Scripting (XSS) and CSRF interception.</li>
+      <li><strong>NFC Hardware Separation:</strong> Physical NFC cards do not store account passwords, contact databases, or financial numbers. They contain only a public redirect web link.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 9 -->
+  <section class="legal-section" id="minors">
+    <h2 class="legal-section-title"><span class="legal-section-number">09.</span> Protection of Minors</h2>
+    <p>{{ BRAND_NAME }} is a professional digital networking and commercial platform intended for individuals aged 18 years and older, or minors aged 16 and above with verified parental or guardian guidance for academic/professional networking. We do not knowingly solicit or collect personal data from children under the age of 16. If we become aware that personal data of a minor under 16 has been registered without parental consent, we will promptly delete the account.</p>
+  </section>
+
+  <!-- SECTION 10 -->
+  <section class="legal-section" id="updates">
+    <h2 class="legal-section-title"><span class="legal-section-number">10.</span> Changes to this Privacy Policy</h2>
+    <p>We may update this Privacy Policy from time to time to reflect operational modifications, feature expansions, or regulatory developments under Nigerian law. Whenever material revisions are introduced, we will update the "Effective Date" at the top of this document and notify active account holders via email or a platform announcement banner.</p>
+  </section>
+
+</div>
+{% endblock %}

@@ -7,11 +7,12 @@ from apps.accounts import views as account_views
 from apps.cards import views as card_views
 from apps.profiles import views as profile_views
 from apps.websites import views as web_views
-from apps.core.sitemaps import StaticViewSitemap, ProfileSitemap, WebsiteSitemap
+from apps.core.sitemaps import StaticViewSitemap, LegalViewSitemap, ProfileSitemap, WebsiteSitemap
 from apps.core.views import robots_txt_view
 
 SITEMAPS = {
     "static": StaticViewSitemap,
+    "legal": LegalViewSitemap,
     "profiles": ProfileSitemap,
     "websites": WebsiteSitemap,
 }
@@ -31,6 +32,9 @@ urlpatterns = [
 
     # Core Marketing Website
     path('', include('apps.core.urls', namespace='core')),
+
+    # Legal & Compliance Suite: /legal/
+    path('legal/', include('apps.core.legal_urls', namespace='legal')),
 
     # Unified Customer Dashboard
     path('dashboard/', include('apps.core.dashboard_urls', namespace='dashboard')),

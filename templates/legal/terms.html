@@ -1,0 +1,153 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Terms of Service — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Terms of Service of {{ BRAND_NAME }}. Review the legal terms governing digital profiles, physical NFC smart cards, orders, and platform usage in Nigeria.{% endblock %}
+
+{% block legal_title %}Terms of Service{% endblock %}
+{% block legal_summary %}
+These Terms of Service constitute a legally binding agreement between you and {{ BRAND_NAME }}, governing your access to and use of our digital profile platform, physical NFC smart cards, orders, and related services under the laws of the Federal Republic of Nigeria.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Binding Agreement Notice:</strong> By creating an account, ordering a smart card, or using {{ BRAND_NAME }} services, you confirm that you have read, understood, and agreed to be bound by these Terms of Service and our <a href="{% url 'legal:privacy' %}">Privacy Policy</a>. If you do not agree to these terms, you must not access or use our services.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="acceptance">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Acceptance of Terms & Eligibility</h2>
+    <p>These Terms of Service ("Terms") govern your relationship with {{ BRAND_NAME }} ("we", "us", "our").</p>
+    <ul>
+      <li><strong>Individual Eligibility:</strong> You represent and warrant that you are at least 18 years of age, or at least 16 years of age operating with the express consent and supervision of a parent or legal guardian.</li>
+      <li><strong>Entity Representation:</strong> If you are registering an account or purchasing smart cards on behalf of a company, partnership, government body, or other legal entity, you represent and warrant that you have full legal authority to bind that entity to these Terms.</li>
+      <li><strong>Jurisdiction:</strong> These services are offered and administered from the Federal Republic of Nigeria.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="accounts">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> User Accounts & Account Security</h2>
+    <p>To access profile customization, card management, and interaction analytics, you must register a customer account:</p>
+    <ul>
+      <li><strong>Accurate Information:</strong> You agree to provide true, accurate, current, and complete registration details and to update them promptly if changes occur.</li>
+      <li><strong>Credential Confidentiality:</strong> You are solely responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.</li>
+      <li><strong>Unauthorized Access:</strong> You must notify {{ BRAND_NAME }} immediately via <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> if you detect or suspect any unauthorized access or breach of your account security.</li>
+      <li><strong>One Person Per Account:</strong> Accounts may not be shared, rented, or transferred to third parties without our prior written authorization.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="profiles">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Digital Business Profiles & Public URLs</h2>
+    <p>{{ BRAND_NAME }} empowers users to create mobile-first digital business profiles accessible via unique public web addresses (<code>https://uzyra.onrender.com/u/&lt;slug&gt;/</code>):</p>
+    <ul>
+      <li><strong>Public Visibility:</strong> Information, links, and photographs you place on your digital profile are designed for public viewing by anyone who taps your physical card or visits your link. You control what information you publish.</li>
+      <li><strong>Profile Slugs:</strong> You may select an available profile handle/slug. {{ BRAND_NAME }} reserves the right to reclaim, reassign, or modify any slug that infringes on trademark rights, impersonates another individual or business, or violates our <a href="{% url 'legal:acceptable_use' %}">Acceptable Use Policy</a>.</li>
+      <li><strong>Content Responsibility:</strong> You retain full responsibility for the legality, accuracy, and decency of all information, credentials, and links displayed on your profile.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="cards">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Physical NFC Smart Cards & Hardware Terms</h2>
+    <p>{{ BRAND_NAME }} produces and supplies physical smart cards embedded with high-frequency NTAG216 microchips and laser-etched optical QR codes:</p>
+    <ul>
+      <li><strong>Hardware Functionality:</strong> Physical cards operate using passive Near Field Communication (NFC). The embedded chip stores a web redirect URL pointing to your digital profile. It does NOT store private cryptographic keys, passwords, or banking information.</li>
+      <li><strong>Device Compatibility:</strong> NFC tap reading requires an NFC-enabled smartphone (iOS 13+ / Android native). For devices without active NFC sensors, the optical QR code on the reverse side serves as a universal camera fallback.</li>
+      <li><strong>Card Activation:</strong> Before a newly delivered physical card can route taps to your digital profile, it must be claimed and paired through your customer dashboard using its unique activation security code.</li>
+      <li><strong>Card Suspension & Lost Cards:</strong> If your card is lost, stolen, or misplaced, you can toggle its status to "Suspended" or "Lost" immediately from your customer dashboard. Once suspended, public taps on the card will display a protective notice and will not reveal your contact information.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="legal-section" id="orders-payments">
+    <h2 class="legal-section-title"><span class="legal-section-number">05.</span> Orders, Pricing & Payment Processing</h2>
+    <p>Ordering physical NFC hardware cards, packages, or services is subject to the following billing terms:</p>
+    <ul>
+      <li><strong>Currency & Pricing:</strong> All prices displayed on our website are denominated in Nigerian Naira (NGN) unless explicitly indicated otherwise. We reserve the right to revise pricing at any time prior to order confirmation.</li>
+      <li><strong>Payment Gateway:</strong> All card payments and transfers are processed through <strong>Paystack Payments Limited</strong>. By checking out, you authorize Paystack to charge your selected payment method for the full order amount.</li>
+      <li><strong>Order Confirmation:</strong> An order is deemed confirmed upon successful authorization by Paystack and receipt of an automated electronic invoice.</li>
+      <li><strong>Shipping & Delivery:</strong> Physical card delivery across Nigeria is governed by our <a href="{% url 'legal:shipping' %}">Shipping &amp; Delivery Policy</a>. Courier delivery timeframes are estimates and may vary based on regional logistics.</li>
+      <li><strong>Refunds & Replacements:</strong> Hardware returns, defect claims, and order cancellations are governed exclusively by our <a href="{% url 'legal:refunds' %}">Refund &amp; Cancellation Policy</a>.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="legal-section" id="prohibited-use">
+    <h2 class="legal-section-title"><span class="legal-section-number">06.</span> Prohibited Conduct & Platform Integrity</h2>
+    <p>You agree not to misuse or abuse the {{ BRAND_NAME }} platform. Specifically, you must not:</p>
+    <ul>
+      <li>Engage in advance-fee fraud, Ponzi schemes, money laundering, phishing, or impersonation of individuals, banks, or corporate brands.</li>
+      <li>Publish defamatory, fraudulent, obscene, violent, or unlawful materials on your digital profile.</li>
+      <li>Reprogram or tamper with the NFC microchip to deliver malware, malicious exploits, or unauthorized redirects.</li>
+      <li>Deploy automated bots, scrapers, or high-volume scripts to access or extract data from our platform without express permission.</li>
+      <li>Attempt to probe, scan, or compromise the vulnerability of our cloud infrastructure or circumvent access controls.</li>
+    </ul>
+    <p>Violations are subject to our <a href="{% url 'legal:acceptable_use' %}">Acceptable Use Policy</a> and will result in immediate card suspension and account termination.</p>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section class="legal-section" id="intellectual-property">
+    <h2 class="legal-section-title"><span class="legal-section-number">07.</span> Intellectual Property Rights</h2>
+    <ul>
+      <li><strong>UZYRA Ownership:</strong> The {{ BRAND_NAME }} name, brand marks, logos, website layout, styling, user interface software, documentation, and hardware card design patterns are the exclusive intellectual property of {{ BRAND_NAME }} and are protected under Nigerian copyright and trademark laws.</li>
+      <li><strong>User Ownership:</strong> You retain all intellectual property rights to your personal photographs, trade names, business logos, and original text uploaded to your digital profile. You grant {{ BRAND_NAME }} a limited, non-exclusive license solely to host, render, and display your materials for the purpose of operating your profile.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 8 -->
+  <section class="legal-section" id="disclaimers">
+    <h2 class="legal-section-title"><span class="legal-section-number">08.</span> Warranties & Platform Disclaimers</h2>
+    <p>To the fullest extent permissible under Nigerian law, the {{ BRAND_NAME }} platform and physical cards are provided on an <strong>"AS IS"</strong> and <strong>"AS AVAILABLE"</strong> basis:</p>
+    <ul>
+      <li><strong>No Verification of Profile Claims:</strong> {{ BRAND_NAME }} does not endorse, verify, audit, or guarantee the accuracy, truthfulness, credentials, or licenses claimed by individual digital profile holders. Visitors who engage in business with profile owners do so at their own discretion and risk.</li>
+      <li><strong>Service Availability:</strong> While we employ high-availability cloud infrastructure, we do not warrant that our platform will be entirely uninterrupted, error-free, or impervious to unforeseen carrier outages or maintenance downtime.</li>
+      <li><strong>Third-Party Dependencies:</strong> Tapping functionality depends on the operating system, NFC hardware antenna, and cellular data connection of the reading smartphone.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 9 -->
+  <section class="legal-section" id="liability">
+    <h2 class="legal-section-title"><span class="legal-section-number">09.</span> Limitation of Liability</h2>
+    <p>Under no circumstances shall {{ BRAND_NAME }}, its directors, officers, employees, or contractors be liable for any indirect, incidental, special, consequential, or punitive damages—including loss of profits, goodwill, business opportunities, or data—arising out of or relating to your use of or inability to use our services or physical cards.</p>
+    <p>To the maximum extent permitted by applicable law, our total aggregate liability for all claims arising under these Terms shall not exceed the amount actually paid by you to {{ BRAND_NAME }} during the six (6) months preceding the event giving rise to liability.</p>
+  </section>
+
+  <!-- SECTION 10 -->
+  <section class="legal-section" id="suspension">
+    <h2 class="legal-section-title"><span class="legal-section-number">10.</span> Account Suspension & Termination</h2>
+    <p>We reserve the right to suspend, restrict, or terminate your account, deactivate your digital profile, or block your smart cards with immediate effect if:</p>
+    <ul>
+      <li>You breach any provision of these Terms or our linked compliance policies.</li>
+      <li>We receive verified reports or court orders indicating fraudulent, deceptive, or illegal conduct.</li>
+      <li>Your continued access threatens the security, performance, or reputation of the platform.</li>
+    </ul>
+    <p>You may terminate your account at any time by contacting our support desk or requesting account deletion.</p>
+  </section>
+
+  <!-- SECTION 11 -->
+  <section class="legal-section" id="governing-law">
+    <h2 class="legal-section-title"><span class="legal-section-number">11.</span> Governing Law & Dispute Resolution</h2>
+    <p>These Terms of Service and any dispute, controversy, or claim arising out of or in connection with them shall be governed by and construed in accordance with the <strong>laws of the Federal Republic of Nigeria</strong>.</p>
+    <ul>
+      <li><strong>Amicable Negotiation:</strong> The parties agree to first attempt in good faith to resolve any dispute through amicable negotiation for a period of thirty (30) days from written notice of dispute.</li>
+      <li><strong>Mediation / Arbitration:</strong> If the dispute cannot be resolved through negotiation, it may be submitted to mediation at the Lagos Multi-Door Courthouse (LMDC) or resolved by arbitration in accordance with the Arbitration and Mediation Act 2023 of Nigeria.</li>
+      <li><strong>Jurisdiction:</strong> Where litigation is required, the courts of competent jurisdiction in the Federal Republic of Nigeria shall have exclusive jurisdiction.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 12 -->
+  <section class="legal-section" id="contact">
+    <h2 class="legal-section-title"><span class="legal-section-number">12.</span> Contact Information</h2>
+    <p>If you have any questions, legal notices, or feedback regarding these Terms of Service, please contact us:</p>
+    <ul>
+      <li><strong>Email:</strong> <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a></li>
+      <li><strong>Complaints Desk:</strong> <a href="{% url 'legal:complaints' %}">UZYRA Complaints &amp; Inquiries</a></li>
+      <li><strong>Phone / WhatsApp:</strong> {{ BRAND_SUPPORT_PHONE }}</li>
+    </ul>
+  </section>
+
+</div>
+{% endblock %}

@@ -105,7 +105,7 @@
           <label class="form-check">
             {{ form.agree_terms }}
             <span class="text-secondary" style="font-size: 0.8125rem;">
-              I agree to the <a href="{% url 'core:faq' %}" class="text-silver">Terms of Service</a> and <a href="{% url 'core:faq' %}" class="text-silver">Privacy Policy</a>
+              I agree to the <a href="{% url 'legal:terms' %}" target="_blank" class="text-silver">Terms of Service</a> and acknowledge the <a href="{% url 'legal:privacy' %}" target="_blank" class="text-silver">Privacy Policy</a>
             </span>
           </label>
           {% if form.agree_terms.errors %}

@@ -1,0 +1,84 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Acceptable Use Policy — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Acceptable Use Policy of {{ BRAND_NAME }}. Learn the rules governing digital profiles, smart cards, and prohibited online activities.{% endblock %}
+
+{% block legal_title %}Acceptable Use Policy{% endblock %}
+{% block legal_summary %}
+This Acceptable Use Policy defines the standards and behavioral rules governing all users of {{ BRAND_NAME }}. Our mission is to provide an elite, trustworthy networking platform. Deceptive, malicious, fraudulent, and abusive uses of our platform or smart cards are strictly prohibited.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Zero Tolerance for Fraud & Impersonation:</strong> {{ BRAND_NAME }} strictly enforces zero tolerance for digital fraud, advance-fee schemes, unauthorized banking claims, or impersonation of commercial or public authorities. Violating profiles will be permanently suspended immediately upon verification.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="scope">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Purpose & Scope</h2>
+    <p>This Acceptable Use Policy ("AUP") applies to any individual or business registering an account, publishing a digital profile, programming an NFC card, or utilizing {{ BRAND_NAME }} web services. By accessing our services, you agree to comply with this policy in full.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="prohibited-activities">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Strictly Prohibited Activities</h2>
+    <p>You may not use {{ BRAND_NAME }} services, profiles, or physical hardware cards to engage in, facilitate, or promote any of the following activities:</p>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">A. Fraud, Deception & Impersonation</h3>
+    <ul>
+      <li><strong>Advance-Fee & Investment Fraud:</strong> Operating or promoting Ponzi schemes, multi-level marketing scams, fake investment clubs, cryptocurrency doubling schemes, or advance-fee fraud (commonly termed "419").</li>
+      <li><strong>Impersonation:</strong> Falsely claiming to be an employee, agent, executive, or representative of a bank, financial institution, government agency (e.g. CBN, EFCC, FIRS, CAC), or existing legitimate company without authorization.</li>
+      <li><strong>Counterfeit Credentials:</strong> Displaying fabricated academic degrees, fake professional certifications (e.g. medical, legal, accounting, engineering), or bogus corporate registration credentials.</li>
+    </ul>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">B. Cyber Threats, Malware & Security Exploits</h3>
+    <ul>
+      <li><strong>Phishing & Credential Harvesting:</strong> Creating digital profiles or custom button links that deceive visitors into entering passwords, banking OTPs, or financial credentials.</li>
+      <li><strong>Malicious Payloads:</strong> Linking to malware, ransomware, spyware, trojans, or exploit kits.</li>
+      <li><strong>NFC Microchip Tampering:</strong> Reprogramming physical {{ BRAND_NAME }} cards to transmit malicious NDEF payloads designed to exploit vulnerabilities in reading devices.</li>
+      <li><strong>System Abuse:</strong> Deploying automated scripts, scrapers, credential-stuffing tools, or denial-of-service (DDoS) traffic against {{ BRAND_NAME }} servers.</li>
+    </ul>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">C. Harassment, Violence & Illegal Content</h3>
+    <ul>
+      <li><strong>Defamation & Harassment:</strong> Publishing content that slanders, bullies, blackmails, stalks, or threatens individuals or groups.</li>
+      <li><strong>Hate Speech & Extremism:</strong> Content promoting violence, discrimination, or hatred based on race, ethnicity, religion, disability, gender, or sexual orientation.</li>
+      <li><strong>Explicit Adult Content:</strong> Publishing non-consensual imagery, prostitution listings, pornography, or exploitative material.</li>
+      <li><strong>Unlawful Goods:</strong> Advertising illegal drugs, unregistered firearms, stolen property, or regulated substances without proper licenses.</li>
+    </ul>
+
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">D. Intellectual Property Violations</h3>
+    <ul>
+      <li>Unauthorized use of registered trademarks, business names, or copyright-protected logos to create a misleading appearance of official corporate affiliation.</li>
+      <li>Uploading copyrighted photography, art, or written material without explicit permission or legal right.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="legal-section" id="enforcement">
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Monitoring, Investigation & Enforcement</h2>
+    <p>{{ BRAND_NAME }} actively protects its user community and the integrity of smart networking in Nigeria:</p>
+    <ul>
+      <li><strong>Proactive Review & Anomaly Detection:</strong> We employ automated heuristics and administrative audits to detect abusive profiles, unusual card tap spikes, and malicious redirect links.</li>
+      <li><strong>Investigation:</strong> Upon receiving an abuse notice or detecting suspicious behavior, we reserve the right to review the user's published profile content and outbound links.</li>
+      <li><strong>Immediate Sanctions:</strong> In the event of an AUP breach, we may without prior notice:
+        <ol style="margin-top: 0.5rem;">
+          <li>Deactivate the user's public profile URL immediately.</li>
+          <li>Suspend and permanently blacklist associated physical NFC cards from redirecting.</li>
+          <li>Terminate the user account and retain records for law enforcement reporting.</li>
+          <li>Report illegal activities to appropriate statutory bodies (such as the Nigeria Police Force or EFCC).</li>
+        </ol>
+      </li>
+    </ul>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="legal-section" id="reporting">
+    <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Reporting Abuse or Impersonation</h2>
+    <p>If you encounter an {{ BRAND_NAME }} profile or smart card that violates this policy—or if someone is impersonating you or your business—please report it immediately through our <a href="{% url 'legal:complaints' %}?category=abuse">Abuse &amp; Impersonation Reporting Desk</a> or email <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> with the offending profile URL.</p>
+  </section>
+
+</div>
+{% endblock %}

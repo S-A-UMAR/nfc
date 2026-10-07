@@ -1,0 +1,116 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block title %}Third-Party Services Disclosure — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Official Third-Party Services Disclosure of {{ BRAND_NAME }}. Learn about the verified external cloud, payment, database, and infrastructure providers powering our platform.{% endblock %}
+
+{% block legal_title %}Third-Party Services Disclosure{% endblock %}
+{% block legal_summary %}
+This disclosure provides full transparency regarding the external cloud, payment, database, and messaging infrastructure providers integrated into the {{ BRAND_NAME }} platform to deliver our services.
+{% endblock %}
+
+{% block legal_content %}
+<div class="legal-prose">
+
+  <div class="legal-callout">
+    <strong>Infrastructure Transparency:</strong> To provide a secure, scalable, and resilient experience, {{ BRAND_NAME }} integrates with carefully vetted third-party service providers. We maintain strict data processing agreements with these providers to ensure your information is safeguarded.
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="legal-section" id="verified-providers">
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Verified Infrastructure & Cloud Partners</h2>
+    <p>Below is the complete, audited directory of third-party platforms utilized by {{ BRAND_NAME }}:</p>
+
+    <!-- PROVIDER 1 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6);">
+      <div class="d-flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">1. Paystack Payments Limited</h3>
+        <span class="badge badge-silver">PAYMENT GATEWAY</span>
+      </div>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-3);">
+        <strong>Role:</strong> Secure checkout and payment processing for physical NFC cards, accessories, and web solutions.
+      </p>
+      <ul style="font-size: 0.85rem; margin-bottom: var(--space-3);">
+        <li><strong>Data Handled:</strong> Transaction amounts, currency (NGN), customer email address, and cryptographic transaction reference tokens.</li>
+        <li><strong>Security & Compliance:</strong> Certified PCI-DSS Level 1 service provider regulated by the Central Bank of Nigeria (CBN).</li>
+        <li><strong>Privacy Policy:</strong> <a href="https://paystack.com/terms" target="_blank" rel="noopener">paystack.com/terms</a></li>
+      </ul>
+    </div>
+
+    <!-- PROVIDER 2 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6);">
+      <div class="d-flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">2. Brevo (Sendinblue SAS)</h3>
+        <span class="badge badge-silver">TRANSACTIONAL EMAIL</span>
+      </div>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-3);">
+        <strong>Role:</strong> High-deliverability transactional messaging, including 6-digit email OTP verification codes and password reset tokens.
+      </p>
+      <ul style="font-size: 0.85rem; margin-bottom: var(--space-3);">
+        <li><strong>Data Handled:</strong> Recipient email address, verification codes, and automated system alerts.</li>
+        <li><strong>Security & Compliance:</strong> Headquartered in France; strict compliance with European GDPR, ISO 27001 certified, TLS 1.3 email encryption in transit.</li>
+        <li><strong>Privacy Policy:</strong> <a href="https://www.brevo.com/legal/privacypolicy/" target="_blank" rel="noopener">brevo.com/legal/privacypolicy</a></li>
+      </ul>
+    </div>
+
+    <!-- PROVIDER 3 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6);">
+      <div class="d-flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">3. TiDB Cloud (PingCAP, Inc.)</h3>
+        <span class="badge badge-silver">SERVERLESS CLOUD DATABASE</span>
+      </div>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-3);">
+        <strong>Role:</strong> Distributed, highly available relational MySQL database cluster hosting account data, cards, and interaction records.
+      </p>
+      <ul style="font-size: 0.85rem; margin-bottom: var(--space-3);">
+        <li><strong>Data Handled:</strong> Encrypted customer account records, profile details, smart card hardware assignments, orders, and first-party analytics.</li>
+        <li><strong>Security & Compliance:</strong> SOC 2 Type II, ISO 27001, end-to-end TLS/SSL mandatory connection encryption, hosted on enterprise AWS European infrastructure (Frankfurt).</li>
+        <li><strong>Privacy Policy:</strong> <a href="https://www.pingcap.com/privacy-policy/" target="_blank" rel="noopener">pingcap.com/privacy-policy</a></li>
+      </ul>
+    </div>
+
+    <!-- PROVIDER 4 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6);">
+      <div class="d-flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">4. Cloudinary Ltd</h3>
+        <span class="badge badge-silver">MEDIA STORAGE & CDN</span>
+      </div>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-3);">
+        <strong>Role:</strong> Persistent storage, optimization, and edge delivery for user-uploaded profile pictures and digital card media.
+      </p>
+      <ul style="font-size: 0.85rem; margin-bottom: var(--space-3);">
+        <li><strong>Data Handled:</strong> Avatar photos and images uploaded by account holders to customize their profile cards.</li>
+        <li><strong>Security & Compliance:</strong> SOC 2 Type II, ISO 27001 certified global media CDN.</li>
+        <li><strong>Privacy Policy:</strong> <a href="https://cloudinary.com/privacy" target="_blank" rel="noopener">cloudinary.com/privacy</a></li>
+      </ul>
+    </div>
+
+    <!-- PROVIDER 5 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6);">
+      <div class="d-flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">5. Render Services, Inc.</h3>
+        <span class="badge badge-silver">APPLICATION HOSTING</span>
+      </div>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-3);">
+        <strong>Role:</strong> Containerized application runtime, WSGI web server hosting, and automated SSL certificate management.
+      </p>
+      <ul style="font-size: 0.85rem; margin-bottom: var(--space-3);">
+        <li><strong>Data Handled:</strong> Ephemeral server request logs, application runtime execution.</li>
+        <li><strong>Security & Compliance:</strong> SOC 2 Type II, automated TLS/HTTPS encryption, DDoS mitigation.</li>
+        <li><strong>Privacy Policy:</strong> <a href="https://render.com/privacy" target="_blank" rel="noopener">render.com/privacy</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="legal-section" id="outbound-links">
+    <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Outbound Links & External Social Services</h2>
+    <p>A core feature of {{ BRAND_NAME }} digital profiles is linking to external channels selected by the user—such as WhatsApp, Instagram, LinkedIn, X (Twitter), YouTube, TikTok, GitHub, and personal portfolio sites:</p>
+    <ul>
+      <li><strong>Independent Control:</strong> When a visitor taps an external link on a digital profile, they leave the {{ BRAND_NAME }} platform and connect directly to that external third-party service.</li>
+      <li><strong>No Endorsement:</strong> {{ BRAND_NAME }} does not control, supervise, endorse, or assume responsibility for the content, security, data handling, or terms of any third-party website linked on a user profile.</li>
+      <li><strong>Visitor Discretion:</strong> Visitors are encouraged to review the respective privacy policies and terms of any external platforms they access through profile links.</li>
+    </ul>
+  </section>
+
+</div>
+{% endblock %}

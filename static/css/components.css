@@ -1153,7 +1153,7 @@
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 1.3fr;
   gap: var(--space-8);
   margin-bottom: var(--space-12);
 }

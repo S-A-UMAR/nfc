@@ -33,6 +33,32 @@ class StaticViewSitemap(Sitemap):
         return reverse(item)
 
 
+class LegalViewSitemap(Sitemap):
+    """Public legal, privacy and compliance policies."""
+    priority = 0.5
+    changefreq = "monthly"
+    protocol = "https"
+
+    def items(self):
+        return [
+            "legal:index",
+            "legal:privacy",
+            "legal:terms",
+            "legal:cookies",
+            "legal:acceptable_use",
+            "legal:refunds",
+            "legal:shipping",
+            "legal:nfc_terms",
+            "legal:copyright",
+            "legal:user_content",
+            "legal:third_party",
+            "legal:complaints",
+        ]
+
+    def location(self, item):
+        return reverse(item)
+
+
 class ProfileSitemap(Sitemap):
     """Public profiles that have opted into search indexing."""
     priority = 0.7
