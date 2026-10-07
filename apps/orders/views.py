@@ -122,3 +122,32 @@ def order_submit_info_view(request, order_number):
         'order': order,
         'form': form,
     })
+
+
+@login_required
+def order_cancel_view(request, order_number):
+    """Allow customer to cancel an unpaid pending order."""
+    if request.method != 'POST':
+        messages.error(request, "Invalid request method.")
+        return redirect('dashboard:order_detail', order_number=order_number)
+
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+
+    if order.payment_status == Order.PAYMENT_PAID:
+        messages.error(request, "Paid orders cannot be cancelled online. Please contact support for assistance.")
+        return redirect('dashboard:order_detail', order_number=order.order_number)
+
+    if order.order_status in [Order.STATUS_DELIVERY, Order.STATUS_COMPLETED, Order.STATUS_CANCELLED]:
+        messages.error(request, f"Order #{order.order_number} cannot be cancelled in its current status ({order.get_order_status_display()}).")
+        return redirect('dashboard:order_detail', order_number=order.order_number)
+
+    from apps.payments.models import Payment
+    order.order_status = Order.STATUS_CANCELLED
+    order.payment_status = Order.PAYMENT_CANCELLED
+    order.save()
+
+    # Cancel any associated pending payment records
+    Payment.objects.filter(order=order, status=Payment.STATUS_PENDING).update(status=Payment.STATUS_CANCELLED)
+
+    messages.success(request, f"Order #{order.order_number} has been successfully cancelled.")
+    return redirect('dashboard:orders_list')

@@ -43,12 +43,14 @@ class Order(models.Model):
     PAYMENT_PAID = 'paid'
     PAYMENT_FAILED = 'failed'
     PAYMENT_REFUNDED = 'refunded'
+    PAYMENT_CANCELLED = 'cancelled'
 
     PAYMENT_STATUS_CHOICES = (
         (PAYMENT_PENDING, 'Payment Pending'),
         (PAYMENT_PAID, 'Payment Confirmed'),
         (PAYMENT_FAILED, 'Payment Failed'),
         (PAYMENT_REFUNDED, 'Refunded'),
+        (PAYMENT_CANCELLED, 'Cancelled'),
     )
 
     STATUS_RECEIVED = 'received'
@@ -60,6 +62,7 @@ class Order(models.Model):
     STATUS_PRODUCTION = 'production'
     STATUS_DELIVERY = 'delivery'
     STATUS_COMPLETED = 'completed'
+    STATUS_CANCELLED = 'cancelled'
 
     ORDER_STATUS_CHOICES = (
         (STATUS_RECEIVED, 'Order Received'),
@@ -71,6 +74,7 @@ class Order(models.Model):
         (STATUS_PRODUCTION, 'Card Production / Encoding'),
         (STATUS_DELIVERY, 'Out for Delivery'),
         (STATUS_COMPLETED, 'Completed & Active'),
+        (STATUS_CANCELLED, 'Cancelled'),
     )
 
     TIMELINE_STEPS = [

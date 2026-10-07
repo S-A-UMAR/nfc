@@ -14,10 +14,14 @@
   </div>
 
   <div style="display: flex; gap: 0.75rem;">
-    {% if not order.is_paid %}
+    {% if not order.is_paid and order.order_status != 'cancelled' %}
       <a href="{% url 'payments:initialize' order.order_number %}" class="btn btn-primary btn-sm">Pay ₦{{ order.amount|floatformat:"0" }}</a>
+      <form action="{% url 'dashboard:order_cancel' order.order_number %}" method="post" onsubmit="return confirm('Are you sure you want to cancel Order #{{ order.order_number }}?');" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger btn-sm" style="height: 100%;">Cancel Order</button>
+      </form>
     {% endif %}
-    {% if not order.has_submitted_requirements %}
+    {% if not order.has_submitted_requirements and order.order_status != 'cancelled' %}
       <a href="{% url 'dashboard:order_submit_info' order.order_number %}" class="btn btn-secondary btn-sm">Submit Design Info</a>
     {% endif %}
   </div>

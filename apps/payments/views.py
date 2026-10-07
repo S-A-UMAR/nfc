@@ -28,17 +28,19 @@ def initialize_payment_view(request, order_number):
         messages.info(request, "This order is already paid.")
         return redirect('dashboard:order_detail', order_number=order.order_number)
 
-    # Generate unique payment reference
-    reference = f"ULV-{order.order_number}-{uuid.uuid4().hex[:6].upper()}"
-    payment, _ = Payment.objects.get_or_create(
-        order=order,
-        reference=reference,
-        defaults={
-            'amount': order.amount,
-            'provider': 'paystack',
-            'status': Payment.STATUS_PENDING,
-        }
-    )
+    # Reuse existing pending payment if present, otherwise generate unique reference
+    payment = Payment.objects.filter(order=order, status=Payment.STATUS_PENDING).first()
+    if not payment:
+        reference = f"ULV-{order.order_number}-{uuid.uuid4().hex[:6].upper()}"
+        payment = Payment.objects.create(
+            order=order,
+            reference=reference,
+            amount=order.amount,
+            provider='paystack',
+            status=Payment.STATUS_PENDING,
+        )
+    else:
+        reference = payment.reference
 
     return render(request, 'payments/checkout_gateway.html', {
         'order': order,

@@ -776,8 +776,6 @@ def operations_order_detail_view(request, order_number):
 @require_POST
 def operations_order_update_status_view(request, order_number):
     """Update order_status or payment_status from the operations portal."""
-    order = get_object_or_404(Order, order_number=order_number)
-
     new_order_status = request.POST.get('order_status', '').strip()
     new_payment_status = request.POST.get('payment_status', '').strip()
 
@@ -786,35 +784,38 @@ def operations_order_update_status_view(request, order_number):
 
     changed = []
 
-    if new_order_status and new_order_status != order.order_status:
-        if new_order_status not in valid_order_statuses:
-            messages.error(request, "Invalid order status.")
-            return redirect('operations:order_detail', order_number=order.order_number)
-        old_status = order.get_order_status_display()
-        order.order_status = new_order_status
-        changed.append(f"Order status: {old_status} → {order.get_order_status_display()}")
+    with transaction.atomic():
+        # Lock order row
+        order = get_object_or_404(Order.objects.select_for_update(), order_number=order_number)
 
-    if new_payment_status and new_payment_status != order.payment_status:
-        if new_payment_status not in valid_payment_statuses:
-            messages.error(request, "Invalid payment status.")
-            return redirect('operations:order_detail', order_number=order.order_number)
-        old_pstatus = order.get_payment_status_display()
-        order.payment_status = new_payment_status
-        changed.append(f"Payment status: {old_pstatus} → {order.get_payment_status_display()}")
+        if new_order_status and new_order_status != order.order_status:
+            if new_order_status not in valid_order_statuses:
+                messages.error(request, "Invalid order status.")
+                return redirect('operations:order_detail', order_number=order.order_number)
+            old_status = order.get_order_status_display()
+            order.order_status = new_order_status
+            changed.append(f"Order status: {old_status} → {order.get_order_status_display()}")
 
-    # Assign card
-    assign_card_id = request.POST.get('assign_card_id', '').strip()
-    if assign_card_id:
-        try:
-            card = Card.objects.select_for_update().get(id=assign_card_id, status=Card.STATUS_UNASSIGNED)
-            order.card_assigned = card
-            changed.append(f"Card assigned: {card.card_code}")
-        except Card.DoesNotExist:
-            messages.error(request, "Card not found or no longer unassigned.")
-            return redirect('operations:order_detail', order_number=order.order_number)
+        if new_payment_status and new_payment_status != order.payment_status:
+            if new_payment_status not in valid_payment_statuses:
+                messages.error(request, "Invalid payment status.")
+                return redirect('operations:order_detail', order_number=order.order_number)
+            old_pstatus = order.get_payment_status_display()
+            order.payment_status = new_payment_status
+            changed.append(f"Payment status: {old_pstatus} → {order.get_payment_status_display()}")
 
-    if changed:
-        with transaction.atomic():
+        # Assign card
+        assign_card_id = request.POST.get('assign_card_id', '').strip()
+        if assign_card_id:
+            try:
+                card = Card.objects.select_for_update().get(id=assign_card_id, status=Card.STATUS_UNASSIGNED)
+                order.card_assigned = card
+                changed.append(f"Card assigned: {card.card_code}")
+            except Card.DoesNotExist:
+                messages.error(request, "Card not found or no longer unassigned.")
+                return redirect('operations:order_detail', order_number=order.order_number)
+
+        if changed:
             order.save()
             AdminAuditLog.log(
                 action=AdminAuditLog.ACTION_ORDER_STATUS,
@@ -822,9 +823,9 @@ def operations_order_update_status_view(request, order_number):
                 target_repr=f"Order #{order.order_number}",
                 details="; ".join(changed),
             )
-        messages.success(request, f"Order #{order.order_number} updated: {'; '.join(changed)}")
-    else:
-        messages.info(request, "No changes were made.")
+            messages.success(request, f"Order #{order.order_number} updated: {'; '.join(changed)}")
+        else:
+            messages.info(request, "No changes were made.")
 
     return redirect('operations:order_detail', order_number=order.order_number)
 

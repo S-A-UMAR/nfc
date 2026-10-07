@@ -6,12 +6,14 @@ class Payment(models.Model):
     STATUS_SUCCESS = 'success'
     STATUS_FAILED = 'failed'
     STATUS_REFUNDED = 'refunded'
+    STATUS_CANCELLED = 'cancelled'
 
     STATUS_CHOICES = (
         (STATUS_PENDING, 'Pending'),
         (STATUS_SUCCESS, 'Successful'),
         (STATUS_FAILED, 'Failed'),
         (STATUS_REFUNDED, 'Refunded'),
+        (STATUS_CANCELLED, 'Cancelled'),
     )
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')

@@ -23,6 +23,7 @@ urlpatterns = [
     path('card/', card_views.card_manage_view, name='card_manage'),
     path('orders/', order_views.order_list_view, name='orders_list'),
     path('orders/<str:order_number>/', order_views.order_detail_view, name='order_detail'),
+    path('orders/<str:order_number>/cancel/', order_views.order_cancel_view, name='order_cancel'),
     path('orders/<str:order_number>/submit-info/', order_views.order_submit_info_view, name='order_submit_info'),
     path('website/', web_views.website_manage_view, name='website_manage'),
     path('website/<int:website_id>/publish/', web_views.website_publish_toggle, name='website_publish'),
