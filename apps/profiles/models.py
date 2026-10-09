@@ -160,3 +160,29 @@ class CustomLink(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.profile.full_name})"
+
+
+class ContactExchange(models.Model):
+    """
+    Two-way contact exchange lead submitted by a visitor on a public UZYRA profile.
+    Strictly isolated: viewable only by the receiving profile's owner.
+    """
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='received_contacts')
+    full_name = models.CharField(max_length=150)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=50, blank=True)
+    business_name = models.CharField(max_length=150, blank=True)
+    notes = models.TextField(blank=True, help_text="Optional note or context from visitor")
+    consent_given = models.BooleanField(default=False, help_text="Explicit user consent given")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Contact Exchange Lead'
+        verbose_name_plural = 'Contact Exchange Leads'
+
+    def __str__(self):
+        return f"Lead: {self.full_name} -> {self.profile.full_name}"
+

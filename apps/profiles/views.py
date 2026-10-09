@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.conf import settings
 from .models import Profile, SocialLink, CustomLink
 from .forms import ProfileForm, SocialLinkForm, CustomLinkForm, ProfileAppearanceForm
 from apps.analytics.models import AnalyticsEvent
@@ -322,3 +323,209 @@ def profile_appearance_view(request):
         'personal_layouts': PERSONAL_LAYOUTS,
         'business_layouts': BUSINESS_LAYOUTS,
     })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TWO-WAY CONTACT EXCHANGE & PROFILE SHARE / QR (V1.1)
+# ─────────────────────────────────────────────────────────────────────────────
+import qrcode
+import io
+import re
+from .forms import ContactExchangeForm
+from .models import ContactExchange
+from apps.core.services.email_service import BrevoEmailService
+
+
+@require_POST
+def submit_contact_exchange_view(request, slug):
+    """
+    Public Endpoint (/u/<slug>/exchange/).
+    Enables visitors to submit their contact details (two-way contact exchange).
+    Features:
+    - Server-side validation & consent enforcement.
+    - IP Rate limiting (max 5 submissions per IP in 10 minutes).
+    - Email notification to profile owner via Brevo.
+    - XSS & IDOR protection.
+    """
+    profile = get_object_or_404(Profile, slug=slug)
+
+    # Rate limiting: limit per IP address
+    client_ip = request.META.get('REMOTE_ADDR')
+    from django.utils import timezone
+    from datetime import timedelta
+    ten_minutes_ago = timezone.now() - timedelta(minutes=10)
+    recent_submissions = ContactExchange.objects.filter(
+        profile=profile,
+        ip_address=client_ip,
+        created_at__gte=ten_minutes_ago
+    ).count()
+
+    if recent_submissions >= 5:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
+            return JsonResponse({'success': False, 'message': 'Too many contact requests. Please wait a few minutes before trying again.'}, status=429)
+        messages.error(request, "Too many contact requests. Please wait a few minutes before trying again.")
+        return redirect('profiles:public_profile', slug=slug)
+
+    form = ContactExchangeForm(request.POST)
+    if form.is_valid():
+        contact_exchange = form.save(commit=False)
+        contact_exchange.profile = profile
+        contact_exchange.ip_address = client_ip
+        contact_exchange.user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
+        contact_exchange.save()
+
+        # Analytics event
+        AnalyticsEvent.objects.create(
+            profile=profile,
+            event_type=AnalyticsEvent.TYPE_VCARD,
+            target_label="Contact Exchange Submitted",
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+        )
+
+        # Notify profile owner safely via Brevo
+        try:
+            BrevoEmailService.send_contact_exchange_notification(contact_exchange)
+        except Exception as e:
+            import logging
+            logging.getLogger('uzyra.contact_exchange').error(f"Contact exchange email notification failed: {e}")
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
+            return JsonResponse({'success': True, 'message': f'Your contact details have been shared with {profile.full_name}. Thank you!'})
+
+        messages.success(request, f"Your contact details have been shared with {profile.full_name}. Thank you!")
+        return redirect('profiles:public_profile', slug=slug)
+    else:
+        errors = "; ".join([f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()])
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
+            return JsonResponse({'success': False, 'message': f'Could not submit contact: {errors}'}, status=400)
+        messages.error(request, f"Could not submit contact details: {errors}")
+        return redirect('profiles:public_profile', slug=slug)
+
+
+@login_required
+def dashboard_contacts_view(request):
+    """
+    Dashboard Received Contacts (/dashboard/contacts/).
+    Displays leads submitted to request.user.profile via contact exchange.
+    Enforces strict user isolation (IDOR protection).
+    """
+    profile = request.user.profile
+    contacts = profile.received_contacts.all()
+
+    return render(request, 'dashboard/contacts.html', {
+        'profile': profile,
+        'contacts': contacts,
+    })
+
+
+@login_required
+@require_POST
+def delete_contact_exchange_view(request, contact_id):
+    """
+    Deletes a received lead. Isolated to request.user.profile.
+    """
+    profile = request.user.profile
+    contact = get_object_or_404(ContactExchange, id=contact_id, profile=profile)
+    name = contact.full_name
+    contact.delete()
+    messages.info(request, f"Contact record from '{name}' removed.")
+    return redirect('dashboard:contacts_list')
+
+
+@login_required
+def export_contact_exchange_vcard_view(request, contact_id):
+    """
+    Exports a received contact lead as a downloadable .vcf vCard file.
+    Isolated to request.user.profile.
+    """
+    profile = request.user.profile
+    contact = get_object_or_404(ContactExchange, id=contact_id, profile=profile)
+
+    def _clean_vcard(text):
+        if not text:
+            return ""
+        return str(text).replace('\r', '').replace('\n', ' ').replace(';', '\\;').strip()
+
+    clean_name = _clean_vcard(contact.full_name)
+    vcard_lines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        f"FN:{clean_name}",
+        f"N:{clean_name};;;;",
+    ]
+
+    if contact.business_name:
+        vcard_lines.append(f"ORG:{_clean_vcard(contact.business_name)}")
+    if contact.phone:
+        vcard_lines.append(f"TEL;TYPE=CELL,VOICE:{_clean_vcard(contact.phone)}")
+    if contact.email:
+        vcard_lines.append(f"EMAIL;TYPE=PREF,INTERNET:{_clean_vcard(contact.email)}")
+    if contact.notes:
+        vcard_lines.append(f"NOTE:{_clean_vcard(contact.notes)}")
+
+    vcard_lines.append("END:VCARD")
+    vcard_content = "\r\n".join(vcard_lines) + "\r\n"
+
+    safe_name = re.sub(r'[^a-zA-Z0-9_\-]', '', contact.full_name.replace(' ', '_')) or 'contact'
+    response = HttpResponse(vcard_content, content_type='text/vcard; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{safe_name}_lead.vcf"'
+    return response
+
+
+def download_profile_qr_view(request, slug):
+    """
+    Generates a PNG QR code image encoding the canonical profile URL (/u/<slug>/).
+    """
+    profile = get_object_or_404(Profile, slug=slug)
+    site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+    canonical_url = f"{site_url}/u/{profile.slug}/"
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=10,
+        border=2,
+    )
+    qr.add_data(canonical_url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="#0A0A0A", back_color="#FFFFFF")
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+
+    # Log analytics event if request comes from scan or download
+    if request.GET.get('download') == 'true':
+        AnalyticsEvent.objects.create(
+            profile=profile,
+            event_type=AnalyticsEvent.TYPE_QR_SCAN,
+            target_label="Profile QR Code Download",
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+        )
+
+    response = HttpResponse(buffer.getvalue(), content_type='image/png')
+    if request.GET.get('download') == 'true':
+        response['Content-Disposition'] = f'attachment; filename="{profile.slug}_qr.png"'
+    return response
+
+
+@login_required
+def dashboard_share_view(request):
+    """
+    Dashboard Share Hub (/dashboard/share/).
+    Provides Copy Link, QR Code preview/download, Web Share API support,
+    and Referral invite growth prompt.
+    """
+    profile = request.user.profile
+    user = request.user
+    site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+    public_url = f"{site_url}/u/{profile.slug}/"
+    referral_link = f"{site_url}/join/?ref={user.referral_code}"
+
+    return render(request, 'dashboard/share.html', {
+        'profile': profile,
+        'user': user,
+        'public_url': public_url,
+        'referral_link': referral_link,
+        'qr_url': f"/u/{profile.slug}/qr/",
+    })
+

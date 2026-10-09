@@ -57,6 +57,18 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           <span>Smart Card</span>
         </a>
+        <a href="{% url 'dashboard:contacts_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Contacts Received</span>
+        </a>
+        <a href="{% url 'dashboard:share' %}" class="sidebar-link {% if request.resolver_match.url_name == 'share' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Share Profile & QR</span>
+        </a>
+        <a href="{% url 'dashboard:referrals' %}" class="sidebar-link {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          <span>Referral Program</span>
+        </a>
         <a href="{% url 'dashboard:website_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'website_manage' %}active{% endif %}" style="opacity:0.7;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <span>Website Builder <span style="font-size:0.65rem;font-family:var(--font-body);background:rgba(245,158,11,0.15);color:#F59E0B;border:1px solid rgba(245,158,11,0.3);border-radius:4px;padding:1px 5px;margin-left:2px;vertical-align:middle;">Soon</span></span>
@@ -110,12 +122,16 @@
         <a href="{% url 'dashboard:links_manage' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">Links</a>
         <a href="{% url 'dashboard:appearance' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">Appearance</a>
         <a href="{% url 'dashboard:card_manage' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}">Card</a>
+        <a href="{% url 'dashboard:contacts_list' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}">Contacts</a>
+        <a href="{% url 'dashboard:share' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'share' %}active{% endif %}">Share & QR</a>
+        <a href="{% url 'dashboard:referrals' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}">Referrals</a>
         <a href="{% url 'dashboard:website_manage' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'website_manage' %}active{% endif %}" style="opacity:0.6;">Website ✦</a>
         <a href="{% url 'dashboard:orders_list' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">Orders</a>
         <a href="{% url 'dashboard:analytics_view' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">Analytics</a>
         <a href="{% url 'dashboard:settings_view' %}" class="mobile-nav-pill {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">Settings</a>
       </div>
     </div>
+
 
     <div class="dashboard-content" role="region" aria-label="Dashboard View">
       {% if not request.user.is_email_verified %}

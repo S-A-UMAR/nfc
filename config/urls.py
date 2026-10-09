@@ -28,6 +28,7 @@ urlpatterns = [
     path('login/', account_views.login_view, name='login'),
     path('register/', account_views.register_view, name='register'),
     path('logout/', account_views.logout_view, name='logout'),
+    path('join/', account_views.referral_join_view, name='referral_join'),
     path('auth/', include('apps.accounts.urls', namespace='accounts')),
 
     # Core Marketing Website

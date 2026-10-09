@@ -108,3 +108,37 @@ class ProfileAppearanceForm(forms.ModelForm):
             'theme': forms.HiddenInput(),
             'profile_layout': forms.HiddenInput(),
         }
+
+
+class ContactExchangeForm(forms.ModelForm):
+    """
+    Form for visitors to submit contact details to a profile owner.
+    Enforces server-side consent validation and minimum required contact information.
+    """
+    class Meta:
+        from .models import ContactExchange
+        model = ContactExchange
+        fields = ['full_name', 'email', 'phone', 'business_name', 'notes', 'consent_given']
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your Full Name *', 'required': 'required'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email Address'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number (e.g. +234 ...)'}),
+            'business_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Company / Business (Optional)'}),
+            'notes': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'Short note or context (Optional)'}),
+            'consent_given': forms.CheckboxInput(attrs={'class': 'form-checkbox', 'required': 'required'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email', '').strip()
+        phone = cleaned_data.get('phone', '').strip()
+        consent = cleaned_data.get('consent_given')
+
+        if not email and not phone:
+            raise forms.ValidationError("Please provide at least an email address or phone number so the profile owner can get back to you.")
+        
+        if not consent:
+            raise forms.ValidationError("You must consent to sharing your details with the profile owner.")
+
+        return cleaned_data
+

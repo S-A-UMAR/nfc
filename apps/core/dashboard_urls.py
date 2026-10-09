@@ -37,6 +37,12 @@ urlpatterns = [
     path('website/product/<int:product_id>/delete/', web_views.product_delete_view, name='product_delete'),
     path('analytics/', ana_views.analytics_dashboard_view, name='analytics_view'),
     path('appearance/', prof_views.profile_appearance_view, name='appearance'),
+    path('contacts/', prof_views.dashboard_contacts_view, name='contacts_list'),
+    path('contacts/<int:contact_id>/delete/', prof_views.delete_contact_exchange_view, name='contact_delete'),
+    path('contacts/<int:contact_id>/vcard/', prof_views.export_contact_exchange_vcard_view, name='contact_export_vcard'),
+    path('share/', prof_views.dashboard_share_view, name='share'),
+    path('referrals/', acc_dash.dashboard_referrals_view, name='referrals'),
     path('settings/', acc_dash.settings_view, name='settings_view'),
     path('settings/delete-account/', acc_dash.delete_account_view, name='delete_account'),
 ]
+

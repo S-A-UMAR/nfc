@@ -16,6 +16,26 @@ from apps.orders.models import Order
 from apps.core.services.email_service import BrevoEmailService
 
 
+def _process_referral_qualification(order):
+    """
+    Qualifies referral reward when referred user completes a paid order.
+    Ensures single qualification per referred user, idempotency, and durable record.
+    """
+    from apps.accounts.models import Referral
+    referral = Referral.objects.filter(
+        referred_user=order.user,
+        status__in=[Referral.STATUS_PENDING, Referral.STATUS_VERIFIED]
+    ).first()
+
+    if referral:
+        referral.status = Referral.STATUS_QUALIFIED
+        referral.qualifying_order = order
+        referral.qualified_at = timezone.now()
+        referral.reward_amount_ngn = 2000
+        referral.save()
+
+
+
 @login_required
 def initialize_payment_view(request, order_number):
     """
@@ -94,6 +114,9 @@ def verify_payment_view(request):
         order.order_status = Order.STATUS_PAID
         order.save()
 
+        # Qualify referral if applicable
+        _process_referral_qualification(order)
+
         # Dispatch confirmation email via Brevo
         try:
             BrevoEmailService.send_payment_confirmation_email(payment)
@@ -140,6 +163,9 @@ def verify_payment_view(request):
             order.payment_status = Order.PAYMENT_PAID
             order.order_status = Order.STATUS_PAID
             order.save()
+
+            # Qualify referral if applicable
+            _process_referral_qualification(order)
 
             # Dispatch confirmation email via Brevo
             try:
@@ -216,6 +242,9 @@ def paystack_webhook_view(request):
                     order.payment_status = Order.PAYMENT_PAID
                     order.order_status = Order.STATUS_PAID
                     order.save()
+
+                    # Qualify referral if applicable
+                    _process_referral_qualification(order)
 
                     # Dispatch Brevo receipt
                     try:

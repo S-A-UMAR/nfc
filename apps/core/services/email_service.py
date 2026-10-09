@@ -435,3 +435,42 @@ class BrevoEmailService:
             html,
             "UZYRA Operations",
         )
+
+    # -------------------------------------------------------------------------
+    # 12. Contact Exchange Lead Notification
+    # -------------------------------------------------------------------------
+    @classmethod
+    def send_contact_exchange_notification(cls, contact_exchange):
+        """Notification sent to profile owner when a visitor submits their contact details."""
+        profile = contact_exchange.profile
+        owner_email = profile.email or profile.user.email
+        site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+        dashboard_url = f"{site_url}/dashboard/contacts/"
+
+        body = f"""
+        <p>Someone shared their contact information with you on your UZYRA digital profile (<b>{profile.full_name}</b>)!</p>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
+            <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">Contact Details Shared</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
+                <tr><td style="padding: 6px 0; color: #8E95A3; width: 40%;">Name</td><td style="padding: 6px 0; font-weight: 600; color: #FFFFFF;">{contact_exchange.full_name}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Company</td><td style="padding: 6px 0;">{contact_exchange.business_name or "—"}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Email</td><td style="padding: 6px 0;">{contact_exchange.email or "—"}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Phone</td><td style="padding: 6px 0;">{contact_exchange.phone or "—"}</td></tr>
+            </table>
+        </div>
+        <p style="font-size: 13px; color: #A1A1AA;">Log in to your UZYRA dashboard to view all received contacts, export vCards, or follow up directly.</p>
+        """
+        html = _render_email_template(
+            title="New Contact Received",
+            subtitle=f"{contact_exchange.full_name} shared their details with you.",
+            body_html=body,
+            cta_text="View Contacts in Dashboard",
+            cta_url=dashboard_url
+        )
+        return cls.send_transactional_email(
+            owner_email,
+            f"New Contact Shared: {contact_exchange.full_name} via UZYRA",
+            html,
+            profile.full_name,
+        )
+

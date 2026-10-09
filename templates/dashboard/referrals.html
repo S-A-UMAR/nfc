@@ -1,0 +1,128 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block dashboard_title %}Referral Program — UZYRA{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-page-header">
+  <div>
+    <h1 class="dashboard-page-title">Referral Program</h1>
+    <p class="dashboard-page-subtitle">Invite people and businesses to UZYRA. Earn ₦2,000 credit for every verified NFC card purchase.</p>
+  </div>
+</div>
+
+<!-- Personal Referral Link Panel -->
+<div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.25rem;">Your Unique Referral Link</div>
+      <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">Code: <span style="font-family: monospace; color: #FFFFFF; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">{{ referral_code }}</span></div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="copyReferralLink('{{ referral_link }}', this)">
+      Copy Referral Link
+    </button>
+  </div>
+
+  <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.85rem 1rem; font-family: monospace; font-size: 0.85rem; color: var(--text-secondary); word-break: break-all;">
+    {{ referral_link }}
+  </div>
+</div>
+
+<!-- Key Performance Stats -->
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Total Invites Sent</div>
+    <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">{{ total_count }}</div>
+  </div>
+
+  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Verified Accounts</div>
+    <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">{{ verified_count }}</div>
+  </div>
+
+  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Qualified Card Purchases</div>
+    <div style="font-size: 1.75rem; font-weight: 700; color: #10B981;">{{ qualified_count }}</div>
+  </div>
+
+  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Total Earned Credits</div>
+    <div style="font-size: 1.75rem; font-weight: 700; color: #F59E0B;">₦{{ total_rewards_ngn|floatformat:0 }}</div>
+  </div>
+</div>
+
+<!-- Referral History Table -->
+<div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem;">
+  <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: space-between;">
+    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0;">Referral History & Ledger</h3>
+    <span style="font-size: 0.8rem; color: var(--text-muted);">Privacy Protected</span>
+  </div>
+
+  {% if referral_history %}
+  <div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border-primary); background: rgba(255, 255, 255, 0.02);">
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Referred Account</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Status</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Date Registered</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600; text-align: right;">Earned Credit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in referral_history %}
+        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+          <td style="padding: 1rem 1.25rem;">
+            <div style="font-weight: 600; color: var(--text-primary);">{{ item.masked_name }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ item.masked_email }}</div>
+          </td>
+          <td style="padding: 1rem 1.25rem;">
+            {% if item.status == 'qualified' or item.status == 'rewarded' %}
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Qualified</span>
+            {% elif item.status == 'verified' %}
+              <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Email Verified</span>
+            {% elif item.status == 'pending' %}
+              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Pending</span>
+            {% else %}
+              <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Rejected / Cancelled</span>
+            {% endif %}
+          </td>
+          <td style="padding: 1rem 1.25rem; color: var(--text-muted); font-size: 0.8rem;">
+            {{ item.created_at|date:"M d, Y" }}
+          </td>
+          <td style="padding: 1rem 1.25rem; text-align: right; font-weight: 600; color: {% if item.reward_ngn > 0 %}#10B981{% else %}var(--text-muted){% endif %};">
+            {% if item.reward_ngn > 0 %}+₦{{ item.reward_ngn|floatformat:0 }}{% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="padding: 3rem 1.5rem; text-align: center; color: var(--text-secondary);">
+    <p style="margin: 0;">You haven't referred any users yet. Share your referral link above to start earning purchase credits!</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Program Rules & Terms Card -->
+<div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.5rem;">
+  <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">How the Referral Program Works</h4>
+  <ul style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0; padding-left: 1.25rem;">
+    <li><strong>Qualification Rule:</strong> A referral qualifies when the referred user registers a new UZYRA account via your link, verifies their email, and completes one paid physical NFC card order verified by Paystack.</li>
+    <li><strong>Reward Value:</strong> ₦2,000 in UZYRA purchase credits per qualified purchase.</li>
+    <li><strong>Fraud & Anti-Self Referral:</strong> Self-referrals, duplicate accounts, and cancelled/refunded orders are automatically rejected to protect platform integrity.</li>
+    <li><strong>Privacy Notice:</strong> Referred user identities are masked in public displays to protect personal data in compliance with NDPA 2023.</li>
+  </ul>
+</div>
+
+<script>
+function copyReferralLink(link, btn) {
+  navigator.clipboard.writeText(link).then(function() {
+    var orig = btn.innerText;
+    btn.innerText = 'Link Copied!';
+    setTimeout(function() { btn.innerText = orig; }, 2000);
+  });
+}
+</script>
+{% endblock %}

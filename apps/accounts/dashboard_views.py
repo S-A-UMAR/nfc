@@ -164,3 +164,56 @@ def delete_account_view(request):
 
     return render(request, 'dashboard/delete_account.html')
 
+
+@login_required
+def dashboard_referrals_view(request):
+    """
+    Dashboard Referrals Overview (/dashboard/referrals/).
+    Displays personal referral code, link, stats (verified, qualified),
+    earned rewards balance, and referral history with privacy protection.
+    """
+    from .models import Referral
+    from django.conf import settings
+    from django.db.models import Sum
+
+    user = request.user
+    site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+    referral_link = f"{site_url}/join/?ref={user.referral_code}"
+
+    referrals = Referral.objects.filter(referrer=user).select_related('referred_user', 'qualifying_order')
+
+    total_count = referrals.count()
+    verified_count = referrals.filter(status__in=[Referral.STATUS_VERIFIED, Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED]).count()
+    qualified_count = referrals.filter(status__in=[Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED]).count()
+    
+    total_rewards_ngn = referrals.filter(status__in=[Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED]).aggregate(
+        total=Sum('reward_amount_ngn')
+    )['total'] or 0
+
+    # Privacy-conscious history formatting
+    referral_history = []
+    for ref in referrals:
+        email = ref.referred_user.email
+        parts = email.split('@')
+        masked_email = f"{parts[0][0]}***@{parts[1]}" if len(parts) == 2 and len(parts[0]) > 0 else "User"
+        referral_history.append({
+            'masked_name': ref.referred_user.first_name or masked_email,
+            'masked_email': masked_email,
+            'status_display': ref.get_status_display(),
+            'status': ref.status,
+            'created_at': ref.created_at,
+            'reward_ngn': ref.reward_amount_ngn if ref.status in (Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED) else 0,
+        })
+
+    return render(request, 'dashboard/referrals.html', {
+        'user': user,
+        'referral_code': user.referral_code,
+        'referral_link': referral_link,
+        'total_count': total_count,
+        'verified_count': verified_count,
+        'qualified_count': qualified_count,
+        'total_rewards_ngn': total_rewards_ngn,
+        'referral_history': referral_history,
+    })
+
+

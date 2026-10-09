@@ -1,0 +1,111 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block dashboard_title %}Share Digital Profile & QR — UZYRA{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-page-header">
+  <div>
+    <h1 class="dashboard-page-title">Share Digital Profile</h1>
+    <p class="dashboard-page-subtitle">Share your UZYRA profile via direct link, downloadable QR code, or mobile native sharing.</p>
+  </div>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+
+  <!-- QR Code & Public Link Card -->
+  <div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.75rem; text-align: center;">
+    <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Your Profile QR Code</h3>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Scan with any phone camera to view your digital contact card instantly.</p>
+
+    <div style="background: #FFFFFF; padding: 1rem; border-radius: 12px; display: inline-block; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-bottom: 1.5rem;">
+      <img src="{{ qr_url }}" alt="Profile QR Code" style="width: 180px; height: 180px; display: block;" />
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+      <a href="{{ qr_url }}?download=true" class="btn btn-secondary" style="font-size: 0.85rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.35rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download QR Image (.PNG)
+      </a>
+      {% if profile.slug %}
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-secondary" style="font-size: 0.85rem;">
+          Preview Profile
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Direct URL Box -->
+    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.75rem 1rem; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+      <div style="font-family: monospace; font-size: 0.85rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        {{ public_url }}
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="copyToClipboard('{{ public_url }}', this)" style="flex-shrink: 0;">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- Share & Growth Prompt Card -->
+  <div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.75rem;">
+    <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Quick Share Options</h3>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Easily send your digital profile to clients or business partners.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 2rem;">
+      <button type="button" class="btn btn-primary" onclick="shareProfile('{{ profile.full_name }}', '{{ public_url }}')" style="width: 100%; justify-content: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Native Mobile Share
+      </button>
+
+      <a href="https://wa.me/?text=Check%20out%20my%20digital%20profile%20on%20UZYRA%3A%20{{ public_url|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%; justify-content: center; background: rgba(37, 211, 102, 0.1); border-color: rgba(37, 211, 102, 0.3); color: #25D366;">
+        Share via WhatsApp
+      </a>
+    </div>
+
+    <div style="border-top: 1px solid var(--border-primary); padding-top: 1.5rem;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.35rem;">Growth & Referrals</div>
+      <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">Invite Another Business Owner</h4>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        Invite colleagues to create their free digital profile on UZYRA and earn ₦2,000 purchase credits when they order a smart NFC card.
+      </p>
+
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-primary); border-radius: var(--radius-md); padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+        <div style="font-family: monospace; font-size: 0.8rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          {{ referral_link }}
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('{{ referral_link }}', this)" style="flex-shrink: 0;">
+          Copy Invite Link
+        </button>
+      </div>
+
+      <div style="margin-top: 0.85rem; text-align: right;">
+        <a href="{% url 'dashboard:referrals' %}" style="font-size: 0.85rem; color: var(--text-primary); text-decoration: underline;">
+          View Referral Program Dashboard &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(function() {
+    var orig = btn.innerText;
+    btn.innerText = 'Copied!';
+    setTimeout(function() { btn.innerText = orig; }, 2000);
+  });
+}
+
+function shareProfile(title, url) {
+  if (navigator.share) {
+    navigator.share({
+      title: title + ' — UZYRA Profile',
+      text: 'View my UZYRA digital profile:',
+      url: url
+    }).catch(function(e){});
+  } else {
+    copyToClipboard(url, document.querySelector('button[onclick*="copyToClipboard"]'));
+  }
+}
+</script>
+{% endblock %}

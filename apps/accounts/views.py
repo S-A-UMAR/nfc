@@ -24,6 +24,21 @@ from apps.core.services.email_service import BrevoEmailService
 User = get_user_model()
 
 
+def referral_join_view(request):
+    """
+    Public Referral Join Route (/join/?ref=CODE).
+    Stores referral code in session & secure cookie, then redirects to registration.
+    """
+    ref_code = request.GET.get('ref', '').strip()
+    if ref_code:
+        request.session['referral_code'] = ref_code
+    
+    response = redirect('accounts:register')
+    if ref_code:
+        response.set_cookie('uzyra_ref', ref_code, max_age=30*86400, httponly=True, samesite='Lax')
+    return response
+
+
 def register_view(request):
     """Register new customer, dispatch welcome email + OTP, and auto-provision digital profile."""
     if request.user.is_authenticated:
@@ -53,6 +68,22 @@ def register_view(request):
                 profile.phone = user.phone
                 profile.whatsapp = user.phone
             profile.save()
+
+            # Process Referral Attribution if a valid referral code exists in session or cookie
+            ref_code = request.session.get('referral_code') or request.COOKIES.get('uzyra_ref')
+            if ref_code:
+                from .models import Referral
+                referrer = User.objects.filter(referral_code=ref_code).first()
+                if referrer and referrer != user:
+                    if not Referral.objects.filter(referred_user=user).exists():
+                        Referral.objects.create(
+                            referrer=referrer,
+                            referred_user=user,
+                            code_used=ref_code,
+                            status=Referral.STATUS_PENDING
+                        )
+                if 'referral_code' in request.session:
+                    del request.session['referral_code']
 
             # Generate OTP code & send Welcome email via Brevo
             plain_code = None
@@ -87,6 +118,7 @@ def register_view(request):
         form = UserRegisterForm()
 
     return render(request, 'accounts/register.html', {'form': form})
+
 
 
 def login_view(request):
@@ -173,8 +205,19 @@ def verify_email_otp_view(request):
                 if request.user.is_authenticated:
                     request.user.is_email_verified = True
                     request.user.save(update_fields=['is_email_verified'])
+                    verified_user = request.user
                 else:
                     User.objects.filter(email__iexact=target_email).update(is_email_verified=True)
+                    verified_user = User.objects.filter(email__iexact=target_email).first()
+
+                # Update pending referral status to verified
+                if verified_user:
+                    from .models import Referral
+                    from django.utils import timezone
+                    Referral.objects.filter(referred_user=verified_user, status=Referral.STATUS_PENDING).update(
+                        status=Referral.STATUS_VERIFIED,
+                        verified_at=timezone.now()
+                    )
 
                 if 'pending_verification_email' in request.session:
                     del request.session['pending_verification_email']

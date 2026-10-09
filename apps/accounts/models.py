@@ -37,6 +37,7 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     phone = models.CharField(_('phone number'), max_length=30, blank=True, null=True)
     is_email_verified = models.BooleanField(_('email verified'), default=False)
+    referral_code = models.CharField(_('referral code'), max_length=20, unique=True, null=True, blank=True, db_index=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
@@ -56,6 +57,53 @@ class User(AbstractUser):
     def display_name(self):
         full = f"{self.first_name} {self.last_name}".strip()
         return full if full else self.email.split('@')[0]
+
+    def save(self, *args, **kwargs):
+        if not self.referral_code:
+            import secrets, string
+            while True:
+                candidate = "UZY-" + "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+                if not User.objects.filter(referral_code=candidate).exists():
+                    self.referral_code = candidate
+                    break
+        super().save(*args, **kwargs)
+
+
+class Referral(models.Model):
+    """
+    Durable ledger tracking referral relationships, attribution, and qualification states.
+    """
+    STATUS_PENDING = 'pending'
+    STATUS_VERIFIED = 'verified'
+    STATUS_QUALIFIED = 'qualified'
+    STATUS_REWARDED = 'rewarded'
+    STATUS_REJECTED = 'rejected'
+
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending Verification'),
+        (STATUS_VERIFIED, 'Email Verified'),
+        (STATUS_QUALIFIED, 'Qualified Purchase'),
+        (STATUS_REWARDED, 'Reward Granted'),
+        (STATUS_REJECTED, 'Rejected'),
+    )
+
+    referrer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='referrals_made')
+    referred_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='referred_by')
+    code_used = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
+    qualifying_order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='qualifying_referrals')
+    reward_amount_ngn = models.PositiveIntegerField(default=2000, help_text="Configurable reward value in NGN")
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    qualified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Referral: {self.referrer.email} -> {self.referred_user.email} ({self.status})"
+
 
 
 import hashlib

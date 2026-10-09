@@ -1,0 +1,91 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block dashboard_title %}Received Contacts — UZYRA{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-page-header">
+  <div>
+    <h1 class="dashboard-page-title">Received Contacts</h1>
+    <p class="dashboard-page-subtitle">View and manage contact details shared with you by visitors on your digital profile.</p>
+  </div>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Total Contacts Received</div>
+    <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">{{ contacts.count }}</div>
+  </div>
+</div>
+
+{% if contacts %}
+<div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); overflow: hidden;">
+  <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: space-between;">
+    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0;">Shared Contact Submissions</h3>
+    <span style="font-size: 0.8rem; color: var(--text-muted);">Strictly Private & Confidential</span>
+  </div>
+
+  <div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border-primary); background: rgba(255, 255, 255, 0.02);">
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Contact Name</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Details</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Company</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Date Shared</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600; text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contact in contacts %}
+        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+          <td style="padding: 1rem 1.25rem;">
+            <div style="font-weight: 600; color: var(--text-primary);">{{ contact.full_name }}</div>
+            {% if contact.notes %}
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">"{{ contact.notes|truncatechars:60 }}"</div>
+            {% endif %}
+          </td>
+          <td style="padding: 1rem 1.25rem;">
+            {% if contact.email %}<div style="color: var(--text-secondary);">✉ {{ contact.email }}</div>{% endif %}
+            {% if contact.phone %}<div style="color: var(--text-secondary);">📞 {{ contact.phone }}</div>{% endif %}
+          </td>
+          <td style="padding: 1rem 1.25rem; color: var(--text-secondary);">
+            {{ contact.business_name|default:"—" }}
+          </td>
+          <td style="padding: 1rem 1.25rem; color: var(--text-muted); font-size: 0.8rem;">
+            {{ contact.created_at|date:"M d, Y H:i" }}
+          </td>
+          <td style="padding: 1rem 1.25rem; text-align: right;">
+            <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
+              <a href="{% url 'dashboard:contact_export_vcard' contact.id %}" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Download vCard file">
+                Download .vcf
+              </a>
+              <form method="POST" action="{% url 'dashboard:contact_delete' contact.id %}" style="display: inline;" onsubmit="return confirm('Delete this contact submission?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">
+                  Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 3.5rem 1.5rem; text-align: center;">
+  <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; color: var(--text-secondary);">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No Received Contacts Yet</h3>
+  <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 1.5rem;">
+    When visitors tap "Exchange Contact" on your public profile, their submitted name, phone, email, and message will appear here securely.
+  </p>
+  <a href="{% url 'dashboard:share' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+    Share Your Profile to Collect Leads &rarr;
+  </a>
+</div>
+{% endif %}
+{% endblock %}
