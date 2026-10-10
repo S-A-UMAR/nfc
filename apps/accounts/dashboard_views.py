@@ -26,7 +26,13 @@ def dashboard_overview_view(request):
 
     primary_card = Card.objects.filter(user=request.user).order_by('activated_at').first()
     orders = Order.objects.filter(user=request.user).select_related('package').order_by('-created_at')[:4]
+    active_order = Order.objects.filter(user=request.user).exclude(order_status__in=['completed', 'cancelled']).order_by('-created_at').first()
     primary_website = Website.objects.filter(user=request.user).first()
+
+    has_slug = bool(profile.slug)
+    has_contact = bool(profile.phone or profile.whatsapp or profile.email)
+    has_links = profile.social_links.exists() or profile.custom_links.exists()
+    has_card = bool(primary_card)
 
     # Time boundaries for deltas
     now = timezone.now()
@@ -62,7 +68,12 @@ def dashboard_overview_view(request):
         'profile': profile,
         'primary_card': primary_card,
         'orders': orders,
+        'active_order': active_order,
         'primary_website': primary_website,
+        'has_slug': has_slug,
+        'has_contact': has_contact,
+        'has_links': has_links,
+        'has_card': has_card,
         'profile_views': stats['profile_views'] or 0,
         'card_taps': stats['card_taps'] or 0,
         'whatsapp_clicks': stats['whatsapp_clicks'] or 0,

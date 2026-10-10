@@ -356,6 +356,75 @@ window.uzyraToast = function(message, type = 'success', title = null, duration =
 };
 
 /* --------------------------------------------------------------------------
+   7. LIVE IMAGE PREVIEW HANDLER
+   -------------------------------------------------------------------------- */
+function initImagePreviews() {
+  const profileInput = document.getElementById('id_profile_image');
+  const profilePreview = document.getElementById('profile-img-preview');
+  
+  if (profileInput && profilePreview) {
+    profileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          profilePreview.src = event.target.result;
+          profilePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  const logoInput = document.getElementById('id_business_logo');
+  const logoPreview = document.getElementById('logo-img-preview');
+
+  if (logoInput && logoPreview) {
+    logoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          logoPreview.src = event.target.result;
+          logoPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+}
+
+/**
+ * Global Copy Profile URL Helper
+ */
+window.copyProfileUrl = function(btn, url) {
+  if (!url) return;
+  const doCopy = () => {
+    const span = btn ? btn.querySelector('span') : null;
+    const origText = span ? span.textContent : '';
+    if (span) span.textContent = 'Copied! ✓';
+    if (btn) btn.style.borderColor = '#4ADE80';
+
+    if (window.uzyraToast) {
+      window.uzyraToast('Profile link copied to clipboard!', 'success');
+    }
+
+    setTimeout(() => {
+      if (span) span.textContent = origText;
+      if (btn) btn.style.borderColor = '';
+    }, 2500);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(doCopy).catch(() => {
+      prompt('Copy your profile URL:', url);
+    });
+  } else {
+    prompt('Copy your profile URL:', url);
+  }
+};
+
+/* --------------------------------------------------------------------------
    HELPER: GET CSRF COOKIE
    -------------------------------------------------------------------------- */
 function getCookie(name) {
@@ -372,3 +441,4 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+
