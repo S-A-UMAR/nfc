@@ -68,11 +68,11 @@
 
       <!-- Desktop Nav Links -->
       <nav class="nav-menu" aria-label="Main Navigation">
-        <a href="{% url 'core:smart_card' %}" class="nav-link {% if request.resolver_match.url_name == 'smart_card' %}active{% endif %}">Smart Card</a>
         <a href="{% url 'core:how_it_works' %}" class="nav-link {% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">How It Works</a>
-        <a href="{% url 'core:websites' %}" class="nav-link {% if request.resolver_match.url_name == 'websites' %}active{% endif %}">Websites</a>
-        <a href="{% url 'core:pricing' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}">Pricing</a>
+        <a href="{% url 'core:smart_card' %}" class="nav-link {% if request.resolver_match.url_name == 'smart_card' %}active{% endif %}">Smart Card</a>
         <a href="{% url 'core:business' %}" class="nav-link {% if request.resolver_match.url_name == 'business' %}active{% endif %}">Business</a>
+        <a href="{% url 'core:pricing' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}">Pricing</a>
+        <a href="{% url 'core:websites' %}" class="nav-link {% if request.resolver_match.url_name == 'websites' %}active{% endif %}">Websites</a>
       </nav>
 
       <!-- Auth Actions -->
@@ -178,14 +178,14 @@
         <nav class="drawer-links" aria-label="Mobile Menu Links">
         {% endif %}
         <a href="{% url 'core:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
-        <a href="{% url 'core:smart_card' %}" class="nav-link {% if request.resolver_match.url_name == 'smart_card' %}active{% endif %}">Smart Card</a>
         <a href="{% url 'core:how_it_works' %}" class="nav-link {% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">How It Works</a>
-        <a href="{% url 'core:websites' %}" class="nav-link {% if request.resolver_match.url_name == 'websites' %}active{% endif %}">Websites</a>
+        <a href="{% url 'core:smart_card' %}" class="nav-link {% if request.resolver_match.url_name == 'smart_card' %}active{% endif %}">Smart Card</a>
+        <a href="{% url 'core:business' %}" class="nav-link {% if request.resolver_match.url_name == 'business' %}active{% endif %}">Business Solutions</a>
         <a href="{% url 'core:pricing' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}">Pricing</a>
-        <a href="{% url 'core:business' %}" class="nav-link {% if request.resolver_match.url_name == 'business' %}active{% endif %}">Business</a>
-        <a href="{% url 'core:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
-        <a href="{% url 'core:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+        <a href="{% url 'core:websites' %}" class="nav-link {% if request.resolver_match.url_name == 'websites' %}active{% endif %}">Websites</a>
         <a href="{% url 'core:faq' %}" class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}">FAQ</a>
+        <a href="{% url 'core:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+        <a href="{% url 'core:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
       </nav>
     </div>
 

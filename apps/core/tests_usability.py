@@ -238,3 +238,111 @@ class UsabilityJourneyTests(TestCase):
         complaints_resp = self.client.get(reverse('legal:complaints'))
         self.assertEqual(complaints_resp.status_code, 200)
         self.assertContains(complaints_resp, "Complaints")
+
+
+# ==============================================================================
+# PHASE 1 HOMEPAGE REDESIGN AUTOMATED VALIDATION
+# ==============================================================================
+class Phase1HomepageRedesignTests(TestCase):
+    """
+    Validation tests for Phase 1 Homepage and First-Impression Redesign.
+    Ensures that first-time visitors immediately understand what UZYRA is,
+    how it works, and how to create their profile.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user_password = "SecurePassword123!"
+        self.user = User.objects.create_user(
+            email="visitor@example.com",
+            password=self.user_password,
+            first_name="Alex",
+            last_name="Cole",
+            is_email_verified=True
+        )
+        self.profile, _ = Profile.objects.get_or_create(
+            user=self.user,
+            defaults={'full_name': 'Alex Cole', 'slug': 'alex-cole', 'phone': '+2348011112222'}
+        )
+        self.package = ProductPackage.objects.create(
+            name="Smart NFC Card",
+            code="smart-nfc-card",
+            price_ngn=15000,
+            description="High quality card",
+            features="Feature A\nFeature B",
+            is_active=True
+        )
+
+    def test_hero_communicates_product_and_ctas(self):
+        """Unauthenticated visitor sees core message and immediate registration CTA."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Your Introduction,")
+        self.assertContains(response, "One Tap Away.")
+        self.assertContains(response, "Create Your Profile Free")
+        self.assertContains(response, reverse('accounts:register'))
+        self.assertContains(response, "#how-it-works")
+        self.assertContains(response, "Zero Apps Needed")
+        self.assertContains(response, "iOS & Android Native")
+
+    def test_clarity_strip_pillars_present(self):
+        """Homepage provides 5-second clarity across 3 core pillars."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Digital Profile First")
+        self.assertContains(response, "Physical NFC Smart Card")
+        self.assertContains(response, "Always Up to Date")
+
+    def test_how_it_works_three_teaching_steps(self):
+        """3 teaching steps explain registration -> link customization -> in-person tap."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "How It Works in 3 Steps")
+        self.assertContains(response, "Create Your Digital Profile")
+        self.assertContains(response, "Customize & Get Your Link")
+        self.assertContains(response, "Share Anywhere — Tap or Link")
+
+    def test_personal_vs_business_differentiation(self):
+        """Distinct sections for individuals and corporate teams with relevant CTAs."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "For Individuals & Professionals")
+        self.assertContains(response, "Elevate Your Personal Brand")
+        self.assertContains(response, "For Teams & Companies")
+        self.assertContains(response, "Empower Your Entire Fleet")
+        self.assertContains(response, reverse('core:business'))
+
+    def test_nfc_card_hardware_specifications(self):
+        """Physical card companion clearly explained as independent from digital profile."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The NFC Smart Card Companion")
+        self.assertContains(response, "Embedded NTAG216 Chip")
+        self.assertContains(response, "Zero Battery & Charging")
+        self.assertContains(response, "You do not need a physical card to use your digital profile")
+
+    def test_packages_rendered_with_checkout_links(self):
+        """Live ProductPackages render with prices in NGN and checkout links."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Smart NFC Card")
+        self.assertContains(response, "₦15000")
+        checkout_url = reverse('orders:checkout', kwargs={'package_code': self.package.code})
+        self.assertContains(response, checkout_url)
+
+    def test_authenticated_user_hero_actions(self):
+        """Logged in user sees direct profile management CTA."""
+        self.client.login(email=self.user.email, password=self.user_password)
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Go to Your Digital Profile")
+        self.assertContains(response, reverse('dashboard:profile_edit'))
+
+    def test_faq_accordion_answers_card_requirement(self):
+        """FAQ addresses common misconceptions including no requirement to buy card first."""
+        response = self.client.get(reverse('core:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Can I create a profile without buying a physical card?")
+        self.assertContains(response, "Does the person tapping my card need to install an app?")
+        self.assertContains(response, "Does the card work on both iPhone and Android?")
+

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}UZYRA — YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH.{% endblock %}
-{% block meta_description %}Premium NFC smart cards, instant digital profiles, and professional web platforms for modern professionals and businesses.{% endblock %}
+{% block meta_description %}Create your free digital profile in minutes. Share your contact details, social links, and portfolio with a tap of your UZYRA NFC smart card or custom link. Zero apps required.{% endblock %}
 
 {% block content %}
 <!-- ==========================================================================
@@ -14,21 +14,20 @@
   <div class="hero-glow-secondary" aria-hidden="true"></div>
   <div class="container">
     <div class="hero-layout">
-      <!-- Left: Headline, Actions & Trust Metrics -->
+      <!-- Left: Headline, Value Proposition & Direct CTAs -->
       <div>
         <div class="hero-tag">
           <span class="dot dot-active dot-pulse"></span>
-          <span>NFC + QR Smart Technology</span>
+          <span>NFC Smart Card + Digital Profile</span>
         </div>
         
         <h1 class="hero-title text-display">
-          <span class="title-line-1">Your Identity.</span><br>
-          <span class="title-line-2">Your Business.</span><br>
-          <span class="title-line-3 text-gradient-animated">One Touch.</span>
+          <span class="title-line-1">Your Introduction,</span><br>
+          <span class="title-line-3 text-gradient-animated">One Tap Away.</span>
         </h1>
 
         <p class="hero-desc">
-          Share your contact information, digital profile, and business links instantly with a single tap of your UZYRA smart card. No app required.
+          UZYRA lets you share your contact details, professional portfolio, and social links through a custom digital profile, with an NFC smart card that makes in-person sharing instant. Create your profile free in minutes.
         </p>
 
         <div class="hero-actions">
@@ -38,24 +37,24 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
             <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
-              <span>Get Your Smart Card</span>
+              <span>Order Your Smart Card</span>
             </a>
           {% else %}
             <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
-              <span>Create Your Digital Profile</span>
+              <span>Create Your Profile Free</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
-            <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
-              <span>Get Your Smart Card</span>
+            <a href="#how-it-works" class="btn btn-secondary btn-lg">
+              <span>See How It Works</span>
             </a>
           {% endif %}
         </div>
 
-        <!-- Capability & Trust Strip: fills the space with luxury credibility -->
+        <!-- Capability & Credibility Strip -->
         <div class="hero-trust-strip">
           <div class="hero-trust-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Bank-Grade Security</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Zero Apps Needed</span>
           </div>
           <span class="hero-trust-dot" aria-hidden="true">•</span>
           <div class="hero-trust-item">
@@ -64,70 +63,127 @@
           </div>
           <span class="hero-trust-dot" aria-hidden="true">•</span>
           <div class="hero-trust-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>Zero Apps Needed</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>1-Tap Phonebook Save (.vcf)</span>
+          </div>
+          <span class="hero-trust-dot" aria-hidden="true">•</span>
+          <div class="hero-trust-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Free Digital Profile</span>
           </div>
         </div>
       </div>
 
-      <!-- Right: Premium Smart Card Stage with Specs Grounding -->
-      <div class="hero-card-stage-wrapper">
-        <div class="hero-card-stage">
-          <div class="hero-glow-card-stage" aria-hidden="true"></div>
-          <div class="hero-card-glow" aria-hidden="true"></div>
-          <div class="nfc-pulse-ring ring-1" aria-hidden="true"></div>
-          <div class="nfc-pulse-ring ring-2" aria-hidden="true"></div>
-          <div class="hero-card-object" aria-label="UZYRA Smart NFC Card Preview">
+      <!-- Right: Dual Interactive Stage (Floating NFC Smart Card + Smartphone Live Profile Preview) -->
+      <div class="hero-dual-stage">
+        <div class="hero-dual-glow" aria-hidden="true"></div>
+        <div class="hero-interactive-scene">
+          <!-- Floating NFC Smart Card -->
+          <div class="hero-card-floating" aria-label="UZYRA Smart NFC Card Preview">
             <div class="card-sheen-beam"></div>
-            <!-- Top Row: NFC Wave Indicator -->
+            <!-- Card Top: Chip and NFC Indicator -->
             <div class="d-flex justify-between items-center">
               <div class="card-mockup-chip">
                 <div class="card-chip-icon"></div>
               </div>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="opacity: 0.85;" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="opacity: 0.9;" aria-hidden="true">
                 <path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/>
                 <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/>
                 <path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
               </svg>
             </div>
 
-            <!-- Center: UZYRA Shield Emblem & Wordmark -->
-            <div class="text-center" style="margin: var(--space-4) 0;">
-              <svg width="34" height="38" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto var(--space-2);" aria-hidden="true">
-                <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#hero-card-silver)"/>
+            <!-- Card Center: UZYRA Shield Emblem -->
+            <div class="text-center" style="margin: 0.35rem 0;">
+              <svg width="28" height="32" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 4px;" aria-hidden="true">
+                <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#hero-stage-silver)"/>
                 <defs>
-                  <linearGradient id="hero-card-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
+                  <linearGradient id="hero-stage-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
                     <stop stop-color="#FFFFFF"/>
                     <stop offset="0.55" stop-color="#BFC5CF"/>
                     <stop offset="1" stop-color="#8E95A3"/>
                   </linearGradient>
                 </defs>
               </svg>
-              <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.2em; color: var(--text-primary);">UZYRA</div>
+              <div style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.2em; color: var(--text-primary);">UZYRA</div>
             </div>
 
-            <!-- Bottom Row: Card Type & ID -->
+            <!-- Card Bottom: Type & Chip Spec -->
             <div class="d-flex justify-between items-end">
-              <span style="font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; color: var(--silver-steel); letter-spacing: 0.05em;">SMART NFC</span>
-              <span class="card-mockup-code">SECURE ID</span>
+              <span style="font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--silver-steel); letter-spacing: 0.05em;">SMART NFC</span>
+              <span class="card-mockup-code" style="font-size: 0.65rem;">NTAG216</span>
+            </div>
+          </div>
+
+          <!-- Beaming Connection Badge: Tap Card -> Profile Opens -->
+          <div class="hero-tap-wave-connector" aria-hidden="true">
+            <span class="dot dot-active"></span>
+            <span>Tap Card &rarr; Profile Opens</span>
+          </div>
+
+          <!-- Live Smartphone Profile Screen Preview -->
+          <div class="hero-phone-preview" aria-label="Smartphone displaying live digital profile">
+            <div class="hero-phone-notch" aria-hidden="true"></div>
+
+            <div class="hero-phone-avatar-circle" aria-hidden="true">
+              <span>U</span>
+            </div>
+
+            <div class="hero-phone-identity">
+              <div class="hero-phone-name">Umar Sani</div>
+              <div class="hero-phone-role">Principal Consultant</div>
+              <div class="hero-phone-company">UZYRA Technologies</div>
+            </div>
+
+            <div class="hero-phone-actions-row">
+              <span class="hero-phone-action-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Call
+              </span>
+              <span class="hero-phone-action-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                WhatsApp
+              </span>
+              <span class="hero-phone-action-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email
+              </span>
+            </div>
+
+            <div class="hero-phone-vcard-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <span>+ Save Contact to Phone</span>
+            </div>
+
+            <div class="hero-phone-link-row">
+              <span>Schedule a Consultation</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="hero-phone-link-row">
+              <span>View Portfolio & Services</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
           </div>
         </div>
 
-        <!-- Capability Pills grounding the card stage -->
-        <div class="hero-card-specs-strip">
+        <!-- Capability Specs Strip -->
+        <div class="hero-dual-specs-strip">
           <div class="hero-card-spec-pill">
             <span class="spec-dot"></span>
             <span>NTAG216 Chip</span>
           </div>
           <div class="hero-card-spec-pill">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
-            <span>Global Tap</span>
+            <span>Instant Tap</span>
           </div>
           <div class="hero-card-spec-pill">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><polyline points="8 16 12 12 16 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
             <span>Live Cloud Sync</span>
           </div>
+          <div class="hero-card-spec-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Laser QR Backup</span>
+          </div>
         </div>
       </div>
     </div>
@@ -135,83 +191,250 @@
 </section>
 
 <!-- ==========================================================================
-     SECTION 2: QUICK VALUE (Intentional Composition)
+     SECTION 2: 5-SECOND CLARITY STRIP (The 3 Pillars of UZYRA)
      ========================================================================== -->
-<section class="value-section" aria-label="Core Benefits">
+<section class="clarity-strip-section" aria-label="Why UZYRA">
   <div class="container">
-    <h2 class="sr-only">Core Features and Benefits</h2>
-    <div class="value-grid">
-      <!-- Benefit 1 -->
-      <div class="value-card">
-        <div class="value-icon-box" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+    <div class="clarity-grid">
+      <!-- Pillar 1: Digital Profile First -->
+      <div class="clarity-card">
+        <div class="clarity-card-header">
+          <div class="clarity-icon-box" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="clarity-step-badge">01 · IDENTITY</span>
         </div>
-        <h3 class="value-card-title">Instant Tap & Connect</h3>
-        <p class="value-card-desc">No mobile application required. The recipient simply taps their smartphone against your card or scans the QR code to open your live profile immediately.</p>
+        <h3 class="clarity-card-title">Digital Profile First</h3>
+        <p class="clarity-card-desc">Your complete professional identity hub with phone, WhatsApp, email, links, bio, and social handles. Free to create and live immediately.</p>
       </div>
 
-      <!-- Benefit 2 -->
-      <div class="value-card">
-        <div class="value-icon-box" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <!-- Pillar 2: Physical NFC Smart Card -->
+      <div class="clarity-card">
+        <div class="clarity-card-header">
+          <div class="clarity-icon-box" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <span class="clarity-step-badge">02 · HARDWARE</span>
         </div>
-        <h3 class="value-card-title">Live Dynamic Profile</h3>
-        <p class="value-card-desc">Update your phone number, social links, bio, or business offerings at any time from your dashboard. Changes reflect immediately with zero reprinting.</p>
+        <h3 class="clarity-card-title">Physical NFC Smart Card</h3>
+        <p class="clarity-card-desc">Never buy paper cards again. Tap your card on any modern iPhone or Android to open your profile in their browser instantly. Zero apps needed.</p>
       </div>
 
-      <!-- Benefit 3 -->
-      <div class="value-card">
-        <div class="value-icon-box" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <!-- Pillar 3: Always Up to Date -->
+      <div class="clarity-card">
+        <div class="clarity-card-header">
+          <div class="clarity-icon-box" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </div>
+          <span class="clarity-step-badge">03 · REAL-TIME</span>
         </div>
-        <h3 class="value-card-title">Privacy & Security</h3>
-        <p class="value-card-desc">Your NFC chip stores only your secure public profile URL. If your physical card is ever misplaced, deactivate it instantly with a single click from your account.</p>
+        <h3 class="clarity-card-title">Always Up to Date</h3>
+        <p class="clarity-card-desc">Changed your phone number, job title, or business links? Update it in seconds from your dashboard with zero reprinting costs.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ==========================================================================
-     SECTION 3: HOW IT WORKS
+     SECTION 3: HOW IT WORKS (3 Simple Steps)
      ========================================================================== -->
-<section class="how-section" aria-label="How It Works">
+<section id="how-it-works" class="how-section" aria-label="How It Works">
   <div class="container">
     <div class="section-header-row">
       <div>
         <div class="label-overline mb-2">Simplicity First</div>
-        <h2>How It Works</h2>
-        <p class="text-secondary mt-1">From physical touch to real business connection in three seamless steps.</p>
+        <h2>How It Works in 3 Steps</h2>
+        <p class="text-secondary mt-1">From creating your digital presence to tapping in person with zero friction.</p>
       </div>
-      <a href="{% url 'core:how_it_works' %}" class="btn btn-ghost btn-sm">Learn More &rarr;</a>
+      <a href="{% url 'core:how_it_works' %}" class="btn btn-ghost btn-sm">Full Guide &rarr;</a>
     </div>
 
     <div class="steps-grid">
       <!-- Step 1 -->
       <div class="step-card">
         <div class="step-number">01</div>
-        <h3 class="step-title">Tap Your Card</h3>
-        <p class="step-desc">Hold your UZYRA card near any modern iPhone or Android device, or present the reverse laser-etched QR code for instant scanning.</p>
+        <h3 class="step-title">Create Your Digital Profile</h3>
+        <p class="step-desc">Sign up for free in under 60 seconds. Add your bio, phone numbers, email address, WhatsApp line, and professional links in your personal dashboard.</p>
       </div>
 
       <!-- Step 2 -->
       <div class="step-card">
         <div class="step-number">02</div>
-        <h3 class="step-title">Profile Opens Instantly</h3>
-        <p class="step-desc">The reader's phone immediately launches your clean, branded digital profile in their native web browser with zero app installation needed.</p>
+        <h3 class="step-title">Customize & Get Your Link</h3>
+        <p class="step-desc">Upload your photo, curate your social handles, and immediately receive your unique public profile link and downloadable QR code ready to share.</p>
       </div>
 
       <!-- Step 3 -->
       <div class="step-card">
         <div class="step-number">03</div>
-        <h3 class="step-title">Save & Connect</h3>
-        <p class="step-desc">Visitors can download your complete vCard directly to their phonebook with one tap, start a WhatsApp conversation, or explore your business portfolio.</p>
+        <h3 class="step-title">Share Anywhere — Tap or Link</h3>
+        <p class="step-desc">Share your link digitally on social media and email signatures, or tap your physical UZYRA NFC card on any smartphone to connect instantly.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ==========================================================================
-     SECTION 4: DIGITAL PROFILE SHOWCASE
+     SECTION 4: PERSONAL VS BUSINESS DIFFERENTIATION
+     ========================================================================== -->
+<section id="personal" class="persona-section" aria-label="Personal and Business Solutions">
+  <div class="container">
+    <div class="text-center max-w-md mb-8">
+      <div class="label-overline mb-2">Tailored Solutions</div>
+      <h2>Built For Professionals & Growing Teams</h2>
+      <p class="text-secondary mt-1">Whether you are networking solo or managing employee credentials across an organization.</p>
+    </div>
+
+    <div class="persona-grid">
+      <!-- Persona 1: For Individuals -->
+      <div class="persona-card">
+        <div>
+          <div class="persona-tag">For Individuals & Professionals</div>
+          <h3 class="persona-title">Elevate Your Personal Brand</h3>
+          <p class="persona-desc">Ideal for consultants, creators, freelancers, executives, and modern job seekers looking to stand out at every introduction.</p>
+
+          <ul class="persona-features-list">
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Free permanent digital profile link with custom username</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>1-Tap direct phonebook contact saving (.vcf) for new clients</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>WhatsApp, direct call, and social media buttons</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>2-way contact exchange to capture leads and contact info</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Optional custom handcrafted NFC smart card delivered to you</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="persona-actions">
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary">Go to Your Profile</a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary">Create Personal Profile</a>
+          {% endif %}
+          <a href="{% url 'core:pricing' %}" class="btn btn-ghost btn-sm">View Card Options &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Persona 2: For Teams & Businesses -->
+      <div id="business" class="persona-card featured-card">
+        <div>
+          <div class="persona-tag" style="background: rgba(255, 255, 255, 0.12); color: #FFFFFF;">For Teams & Companies</div>
+          <h3 class="persona-title">Empower Your Entire Fleet</h3>
+          <p class="persona-desc">Ideal for corporate teams, agencies, sales departments, and growing enterprises that require consistent corporate presentation.</p>
+
+          <ul class="persona-features-list">
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Centralized corporate branding, uniform logos, and color palettes</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Multi-user card provisioning and fleet card management</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Product catalogue, services menu, and appointment booking links</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Lead collection with downloadable CSV and analytics tracking</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="persona-feature-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Dedicated custom business websites and custom domain hosting</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="persona-actions">
+          <a href="{% url 'core:business' %}" class="btn btn-primary">Explore Business Solutions</a>
+          {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-secondary">Start Free Profile</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 5: SMART CARD (Hardware Specifications & Relationship)
+     ========================================================================== -->
+<section id="nfc-cards" class="product-section" aria-label="Smart Card Hardware">
+  <div class="container">
+    <div class="text-center max-w-md">
+      <div class="label-overline mb-2">Physical Craftsmanship</div>
+      <h2>The NFC Smart Card Companion</h2>
+      <p class="text-secondary mt-2">Your physical key to modern networking. Handcrafted with high-frequency passive microchips built to last.</p>
+    </div>
+
+    <div class="specs-grid">
+      <div class="spec-box">
+        <h3 class="spec-title">Embedded NTAG216 Chip</h3>
+        <p class="spec-desc">High-frequency passive RFID/NFC chip programmed with your unique encrypted security identifier.</p>
+      </div>
+
+      <div class="spec-box">
+        <h3 class="spec-title">Zero Battery & Charging</h3>
+        <p class="spec-desc">Operates passively via near-field electromagnetic induction from reading phones. Never needs charging.</p>
+      </div>
+
+      <div class="spec-box">
+        <h3 class="spec-title">Dual NFC + Laser QR</h3>
+        <p class="spec-desc">Precision QR fallback on reverse ensures 100% compatibility across older cameras and legacy devices.</p>
+      </div>
+
+      <div class="spec-box">
+        <h3 class="spec-title">Waterproof & Durable</h3>
+        <p class="spec-desc">Industrial matte polymer construction designed to withstand everyday wallet wear, moisture, and scratches.</p>
+      </div>
+    </div>
+
+    <!-- Hardware Clarity Callout -->
+    <div class="hardware-callout-note">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div class="d-flex justify-between items-center w-100 flex-wrap gap-3">
+        <span>You do not need a physical card to use your digital profile, but having one makes meeting clients in person unforgettable.</span>
+        <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Get Your Smart Card &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 6: DIGITAL PROFILE SHOWCASE
      ========================================================================== -->
 <section class="showcase-section" aria-label="Digital Profile Showcase">
   <div class="container">
@@ -265,7 +488,7 @@
         <div class="label-overline mb-2">Modern Digital Experience</div>
         <h2 class="mb-4">Designed for Immediate Impact.</h2>
         <p class="lead mb-6">
-          When someone taps your card, they receive a fast, tailored mobile experience that lets them reach you on WhatsApp, call directly, download your verified contact file, or view your portfolio.
+          When someone taps your card or opens your link, they receive a fast, tailored mobile experience that lets them reach you on WhatsApp, call directly, download your verified contact file, or view your portfolio.
         </p>
 
         <div class="d-flex flex-column gap-3 mb-6">
@@ -276,6 +499,10 @@
           <div class="d-flex items-center gap-3">
             <div class="dot dot-active"></div>
             <span class="text-primary font-medium">Integrated social platforms & custom action links</span>
+          </div>
+          <div class="d-flex items-center gap-3">
+            <div class="dot dot-active"></div>
+            <span class="text-primary font-medium">Two-way contact exchange to capture visitor contact leads</span>
           </div>
           <div class="d-flex items-center gap-3">
             <div class="dot dot-active"></div>
@@ -290,7 +517,7 @@
           </a>
         {% else %}
           <a href="{% url 'accounts:register' %}" class="btn btn-primary">
-            <span>Create Your Profile</span>
+            <span>Create Your Profile Free</span>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         {% endif %}
@@ -300,42 +527,7 @@
 </section>
 
 <!-- ==========================================================================
-     SECTION 5: SMART CARD (Hardware Specifications)
-     ========================================================================== -->
-<section class="product-section" aria-label="Smart Card Hardware">
-  <div class="container">
-    <div class="text-center max-w-md">
-      <div class="label-overline mb-2">Physical Craftsmanship</div>
-      <h2>More Than A Business Card.</h2>
-      <p class="text-secondary mt-2">Engineered with high-grade materials and passive NFC microchips built to last.</p>
-    </div>
-
-    <div class="specs-grid">
-      <div class="spec-box">
-        <h3 class="spec-title">Embedded NTAG Chip</h3>
-        <p class="spec-desc">High-frequency passive RFID/NFC chip programmed with your unique encrypted security identifier.</p>
-      </div>
-
-      <div class="spec-box">
-        <h3 class="spec-title">Zero Battery & Charging</h3>
-        <p class="spec-desc">Operates passively via near-field electromagnetic induction from reading phones. Never needs charging.</p>
-      </div>
-
-      <div class="spec-box">
-        <h3 class="spec-title">Dual NFC + Laser QR</h3>
-        <p class="spec-desc">Precision QR fallback on reverse ensures 100% compatibility across older cameras and legacy devices.</p>
-      </div>
-
-      <div class="spec-box">
-        <h3 class="spec-title">Waterproof & Durable</h3>
-        <p class="spec-desc">Industrial matte polymer construction designed to withstand everyday wallet wear and moisture.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==========================================================================
-     SECTION 6: COMPLETE DIGITAL PRESENCE (Websites Suite)
+     SECTION 7: COMPLETE DIGITAL PRESENCE (Websites Suite)
      ========================================================================== -->
 <section class="suite-section" aria-label="Websites Suite">
   <div class="container">
@@ -371,7 +563,7 @@
         </div>
       </div>
 
-      <!-- Right: Clean Graphic Panel -->
+      <!-- Right: Graphic Panel -->
       <div class="card card-carbon d-flex flex-column justify-center items-center text-center p-6">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="1.5" class="mb-3" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-1);">Unified Brand Ecosystem</h3>
@@ -382,49 +574,16 @@
 </section>
 
 <!-- ==========================================================================
-     SECTION 7: GETTING STARTED (Timeline)
-     ========================================================================== -->
-<section class="timeline-section" aria-label="Getting Started Steps">
-  <div class="container">
-    <div class="text-center max-w-md mb-8">
-      <div class="label-overline mb-2">Fast Onboarding</div>
-      <h2>Get Started in 3 Simple Steps</h2>
-      <p class="text-secondary mt-1">Ready to use out of the box with zero complex setup.</p>
-    </div>
-
-    <div class="timeline-cards">
-      <div class="timeline-box">
-        <span class="timeline-badge">Step 01</span>
-        <h3 class="font-heading font-bold text-primary mb-2">Choose Your Package</h3>
-        <p class="text-secondary font-normal" style="font-size: 0.875rem; line-height: 1.6;">Select a standalone smart card or a complete digital presence bundle that matches your career or company requirements.</p>
-      </div>
-
-      <div class="timeline-box">
-        <span class="timeline-badge">Step 02</span>
-        <h3 class="font-heading font-bold text-primary mb-2">Set Up Your Profile</h3>
-        <p class="text-secondary font-normal" style="font-size: 0.875rem; line-height: 1.6;">Add your contact details, bio, photo, WhatsApp number, and brand links in your private account dashboard.</p>
-      </div>
-
-      <div class="timeline-box">
-        <span class="timeline-badge">Step 03</span>
-        <h3 class="font-heading font-bold text-primary mb-2">Receive & Tap</h3>
-        <p class="text-secondary font-normal" style="font-size: 0.875rem; line-height: 1.6;">Your physical card is delivered directly to your doorstep, pre-configured and ready to share immediately.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==========================================================================
      SECTION 8: PRICING PREVIEW (Dynamic from Real ProductPackage Data)
      ========================================================================== -->
-<section class="pricing-section" aria-label="Packages and Pricing">
+<section id="pricing" class="pricing-section" aria-label="Packages and Pricing">
   <div class="pricing-watermark" aria-hidden="true">PRICING</div>
   <div class="container">
     <div class="section-header-row">
       <div>
         <div class="label-overline mb-2">Transparent Plans</div>
         <h2>Available Packages</h2>
-        <p class="text-secondary mt-1">Select the solution tailored to your professional goals.</p>
+        <p class="text-secondary mt-1">Start free with your digital profile, or upgrade with a physical smart card.</p>
       </div>
       <a href="{% url 'core:pricing' %}" class="btn btn-ghost btn-sm">All Packages &rarr;</a>
     </div>
@@ -470,7 +629,7 @@
 <!-- ==========================================================================
      SECTION 9: FAQ (Accessible Accordion)
      ========================================================================== -->
-<section class="faq-section" aria-label="Frequently Asked Questions">
+<section id="faq" class="faq-section" aria-label="Frequently Asked Questions">
   <div class="container">
     <div class="text-center max-w-md mb-8">
       <div class="label-overline mb-2">Common Questions</div>
@@ -482,14 +641,14 @@
       <!-- FAQ 1 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-1">
-          <span>Does the card work on both iPhone and Android?</span>
+          <span>Can I create a profile without buying a physical card?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-1" class="accordion-panel">
           <div class="accordion-content">
-            Yes. NFC sharing is natively supported on iPhone (iPhone 7 and newer with iOS 11+) and all modern NFC-enabled Android devices. For older cameras, the reverse laser QR code provides 100% universal compatibility.
+            Yes! You can create your free digital profile right now, add your contact info, social links, and bio, and share your unique web link or QR code immediately. You can order a physical NFC smart card whenever you are ready.
           </div>
         </div>
       </div>
@@ -504,7 +663,7 @@
         </button>
         <div id="faq-ans-2" class="accordion-panel">
           <div class="accordion-content">
-            No. The person who taps your card needs zero apps. Your digital profile opens instantly in their native smartphone web browser.
+            No. The person who taps your card needs zero apps. Your digital profile opens instantly in their native smartphone web browser (Safari, Chrome, Samsung Internet, etc.).
           </div>
         </div>
       </div>
@@ -512,14 +671,14 @@
       <!-- FAQ 3 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-3">
-          <span>Can I edit my contact details after receiving the physical card?</span>
+          <span>Does the card work on both iPhone and Android?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-3" class="accordion-panel">
           <div class="accordion-content">
-            Yes, unlimited times. Log in to your UZYRA dashboard to update your phone number, email, title, social media handles, or company links. All updates reflect in real time.
+            Yes. NFC sharing is natively supported on iPhone (iPhone 7 and newer with iOS 11+) and all modern NFC-enabled Android devices. For older cameras, the reverse laser QR code provides 100% universal compatibility.
           </div>
         </div>
       </div>
@@ -527,14 +686,14 @@
       <!-- FAQ 4 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-4">
-          <span>What happens if I lose my smart card?</span>
+          <span>Can I edit my contact details after receiving the physical card?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-4" class="accordion-panel">
           <div class="accordion-content">
-            You can immediately mark your card as 'Lost' from your dashboard. Once reported lost, the physical card is deactivated instantly and will no longer display your personal details.
+            Yes, unlimited times. Log in to your UZYRA dashboard to update your phone number, email, title, social media handles, or company links. All updates reflect in real time with zero reprinting.
           </div>
         </div>
       </div>
@@ -542,14 +701,29 @@
       <!-- FAQ 5 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-5">
-          <span>Does the smart card require batteries or charging?</span>
+          <span>What happens if I lose my smart card?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-5" class="accordion-panel">
           <div class="accordion-content">
-            No. The NFC microchip is completely passive and draws power from the electromagnetic field of the smartphone reading it. It never needs charging.
+            You can immediately mark your card as 'Lost' or deactivated from your dashboard. Once reported, the physical card will no longer display your personal details, and you can re-link a new card anytime.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ 6 -->
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-6">
+          <span>Does the smart card require batteries or charging?</span>
+          <span class="accordion-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </button>
+        <div id="faq-ans-4" class="accordion-panel">
+          <div class="accordion-content">
+            No. The NFC microchip is completely passive and draws power from the electromagnetic field of the smartphone reading it. It never needs charging and will last for years.
           </div>
         </div>
       </div>
@@ -563,9 +737,9 @@
 <section class="cta-section" aria-label="Final Call to Action">
   <div class="container">
     <div class="cta-box">
-      <h2 class="cta-title">Elevate How You Connect.</h2>
+      <h2 class="cta-title">Upgrade How You Connect Today.</h2>
       <p class="cta-desc">
-        Join forward-thinking professionals and businesses using UZYRA to build their modern digital identity and professional network.
+        Create your free digital profile in minutes. Add a handcrafted NFC smart card whenever you are ready to make in-person introductions unforgettable.
       </p>
       <div class="hero-actions" style="justify-content: center; margin-top: var(--space-6);">
         {% if user.is_authenticated %}
@@ -578,7 +752,7 @@
           </a>
         {% else %}
           <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
-            <span>Create Your Digital Profile</span>
+            <span>Create Your Profile Free</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
           <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
