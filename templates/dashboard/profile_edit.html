@@ -271,12 +271,91 @@
   </div>
 
   <!-- ========================================================================
-       SECTION 4: SEARCH ENGINE VISIBILITY
+       SECTION 4: HIGHLIGHTS, SKILLS & LIVE PROFILE BADGES
        ======================================================================== -->
   <div class="card mb-6">
     <div class="card-header">
       <div>
-        <h2 class="card-title">4. Privacy & Indexing</h2>
+        <h2 class="card-title">4. Highlights, Skills & Social Proof</h2>
+        <p class="text-caption mb-0">Customise the live badges, tags, and stats shown on your app-style profile.</p>
+      </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+      <div class="form-group mb-0">
+        <label for="id_skills_tags" class="form-label">Skills / Category Tags</label>
+        {{ form.skills_tags }}
+        <div class="form-hint">Comma-separated, e.g. Design, Product, Tech</div>
+        {% if form.skills_tags.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.skills_tags.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+      <div class="form-group mb-0">
+        <label for="id_languages" class="form-label">Languages Spoken</label>
+        {{ form.languages }}
+        <div class="form-hint">Comma-separated, e.g. English, Spanish, French</div>
+        {% if form.languages.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.languages.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="grid-3 mb-4">
+      <div class="form-group mb-0">
+        <label for="id_stat_experience" class="form-label">Experience Stat</label>
+        {{ form.stat_experience }}
+        <div class="form-hint">e.g. 5+ Years</div>
+        {% if form.stat_experience.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.stat_experience.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+      <div class="form-group mb-0">
+        <label for="id_stat_projects" class="form-label">Projects Stat</label>
+        {{ form.stat_projects }}
+        <div class="form-hint">e.g. 50+ Projects</div>
+        {% if form.stat_projects.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.stat_projects.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+      <div class="form-group mb-0">
+        <label for="id_stat_followers" class="form-label">Network / Clients Stat</label>
+        {{ form.stat_followers }}
+        <div class="form-hint">e.g. 10K+ Network</div>
+        {% if form.stat_followers.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.stat_followers.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group mb-0">
+      <label for="id_cta_banner_text" class="form-label">Call-To-Action Banner Text</label>
+      {{ form.cta_banner_text }}
+      <div class="form-hint">Highlighted banner above your message prompt, e.g. Let's build something great together.</div>
+      {% if form.cta_banner_text.errors %}
+        <div class="form-error" role="alert">
+          <span>{{ form.cta_banner_text.errors|first }}</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SECTION 5: SEARCH ENGINE VISIBILITY
+       ======================================================================== -->
+  <div class="card mb-6">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">5. Privacy & Indexing</h2>
         <p class="text-caption mb-0">Control search engine discovery of your public URL.</p>
       </div>
     </div>
@@ -297,7 +376,7 @@
   <!-- ========================================================================
        SAVE ACTION BAR
        ======================================================================== -->
-  <div class="d-flex items-center gap-3 flex-wrap">
+  <div class="d-flex items-center gap-3 flex-wrap mb-8">
     <button type="submit" class="btn btn-primary btn-lg">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       <span>Save Profile Changes</span>
@@ -306,4 +385,267 @@
   </div>
 
 </form>
+
+<!-- ==========================================================================
+     SECTION 6: "WHAT I DO" SERVICES MANAGER
+     ========================================================================== -->
+<div class="card mb-6">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">6. What I Do (Services & Offerings)</h2>
+      <p class="text-caption mb-0">Highlighted services with custom icons displayed in your profile About tab.</p>
+    </div>
+    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-service">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Add Service</span>
+    </button>
+  </div>
+
+  {% if services %}
+    <div class="link-list">
+      {% for srv in services %}
+        <div class="link-item flex-wrap" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-primary);">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: var(--silver-steel);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #FFF; font-size: 0.95rem;">{{ srv.title }}</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">{{ srv.description }} &middot; Icon: {{ srv.get_icon_display }}</div>
+            </div>
+          </div>
+          <form method="post" action="{% url 'dashboard:profile_service_delete' srv.id %}" onsubmit="return confirm('Remove service {{ srv.title }}?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No custom services added yet. Add items like Product Design, Strategy, or Speaking.</p>
+      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-service">+ Add First Service</button>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================================================
+     SECTION 7: "MY WORK" PORTFOLIO GALLERY MANAGER
+     ========================================================================== -->
+<div class="card mb-6">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">7. My Work (Portfolio Gallery)</h2>
+      <p class="text-caption mb-0">Showcase design samples, case studies, or photography in your Gallery tab.</p>
+    </div>
+    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-gallery">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Add Work Item</span>
+    </button>
+  </div>
+
+  {% if gallery_items %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; padding: 1rem;">
+      {% for item in gallery_items %}
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-primary); border-radius: 12px; overflow: hidden; position: relative;">
+          {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 120px; object-fit: cover;">
+          {% elif item.image_url %}
+            <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 120px; object-fit: cover;">
+          {% else %}
+            <div style="width: 100%; height: 120px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">No Image</div>
+          {% endif %}
+          <div style="padding: 0.75rem;">
+            <div style="font-weight: 600; color: #FFF; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.title|default:"Gallery Item" }}</div>
+            {% if item.link_url %}
+              <div style="font-size: 0.75rem; color: var(--silver-steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.link_url }}</div>
+            {% endif %}
+            <form method="post" action="{% url 'dashboard:profile_gallery_delete' item.id %}" onsubmit="return confirm('Remove gallery item?')" style="margin-top: 0.5rem;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No portfolio items added yet. Showcase your past work and projects.</p>
+      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-gallery">+ Add First Work Item</button>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================================================
+     SECTION 8: CLIENT TESTIMONIALS MANAGER
+     ========================================================================== -->
+<div class="card mb-6">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">8. Client Testimonials & Reviews</h2>
+      <p class="text-caption mb-0">Client feedback, star ratings, and recommendations displayed in your More tab.</p>
+    </div>
+    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-testimonial">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Add Testimonial</span>
+    </button>
+  </div>
+
+  {% if testimonials %}
+    <div class="link-list">
+      {% for test in testimonials %}
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border-primary); gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="font-weight: 600; color: #FFF;">{{ test.client_name }}</span>
+              {% if test.client_title %}
+                <span style="color: var(--text-secondary); font-size: 0.8rem;">&middot; {{ test.client_title }}</span>
+              {% endif %}
+              <span style="color: #F59E0B; font-size: 0.85rem;">★ {{ test.rating }}/5</span>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">"{{ test.content }}"</div>
+          </div>
+          <form method="post" action="{% url 'dashboard:profile_testimonial_delete' test.id %}" onsubmit="return confirm('Remove testimonial?')" style="flex-shrink: 0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No testimonials added yet. Display social proof and reviews from satisfied clients.</p>
+      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-testimonial">+ Add First Testimonial</button>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================================================
+     MODALS FOR SERVICES, GALLERY & TESTIMONIALS
+     ========================================================================== -->
+<!-- MODAL: ADD SERVICE -->
+<div class="modal-overlay" id="modal-add-service" role="dialog" aria-modal="true" aria-labelledby="modal-add-service-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-add-service-title">Add Service / Offering</h3>
+      <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'dashboard:profile_service_add' %}">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="form-group mb-4">
+          <label class="form-label">Service Title *</label>
+          {{ service_form.title }}
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Description / Subtitle *</label>
+          {{ service_form.description }}
+        </div>
+        <div class="grid-2 mb-4">
+          <div class="form-group mb-0">
+            <label class="form-label">Icon Category</label>
+            {{ service_form.icon }}
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Display Order</label>
+            {{ service_form.order }}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-end gap-2 mt-4">
+        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD GALLERY ITEM -->
+<div class="modal-overlay" id="modal-add-gallery" role="dialog" aria-modal="true" aria-labelledby="modal-add-gallery-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-add-gallery-title">Add Portfolio / Work Item</h3>
+      <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'dashboard:profile_gallery_add' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="form-group mb-4">
+          <label class="form-label">Project / Work Title</label>
+          {{ gallery_form.title }}
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Image Upload</label>
+          {{ gallery_form.image }}
+          <div class="form-hint">JPG, PNG, or WebP.</div>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">External Image URL <span class="form-label-hint">(Optional fallback)</span></label>
+          {{ gallery_form.image_url }}
+        </div>
+        <div class="grid-2 mb-4">
+          <div class="form-group mb-0">
+            <label class="form-label">Destination / Project Link</label>
+            {{ gallery_form.link_url }}
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Display Order</label>
+            {{ gallery_form.order }}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-end gap-2 mt-4">
+        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Work Item</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD TESTIMONIAL -->
+<div class="modal-overlay" id="modal-add-testimonial" role="dialog" aria-modal="true" aria-labelledby="modal-add-testimonial-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-add-testimonial-title">Add Client Testimonial</h3>
+      <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'dashboard:profile_testimonial_add' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="grid-2 mb-4">
+          <div class="form-group mb-0">
+            <label class="form-label">Client Name *</label>
+            {{ testimonial_form.client_name }}
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Client Title / Company</label>
+            {{ testimonial_form.client_title }}
+          </div>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Review / Testimonial Text *</label>
+          {{ testimonial_form.content }}
+        </div>
+        <div class="grid-2 mb-4">
+          <div class="form-group mb-0">
+            <label class="form-label">Star Rating (1 - 5)</label>
+            {{ testimonial_form.rating }}
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Display Order</label>
+            {{ testimonial_form.order }}
+          </div>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Client Avatar Photo <span class="form-label-hint">(Optional)</span></label>
+          {{ testimonial_form.client_avatar }}
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-end gap-2 mt-4">
+        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Testimonial</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

@@ -9,6 +9,9 @@ class ProfileForm(forms.ModelForm):
             'profile_image', 'cover_image',
             'phone', 'whatsapp', 'email', 'website_url', 'location', 'address',
             'business_name', 'business_category', 'business_description', 'business_logo',
+            'skills_tags', 'languages',
+            'stat_experience', 'stat_projects', 'stat_followers',
+            'cta_banner_text',
             'is_search_indexed'
         ]
         widgets = {
@@ -24,6 +27,12 @@ class ProfileForm(forms.ModelForm):
             'business_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Business or Brand Name'}),
             'business_category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Technology, Fashion, Real Estate'}),
             'business_description': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'Short business overview...'}),
+            'skills_tags': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Design, Product, Tech'}),
+            'languages': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. English, Spanish, French'}),
+            'stat_experience': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 5+ Years'}),
+            'stat_projects': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 50+ Projects'}),
+            'stat_followers': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 10K+ Followers'}),
+            'cta_banner_text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "e.g. Let's build something great together."}),
         }
 
     def clean_profile_image(self):
@@ -141,4 +150,66 @@ class ContactExchangeForm(forms.ModelForm):
             raise forms.ValidationError("You must consent to sharing your details with the profile owner.")
 
         return cleaned_data
+
+
+class ProfileServiceForm(forms.ModelForm):
+    class Meta:
+        from .models import ProfileService
+        model = ProfileService
+        fields = ['title', 'description', 'icon', 'order']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Product Design'}),
+            'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. UI/UX, Brand & Product'}),
+            'icon': forms.Select(attrs={'class': 'form-select'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'style': 'max-width: 100px;'}),
+        }
+
+
+class ProfileGalleryItemForm(forms.ModelForm):
+    class Meta:
+        from .models import ProfileGalleryItem
+        model = ProfileGalleryItem
+        fields = ['title', 'image', 'image_url', 'link_url', 'order']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project or image title'}),
+            'image_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://... (Optional fallback image URL)'}),
+            'link_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://... (External project link)'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'style': 'max-width: 100px;'}),
+        }
+
+    def clean_image(self):
+        from apps.core.validators import validate_image_upload
+        image = self.cleaned_data.get('image')
+        if image:
+            validate_image_upload(image)
+        return image
+
+    def clean_link_url(self):
+        from apps.core.validators import validate_safe_url
+        url = self.cleaned_data.get('link_url')
+        if url:
+            return validate_safe_url(url, allow_relative=False)
+        return url
+
+
+class ProfileTestimonialForm(forms.ModelForm):
+    class Meta:
+        from .models import ProfileTestimonial
+        model = ProfileTestimonial
+        fields = ['client_name', 'client_title', 'content', 'rating', 'client_avatar', 'order']
+        widgets = {
+            'client_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Client Name'}),
+            'client_title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Founder, ScaleUp'}),
+            'content': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'What the client said...'}),
+            'rating': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 5, 'style': 'max-width: 100px;'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'style': 'max-width: 100px;'}),
+        }
+
+    def clean_client_avatar(self):
+        from apps.core.validators import validate_image_upload
+        avatar = self.cleaned_data.get('client_avatar')
+        if avatar:
+            validate_image_upload(avatar)
+        return avatar
+
 

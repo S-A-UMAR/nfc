@@ -73,6 +73,14 @@ class Profile(models.Model):
     website_url = models.URLField(blank=True)
     location = models.CharField(max_length=150, blank=True, help_text="e.g. Lagos, Nigeria")
     address = models.TextField(blank=True)
+
+    # Highlights, Tags & Social Proof
+    skills_tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated skills or tags, e.g. Design, Product, Tech")
+    languages = models.CharField(max_length=255, blank=True, help_text="Languages, e.g. English, Spanish, French")
+    stat_experience = models.CharField(max_length=50, blank=True, default="5+ Years", help_text="e.g. 5+ Years")
+    stat_projects = models.CharField(max_length=50, blank=True, default="50+ Projects", help_text="e.g. 50+ Projects")
+    stat_followers = models.CharField(max_length=50, blank=True, default="10K+ Network", help_text="e.g. 10K+ Network / Clients")
+    cta_banner_text = models.CharField(max_length=200, blank=True, default="Let's build something great together.")
     
     # Design & Visibility
     theme = models.CharField(max_length=25, choices=THEME_CHOICES, default='graphite')
@@ -102,6 +110,20 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def skills_tag_list(self):
+        if not self.skills_tags:
+            if self.business_category:
+                return [t.strip() for t in self.business_category.split(',') if t.strip()]
+            return ["Design", "Product", "Tech"]
+        return [t.strip() for t in self.skills_tags.split(',') if t.strip()]
+
+    @property
+    def language_list(self):
+        if not self.languages:
+            return ["English"]
+        return [l.strip() for l in self.languages.split(',') if l.strip()]
+
+    @property
     def clean_whatsapp(self):
         """Clean phone for wa.me direct links."""
         if not self.whatsapp:
@@ -115,6 +137,64 @@ class Profile(models.Model):
         if not self.phone:
             return ""
         return self.phone.replace(" ", "").replace("-", "")
+
+
+class ProfileService(models.Model):
+    """What I Do / Services offered by the profile owner."""
+    ICON_CHOICES = (
+        ('design', 'Product & Design'),
+        ('consulting', 'Consulting & Strategy'),
+        ('speaking', 'Speaking & Events'),
+        ('code', 'Engineering & Tech'),
+        ('camera', 'Media & Photography'),
+        ('briefcase', 'Business & Management'),
+        ('star', 'Specialist Service'),
+    )
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='services')
+    title = models.CharField(max_length=150)
+    description = models.CharField(max_length=255)
+    icon = models.CharField(max_length=30, choices=ICON_CHOICES, default='design')
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"{self.title} ({self.profile.full_name})"
+
+
+class ProfileGalleryItem(models.Model):
+    """My Work / Portfolio gallery item."""
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='gallery_items')
+    title = models.CharField(max_length=150, blank=True)
+    image = models.ImageField(upload_to='profiles/gallery/', blank=True, null=True)
+    image_url = models.URLField(blank=True, help_text="External or fallback image URL")
+    link_url = models.URLField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"{self.title or 'Gallery Item'} ({self.profile.full_name})"
+
+
+class ProfileTestimonial(models.Model):
+    """Client review or testimonial."""
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='testimonials')
+    client_name = models.CharField(max_length=150)
+    client_title = models.CharField(max_length=150, blank=True, help_text="e.g. Founder, ScaleUp")
+    client_avatar = models.ImageField(upload_to='profiles/testimonials/', blank=True, null=True)
+    content = models.TextField()
+    rating = models.PositiveSmallIntegerField(default=5)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"Review by {self.client_name} for {self.profile.full_name}"
 
 
 class SocialLink(models.Model):

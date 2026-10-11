@@ -1,21 +1,28 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from .models import Profile, SocialLink, CustomLink
-from .forms import ProfileForm, SocialLinkForm, CustomLinkForm, ProfileAppearanceForm
+from .models import Profile, SocialLink, CustomLink, ProfileService, ProfileGalleryItem, ProfileTestimonial
+from .forms import (
+    ProfileForm, SocialLinkForm, CustomLinkForm, ProfileAppearanceForm,
+    ProfileServiceForm, ProfileGalleryItemForm, ProfileTestimonialForm
+)
 from apps.analytics.models import AnalyticsEvent
 
 def public_profile_view(request, slug):
     """
-    Mobile-First Public Digital Profile (/u/<slug>/).
-    Renders the live profile with instant contact actions, social icons, and links.
+    Mobile-First App-Style Digital Profile (/u/<slug>/).
+    Renders multi-tab profile with Overview, About, Links, Gallery, More, and Modal Sheets.
     """
     profile = get_object_or_404(Profile.objects.select_related('user'), slug=slug)
     social_links = profile.social_links.filter(is_active=True)
     custom_links = profile.custom_links.filter(is_active=True)
+    services = profile.services.all()
+    gallery_items = profile.gallery_items.all()
+    testimonials = profile.testimonials.all()
 
     # Log anonymous profile view analytics event
     AnalyticsEvent.objects.create(
@@ -29,6 +36,10 @@ def public_profile_view(request, slug):
         'profile': profile,
         'social_links': social_links,
         'custom_links': custom_links,
+        'services': services,
+        'gallery_items': gallery_items,
+        'testimonials': testimonials,
+        'qr_url': reverse('profiles:download_profile_qr', kwargs={'slug': profile.slug}),
     })
 
 
@@ -104,10 +115,102 @@ def profile_edit_view(request):
     else:
         form = ProfileForm(instance=profile)
 
+    services = profile.services.all()
+    gallery_items = profile.gallery_items.all()
+    testimonials = profile.testimonials.all()
+
     return render(request, 'dashboard/profile_edit.html', {
         'profile': profile,
         'form': form,
+        'services': services,
+        'gallery_items': gallery_items,
+        'testimonials': testimonials,
+        'service_form': ProfileServiceForm(),
+        'gallery_form': ProfileGalleryItemForm(),
+        'testimonial_form': ProfileTestimonialForm(),
     })
+
+
+@login_required
+@require_POST
+def add_profile_service_view(request):
+    """Add a new service to profile."""
+    profile = request.user.profile
+    form = ProfileServiceForm(request.POST)
+    if form.is_valid():
+        service = form.save(commit=False)
+        service.profile = profile
+        service.save()
+        messages.success(request, f'Service "{service.title}" added.')
+    else:
+        messages.error(request, "Failed to add service. Please check details.")
+    return redirect('dashboard:profile_edit')
+
+
+@login_required
+@require_POST
+def delete_profile_service_view(request, item_id):
+    """Delete a profile service."""
+    profile = request.user.profile
+    service = get_object_or_404(ProfileService, id=item_id, profile=profile)
+    service.delete()
+    messages.success(request, "Service removed.")
+    return redirect('dashboard:profile_edit')
+
+
+@login_required
+@require_POST
+def add_profile_gallery_view(request):
+    """Add a new portfolio/work item to gallery."""
+    profile = request.user.profile
+    form = ProfileGalleryItemForm(request.POST, request.FILES)
+    if form.is_valid():
+        item = form.save(commit=False)
+        item.profile = profile
+        item.save()
+        messages.success(request, f'Gallery item "{item.title or "Item"}" added.')
+    else:
+        messages.error(request, "Failed to add gallery item. Please check inputs.")
+    return redirect('dashboard:profile_edit')
+
+
+@login_required
+@require_POST
+def delete_profile_gallery_view(request, item_id):
+    """Delete a gallery item."""
+    profile = request.user.profile
+    item = get_object_or_404(ProfileGalleryItem, id=item_id, profile=profile)
+    item.delete()
+    messages.success(request, "Gallery item removed.")
+    return redirect('dashboard:profile_edit')
+
+
+@login_required
+@require_POST
+def add_profile_testimonial_view(request):
+    """Add a client testimonial."""
+    profile = request.user.profile
+    form = ProfileTestimonialForm(request.POST, request.FILES)
+    if form.is_valid():
+        item = form.save(commit=False)
+        item.profile = profile
+        item.save()
+        messages.success(request, f'Testimonial from {item.client_name} added.')
+    else:
+        messages.error(request, "Failed to add testimonial. Please check details.")
+    return redirect('dashboard:profile_edit')
+
+
+@login_required
+@require_POST
+def delete_profile_testimonial_view(request, item_id):
+    """Delete a testimonial."""
+    profile = request.user.profile
+    item = get_object_or_404(ProfileTestimonial, id=item_id, profile=profile)
+    item.delete()
+    messages.success(request, "Testimonial removed.")
+    return redirect('dashboard:profile_edit')
+
 
 
 @login_required
