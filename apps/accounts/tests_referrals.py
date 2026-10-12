@@ -1,6 +1,7 @@
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from apps.accounts.models import Referral
 from apps.orders.models import Order, ProductPackage
 from apps.payments.models import Payment
@@ -10,6 +11,7 @@ User = get_user_model()
 @override_settings(PAYSTACK_TEST_MODE=True)
 class ReferralProgrammeTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.client = Client()
         self.referrer = User.objects.create_user(
             email='referrer@example.com',

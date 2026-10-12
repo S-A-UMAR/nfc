@@ -34,6 +34,25 @@ def dashboard_overview_view(request):
     has_links = profile.social_links.exists() or profile.custom_links.exists()
     has_card = bool(primary_card)
 
+    # Real profile checklist calculations (only genuine database fields)
+    has_headline = bool(profile.title or profile.business_name)
+    has_bio = bool(profile.bio or profile.business_description)
+    has_photo = bool(profile.profile_image or profile.business_logo)
+
+    checklist = [
+        {'key': 'identity', 'label': 'Full Name & Slug', 'done': bool(profile.full_name and profile.slug)},
+        {'key': 'headline', 'label': 'Headline or Business Name', 'done': has_headline},
+        {'key': 'bio', 'label': 'Professional Bio or Overview', 'done': has_bio},
+        {'key': 'contact', 'label': 'Direct Contact Info', 'done': has_contact},
+        {'key': 'photo', 'label': 'Profile Photo or Logo', 'done': has_photo},
+        {'key': 'links', 'label': 'Social or Portfolio Links', 'done': has_links},
+    ]
+    completed_checklist_count = sum(1 for item in checklist if item['done'])
+    total_checklist_count = len(checklist)
+    completion_percentage = round((completed_checklist_count / total_checklist_count) * 100)
+    is_profile_configured = bool(profile.slug and (profile.title or profile.business_name))
+    received_contacts_count = profile.received_contacts.count()
+
     # Time boundaries for deltas
     now = timezone.now()
     seven_days_ago = now - timedelta(days=7)
@@ -74,6 +93,15 @@ def dashboard_overview_view(request):
         'has_contact': has_contact,
         'has_links': has_links,
         'has_card': has_card,
+        'has_headline': has_headline,
+        'has_bio': has_bio,
+        'has_photo': has_photo,
+        'checklist': checklist,
+        'completed_checklist_count': completed_checklist_count,
+        'total_checklist_count': total_checklist_count,
+        'completion_percentage': completion_percentage,
+        'is_profile_configured': is_profile_configured,
+        'received_contacts_count': received_contacts_count,
         'profile_views': stats['profile_views'] or 0,
         'card_taps': stats['card_taps'] or 0,
         'whatsapp_clicks': stats['whatsapp_clicks'] or 0,

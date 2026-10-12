@@ -1,12 +1,14 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.core.cache import cache
 from apps.profiles.models import Profile
 
 User = get_user_model()
 
 class Phase2AuthenticationTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.client = Client()
         self.register_url = reverse('accounts:register')
         self.login_url = reverse('accounts:login')
