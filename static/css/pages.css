@@ -3151,22 +3151,41 @@ html, body {
    Dual-Stage Hero, 5-Second Clarity Strip & Persona Differentiation
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Hero Dual Stage Visual ──────────────────────────────────────────────── */
-.hero-dual-stage {
+/* ── Friendly Badge Pill ─────────────────────────────────────────────────── */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--silver-highlight);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Hero Dual Stage Visual (Spacious & Friendly) ────────────────────────── */
+.hero-dual-stage,
+.hero-stage-wrap {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 540px;
+  max-width: 520px;
   margin: 0 auto;
 }
 
 .hero-interactive-scene {
   position: relative;
   width: 100%;
-  min-height: 490px;
+  min-height: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3178,8 +3197,8 @@ html, body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
+  width: 480px;
+  height: 480px;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(191, 197, 207, 0.04) 40%, transparent 70%);
   filter: blur(60px);
   pointer-events: none;
@@ -3189,25 +3208,25 @@ html, body {
 /* Floating NFC Smart Card (left side / top overlap) */
 .hero-card-floating {
   position: absolute;
-  top: 30px;
+  top: 25px;
   left: 0;
   width: 250px;
   aspect-ratio: 1.586 / 1;
-  background: linear-gradient(145deg, #24242C 0%, #0E0E12 50%, #1A1A22 100%);
+  background: linear-gradient(145deg, #22232c 0%, #0d0e12 55%, #181922 100%);
   border-style: solid;
   border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.18) rgba(255, 255, 255, 0.08) rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
-  padding: 1.1rem;
+  border-color: rgba(255, 255, 255, 0.32) rgba(255, 255, 255, 0.18) rgba(255, 255, 255, 0.08) rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  padding: 1.15rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.95),
-    0 0 35px rgba(255, 255, 255, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    0 24px 60px rgba(0, 0, 0, 0.92),
+    0 0 35px rgba(255, 255, 255, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 0.40),
     inset 0 -1px 1px rgba(0, 0, 0, 0.60);
-  transform: perspective(1000px) rotateY(-10deg) rotateX(6deg) rotate(-4deg);
+  transform: perspective(1000px) rotateY(-8deg) rotateX(5deg) rotate(-3deg);
   animation: floatCard 6s ease-in-out infinite;
   z-index: 10;
   transition: transform 0.4s var(--transition-spring), border-color 0.3s ease, box-shadow 0.3s ease;
@@ -3224,19 +3243,19 @@ html, body {
 /* Beaming connection / Tap wave between card and phone */
 .hero-tap-wave-connector {
   position: absolute;
-  top: 90px;
-  left: 200px;
+  top: 85px;
+  left: 195px;
   z-index: 12;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0.35rem 0.75rem;
-  background: rgba(18, 19, 26, 0.88);
-  border: 1px solid rgba(34, 197, 94, 0.5);
+  gap: 7px;
+  padding: 0.38rem 0.85rem;
+  background: rgba(18, 22, 28, 0.95);
+  border: 1px solid rgba(34, 197, 94, 0.45);
   border-radius: var(--radius-pill);
-  box-shadow: 0 0 16px rgba(34, 197, 94, 0.3), 0 4px 14px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.25), 0 4px 14px rgba(0, 0, 0, 0.5);
   font-family: var(--font-body);
-  font-size: 0.6875rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #4ade80;
   letter-spacing: 0.03em;
@@ -3249,45 +3268,45 @@ html, body {
 /* Live Smartphone Mockup Screen */
 .hero-phone-preview {
   position: relative;
-  width: 270px;
-  background: linear-gradient(160deg, rgba(28, 28, 36, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%);
+  width: 275px;
+  background: linear-gradient(160deg, rgba(28, 29, 38, 0.96) 0%, rgba(13, 14, 18, 0.98) 100%);
   border-style: solid;
   border-width: 1.5px;
-  border-color: rgba(255, 255, 255, 0.24) rgba(255, 255, 255, 0.12) rgba(255, 255, 255, 0.06) rgba(255, 255, 255, 0.18);
-  border-radius: 34px;
-  padding: 1rem 1rem 1.4rem;
+  border-color: rgba(255, 255, 255, 0.22) rgba(255, 255, 255, 0.12) rgba(255, 255, 255, 0.06) rgba(255, 255, 255, 0.18);
+  border-radius: 32px;
+  padding: 1rem 1rem 1.35rem;
   box-shadow:
-    0 32px 80px rgba(0, 0, 0, 0.95),
-    0 0 35px rgba(255, 255, 255, 0.04),
-    inset 0 1.5px 2px rgba(255, 255, 255, 0.25),
+    0 28px 70px rgba(0, 0, 0, 0.92),
+    0 0 35px rgba(255, 255, 255, 0.03),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.22),
     inset 0 -1.5px 2px rgba(0, 0, 0, 0.60);
   margin-left: 110px;
-  margin-top: 20px;
+  margin-top: 15px;
   z-index: 5;
   transition: transform 0.4s ease;
 }
 
 .hero-phone-notch {
-  width: 65px;
-  height: 12px;
-  background: #0A0A0E;
+  width: 60px;
+  height: 11px;
+  background: #08090C;
   border-radius: var(--radius-pill);
   margin: 0 auto 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .hero-phone-avatar-circle {
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.20) 0%, rgba(45, 45, 55, 0.85) 60%, rgba(18, 18, 22, 0.95) 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.30);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(45, 45, 55, 0.85) 60%, rgba(18, 18, 22, 0.95) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   color: var(--silver-accent);
   margin: 0 auto 0.5rem;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
@@ -3300,7 +3319,7 @@ html, body {
 
 .hero-phone-name {
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
@@ -3315,6 +3334,7 @@ html, body {
 .hero-phone-company {
   font-size: 0.6875rem;
   color: var(--silver-steel);
+  margin-top: 1px;
 }
 
 .hero-phone-actions-row {
@@ -3383,13 +3403,13 @@ html, body {
   z-index: 5;
 }
 
-/* ── 5-Second Clarity Strip ──────────────────────────────────────────────── */
+/* ── 5-Second Clarity Strip (Spacious & Friendly) ────────────────────────── */
 .clarity-strip-section {
-  padding: var(--space-10) 0;
+  padding: 5rem 0;
   border-bottom: 1px solid var(--border-primary);
-  background: rgba(14, 14, 18, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(14, 15, 20, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   position: relative;
   z-index: 2;
 }
@@ -3397,42 +3417,42 @@ html, body {
 .clarity-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
+  gap: 2rem;
 }
 
 .clarity-card {
   display: flex;
   flex-direction: column;
-  padding: var(--space-6);
-  background: rgba(20, 21, 28, 0.70);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: var(--radius-lg);
+  padding: 2.5rem 2.25rem;
+  background: linear-gradient(145deg, rgba(22, 24, 32, 0.75) 0%, rgba(14, 15, 20, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.08);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.10);
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
   position: relative;
 }
 
 .clarity-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 255, 255, 0.03);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 255, 255, 0.04);
 }
 
 .clarity-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-4);
+  margin-bottom: 1.25rem;
 }
 
 .clarity-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3445,27 +3465,28 @@ html, body {
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--silver-steel);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .clarity-card-title {
   font-family: var(--font-heading);
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--space-2);
+  margin-bottom: 0.65rem;
+  line-height: 1.3;
 }
 
 .clarity-card-desc {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
 }
 
-/* ── Personal vs Business Split ─────────────────────────────────────────── */
+/* ── Personal vs Business Split (Spacious & Friendly) ────────────────────── */
 .persona-section {
-  padding: var(--space-16) 0;
+  padding: 5.5rem 0;
   border-bottom: 1px solid var(--border-primary);
   position: relative;
 }
@@ -3473,20 +3494,20 @@ html, body {
 .persona-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
+  gap: 2.25rem;
 }
 
 .persona-card {
-  padding: var(--space-8);
-  background: linear-gradient(145deg, rgba(24, 25, 33, 0.85) 0%, rgba(14, 15, 20, 0.95) 100%);
+  padding: 3rem 2.5rem;
+  background: linear-gradient(145deg, rgba(24, 25, 34, 0.88) 0%, rgba(13, 14, 19, 0.95) 100%);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: var(--radius-xl);
+  border-radius: 26px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.12);
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
@@ -3497,14 +3518,14 @@ html, body {
 
 .persona-card.featured-card {
   border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75), 0 0 35px rgba(255, 255, 255, 0.05);
 }
 
 .persona-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0.3rem 0.8rem;
+  padding: 0.35rem 0.85rem;
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3512,47 +3533,48 @@ html, body {
   font-weight: 600;
   color: var(--silver-highlight);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-4);
+  letter-spacing: 0.06em;
+  margin-bottom: 1.25rem;
   width: fit-content;
 }
 
 .persona-title {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: var(--space-2);
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
 }
 
 .persona-desc {
-  font-size: 0.9375rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: var(--space-6);
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
 }
 
 .persona-features-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 var(--space-8) 0;
+  margin: 0 0 2.25rem 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 0.85rem;
 }
 
 .persona-feature-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  font-size: 0.875rem;
+  gap: 12px;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .persona-feature-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.10);
   display: flex;
@@ -3566,39 +3588,62 @@ html, body {
 .persona-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 /* ── Hardware Showcase Highlight Strip ──────────────────────────────────── */
 .hardware-callout-note {
-  margin-top: var(--space-8);
-  padding: var(--space-4) var(--space-6);
+  margin-top: 2.5rem;
+  padding: 1.25rem 1.75rem;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-radius: var(--radius-lg);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  font-size: 0.875rem;
+  gap: 1rem;
+  font-size: 0.9rem;
   color: var(--silver-highlight);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-/* ── Responsive adjustments for new components ─────────────────────────── */
+/* ── Suite Graphic Panel ────────────────────────────────────────────────── */
+.suite-graphic-panel {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 19, 25, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2.25rem 1.75rem;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Responsive adjustments for spacious, friendly layout ───────────────── */
 @media (max-width: 992px) {
-  .hero-dual-stage {
-    margin-top: var(--space-4);
+  .hero-section {
+    padding: calc(var(--navbar-height) + 2rem) 0 3.5rem;
+  }
+  .hero-dual-stage,
+  .hero-stage-wrap {
+    margin-top: 2rem;
     width: 100%;
   }
   .clarity-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   .persona-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   .persona-card {
-    padding: var(--space-6);
+    padding: 2.25rem 1.75rem;
+  }
+  .clarity-card {
+    padding: 2rem 1.75rem;
   }
 }
 
@@ -3612,13 +3657,48 @@ html, body {
 }
 
 @media (max-width: 640px) {
-  /* ── Hero Scene: polished vertical stack on mobile ── */
+  /* ── Mobile Layout Overrides: Simple, Less Tight, Friendly ── */
+  .hero-section,
+  .clarity-strip-section,
+  .how-section,
+  .persona-section,
+  .product-section,
+  .showcase-section,
+  .suite-section,
+  .pricing-section,
+  .faq-section,
+  .cta-section {
+    padding: 3.75rem 0;
+  }
+
+  .hero-copy-wrap {
+    text-align: center;
+  }
+
+  .hero-actions {
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .hero-trust-strip {
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  /* ── Hero Scene on mobile: airy, clean, friendly stack ── */
   .hero-interactive-scene {
     min-height: auto;
     flex-direction: column;
     align-items: center;
     gap: 0;
-    padding: var(--space-2) 0 0;
+    padding: 1.25rem 0 0;
     width: 100%;
   }
 
@@ -3633,21 +3713,21 @@ html, body {
     background: linear-gradient(145deg, #1e1f27 0%, #0d0e12 55%, #15161f 100%);
     border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 16px;
-    padding: 0.95rem 1rem;
+    padding: 1rem 1.1rem;
     box-shadow: 
       0 14px 36px rgba(0, 0, 0, 0.8),
       inset 0 1px 1px rgba(255, 255, 255, 0.35);
   }
 
-  /* Tap Connector Badge: pulsing visual bridge between card and phone screen */
+  /* Tap Connector Badge: gentle visual bridge */
   .hero-tap-wave-connector {
     position: static;
-    margin: 0.75rem auto;
+    margin: 0.85rem auto;
     transform: none;
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 0.38rem 0.9rem;
+    padding: 0.4rem 0.95rem;
     background: rgba(18, 22, 28, 0.95);
     border: 1px solid rgba(34, 197, 94, 0.45);
     border-radius: var(--radius-pill);
@@ -3658,13 +3738,13 @@ html, body {
     letter-spacing: 0.03em;
   }
 
-  /* Live Smartphone Mockup Screen: sleek, proportional bezel */
+  /* Live Smartphone Mockup Screen: proportional, clean, friendly */
   .hero-phone-preview {
     margin-left: 0;
     margin-top: 0;
     width: 100%;
     max-width: 276px;
-    border-radius: 30px;
+    border-radius: 28px;
     border: 2px solid rgba(255, 255, 255, 0.18);
     background: linear-gradient(160deg, #181922 0%, #0d0e12 100%);
     box-shadow: 
@@ -3725,7 +3805,7 @@ html, body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-top: var(--space-4);
+    margin-top: 1.25rem;
     width: 100%;
     max-width: 276px;
     margin-left: auto;
@@ -3740,13 +3820,41 @@ html, body {
     gap: 6px;
   }
 
-  /* Persona section actions */
+  /* Cards inner padding on mobile */
+  .clarity-card,
+  .step-card,
+  .persona-card,
+  .spec-box,
+  .price-card {
+    padding: 1.85rem 1.5rem;
+    border-radius: 20px;
+  }
+
+  /* Persona actions full-width on mobile */
   .persona-actions {
     flex-direction: column;
     width: 100%;
   }
   .persona-actions .btn {
     width: 100%;
+  }
+
+  .hardware-callout-note {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1.25rem;
+  }
+  .hardware-callout-note .btn {
+    width: 100%;
+  }
+
+  .showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .suite-card {
+    padding: 2rem 1.5rem;
   }
 }
 

@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from apps.profiles.models import Profile, SocialLink
 from apps.cards.models import Card
 from apps.orders.models import Order, ProductPackage
@@ -15,6 +16,7 @@ class UsabilityJourneyTests(TestCase):
     """
 
     def setUp(self):
+        cache.clear()
         self.client = Client()
         self.user_password = "SecurePassword123!"
         self.user = User.objects.create_user(
