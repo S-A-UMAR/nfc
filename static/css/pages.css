@@ -3589,6 +3589,7 @@ html, body {
 @media (max-width: 992px) {
   .hero-dual-stage {
     margin-top: var(--space-4);
+    width: 100%;
   }
   .clarity-grid {
     grid-template-columns: 1fr;
@@ -3601,33 +3602,145 @@ html, body {
   }
 }
 
+@media (min-width: 641px) and (max-width: 992px) {
+  .hero-interactive-scene {
+    max-width: 440px;
+    margin: 0 auto;
+    position: relative;
+    min-height: 470px;
+  }
+}
+
 @media (max-width: 640px) {
+  /* ── Hero Scene: polished vertical stack on mobile ── */
   .hero-interactive-scene {
     min-height: auto;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-4) 0;
+    gap: 0;
+    padding: var(--space-2) 0 0;
+    width: 100%;
   }
+
+  /* Physical Card mockup: centered, luxury matte black with silver rim */
   .hero-card-floating {
     position: static;
     transform: none !important;
     animation: none;
     width: 100%;
-    max-width: 290px;
+    max-width: 280px;
     margin: 0 auto;
+    background: linear-gradient(145deg, #1e1f27 0%, #0d0e12 55%, #15161f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 16px;
+    padding: 0.95rem 1rem;
+    box-shadow: 
+      0 14px 36px rgba(0, 0, 0, 0.8),
+      inset 0 1px 1px rgba(255, 255, 255, 0.35);
   }
+
+  /* Tap Connector Badge: pulsing visual bridge between card and phone screen */
+  .hero-tap-wave-connector {
+    position: static;
+    margin: 0.75rem auto;
+    transform: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0.38rem 0.9rem;
+    background: rgba(18, 22, 28, 0.95);
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.25), 0 4px 14px rgba(0, 0, 0, 0.45);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4ade80;
+    letter-spacing: 0.03em;
+  }
+
+  /* Live Smartphone Mockup Screen: sleek, proportional bezel */
   .hero-phone-preview {
     margin-left: 0;
     margin-top: 0;
     width: 100%;
-    max-width: 290px;
+    max-width: 276px;
+    border-radius: 30px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: linear-gradient(160deg, #181922 0%, #0d0e12 100%);
+    box-shadow: 
+      0 24px 60px rgba(0, 0, 0, 0.85),
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.2);
+    padding: 0.85rem 0.85rem 1.1rem;
   }
-  .hero-tap-wave-connector {
-    position: static;
-    margin: 0 auto;
-    transform: none;
+
+  .hero-phone-notch {
+    width: 55px;
+    height: 10px;
+    margin: 0 auto 0.65rem;
   }
+
+  .hero-phone-avatar-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+    margin: 0 auto 0.4rem;
+  }
+
+  .hero-phone-name {
+    font-size: 0.95rem;
+  }
+
+  .hero-phone-role {
+    font-size: 0.72rem;
+  }
+
+  .hero-phone-company {
+    font-size: 0.6875rem;
+  }
+
+  .hero-phone-actions-row {
+    margin-bottom: 0.65rem;
+    gap: 6px;
+  }
+
+  .hero-phone-action-btn {
+    padding: 0.32rem 0.6rem;
+    font-size: 0.6875rem;
+  }
+
+  .hero-phone-vcard-btn {
+    padding: 0.52rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .hero-phone-link-row {
+    padding: 0.42rem 0.7rem;
+    font-size: 0.6875rem;
+    margin-bottom: 0.35rem;
+  }
+
+  /* Spec pills: clean 2-column grid on mobile */
+  .hero-dual-specs-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: var(--space-4);
+    width: 100%;
+    max-width: 276px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-card-spec-pill {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* Persona section actions */
   .persona-actions {
     flex-direction: column;
     width: 100%;
@@ -3636,6 +3749,7 @@ html, body {
     width: 100%;
   }
 }
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    UZYRA PHASE 2 GUIDED ONBOARDING STYLES
