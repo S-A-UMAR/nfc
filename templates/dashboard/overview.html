@@ -62,9 +62,15 @@
       <div class="dash-identity-avatar-col">
         <div class="dash-identity-avatar">
           {% if profile.profile_type == 'business' and profile.business_logo %}
-            <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name|default:profile.full_name }}" width="64" height="64" loading="lazy" decoding="async">
+            <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name|default:profile.full_name }}" width="64" height="64" loading="lazy" decoding="async" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+            <span class="avatar-fallback" style="display: none;">
+              {{ profile.business_name|make_list|first|upper }}
+            </span>
           {% elif profile.profile_image %}
-            <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="64" height="64" loading="lazy" decoding="async">
+            <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="64" height="64" loading="lazy" decoding="async" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+            <span class="avatar-fallback" style="display: none;">
+              {{ profile.full_name|default:user.display_name|make_list|first|upper }}
+            </span>
           {% else %}
             <span>
               {% if profile.profile_type == 'business' and profile.business_name %}
