@@ -3,541 +3,287 @@
 {% block title %}Workspace Dashboard — UZYRA{% endblock %}
 
 {% block dashboard_content %}
-<!-- ==========================================================================
-     DASHBOARD HEADER: Personalized Greeting
-     ========================================================================== -->
-<div class="dashboard-header">
-  <div>
-    <h1 class="dashboard-title">Welcome back, {{ user.first_name|default:user.display_name }}.</h1>
-    <p class="dashboard-subtitle">
-      {% if profile.profile_type == 'business' %}
-        Manage your business digital card, physical smart hardware, and client inquiries.
-      {% else %}
-        Manage your digital identity, physical smart card, and live networking interactions.
-      {% endif %}
-    </p>
-  </div>
-  <div class="dashboard-header-actions d-flex gap-2">
-    {% if profile.slug %}
-      <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-secondary btn-sm">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        <span>View Live Profile</span>
-      </a>
-    {% endif %}
-    <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary btn-sm">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      <span>Edit Profile</span>
-    </a>
-  </div>
-</div>
 
 <!-- ==========================================================================
-     1. PROFILE OVERVIEW HERO: Immediate Identity, Status & Completion
+     CONDITIONAL: FINISH PROFILE SETUP PROMPT (If Incomplete)
      ========================================================================== -->
-<div class="overview-profile-hero">
-  <!-- Top: Identity, Type & Publication Status -->
-  <div class="overview-hero-top">
-    <div class="overview-hero-identity">
-      <div class="overview-hero-avatar">
-        {% if profile.profile_type == 'business' and profile.business_logo %}
-          <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name|default:profile.full_name }}" width="60" height="60" loading="lazy" decoding="async">
-        {% elif profile.profile_image %}
-          <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="60" height="60" loading="lazy" decoding="async">
-        {% else %}
-          <span>
-            {% if profile.profile_type == 'business' and profile.business_name %}
-              {{ profile.business_name|make_list|first|upper }}
-            {% else %}
-              {{ profile.full_name|default:user.display_name|make_list|first|upper }}
-            {% endif %}
-          </span>
-        {% endif %}
+{% if not is_profile_configured %}
+<div class="dash-onboarding-callout mb-4" role="region" aria-label="Onboarding Prompt">
+  <div class="dash-onboarding-left">
+    <div class="dash-onboarding-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div>
+      <h2 class="dash-onboarding-title">Finish Setting Up Your Profile</h2>
+      <p class="dash-onboarding-desc">Launch your digital profile in under 2 minutes to generate your live shareable link and QR code.</p>
+    </div>
+  </div>
+  <a href="{% url 'dashboard:onboarding' %}" class="btn btn-primary btn-sm">
+    <span>Start Guided Setup &rarr;</span>
+  </a>
+</div>
+{% endif %}
+
+<!-- ==========================================================================
+     CONDITIONAL: ACTIVE ORDER FULFILLMENT TRACKER
+     ========================================================================== -->
+{% if active_order %}
+<div class="dash-order-callout mb-4" role="region" aria-label="Active Order Notification">
+  <div class="dash-order-left">
+    <div class="dash-order-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    </div>
+    <div>
+      <div class="dash-order-title">
+        <span>Active Order #{{ active_order.order_number }}</span>
+        <span class="badge badge-{% if active_order.order_status == 'completed' %}active{% else %}pending{% endif %}">
+          {{ active_order.get_order_status_display }}
+        </span>
       </div>
-      <div class="overview-hero-title-area">
-        <div class="overview-hero-name-row">
-          <span class="overview-hero-name">
+      <div class="dash-order-desc">
+        {{ active_order.package.name }} &bull; Placed {{ active_order.created_at|date:"M d, Y" }}
+      </div>
+    </div>
+  </div>
+  <a href="{% url 'dashboard:order_detail' active_order.order_number %}" class="btn btn-sm btn-secondary">
+    <span>Track Fulfillment &rarr;</span>
+  </a>
+</div>
+{% endif %}
+
+<!-- ==========================================================================
+     1. DIGITAL IDENTITY HERO CARD (The Core Product Experience)
+     ========================================================================== -->
+<div class="dash-identity-card mb-5" role="region" aria-label="Digital Identity Card">
+  <div class="dash-identity-inner">
+    
+    <!-- Top Identity Details -->
+    <div class="dash-identity-header">
+      <div class="dash-identity-avatar-col">
+        <div class="dash-identity-avatar">
+          {% if profile.profile_type == 'business' and profile.business_logo %}
+            <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name|default:profile.full_name }}" width="64" height="64" loading="lazy" decoding="async">
+          {% elif profile.profile_image %}
+            <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="64" height="64" loading="lazy" decoding="async">
+          {% else %}
+            <span>
+              {% if profile.profile_type == 'business' and profile.business_name %}
+                {{ profile.business_name|make_list|first|upper }}
+              {% else %}
+                {{ profile.full_name|default:user.display_name|make_list|first|upper }}
+              {% endif %}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="dash-identity-info">
+        <div class="dash-identity-title-row">
+          <h1 class="dash-identity-name">
             {% if profile.profile_type == 'business' and profile.business_name %}
               {{ profile.business_name }}
             {% else %}
               {{ profile.full_name|default:user.display_name }}
             {% endif %}
-          </span>
-          <span class="badge badge-silver" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
-            {% if profile.profile_type == 'business' %}Business Profile{% else %}Personal Identity{% endif %}
-          </span>
-          <span class="badge badge-{% if profile.slug %}active{% else %}pending{% endif %}" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
+          </h1>
+          <span class="badge badge-{% if profile.slug %}active{% else %}pending{% endif %}">
             <span class="dot dot-{% if profile.slug %}active{% else %}pending{% endif %}"></span>
             {% if profile.slug %}Live Active{% else %}Setup Pending{% endif %}
           </span>
         </div>
-        <div class="overview-hero-headline">
+
+        <div class="dash-identity-role">
           {% if profile.profile_type == 'business' %}
             {{ profile.business_category|default:profile.title|default:"Business & Enterprise Profile" }}
           {% else %}
-            {{ profile.title|default:"Professional Profile" }}
+            {{ profile.title|default:"Professional Digital Profile" }}
           {% endif %}
         </div>
-        <div class="overview-hero-url-row">
-          {% if profile.slug %}
-            <span>Public URL:</span>
-            <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="overview-hero-url-link">
-              /u/{{ profile.slug }}/
-            </a>
-            <button type="button" class="btn btn-ghost btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem;" onclick="copyProfileUrl(this, '{{ request.scheme }}://{{ request.get_host }}{% url 'profiles:public_profile' profile.slug %}')">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+
+        <!-- Public URL with 1-Tap Copy & View -->
+        {% if profile.slug %}
+        <div class="dash-identity-link-pill">
+          <span class="dash-link-text">/u/{{ profile.slug }}/</span>
+          <div class="dash-link-actions">
+            <button type="button" class="dash-copy-btn" onclick="copyProfileUrl(this, '{{ request.scheme }}://{{ request.get_host }}{% url 'profiles:public_profile' profile.slug %}')" title="Copy public profile link" aria-label="Copy public link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-          {% else %}
-            <span class="text-muted">Public link pending setup completion</span>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Profile Action Buttons -->
-    <div class="d-flex items-center gap-2 flex-wrap">
-      {% if profile.slug %}
-        <a href="{% url 'dashboard:share' %}" class="btn btn-secondary btn-sm">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span>QR &amp; Share</span>
-        </a>
-      {% else %}
-        <a href="{% url 'dashboard:onboarding' %}" class="btn btn-primary btn-sm">
-          <span>Complete Setup &rarr;</span>
-        </a>
-      {% endif %}
-      <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-secondary btn-sm">
-        <span>Edit</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Middle: Real Database Profile Completion Meter -->
-  <div class="profile-completion-box">
-    <div class="completion-header-row">
-      <div class="completion-title">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>Profile Completeness ({{ completed_checklist_count }}/{{ total_checklist_count }} Sections)</span>
-      </div>
-      <div class="completion-score-badge">{{ completion_percentage }}% Complete</div>
-    </div>
-    <div class="completion-track" role="progressbar" aria-valuenow="{{ completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
-      <div class="completion-fill" style="width: {{ completion_percentage }}%;"></div>
-    </div>
-    <div class="completion-pills-row">
-      {% for item in checklist %}
-        <span class="chk-pill {% if item.done %}done{% endif %}">
-          {% if item.done %}✓{% else %}○{% endif %} {{ item.label }}
-        </span>
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- Bottom: Hardware Companion Strip -->
-  <div class="overview-hero-footer">
-    <div class="card-status-pill">
-      {% if primary_card %}
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        <span>Paired NFC Card: <strong style="font-family: var(--font-mono); color: #fff;">{{ primary_card.card_code }}</strong> &bull; <span class="badge badge-{% if primary_card.status == 'ACTIVE' %}active{% else %}pending{% endif %}" style="font-size: 0.7rem; padding: 0.1rem 0.45rem;">{{ primary_card.get_status_display }}</span></span>
-      {% else %}
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        <span>Physical NFC Card: <em style="color: var(--text-muted);">Not paired yet (Optional companion for in-person tap)</em></span>
-      {% endif %}
-    </div>
-    <div class="d-flex gap-2">
-      {% if primary_card %}
-        <a href="{% url 'dashboard:card_manage' %}" class="btn btn-ghost btn-sm" style="font-size: 0.8rem;">
-          <span>Manage Card Hardware &rarr;</span>
-        </a>
-      {% else %}
-        <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm" style="font-size: 0.8rem;">
-          <span>Order Smart Card</span>
-        </a>
-        <a href="{% url 'dashboard:card_manage' %}" class="btn btn-secondary btn-sm" style="font-size: 0.8rem;">
-          <span>Activate Existing Card</span>
-        </a>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<!-- ==========================================================================
-     2. HELPFUL NEXT STEPS (Conditional Guides Without Nagging)
-     ========================================================================== -->
-{% if not is_profile_configured %}
-<!-- Prompt for Incomplete Profile -->
-<div class="card mb-6" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.16) 0%, rgba(30, 41, 59, 0.75) 100%); border: 1.5px solid rgba(59, 130, 246, 0.4); box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
-  <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.5); display: flex; align-items: center; justify-content: center; color: #60A5FA; flex-shrink: 0;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </div>
-      <div>
-        <h2 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0 0 0.25rem 0;">Finish Setting Up Your Profile</h2>
-        <p style="font-size: 0.85rem; color: #CBD5E1; margin: 0;">Launch your digital profile in under 2 minutes to generate your live shareable link and QR code.</p>
-      </div>
-    </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-      <a href="{% url 'dashboard:onboarding' %}" class="btn btn-primary btn-sm" style="box-shadow: 0 2px 10px rgba(37,99,235,0.35);">
-        <span>Start Guided Setup &rarr;</span>
-      </a>
-    </div>
-  </div>
-</div>
-{% elif not has_links %}
-<!-- Suggestion to Add Links for configured profiles without links -->
-<div class="card mb-6" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(20, 21, 28, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.12);">
-  <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 0.85rem;">
-      <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center; color: var(--silver-accent); flex-shrink: 0;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      </div>
-      <div>
-        <div style="font-family: var(--font-heading); font-weight: 700; font-size: 0.925rem; color: #fff;">Connect Your Social &amp; Action Links</div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Add WhatsApp, LinkedIn, or custom portfolio buttons so visitors can connect with you directly.</div>
-      </div>
-    </div>
-    <a href="{% url 'dashboard:links_manage' %}" class="btn btn-secondary btn-sm">
-      <span>Add Links Now &rarr;</span>
-    </a>
-  </div>
-</div>
-{% endif %}
-
-{% if active_order %}
-<!-- Active Order Fulfillment Tracker -->
-<div class="card mb-6" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%); border: 1px solid rgba(59, 130, 246, 0.35);">
-  <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 0.85rem;">
-      <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; color: #60A5FA; flex-shrink: 0;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      </div>
-      <div>
-        <div style="font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; color: #93C5FD; display: flex; align-items: center; gap: 0.5rem;">
-          <span>Active Order #{{ active_order.order_number }}</span>
-          <span class="badge badge-{% if active_order.order_status == 'completed' %}active{% else %}pending{% endif %}">
-            {{ active_order.get_order_status_display }}
-          </span>
-        </div>
-        <div style="font-size: 0.8125rem; color: #CBD5E1; margin-top: 2px;">
-          {{ active_order.package.name }} &bull; Placed {{ active_order.created_at|date:"M d, Y" }}
-        </div>
-      </div>
-    </div>
-    <a href="{% url 'dashboard:order_detail' active_order.order_number %}" class="btn btn-sm btn-primary">
-      Track Fulfillment Progress &rarr;
-    </a>
-  </div>
-</div>
-{% endif %}
-
-<!-- ==========================================================================
-     3. PRIMARY ACTIONS HUB (Clear 6-Action Responsive Grid)
-     ========================================================================== -->
-<div class="quick-actions-grid">
-  <!-- 1. Edit Profile -->
-  <a href="{% url 'dashboard:profile_edit' %}" class="dash-action-card">
-    <div class="dash-action-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </div>
-    <div class="dash-action-body">
-      <div class="dash-action-title">Edit Profile</div>
-      <div class="dash-action-desc">
-        {% if profile.profile_type == 'business' %}Update company info, category, logo{% else %}Update identity, bio, contact details{% endif %}
-      </div>
-    </div>
-    <div class="dash-action-arrow">&rarr;</div>
-  </a>
-
-  <!-- 2. Share Profile & QR -->
-  <a href="{% url 'dashboard:share' %}" class="dash-action-card">
-    <div class="dash-action-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    </div>
-    <div class="dash-action-body">
-      <div class="dash-action-title">Share &amp; QR Code</div>
-      <div class="dash-action-desc">Download QR code and copy public link</div>
-    </div>
-    <div class="dash-action-arrow">&rarr;</div>
-  </a>
-
-  <!-- 3. Manage Links -->
-  <a href="{% url 'dashboard:links_manage' %}" class="dash-action-card">
-    <div class="dash-action-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-    </div>
-    <div class="dash-action-body">
-      <div class="dash-action-title">Manage Links</div>
-      <div class="dash-action-desc">Social profiles, WhatsApp, websites</div>
-    </div>
-    <div class="dash-action-arrow">&rarr;</div>
-  </a>
-
-  <!-- 4. Smart NFC Card -->
-  <a href="{% url 'dashboard:card_manage' %}" class="dash-action-card">
-    <div class="dash-action-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    </div>
-    <div class="dash-action-body">
-      <div class="dash-action-title">Smart NFC Card</div>
-      <div class="dash-action-desc">
-        {% if primary_card %}Paired: {{ primary_card.card_code }}{% else %}Order or activate physical card{% endif %}
-      </div>
-    </div>
-    <div class="dash-action-arrow">&rarr;</div>
-  </a>
-
-  <!-- 5. Received Leads -->
-  <a href="{% url 'dashboard:contacts_list' %}" class="dash-action-card">
-    <div class="dash-action-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    </div>
-    <div class="dash-action-body">
-      <div class="dash-action-title">Received Leads</div>
-      <div class="dash-action-desc">
-        {{ received_contacts_count }} shared contact{{ received_contacts_count|pluralize }}
-      </div>
-    </div>
-    <div class="dash-action-arrow">&rarr;</div>
-  </a>
-
-  <!-- 6. Traffic Analytics -->
-  <a href="{% url 'dashboard:analytics_view' %}" class="dash-action-card">
-    <div class="dash-action-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    </div>
-    <div class="dash-action-body">
-      <div class="dash-action-title">Live Analytics</div>
-      <div class="dash-action-desc">Inspect taps, views, clicks</div>
-    </div>
-    <div class="dash-action-arrow">&rarr;</div>
-  </a>
-</div>
-
-<!-- ==========================================================================
-     4. REAL PERFORMANCE OVERVIEW (Only Genuine Database Records)
-     ========================================================================== -->
-<div class="stat-grid">
-  <!-- Card Taps & Scans -->
-  <div class="stat-card">
-    <div class="stat-card-title">
-      <span>Card Taps</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    </div>
-    <div class="stat-card-value">{{ card_taps }}</div>
-    <div class="stat-card-delta {% if card_taps_delta == 0 %}neutral{% endif %}">
-      {% if card_taps_delta > 0 %}+{{ card_taps_delta }}% (7d){% else %}0% change{% endif %}
-    </div>
-  </div>
-
-  <!-- Profile Views -->
-  <div class="stat-card">
-    <div class="stat-card-title">
-      <span>Profile Views</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-    </div>
-    <div class="stat-card-value">{{ profile_views }}</div>
-    <div class="stat-card-delta {% if profile_views_delta == 0 %}neutral{% endif %}">
-      {% if profile_views_delta > 0 %}+{{ profile_views_delta }}% (7d){% else %}0% change{% endif %}
-    </div>
-  </div>
-
-  <!-- WhatsApp Inquiries -->
-  <div class="stat-card">
-    <div class="stat-card-title">
-      <span>WhatsApp Taps</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-    </div>
-    <div class="stat-card-value">{{ whatsapp_clicks }}</div>
-    <div class="stat-card-delta {% if whatsapp_delta == 0 %}neutral{% endif %}">
-      {% if whatsapp_delta > 0 %}+{{ whatsapp_delta }}% (7d){% else %}0% change{% endif %}
-    </div>
-  </div>
-
-  <!-- External Link Clicks -->
-  <div class="stat-card">
-    <div class="stat-card-title">
-      <span>Website Clicks</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    </div>
-    <div class="stat-card-value">{{ website_visits }}</div>
-    <div class="stat-card-delta {% if website_delta == 0 %}neutral{% endif %}">
-      {% if website_delta > 0 %}+{{ website_delta }}% (7d){% else %}0% change{% endif %}
-    </div>
-  </div>
-</div>
-
-{% if card_taps == 0 and profile_views == 0 and whatsapp_clicks == 0 and website_visits == 0 %}
-<div style="font-size: 0.8125rem; color: var(--text-muted); text-align: center; margin-top: -0.75rem; margin-bottom: 1.75rem;">
-  No visits recorded yet. Share your profile link or tap your NFC card to start seeing live activity.
-</div>
-{% endif %}
-
-<!-- ==========================================================================
-     5. WORKSPACE 2-COLUMN SECTION: Smart Card & Links Manager
-     ========================================================================== -->
-<div class="dashboard-grid-2">
-
-  <!-- Smart Card Hub -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Smart NFC Card</h2>
-      <a href="{% url 'dashboard:card_manage' %}" class="btn btn-secondary btn-sm">Manage Card</a>
-    </div>
-
-    {% if primary_card %}
-      <div class="dash-card-mockup mb-4">
-        <div class="d-flex justify-between items-center">
-          <div class="card-mockup-chip">
-            <div class="card-chip-icon"></div>
+            <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="dash-visit-btn" title="Open live public profile" aria-label="View live profile in new tab">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span>View</span>
+            </a>
           </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/><path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/><path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
         </div>
-        <div class="text-center">
-          <div style="font-family: var(--font-heading); font-size: 0.9rem; font-weight: 800; letter-spacing: 0.18em; color: var(--text-primary);">UZYRA</div>
-        </div>
-        <div class="d-flex justify-between items-end">
-          <span class="badge badge-{% if primary_card.status == 'ACTIVE' %}active{% else %}pending{% endif %}">
-            <span class="dot dot-{% if primary_card.status == 'ACTIVE' %}active{% else %}pending{% endif %}"></span>
-            {{ primary_card.get_status_display }}
-          </span>
-          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--silver-steel);">{{ primary_card.card_code }}</span>
-        </div>
-      </div>
-
-      <div class="d-flex gap-2">
-        <a href="{% url 'dashboard:card_manage' %}" class="btn btn-secondary btn-sm flex-1">Card Details</a>
-        {% if primary_card.qr_code_image %}
-          <a href="{{ primary_card.qr_code_image.url }}" download class="btn btn-ghost btn-sm" title="Download QR Code">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </a>
         {% endif %}
       </div>
-    {% else %}
-      <div class="dash-empty-box">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" class="mb-2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        <p>You do not have an active physical smart card linked to your account yet.</p>
-        <div class="d-flex justify-center gap-2">
-          <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm">Order Smart Card</a>
-          <a href="{% url 'dashboard:card_manage' %}" class="btn btn-secondary btn-sm">Activate Card</a>
-        </div>
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- Links & Social Hub -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Links &amp; Social Hub</h2>
-      <a href="{% url 'dashboard:links_manage' %}" class="btn btn-secondary btn-sm">Manage Links</a>
     </div>
 
-    {% if profile.social_links.exists or profile.custom_links.exists %}
-      <div class="d-flex flex-column gap-2 mb-4">
-        {% for link in profile.social_links.all|slice:":3" %}
-          <div class="link-item">
-            <div class="link-item-left">
-              <div class="link-icon-box">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              </div>
-              <div class="link-info">
-                <div class="title">{{ link.get_platform_display }}</div>
-                <div class="url">{{ link.url }}</div>
-              </div>
-            </div>
-            <span class="badge badge-{% if link.is_active %}active{% else %}pending{% endif %}">
-              {% if link.is_active %}Active{% else %}Disabled{% endif %}
-            </span>
-          </div>
-        {% endfor %}
-      </div>
-      <a href="{% url 'dashboard:links_manage' %}" class="btn btn-secondary btn-sm btn-block">+ Add or Edit Links</a>
-    {% else %}
-      <div class="dash-empty-box">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" class="mb-2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <p>No social media or custom action links added yet. Add links to display on your public profile.</p>
-        <a href="{% url 'dashboard:links_manage' %}" class="btn btn-primary btn-sm">+ Add Your First Link</a>
-      </div>
-    {% endif %}
-  </div>
-</div>
-
-<!-- ==========================================================================
-     6. WEBSITE HUB (Real Database Records)
-     ========================================================================== -->
-<div class="card mb-6 mt-6">
-  <div class="card-header">
-    <h2 class="card-title">Website Management</h2>
-    <a href="{% url 'dashboard:website_manage' %}" class="btn btn-secondary btn-sm">Manage Website</a>
-  </div>
-
-  {% if primary_website %}
-    <div class="link-item mb-2" style="border: 1px solid var(--border-primary); background: var(--bg-surface); border-radius: var(--radius-sm); padding: 1.25rem;">
-      <div class="d-flex items-center gap-3">
-        <div style="width: 48px; height: 48px; background: var(--bg-primary); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        </div>
-        <div class="flex-1">
-          <div class="font-semibold text-primary" style="font-size: 1rem;">
-            {{ primary_website.title }}
-          </div>
-          <div class="text-caption mt-1 font-mono" style="color: var(--silver-steel);">
-            {{ primary_website.domain|default:"Pending Domain Setup" }}
-          </div>
-        </div>
-        <div class="text-right">
-          <span class="badge badge-{% if primary_website.status == 'live' %}active{% else %}pending{% endif %} mb-2">
-            <span class="dot dot-{% if primary_website.status == 'live' %}active{% else %}pending{% endif %}"></span>
-            {{ primary_website.get_status_display }}
-          </span>
-          {% if primary_website.live_url %}
-            <div class="mt-1">
-              <a href="{{ primary_website.live_url }}" target="_blank" class="text-silver font-medium" style="font-size: 0.8125rem;">Visit Site &nearr;</a>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  {% else %}
-    <div class="dash-empty-box">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" class="mb-2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <p class="mb-0">You don't have a custom website connected to your account. Elevate your brand with a managed web suite.</p>
-      <div class="mt-3">
-        <a href="{% url 'core:websites' %}" class="btn btn-primary btn-sm">Explore Packages</a>
-      </div>
-    </div>
-  {% endif %}
-</div>
-
-<!-- ==========================================================================
-     7. RECENT ORDERS (Real Database Records)
-     ========================================================================== -->
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">Recent Orders</h2>
-    <a href="{% url 'dashboard:orders_list' %}" class="text-silver font-medium" style="font-size: 0.8125rem;">View All Orders &rarr;</a>
-  </div>
-
-  {% if orders %}
-    <div class="d-flex flex-column gap-2">
-      {% for order in orders %}
-        <a href="{% url 'dashboard:order_detail' order.order_number %}" class="link-item">
-          <div>
-            <div class="font-semibold text-primary" style="font-size: 0.875rem;">
-              #{{ order.order_number }} &mdash; {{ order.package.name }}
-            </div>
-            <div class="text-caption mt-1">{{ order.created_at|date:"M d, Y" }}</div>
-          </div>
-          <span class="badge badge-{% if order.order_status == 'completed' %}active{% elif order.payment_status == 'pending' %}pending{% else %}silver{% endif %}">
-            {{ order.get_order_status_display }}
-          </span>
+    <!-- Primary Action Buttons Row -->
+    <div class="dash-identity-actions">
+      {% if profile.slug %}
+        <a href="{% url 'dashboard:share' %}" class="btn btn-primary dash-cta-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Share &amp; QR Code</span>
         </a>
-      {% endfor %}
+      {% else %}
+        <a href="{% url 'dashboard:onboarding' %}" class="btn btn-primary dash-cta-btn">
+          <span>Complete Profile &rarr;</span>
+        </a>
+      {% endif %}
+      <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-secondary dash-cta-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>Edit Profile</span>
+      </a>
     </div>
-  {% else %}
-    <div class="dash-empty-box">
-      <p class="mb-0">No hardware or suite orders yet. Explore packages to order custom NFC cards or complete web suites.</p>
+
+    <!-- Quiet Completion Meter -->
+    <div class="dash-identity-completion">
+      <div class="dash-completion-header">
+        <span class="dash-completion-label">
+          {% if completion_percentage == 100 %}
+            ✓ Profile Complete &amp; Ready
+          {% else %}
+            Profile Setup: {{ completion_percentage }}% complete
+          {% endif %}
+        </span>
+        <span class="dash-completion-pct">{{ completed_checklist_count }}/{{ total_checklist_count }}</span>
+      </div>
+      <div class="completion-track" role="progressbar" aria-valuenow="{{ completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="completion-fill" style="width: {{ completion_percentage }}%;"></div>
+      </div>
     </div>
-  {% endif %}
+
+  </div>
 </div>
+
+<!-- ==========================================================================
+     2. QUICK VITAL STATS AT A GLANCE
+     ========================================================================== -->
+<div class="dash-stats-row mb-5" role="region" aria-label="Vital Statistics">
+  <div class="dash-stat-tile">
+    <div class="dash-stat-top">
+      <span class="dash-stat-label">Profile Views</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <div class="dash-stat-num">{{ profile_views }}</div>
+    <div class="dash-stat-sub">Live visitors</div>
+  </div>
+
+  <div class="dash-stat-tile">
+    <div class="dash-stat-top">
+      <span class="dash-stat-label">Card Taps</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    </div>
+    <div class="dash-stat-num">{{ card_taps }}</div>
+    <div class="dash-stat-sub">NFC &amp; QR scans</div>
+  </div>
+
+  <div class="dash-stat-tile">
+    <div class="dash-stat-top">
+      <span class="dash-stat-label">Leads Received</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    </div>
+    <div class="dash-stat-num">{{ received_contacts_count }}</div>
+    <div class="dash-stat-sub">Exchanged contacts</div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     3. THE 3 IMMEDIATE TOOLS (Links, Smart Card, Contacts)
+     ========================================================================== -->
+<div class="dash-essentials-grid mb-5" role="region" aria-label="Core Tools">
+
+  <!-- Tool 1: Links & Socials -->
+  <a href="{% url 'dashboard:links_manage' %}" class="dash-tool-card">
+    <div class="dash-tool-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    </div>
+    <div class="dash-tool-body">
+      <div class="dash-tool-title">Links &amp; Socials</div>
+      <div class="dash-tool-desc">
+        {% if has_links %}
+          {{ profile.social_links.count }} social &amp; action link{{ profile.social_links.count|pluralize }}
+        {% else %}
+          Add WhatsApp, LinkedIn &amp; socials
+        {% endif %}
+      </div>
+    </div>
+    <div class="dash-tool-action">Manage &rarr;</div>
+  </a>
+
+  <!-- Tool 2: Smart NFC Card -->
+  <a href="{% url 'dashboard:card_manage' %}" class="dash-tool-card">
+    <div class="dash-tool-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    </div>
+    <div class="dash-tool-body">
+      <div class="dash-tool-title">Smart NFC Card</div>
+      <div class="dash-tool-desc">
+        {% if primary_card %}
+          Paired: {{ primary_card.card_code }} &bull; {{ primary_card.get_status_display }}
+        {% else %}
+          Order or activate physical smart card
+        {% endif %}
+      </div>
+    </div>
+    <div class="dash-tool-action">{% if primary_card %}Card &rarr;{% else %}Pair &rarr;{% endif %}</div>
+  </a>
+
+  <!-- Tool 3: Contacts Received -->
+  <a href="{% url 'dashboard:contacts_list' %}" class="dash-tool-card">
+    <div class="dash-tool-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="dash-tool-body">
+      <div class="dash-tool-title">Contacts Received</div>
+      <div class="dash-tool-desc">
+        {{ received_contacts_count }} shared connection{{ received_contacts_count|pluralize }}
+      </div>
+    </div>
+    <div class="dash-tool-action">View &rarr;</div>
+  </a>
+
+</div>
+
+<script>
+function copyProfileUrl(btn, url) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function() {
+      var origHtml = btn.innerHTML;
+      btn.innerHTML = '<span>Copied!</span>';
+      btn.style.color = '#4ade80';
+      setTimeout(function() {
+        btn.innerHTML = origHtml;
+        btn.style.color = '';
+      }, 2000);
+    }).catch(function() {
+      fallbackCopy(url, btn);
+    });
+  } else {
+    fallbackCopy(url, btn);
+  }
+}
+
+function fallbackCopy(text, btn) {
+  var textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-9999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    var origHtml = btn.innerHTML;
+    btn.innerHTML = '<span>Copied!</span>';
+    btn.style.color = '#4ade80';
+    setTimeout(function() {
+      btn.innerHTML = origHtml;
+      btn.style.color = '';
+    }, 2000);
+  } catch (err) {}
+  document.body.removeChild(textArea);
+}
+</script>
 {% endblock %}
