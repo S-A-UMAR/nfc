@@ -223,6 +223,9 @@ def verify_email_otp_view(request):
                     del request.session['pending_verification_email']
 
                 messages.success(request, "Email verified successfully! Your account is now fully active.")
+                user_profile = getattr(verified_user, 'profile', None)
+                if user_profile and not user_profile.title and not user_profile.business_name:
+                    return redirect('dashboard:onboarding')
                 return redirect('dashboard:overview')
             else:
                 messages.error(request, msg)

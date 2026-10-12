@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Sign In — UZYRA{% endblock %}
+{% block meta_description %}Sign in to your UZYRA account to manage your digital profile, smart card hardware, and live interactions.{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
@@ -23,15 +24,16 @@
         <span>UZYRA</span>
       </a>
       <h1 class="auth-title">Welcome Back</h1>
-      <p class="auth-subtitle">Sign in to manage your digital profile and smart cards</p>
+      <p class="auth-subtitle">Sign in to manage your digital profile and smart cards.</p>
     </div>
 
     <div class="auth-card">
-      <form method="post" action="{% url 'accounts:login' %}" novalidate>
+      <form id="login-form" method="post" action="{% url 'accounts:login' %}" novalidate>
         {% csrf_token %}
 
         {% if form.non_field_errors %}
-          <div class="alert alert-error" role="alert">
+          <div class="alert alert-error mb-4" role="alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span>{{ form.non_field_errors|first }}</span>
           </div>
         {% endif %}
@@ -41,7 +43,7 @@
           {{ form.username }}
           {% if form.username.errors %}
             <div class="form-error" role="alert">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               <span>{{ form.username.errors|first }}</span>
             </div>
           {% endif %}
@@ -52,18 +54,23 @@
             <label for="id_password" class="form-label" style="margin-bottom: 0;">Password</label>
             <a href="{% url 'accounts:password_reset' %}" class="text-caption text-silver" style="font-size: 0.8125rem; text-decoration: none;">Forgot password?</a>
           </div>
-          {{ form.password }}
+          <div style="position: relative;">
+            {{ form.password }}
+            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center;">
+              <svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
           {% if form.password.errors %}
             <div class="form-error" role="alert">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               <span>{{ form.password.errors|first }}</span>
             </div>
           {% endif %}
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block mt-4">
-          <span>Sign In</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <button type="submit" id="btn-submit-login" class="btn btn-primary btn-block mt-4">
+          <span id="btn-submit-login-text">Sign In</span>
+          <svg id="btn-submit-login-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </form>
 
@@ -76,4 +83,38 @@
     </div>
   </div>
 </div>
+
+<script>
+function togglePasswordVisibility(fieldId, btn) {
+  var input = document.getElementById(fieldId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    btn.setAttribute('aria-label', 'Hide password');
+  } else {
+    input.type = 'password';
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    btn.setAttribute('aria-label', 'Show password');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('login-form');
+  var submitBtn = document.getElementById('btn-submit-login');
+  var submitText = document.getElementById('btn-submit-login-text');
+  var submitIcon = document.getElementById('btn-submit-login-icon');
+
+  if (form && submitBtn) {
+    form.addEventListener('submit', function() {
+      if (form.checkValidity && !form.checkValidity()) return;
+      setTimeout(function() {
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = 'Signing in...';
+        if (submitIcon) submitIcon.style.display = 'none';
+      }, 50);
+    });
+  }
+});
+</script>
 {% endblock %}

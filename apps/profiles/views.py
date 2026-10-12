@@ -97,6 +97,114 @@ def download_vcard_view(request, slug):
 
 
 @login_required
+def onboarding_view(request):
+    """
+    First-time guided onboarding flow (/dashboard/onboarding/).
+    Guides new users through:
+      Step 1: Welcome & Overview
+      Step 2: Choose Profile Type (Personal Identity vs Business Profile)
+      Step 3: Enter Profile Details (Identity, Contact Hub, Social/Links)
+      Step 4: Review, Preview & Launch Profile
+    """
+    profile, _ = Profile.objects.get_or_create(
+        user=request.user,
+        defaults={'full_name': request.user.display_name, 'email': request.user.email}
+    )
+
+    if request.method == 'POST':
+        profile_type = request.POST.get('profile_type', 'personal').strip()
+        if profile_type not in ['personal', 'business']:
+            profile_type = 'personal'
+        profile.profile_type = profile_type
+
+        # Basic identity
+        full_name = request.POST.get('full_name', '').strip()
+        if full_name:
+            profile.full_name = full_name
+        
+        profile.title = request.POST.get('title', '').strip()
+        profile.bio = request.POST.get('bio', '').strip()
+
+        # Contact Hub
+        profile.phone = request.POST.get('phone', '').strip()
+        profile.whatsapp = request.POST.get('whatsapp', '').strip()
+        email = request.POST.get('email', '').strip()
+        if email:
+            profile.email = email
+        profile.location = request.POST.get('location', '').strip()
+        profile.website_url = request.POST.get('website_url', '').strip()
+
+        # Business information
+        if profile_type == 'business':
+            biz_name = request.POST.get('business_name', '').strip()
+            if biz_name:
+                profile.business_name = biz_name
+            profile.business_category = request.POST.get('business_category', '').strip()
+            profile.business_description = request.POST.get('business_description', '').strip()
+            profile.address = request.POST.get('address', '').strip()
+
+        # Image uploads if provided
+        if 'profile_image' in request.FILES:
+            from apps.core.validators import validate_image_upload
+            img = request.FILES['profile_image']
+            try:
+                validate_image_upload(img)
+                profile.profile_image = img
+            except Exception:
+                pass
+
+        if 'business_logo' in request.FILES and profile_type == 'business':
+            from apps.core.validators import validate_image_upload
+            logo = request.FILES['business_logo']
+            try:
+                validate_image_upload(logo)
+                profile.business_logo = logo
+            except Exception:
+                pass
+
+        # Save profile to generate slug and persist attributes
+        profile.save()
+
+        # Handle social links if provided
+        social_instagram = request.POST.get('social_instagram', '').strip()
+        if social_instagram:
+            handle = social_instagram.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '').strip('@').strip('/')
+            ig_url = f"https://instagram.com/{handle}"
+            SocialLink.objects.update_or_create(
+                profile=profile, platform='instagram',
+                defaults={'url': ig_url, 'display_label': 'Instagram', 'is_active': True}
+            )
+
+        social_linkedin = request.POST.get('social_linkedin', '').strip()
+        if social_linkedin:
+            SocialLink.objects.update_or_create(
+                profile=profile, platform='linkedin',
+                defaults={'url': social_linkedin, 'display_label': 'LinkedIn', 'is_active': True}
+            )
+
+        social_twitter = request.POST.get('social_twitter', '').strip()
+        if social_twitter:
+            handle = social_twitter.replace('https://x.com/', '').replace('https://twitter.com/', '').strip('@').strip('/')
+            x_url = f"https://x.com/{handle}"
+            SocialLink.objects.update_or_create(
+                profile=profile, platform='x_twitter',
+                defaults={'url': x_url, 'display_label': 'X (Twitter)', 'is_active': True}
+            )
+
+        request.session['onboarding_completed'] = True
+        messages.success(request, f"Welcome to UZYRA! Your {profile.get_profile_type_display()} is set up and ready to share.")
+        return redirect('dashboard:overview')
+
+    # GET request
+    step = request.GET.get('step', '1')
+    return render(request, 'dashboard/onboarding.html', {
+        'profile': profile,
+        'step': step,
+        'user': request.user,
+    })
+
+
+@login_required
 def profile_edit_view(request):
     """Dashboard profile manager."""
     profile, created = Profile.objects.get_or_create(

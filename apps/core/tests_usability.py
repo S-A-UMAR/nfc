@@ -118,6 +118,7 @@ class UsabilityJourneyTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            'profile_type': 'personal',
             'full_name': 'Jane Doe Updated',
             'title': 'Senior Product Designer',
             'bio': 'Designing simple digital tools for modern professionals.',
@@ -345,4 +346,164 @@ class Phase1HomepageRedesignTests(TestCase):
         self.assertContains(response, "Can I create a profile without buying a physical card?")
         self.assertContains(response, "Does the person tapping my card need to install an app?")
         self.assertContains(response, "Does the card work on both iPhone and Android?")
+
+
+class Phase2OnboardingRedesignTests(TestCase):
+    """
+    Automated tests for UZYRA Phase 2:
+    Registration polish, Guided 4-step onboarding wizard,
+    Personal vs Business profiles, and profile editor improvements.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.password = "SecurePassword123!"
+        self.user = User.objects.create_user(
+            email="onboarding_user@example.com",
+            password=self.password,
+            first_name="Ada",
+            last_name="Lovelace",
+            is_email_verified=True
+        )
+        self.profile, _ = Profile.objects.get_or_create(user=self.user)
+
+    def test_registration_view_renders_clarity_features(self):
+        """Registration view includes trust strip, required indicators, and login link."""
+        response = self.client.get(reverse('accounts:register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Create Your Account")
+        self.assertContains(response, "Free Profile Creation")
+        self.assertContains(response, "Instant Share Link")
+        self.assertContains(response, "Already have an account?")
+        self.assertContains(response, reverse('accounts:login'))
+
+    def test_registration_validation_password_mismatch(self):
+        """Form rejects mismatched passwords with inline error."""
+        data = {
+            'first_name': 'Test',
+            'last_name': 'User',
+            'email': 'new_user@example.com',
+            'phone': '+2348011112222',
+            'password': 'Password123!',
+            'password_confirm': 'DifferentPassword123!',
+            'agree_terms': True
+        }
+        response = self.client.post(reverse('accounts:register'), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Passwords do not match")
+
+    def test_login_view_renders_polished_form(self):
+        """Login page renders toggle password button and clean form."""
+        response = self.client.get(reverse('accounts:login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Welcome Back")
+        self.assertContains(response, "Sign In")
+        self.assertContains(response, "togglePassword")
+
+    def test_onboarding_requires_login(self):
+        """Unauthenticated visitor is redirected to login."""
+        response = self.client.get(reverse('dashboard:onboarding'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('accounts:login'), response.url)
+
+    def test_onboarding_wizard_renders_steps(self):
+        """Authenticated user accesses 4-step guided onboarding wizard."""
+        self.client.login(email=self.user.email, password=self.password)
+        response = self.client.get(reverse('dashboard:onboarding'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Welcome to UZYRA")
+        self.assertContains(response, "Choose Your Profile Type")
+        self.assertContains(response, "Personal Profile")
+        self.assertContains(response, "Business Profile")
+
+    def test_onboarding_completes_personal_profile(self):
+        """Saving personal profile sets profile_type, title, bio, contacts, links, and generates slug."""
+        self.client.login(email=self.user.email, password=self.password)
+        post_data = {
+            'profile_type': 'personal',
+            'full_name': 'Ada Lovelace',
+            'title': 'Computing Pioneer & Consultant',
+            'bio': 'Analytic engine programmer and mathematician.',
+            'phone': '+2348012345678',
+            'whatsapp': '+2348012345678',
+            'email': 'ada@example.com',
+            'website_url': 'https://adalovelace.io',
+            'location': 'London / Lagos',
+            'social_instagram': 'adalovelace',
+            'social_linkedin': 'https://linkedin.com/in/ada-lovelace',
+        }
+        response = self.client.post(reverse('dashboard:onboarding'), post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('dashboard:overview'))
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.profile_type, 'personal')
+        self.assertEqual(self.profile.title, 'Computing Pioneer & Consultant')
+        self.assertEqual(self.profile.phone, '+2348012345678')
+        self.assertTrue(bool(self.profile.slug))
+        self.assertTrue(self.profile.social_links.filter(platform='instagram').exists())
+        self.assertTrue(self.profile.social_links.filter(platform='linkedin').exists())
+
+    def test_onboarding_completes_business_profile(self):
+        """Saving business profile sets profile_type, business_name, category, description, and slug."""
+        self.client.login(email=self.user.email, password=self.password)
+        post_data = {
+            'profile_type': 'business',
+            'full_name': 'Ada Lovelace',
+            'business_name': 'Analytical Engines Ltd',
+            'business_category': 'Technology & Computing',
+            'business_description': 'Pioneering general-purpose computational architectures.',
+            'phone': '+2348099998888',
+            'whatsapp': '+2348099998888',
+            'email': 'biz@example.com',
+            'website_url': 'https://analyticalengines.com',
+            'location': 'Lagos, Nigeria',
+        }
+        response = self.client.post(reverse('dashboard:onboarding'), post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('dashboard:overview'))
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.profile_type, 'business')
+        self.assertEqual(self.profile.business_name, 'Analytical Engines Ltd')
+        self.assertEqual(self.profile.business_category, 'Technology & Computing')
+        self.assertTrue(bool(self.profile.slug))
+
+    def test_dashboard_overview_displays_onboarding_callout_for_incomplete_profile(self):
+        """Incomplete profile displays prominent banner linking to onboarding."""
+        self.profile.title = ""
+        self.profile.business_name = ""
+        self.profile.save()
+
+        self.client.login(email=self.user.email, password=self.password)
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Finish Setting Up Your Profile")
+        self.assertContains(response, reverse('dashboard:onboarding'))
+
+    def test_profile_edit_renders_and_updates_profile_type(self):
+        """Profile editor allows switching profile type between personal and business."""
+        self.client.login(email=self.user.email, password=self.password)
+        response = self.client.get(reverse('dashboard:profile_edit'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Profile Type & Personal Identity")
+        self.assertContains(response, "Personal Profile")
+        self.assertContains(response, "Business Profile")
+
+        # Submit change to business profile
+        edit_data = {
+            'profile_type': 'business',
+            'full_name': 'Ada Lovelace',
+            'title': 'Managing Director',
+            'business_name': 'Analytical Dynamics',
+            'business_category': 'Technology',
+            'email': 'ada@example.com',
+        }
+        post_resp = self.client.post(reverse('dashboard:profile_edit'), edit_data)
+        self.assertEqual(post_resp.status_code, 302)
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.profile_type, 'business')
+        self.assertEqual(self.profile.business_name, 'Analytical Dynamics')
+
 

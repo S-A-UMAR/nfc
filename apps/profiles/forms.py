@@ -2,9 +2,12 @@ from django import forms
 from .models import Profile, SocialLink, CustomLink
 
 class ProfileForm(forms.ModelForm):
+    profile_type = forms.ChoiceField(choices=Profile.PROFILE_TYPES, required=False, widget=forms.Select(attrs={'class': 'form-select'}))
+
     class Meta:
         model = Profile
         fields = [
+            'profile_type',
             'full_name', 'title', 'bio',
             'profile_image', 'cover_image',
             'phone', 'whatsapp', 'email', 'website_url', 'location', 'address',
@@ -15,6 +18,7 @@ class ProfileForm(forms.ModelForm):
             'is_search_indexed'
         ]
         widgets = {
+            'profile_type': forms.Select(attrs={'class': 'form-select'}),
             'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Full Name'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Founder | Software Engineer'}),
             'bio': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'Tell visitors about what you do...'}),
@@ -34,6 +38,12 @@ class ProfileForm(forms.ModelForm):
             'stat_followers': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 10K+ Followers'}),
             'cta_banner_text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "e.g. Let's build something great together."}),
         }
+
+    def clean_profile_type(self):
+        val = self.cleaned_data.get('profile_type')
+        if not val:
+            return getattr(self.instance, 'profile_type', None) or 'personal'
+        return val
 
     def clean_profile_image(self):
         from apps.core.validators import validate_image_upload

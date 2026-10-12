@@ -9,26 +9,58 @@ User = get_user_model()
 class UserRegisterForm(forms.ModelForm):
     first_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First name'})
+        error_messages={'required': 'Please enter your first name.'},
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. Alex',
+            'autocomplete': 'given-name',
+            'autofocus': True
+        })
     )
     last_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last name'})
+        error_messages={'required': 'Please enter your last name.'},
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. Cole',
+            'autocomplete': 'family-name'
+        })
     )
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'name@example.com'})
+        error_messages={
+            'required': 'Please enter your email address.',
+            'invalid': 'Please enter a valid email address (e.g. name@example.com).'
+        },
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'name@example.com',
+            'autocomplete': 'email'
+        })
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Create a secure password'}),
+        required=True,
+        error_messages={'required': 'Please create a password for your account.'},
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'At least 8 characters',
+            'autocomplete': 'new-password'
+        }),
         min_length=8
     )
     password_confirm = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm your password'}),
+        required=True,
+        error_messages={'required': 'Please confirm your password.'},
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Re-enter your password',
+            'autocomplete': 'new-password'
+        }),
         min_length=8
     )
     agree_terms = forms.BooleanField(
         required=True,
+        error_messages={'required': 'You must agree to the Terms of Service and Privacy Policy to continue.'},
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
@@ -36,13 +68,17 @@ class UserRegisterForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'email', 'phone']
         widgets = {
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+234 800 000 0000'}),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+234 800 000 0000',
+                'autocomplete': 'tel'
+            }),
         }
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError("An account with this email address already exists.")
+            raise forms.ValidationError("An account with this email address already exists. Please sign in instead.")
         return email.lower().strip()
 
     def clean(self):
@@ -51,7 +87,7 @@ class UserRegisterForm(forms.ModelForm):
         p2 = cleaned_data.get('password_confirm')
         if p1 and p2:
             if p1 != p2:
-                self.add_error('password_confirm', "Passwords do not match.")
+                self.add_error('password_confirm', "Passwords do not match. Please re-enter them carefully.")
             else:
                 # Enforce Django password validators
                 try:
@@ -59,6 +95,7 @@ class UserRegisterForm(forms.ModelForm):
                 except ValidationError as e:
                     self.add_error('password', e)
         return cleaned_data
+
 
 
 class UserLoginForm(AuthenticationForm):

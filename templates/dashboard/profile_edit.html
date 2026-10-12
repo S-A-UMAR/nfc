@@ -46,9 +46,40 @@
   <div class="card mb-6">
     <div class="card-header">
       <div>
-        <h2 class="card-title">1. Personal Identity</h2>
-        <p class="text-caption mb-0">Your primary details presented on your digital card and profile.</p>
+        <h2 class="card-title">1. Profile Type & Personal Identity</h2>
+        <p class="text-caption mb-0">Choose your profile format and enter your core identity details.</p>
       </div>
+    </div>
+
+    <!-- Profile Type / Mode Selector -->
+    <div class="mb-6 pb-6" style="border-bottom: 1px solid var(--border-primary);">
+      <div class="d-flex items-center justify-between mb-2">
+        <label class="form-label mb-0" style="font-weight: 700;">Profile Type</label>
+        <span class="text-caption" style="color: var(--text-muted);">Select how your card is branded</span>
+      </div>
+      <div class="profile-type-switcher">
+        <label class="profile-mode-option {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}selected{% endif %}" id="edit-mode-personal">
+          <input type="radio" name="profile_type" value="personal" {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
+          <div class="mode-icon">👤</div>
+          <div>
+            <div class="mode-title">Personal Profile</div>
+            <div class="mode-desc">Best for founders, executives, creators, freelancers, and professionals.</div>
+          </div>
+        </label>
+        <label class="profile-mode-option {% if form.instance.profile_type == 'business' %}selected{% endif %}" id="edit-mode-business">
+          <input type="radio" name="profile_type" value="business" {% if form.instance.profile_type == 'business' %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
+          <div class="mode-icon">🏢</div>
+          <div>
+            <div class="mode-title">Business Profile</div>
+            <div class="mode-desc">Best for companies, agencies, retail stores, brands, and sales teams.</div>
+          </div>
+        </label>
+      </div>
+      {% if form.profile_type.errors %}
+        <div class="form-error mt-2" role="alert">
+          <span>{{ form.profile_type.errors|first }}</span>
+        </div>
+      {% endif %}
     </div>
 
     <!-- Profile Image Upload UI -->
@@ -203,11 +234,14 @@
   <!-- ========================================================================
        SECTION 3: BUSINESS INFORMATION
        ======================================================================== -->
-  <div class="card mb-6">
+  <div class="card mb-6" id="business-section">
     <div class="card-header">
       <div>
-        <h2 class="card-title">3. Business & Brand Details</h2>
-        <p class="text-caption mb-0">Showcase your organization, business pitch, and company logo.</p>
+        <h2 class="card-title d-flex items-center gap-2">
+          <span>3. Business & Brand Details</span>
+          <span class="badge" id="biz-mode-badge" style="{% if profile.profile_type != 'business' %}display: none;{% endif %} font-size: 0.72rem; background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3);">Active for Business Mode</span>
+        </h2>
+        <p class="text-caption mb-0">Showcase your company name, business pitch, and company logo.</p>
       </div>
     </div>
 
@@ -648,4 +682,42 @@
     </form>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const personalOpt = document.getElementById('edit-mode-personal');
+    const businessOpt = document.getElementById('edit-mode-business');
+    const bizBadge = document.getElementById('biz-mode-badge');
+
+    function updateProfileTypeUI() {
+      const isBiz = document.querySelector('input[name="profile_type"]:checked')?.value === 'business';
+      if (personalOpt && businessOpt) {
+        if (isBiz) {
+          personalOpt.classList.remove('selected');
+          businessOpt.classList.add('selected');
+        } else {
+          personalOpt.classList.add('selected');
+          businessOpt.classList.remove('selected');
+        }
+      }
+      if (bizBadge) {
+        bizBadge.style.display = isBiz ? 'inline-flex' : 'none';
+      }
+    }
+
+    if (personalOpt && businessOpt) {
+      personalOpt.addEventListener('click', function() {
+        const radio = personalOpt.querySelector('input');
+        if (radio) { radio.checked = true; }
+        updateProfileTypeUI();
+      });
+      businessOpt.addEventListener('click', function() {
+        const radio = businessOpt.querySelector('input');
+        if (radio) { radio.checked = true; }
+        updateProfileTypeUI();
+      });
+      updateProfileTypeUI();
+    }
+  });
+</script>
 {% endblock %}

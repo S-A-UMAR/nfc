@@ -3637,3 +3637,285 @@ html, body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   UZYRA PHASE 2 GUIDED ONBOARDING STYLES
+   4-Step Flow, Profile Type Radio Cards & Review Preview Card
+   ═══════════════════════════════════════════════════════════════════════════ */
+.onboarding-page-wrapper {
+  min-height: 100svh;
+  padding: calc(var(--navbar-height) + 2rem) 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.onboarding-container {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Stepper Header */
+.onboarding-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.onboarding-step-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.onboarding-step-pill.active {
+  color: var(--text-primary);
+}
+
+.onboarding-step-pill.completed {
+  color: #4ade80;
+}
+
+.onboarding-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.onboarding-step-pill.active .onboarding-step-num {
+  background: var(--text-primary);
+  color: #09090C;
+  border-color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+}
+
+.onboarding-step-pill.completed .onboarding-step-num {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border-color: #22C55E;
+}
+
+.onboarding-progress-bar-wrap {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-6);
+  overflow: hidden;
+}
+
+.onboarding-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFFFFF 0%, #BFC5CF 100%);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+/* Card Shell */
+.onboarding-card {
+  background: rgba(18, 18, 22, 0.85);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+/* Step 2 Profile Type Radio Cards */
+.profile-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+.profile-type-card {
+  padding: var(--space-6);
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.profile-type-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+.profile-type-card.selected {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(20, 21, 28, 0.9) 100%);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.profile-type-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--silver-accent);
+  margin-bottom: var(--space-3);
+}
+
+.profile-type-card.selected .profile-type-icon {
+  background: #FFFFFF;
+  color: #09090C;
+}
+
+.profile-type-name {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.profile-type-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+}
+
+.profile-type-check-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--silver-steel);
+}
+
+.profile-type-card.selected .profile-type-check-badge {
+  color: #4ade80;
+}
+
+/* Step 4 Review Card */
+.onboarding-review-card {
+  padding: var(--space-6);
+  background: linear-gradient(145deg, rgba(25, 26, 34, 0.8) 0%, rgba(14, 15, 20, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-lg);
+  margin: var(--space-6) 0;
+}
+
+.onboarding-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .onboarding-stepper {
+    justify-content: center;
+    gap: var(--space-3);
+  }
+  .onboarding-step-pill span:last-child {
+    display: none;
+  }
+  .onboarding-card {
+    padding: var(--space-6) var(--space-4);
+  }
+  .profile-type-grid {
+    grid-template-columns: 1fr;
+  }
+  .onboarding-nav-row {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+  .onboarding-nav-row .btn {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Profile Edit Mode Switcher
+   ========================================================================== */
+.profile-type-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.profile-mode-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.profile-mode-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.profile-mode-option.selected {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(20, 21, 28, 0.85) 100%);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.1);
+}
+
+.profile-mode-option .mode-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.profile-mode-option .mode-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.profile-mode-option .mode-desc {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .profile-type-switcher {
+    grid-template-columns: 1fr;
+  }
+}

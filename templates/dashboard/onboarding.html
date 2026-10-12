@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Set Up Your Digital Profile — UZYRA{% endblock %}
+{% block meta_description %}Quick guided setup for your UZYRA digital profile and NFC smart card presence.{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="onboarding-page-wrapper">
+  <div class="onboarding-container">
+
+    <!-- Stepper Navigation Header -->
+    <div class="onboarding-stepper" aria-label="Onboarding Progress">
+      <div id="step-pill-1" class="onboarding-step-pill active" data-step="1">
+        <span class="onboarding-step-num">1</span>
+        <span>Welcome</span>
+      </div>
+      <div id="step-pill-2" class="onboarding-step-pill" data-step="2">
+        <span class="onboarding-step-num">2</span>
+        <span>Profile Type</span>
+      </div>
+      <div id="step-pill-3" class="onboarding-step-pill" data-step="3">
+        <span class="onboarding-step-num">3</span>
+        <span>Details</span>
+      </div>
+      <div id="step-pill-4" class="onboarding-step-pill" data-step="4">
+        <span class="onboarding-step-num">4</span>
+        <span>Review & Launch</span>
+      </div>
+    </div>
+
+    <!-- Progress Bar Fill -->
+    <div class="onboarding-progress-bar-wrap" aria-hidden="true">
+      <div id="onboarding-progress-bar" class="onboarding-progress-bar-fill" style="width: 25%;"></div>
+    </div>
+
+    <!-- Main Form Shell -->
+    <div class="onboarding-card">
+      <form id="onboarding-form" method="post" action="{% url 'dashboard:onboarding' %}" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Hidden input for profile_type -->
+        <input type="hidden" id="input_profile_type" name="profile_type" value="{{ profile.profile_type|default:'personal' }}">
+
+        <!-- ==================================================================
+             STEP 1: WELCOME & OVERVIEW
+             ================================================================== -->
+        <div id="step-panel-1" class="onboarding-step-panel">
+          <div class="text-center mb-6">
+            <span class="hero-tag" style="margin-bottom: var(--space-3);">
+              <span class="dot dot-active"></span>
+              <span>First-Time Setup</span>
+            </span>
+            <h1 class="auth-title" style="font-size: 1.75rem;">Welcome to UZYRA, {{ user.first_name|default:user.display_name }}!</h1>
+            <p class="auth-subtitle" style="max-width: 480px;">
+              Let's set up your custom digital profile in less than 2 minutes. This is the profile contacts will see when they tap your card or open your link.
+            </p>
+          </div>
+
+          <div class="d-flex flex-column gap-3 mb-6">
+            <div class="d-flex items-center gap-3 p-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md);">
+              <div class="profile-type-icon mb-0" style="width: 36px; height: 36px; flex-shrink: 0;" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">1. Choose Your Profile Type</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">Personal identity for individuals or a dedicated company profile for businesses.</div>
+              </div>
+            </div>
+
+            <div class="d-flex items-center gap-3 p-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md);">
+              <div class="profile-type-icon mb-0" style="width: 36px; height: 36px; flex-shrink: 0;" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">2. Add Contact & Social Channels</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">Enable 1-tap phonebook saving (.vcf), WhatsApp chat, and your key links.</div>
+              </div>
+            </div>
+
+            <div class="d-flex items-center gap-3 p-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md);">
+              <div class="profile-type-icon mb-0" style="width: 36px; height: 36px; flex-shrink: 0;" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">3. Preview & Launch</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">See exactly what visitors experience and get your permanent share link.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-6">
+            <button type="button" class="btn btn-primary btn-lg btn-glow" onclick="goToStep(2)">
+              <span>Get Started</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             STEP 2: CHOOSE PROFILE TYPE
+             ================================================================== -->
+        <div id="step-panel-2" class="onboarding-step-panel" style="display: none;">
+          <div class="text-center mb-6">
+            <h2 class="auth-title">Choose Your Profile Type</h2>
+            <p class="auth-subtitle">Select the format that best fits how you present yourself.</p>
+          </div>
+
+          <div class="profile-type-grid">
+            <!-- Option 1: Personal -->
+            <div id="card-type-personal" class="profile-type-card {% if profile.profile_type != 'business' %}selected{% endif %}" onclick="selectProfileType('personal')" role="radio" aria-checked="{% if profile.profile_type != 'business' %}true{% else %}false{% endif %}" tabindex="0">
+              <div>
+                <div class="profile-type-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h3 class="profile-type-name">Personal Profile</h3>
+                <p class="profile-type-desc">For individuals, consultants, creators, and freelancers sharing their personal contact details, bio, and social links.</p>
+              </div>
+              <div class="profile-type-check-badge">
+                <span id="badge-check-personal">✓ Selected</span>
+              </div>
+            </div>
+
+            <!-- Option 2: Business -->
+            <div id="card-type-business" class="profile-type-card {% if profile.profile_type == 'business' %}selected{% endif %}" onclick="selectProfileType('business')" role="radio" aria-checked="{% if profile.profile_type == 'business' %}true{% else %}false{% endif %}" tabindex="0">
+              <div>
+                <div class="profile-type-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <h3 class="profile-type-name">Business Profile</h3>
+                <p class="profile-type-desc">For professionals, entrepreneurs, companies, and agencies presenting company services, brand details, and business offerings.</p>
+              </div>
+              <div class="profile-type-check-badge">
+                <span id="badge-check-business">{% if profile.profile_type == 'business' %}✓ Selected{% else %}Select Option{% endif %}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="onboarding-nav-row">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
+              <span>&larr; Back</span>
+            </button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(3)">
+              <span>Continue to Details &rarr;</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             STEP 3: ENTER PROFILE DETAILS
+             ================================================================== -->
+        <div id="step-panel-3" class="onboarding-step-panel" style="display: none;">
+          <div class="text-center mb-6">
+            <h2 id="step-3-title" class="auth-title">Enter Profile Details</h2>
+            <p id="step-3-subtitle" class="auth-subtitle">Add your primary information. You can edit or expand anything later.</p>
+          </div>
+
+          <!-- Section A: Identity & Headline -->
+          <div class="card mb-4" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); padding: var(--space-5);">
+            <h3 class="card-title mb-3" style="font-size: 1rem; color: var(--silver-highlight);">1. Primary Identity</h3>
+            
+            <div class="form-group mb-3">
+              <label for="id_onboard_full_name" class="form-label">
+                Your Full Name <span class="text-danger" title="Required">*</span>
+              </label>
+              <input type="text" id="id_onboard_full_name" name="full_name" class="form-control" value="{{ profile.full_name|default:user.display_name }}" placeholder="e.g. Umar Sani" required>
+              <div id="err_full_name" class="form-error" style="display: none;" role="alert">Please enter your full name.</div>
+            </div>
+
+            <!-- Shown for Personal Profile -->
+            <div id="wrap_personal_headline" class="form-group mb-3">
+              <label for="id_onboard_title" class="form-label">
+                Professional Title / Headline <span class="form-label-hint">(Recommended)</span>
+              </label>
+              <input type="text" id="id_onboard_title" name="title" class="form-control" value="{{ profile.title }}" placeholder="e.g. Principal Consultant | Software Engineer">
+              <div class="form-hint">Displayed prominently right beneath your name.</div>
+            </div>
+
+            <!-- Shown for Business Profile -->
+            <div id="wrap_business_fields" style="display: none;">
+              <div class="form-group mb-3">
+                <label for="id_onboard_business_name" class="form-label">
+                  Business / Company Name <span class="text-danger" title="Required">*</span>
+                </label>
+                <input type="text" id="id_onboard_business_name" name="business_name" class="form-control" value="{{ profile.business_name }}" placeholder="e.g. Apex Strategic Consult Ltd">
+                <div id="err_business_name" class="form-error" style="display: none;" role="alert">Please enter your business or company name.</div>
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="id_onboard_business_category" class="form-label">
+                  Industry / Business Category <span class="form-label-hint">(Optional)</span>
+                </label>
+                <input type="text" id="id_onboard_business_category" name="business_category" class="form-control" value="{{ profile.business_category }}" placeholder="e.g. Technology, Real Estate, Consulting">
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="id_onboard_business_description" class="form-label">
+                  Business Overview <span class="form-label-hint">(Optional)</span>
+                </label>
+                <textarea id="id_onboard_business_description" name="business_description" class="form-textarea" rows="2" placeholder="Briefly describe what your business offers...">{{ profile.business_description }}</textarea>
+              </div>
+            </div>
+
+            <div class="form-group mb-0">
+              <label for="id_onboard_bio" class="form-label">
+                Bio / Pitch <span class="form-label-hint">(Optional)</span>
+              </label>
+              <textarea id="id_onboard_bio" name="bio" class="form-textarea" rows="2" placeholder="Short introduction about yourself or your services...">{{ profile.bio }}</textarea>
+            </div>
+          </div>
+
+          <!-- Section B: Direct Contact Hub -->
+          <div class="card mb-4" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); padding: var(--space-5);">
+            <h3 class="card-title mb-3" style="font-size: 1rem; color: var(--silver-highlight);">2. Contact Channels</h3>
+            
+            <div class="form-row-2col mb-3">
+              <div class="form-group mb-0">
+                <label for="id_onboard_phone" class="form-label">Phone Number</label>
+                <input type="text" id="id_onboard_phone" name="phone" class="form-control" value="{{ profile.phone|default:user.phone|default:'' }}" placeholder="+234 800 000 0000">
+                <div class="form-hint">For 1-tap direct calls.</div>
+              </div>
+              <div class="form-group mb-0">
+                <label for="id_onboard_whatsapp" class="form-label">WhatsApp Number</label>
+                <input type="text" id="id_onboard_whatsapp" name="whatsapp" class="form-control" value="{{ profile.whatsapp|default:user.phone|default:'' }}" placeholder="+234 800 000 0000">
+                <div class="form-hint">Enables 1-tap WhatsApp chat button.</div>
+              </div>
+            </div>
+
+            <div class="form-row-2col mb-0">
+              <div class="form-group mb-0">
+                <label for="id_onboard_email" class="form-label">Email Address</label>
+                <input type="email" id="id_onboard_email" name="email" class="form-control" value="{{ profile.email|default:user.email }}" placeholder="contact@example.com">
+              </div>
+              <div class="form-group mb-0">
+                <label for="id_onboard_location" class="form-label">Location</label>
+                <input type="text" id="id_onboard_location" name="location" class="form-control" value="{{ profile.location }}" placeholder="e.g. Lagos, Nigeria">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section C: Links & Digital Presence -->
+          <div class="card mb-4" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); padding: var(--space-5);">
+            <h3 class="card-title mb-3" style="font-size: 1rem; color: var(--silver-highlight);">3. Web & Social Links <span class="form-label-hint" style="font-weight: normal;">(Optional)</span></h3>
+            
+            <div class="form-group mb-3">
+              <label for="id_onboard_website" class="form-label">Website / Portfolio URL</label>
+              <input type="url" id="id_onboard_website" name="website_url" class="form-control" value="{{ profile.website_url }}" placeholder="https://yourwebsite.com">
+            </div>
+
+            <div class="form-row-2col mb-0">
+              <div class="form-group mb-0">
+                <label for="id_onboard_instagram" class="form-label">Instagram Handle</label>
+                <input type="text" id="id_onboard_instagram" name="social_instagram" class="form-control" placeholder="@yourhandle">
+              </div>
+              <div class="form-group mb-0">
+                <label for="id_onboard_linkedin" class="form-label">LinkedIn Profile</label>
+                <input type="text" id="id_onboard_linkedin" name="social_linkedin" class="form-control" placeholder="https://linkedin.com/in/yourname">
+              </div>
+            </div>
+          </div>
+
+          <div class="onboarding-nav-row">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(2)">
+              <span>&larr; Back</span>
+            </button>
+            <button type="button" class="btn btn-primary" onclick="validateAndGoToStep4()">
+              <span>Review Profile &rarr;</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             STEP 4: REVIEW & LAUNCH
+             ================================================================== -->
+        <div id="step-panel-4" class="onboarding-step-panel" style="display: none;">
+          <div class="text-center mb-6">
+            <h2 class="auth-title">Review & Launch Profile</h2>
+            <p class="auth-subtitle">Verify your profile summary below before making it active.</p>
+          </div>
+
+          <!-- Live Preview Summary Card -->
+          <div class="onboarding-review-card">
+            <div class="d-flex justify-between items-center mb-4 pb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+              <span id="rev_profile_type_badge" class="badge badge-active">Personal Identity</span>
+              <span class="text-caption text-silver" style="font-family: var(--font-mono);">
+                uzyra.com/u/{{ profile.slug|default:user.email|slugify }}/
+              </span>
+            </div>
+
+            <div class="d-flex items-center gap-3 mb-4">
+              <div class="hero-phone-avatar-circle" style="width: 52px; height: 52px; font-size: 1.25rem; margin: 0;">
+                <span id="rev_avatar_initial">{{ user.first_name|default:user.display_name|make_list|first|upper }}</span>
+              </div>
+              <div>
+                <div id="rev_name" style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">
+                  {{ profile.full_name|default:user.display_name }}
+                </div>
+                <div id="rev_title" style="font-size: 0.85rem; color: var(--silver-accent);">
+                  {{ profile.title|default:'Professional' }}
+                </div>
+                <div id="rev_business" style="font-size: 0.8rem; color: var(--text-muted); display: none;"></div>
+              </div>
+            </div>
+
+            <div id="rev_bio_box" class="mb-4 p-3" style="background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; display: none;">
+              <span id="rev_bio_text"></span>
+            </div>
+
+            <!-- Enabled Contact Badges -->
+            <div class="d-flex gap-2 flex-wrap mb-4">
+              <span id="rev_badge_call" class="badge" style="background: rgba(255, 255, 255, 0.06); display: none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>Call Enabled</span>
+              </span>
+              <span id="rev_badge_whatsapp" class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; display: none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span>WhatsApp Active</span>
+              </span>
+              <span id="rev_badge_email" class="badge" style="background: rgba(255, 255, 255, 0.06); display: none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span>Email Active</span>
+              </span>
+              <span id="rev_badge_vcard" class="badge" style="background: rgba(255, 255, 255, 0.06);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span>1-Tap vCard Download</span>
+              </span>
+            </div>
+
+            <div class="p-3" style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.12); border-radius: var(--radius-sm); font-size: 0.8125rem; color: var(--silver-steel);">
+              ✓ Your profile will be active immediately. You can customize themes, add portfolio items, and manage links anytime from your dashboard.
+            </div>
+          </div>
+
+          <div class="onboarding-nav-row">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(3)">
+              <span>&larr; Edit Details</span>
+            </button>
+            <button type="submit" id="btn-submit-onboard" class="btn btn-primary btn-lg btn-glow">
+              <span id="btn-submit-onboard-text">Complete Setup & Launch Profile</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentStep = 1;
+var selectedType = '{{ profile.profile_type|default:"personal" }}';
+
+function selectProfileType(type) {
+  selectedType = type;
+  document.getElementById('input_profile_type').value = type;
+
+  var cardPersonal = document.getElementById('card-type-personal');
+  var cardBusiness = document.getElementById('card-type-business');
+  var badgePersonal = document.getElementById('badge-check-personal');
+  var badgeBusiness = document.getElementById('badge-check-business');
+
+  if (type === 'business') {
+    cardBusiness.classList.add('selected');
+    cardBusiness.setAttribute('aria-checked', 'true');
+    cardPersonal.classList.remove('selected');
+    cardPersonal.setAttribute('aria-checked', 'false');
+    badgeBusiness.textContent = '✓ Selected';
+    badgePersonal.textContent = 'Select Option';
+
+    // Show business fields in Step 3
+    document.getElementById('wrap_business_fields').style.display = 'block';
+    document.getElementById('step-3-title').textContent = 'Enter Business Details';
+    document.getElementById('step-3-subtitle').textContent = 'Provide your business information and primary contact channels.';
+  } else {
+    cardPersonal.classList.add('selected');
+    cardPersonal.setAttribute('aria-checked', 'true');
+    cardBusiness.classList.remove('selected');
+    cardBusiness.setAttribute('aria-checked', 'false');
+    badgePersonal.textContent = '✓ Selected';
+    badgeBusiness.textContent = 'Select Option';
+
+    // Hide business fields in Step 3
+    document.getElementById('wrap_business_fields').style.display = 'none';
+    document.getElementById('step-3-title').textContent = 'Enter Personal Details';
+    document.getElementById('step-3-subtitle').textContent = 'Add your headline, contact numbers, and social channels.';
+  }
+}
+
+function goToStep(step) {
+  // Hide all panels
+  for (var i = 1; i <= 4; i++) {
+    var panel = document.getElementById('step-panel-' + i);
+    var pill = document.getElementById('step-pill-' + i);
+    if (panel) panel.style.display = 'none';
+    if (pill) {
+      pill.classList.remove('active');
+      if (i < step) {
+        pill.classList.add('completed');
+      } else {
+        pill.classList.remove('completed');
+      }
+    }
+  }
+
+  // Show active panel
+  var activePanel = document.getElementById('step-panel-' + step);
+  var activePill = document.getElementById('step-pill-' + step);
+  if (activePanel) activePanel.style.display = 'block';
+  if (activePill) activePill.classList.add('active');
+
+  // Update progress bar
+  var progressBar = document.getElementById('onboarding-progress-bar');
+  if (progressBar) {
+    progressBar.style.width = (step * 25) + '%';
+  }
+
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateAndGoToStep4() {
+  var fullNameInput = document.getElementById('id_onboard_full_name');
+  var errFullName = document.getElementById('err_full_name');
+  var bizNameInput = document.getElementById('id_onboard_business_name');
+  var errBizName = document.getElementById('err_business_name');
+
+  var isValid = true;
+
+  if (fullNameInput && !fullNameInput.value.trim()) {
+    errFullName.style.display = 'block';
+    fullNameInput.focus();
+    isValid = false;
+  } else if (errFullName) {
+    errFullName.style.display = 'none';
+  }
+
+  if (selectedType === 'business' && bizNameInput && !bizNameInput.value.trim()) {
+    errBizName.style.display = 'block';
+    if (isValid) bizNameInput.focus();
+    isValid = false;
+  } else if (errBizName) {
+    errBizName.style.display = 'none';
+  }
+
+  if (!isValid) return;
+
+  // Populate Step 4 review
+  updateReviewSummary();
+  goToStep(4);
+}
+
+function updateReviewSummary() {
+  var fullName = document.getElementById('id_onboard_full_name').value.trim() || 'Your Name';
+  var title = document.getElementById('id_onboard_title').value.trim();
+  var bio = document.getElementById('id_onboard_bio').value.trim();
+  var phone = document.getElementById('id_onboard_phone').value.trim();
+  var whatsapp = document.getElementById('id_onboard_whatsapp').value.trim();
+  var email = document.getElementById('id_onboard_email').value.trim();
+  var bizName = document.getElementById('id_onboard_business_name').value.trim();
+  var bizCat = document.getElementById('id_onboard_business_category').value.trim();
+
+  document.getElementById('rev_avatar_initial').textContent = fullName.charAt(0).toUpperCase();
+  document.getElementById('rev_name').textContent = selectedType === 'business' && bizName ? bizName : fullName;
+  
+  if (selectedType === 'business') {
+    document.getElementById('rev_profile_type_badge').textContent = 'Business Profile';
+    document.getElementById('rev_title').textContent = bizCat || 'Business';
+    if (bizName) {
+      document.getElementById('rev_business').style.display = 'block';
+      document.getElementById('rev_business').textContent = 'Represented by ' + fullName;
+    }
+  } else {
+    document.getElementById('rev_profile_type_badge').textContent = 'Personal Identity';
+    document.getElementById('rev_title').textContent = title || 'Professional';
+    document.getElementById('rev_business').style.display = 'none';
+  }
+
+  if (bio) {
+    document.getElementById('rev_bio_box').style.display = 'block';
+    document.getElementById('rev_bio_text').textContent = bio;
+  } else {
+    document.getElementById('rev_bio_box').style.display = 'none';
+  }
+
+  // Badges
+  document.getElementById('rev_badge_call').style.display = phone ? 'inline-flex' : 'none';
+  document.getElementById('rev_badge_whatsapp').style.display = whatsapp ? 'inline-flex' : 'none';
+  document.getElementById('rev_badge_email').style.display = email ? 'inline-flex' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Sync initial type selection
+  selectProfileType(selectedType);
+
+  // Double submit protection
+  var form = document.getElementById('onboarding-form');
+  var submitBtn = document.getElementById('btn-submit-onboard');
+  var submitText = document.getElementById('btn-submit-onboard-text');
+
+  if (form && submitBtn) {
+    form.addEventListener('submit', function() {
+      setTimeout(function() {
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = 'Launching Profile...';
+      }, 50);
+    });
+  }
+});
+</script>
+{% endblock %}

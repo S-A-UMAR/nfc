@@ -10,6 +10,7 @@ app_name = 'dashboard'
 
 urlpatterns = [
     path('', acc_dash.dashboard_overview_view, name='overview'),
+    path('onboarding/', prof_views.onboarding_view, name='onboarding'),
     path('profile/', prof_views.profile_edit_view, name='profile_edit'),
     path('profile/service/add/', prof_views.add_profile_service_view, name='profile_service_add'),
     path('profile/service/delete/<int:item_id>/', prof_views.delete_profile_service_view, name='profile_service_delete'),
