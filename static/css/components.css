@@ -1457,10 +1457,10 @@
 
 @media (max-width: 860px) {
   .navbar-wrapper {
-    padding: 10px var(--space-3);
+    padding: 8px var(--space-3);
   }
   .navbar {
-    height: 50px;
+    height: 48px;
     padding: 0 var(--space-2) 0 var(--space-4);
   }
   .drawer-links .nav-link {
@@ -1468,6 +1468,7 @@
     display: flex;
     align-items: center;
   }
+
   .footer-grid {
     grid-template-columns: 1fr;
   }
@@ -1482,6 +1483,20 @@
 }
 
 @media (max-width: 640px) {
+  .navbar {
+    height: 46px;
+    padding: 0 6px 0 12px;
+  }
+  .nav-btn-pill {
+    padding: 0.32rem 0.65rem;
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+  .nav-toggle {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px;
+  }
   .card, .card-carbon, .card-glass {
     padding: 1.25rem 1rem !important;
     border-radius: 14px;

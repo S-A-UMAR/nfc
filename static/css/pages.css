@@ -1676,12 +1676,30 @@
     width: 100%;
   }
   .hero-trust-strip {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    margin: 1.15rem auto 0 !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  .hero-trust-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    padding: 0.4rem 0.55rem !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 9999px !important;
+    font-size: 0.72rem !important;
+    color: #CBD5E1 !important;
+    white-space: nowrap !important;
   }
   .hero-trust-dot {
-    display: none;
+    display: none !important;
   }
   .price-card {
     padding: var(--space-6) var(--space-4);
@@ -3656,9 +3674,246 @@ html, body {
   }
 }
 
-@media (max-width: 640px) {
-  /* ── Mobile Layout Overrides: Simple, Less Tight, Friendly ── */
-  .hero-section,
+@media (max-width: 768px) {
+  /* ═══════════════════════════════════════════════════════════════════════════
+     COMPLETE MOBILE HOMEPAGE REDESIGN (Responsive, Sleek, Touch-First)
+     ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── 1. Hero Section ── */
+  .hero-section {
+    min-height: auto !important;
+    margin-top: calc(-1 * var(--navbar-height)) !important;
+    padding: calc(var(--navbar-height) + 1.15rem) 0 2.5rem !important;
+    background: radial-gradient(circle at 50% 15%, rgba(245, 247, 250, 0.08) 0%, transparent 65%), #09090B !important;
+  }
+
+  .hero-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+    text-align: center !important;
+  }
+
+  .hero-copy-wrap {
+    text-align: center !important;
+    max-width: 100% !important;
+    padding: 0 0.25rem !important;
+  }
+
+  .hero-copy-wrap .badge-pill {
+    margin-bottom: 0.75rem !important;
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.8rem !important;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 7.8vw, 2.45rem) !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.035em !important;
+    margin-bottom: 0.65rem !important;
+  }
+
+  .hero-desc {
+    font-size: 0.92rem !important;
+    line-height: 1.55 !important;
+    color: #94A3B8 !important;
+    max-width: 360px !important;
+    margin: 0 auto 1.25rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  .hero-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    gap: 0.55rem !important;
+  }
+
+  .hero-actions .btn {
+    width: 100% !important;
+    min-height: 48px !important;
+    border-radius: 9999px !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .hero-actions .btn-primary {
+    box-shadow: 0 0 22px rgba(255, 255, 255, 0.22) !important;
+  }
+
+  .hero-actions .btn-secondary {
+    min-height: 44px !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  }
+
+  /* Trust items: Sleek 2x2 grid of pill chips */
+  .hero-trust-strip {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: 330px !important;
+    margin: 1.15rem auto 0 !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .hero-trust-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    padding: 0.4rem 0.55rem !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 9999px !important;
+    font-size: 0.72rem !important;
+    color: #CBD5E1 !important;
+    white-space: nowrap !important;
+  }
+
+  .hero-trust-item svg {
+    width: 13px !important;
+    height: 13px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .hero-trust-dot {
+    display: none !important;
+  }
+
+  /* ── Interactive Scene on Mobile: Integrated, Luxury Showcase ── */
+  .hero-stage-wrap {
+    width: 100% !important;
+    max-width: 330px !important;
+    margin: 1.25rem auto 0 !important;
+    position: relative !important;
+  }
+
+  .hero-interactive-scene {
+    position: relative !important;
+    min-height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .hero-card-floating {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    animation: none !important;
+    width: 100% !important;
+    max-width: 240px !important;
+    aspect-ratio: 1.586 / 1 !important;
+    border-radius: 16px !important;
+    padding: 0.95rem !important;
+    margin: 0 auto !important;
+    background: linear-gradient(145deg, #1f2028 0%, #0d0e12 60%, #171821 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.35) !important;
+  }
+
+  .hero-tap-wave-connector {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 0.25rem auto !important;
+    transform: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0.35rem 0.85rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .hero-phone-preview {
+    position: relative !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    width: 100% !important;
+    max-width: 260px !important;
+    border-radius: 26px !important;
+    padding: 0.8rem 0.8rem 1rem !important;
+    border: 2px solid rgba(255, 255, 255, 0.16) !important;
+    background: linear-gradient(160deg, #181922 0%, #0d0e12 100%) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1.5px 2px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .hero-phone-notch {
+    width: 52px !important;
+    height: 9px !important;
+    margin: 0 auto 0.55rem !important;
+  }
+
+  .hero-phone-avatar-circle {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.2rem !important;
+    margin: 0 auto 0.35rem !important;
+  }
+
+  .hero-phone-name {
+    font-size: 0.92rem !important;
+  }
+
+  .hero-phone-role {
+    font-size: 0.7rem !important;
+  }
+
+  .hero-phone-company {
+    font-size: 0.65rem !important;
+  }
+
+  .hero-phone-actions-row {
+    margin-bottom: 0.55rem !important;
+    gap: 5px !important;
+  }
+
+  .hero-phone-action-btn {
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .hero-phone-vcard-btn {
+    padding: 0.48rem !important;
+    font-size: 0.72rem !important;
+    margin-bottom: 0.55rem !important;
+  }
+
+  .hero-phone-link-row {
+    padding: 0.38rem 0.65rem !important;
+    font-size: 0.65rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .hero-dual-specs-strip {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    max-width: 260px !important;
+    margin: 0.85rem auto 0 !important;
+  }
+
+  .hero-card-spec-pill {
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    justify-content: center !important;
+    border-radius: 9999px !important;
+  }
+
+  /* ── 2. Sections 2–10 Mobile Refinements ── */
   .clarity-strip-section,
   .how-section,
   .persona-section,
@@ -3668,193 +3923,211 @@ html, body {
   .pricing-section,
   .faq-section,
   .cta-section {
-    padding: 3.75rem 0;
+    padding: 3.25rem 0 !important;
   }
 
-  .hero-copy-wrap {
-    text-align: center;
+  .section-title,
+  .section-header-row h2 {
+    font-size: 1.65rem !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
   }
 
-  .hero-actions {
-    justify-content: center;
-    flex-direction: column;
-    width: 100%;
+  .section-header-row {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    margin-bottom: 2rem !important;
   }
 
-  .hero-actions .btn {
-    width: 100%;
+  /* Clarity Cards */
+  .clarity-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.15rem !important;
   }
 
-  .hero-trust-strip {
-    justify-content: center;
-    gap: 0.75rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+  .clarity-card {
+    padding: 1.45rem 1.25rem !important;
+    border-radius: 20px !important;
+    background: rgba(20, 21, 28, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 
-  /* ── Hero Scene on mobile: airy, clean, friendly stack ── */
-  .hero-interactive-scene {
-    min-height: auto;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-    padding: 1.25rem 0 0;
-    width: 100%;
+  .clarity-card-title {
+    font-size: 1.125rem !important;
   }
 
-  /* Physical Card mockup: centered, luxury matte black with silver rim */
-  .hero-card-floating {
-    position: static;
-    transform: none !important;
-    animation: none;
-    width: 100%;
-    max-width: 280px;
-    margin: 0 auto;
-    background: linear-gradient(145deg, #1e1f27 0%, #0d0e12 55%, #15161f 100%);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 16px;
-    padding: 1rem 1.1rem;
-    box-shadow: 
-      0 14px 36px rgba(0, 0, 0, 0.8),
-      inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  .clarity-card-desc {
+    font-size: 0.86rem !important;
+    line-height: 1.6 !important;
   }
 
-  /* Tap Connector Badge: gentle visual bridge */
-  .hero-tap-wave-connector {
-    position: static;
-    margin: 0.85rem auto;
-    transform: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 0.4rem 0.95rem;
-    background: rgba(18, 22, 28, 0.95);
-    border: 1px solid rgba(34, 197, 94, 0.45);
-    border-radius: var(--radius-pill);
-    box-shadow: 0 0 16px rgba(34, 197, 94, 0.25), 0 4px 14px rgba(0, 0, 0, 0.45);
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #4ade80;
-    letter-spacing: 0.03em;
+  /* Steps Cards */
+  .steps-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.15rem !important;
   }
 
-  /* Live Smartphone Mockup Screen: proportional, clean, friendly */
-  .hero-phone-preview {
-    margin-left: 0;
-    margin-top: 0;
-    width: 100%;
-    max-width: 276px;
-    border-radius: 28px;
-    border: 2px solid rgba(255, 255, 255, 0.18);
-    background: linear-gradient(160deg, #181922 0%, #0d0e12 100%);
-    box-shadow: 
-      0 24px 60px rgba(0, 0, 0, 0.85),
-      inset 0 1.5px 2px rgba(255, 255, 255, 0.2);
-    padding: 0.85rem 0.85rem 1.1rem;
+  .step-card {
+    padding: 1.45rem 1.25rem !important;
+    border-radius: 20px !important;
+    background: rgba(20, 21, 28, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 
-  .hero-phone-notch {
-    width: 55px;
-    height: 10px;
-    margin: 0 auto 0.65rem;
+  .step-number {
+    font-size: 2rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 800 !important;
+    color: rgba(255, 255, 255, 0.3) !important;
   }
 
-  .hero-phone-avatar-circle {
-    width: 50px;
-    height: 50px;
-    font-size: 1.25rem;
-    margin: 0 auto 0.4rem;
+  .step-title {
+    font-size: 1.125rem !important;
   }
 
-  .hero-phone-name {
-    font-size: 0.95rem;
+  .step-desc {
+    font-size: 0.86rem !important;
+    line-height: 1.6 !important;
   }
 
-  .hero-phone-role {
-    font-size: 0.72rem;
+  /* Persona Grid */
+  .persona-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.35rem !important;
   }
 
-  .hero-phone-company {
-    font-size: 0.6875rem;
+  .persona-card {
+    padding: 1.65rem 1.25rem !important;
+    border-radius: 22px !important;
   }
 
-  .hero-phone-actions-row {
-    margin-bottom: 0.65rem;
-    gap: 6px;
+  .persona-title {
+    font-size: 1.35rem !important;
   }
 
-  .hero-phone-action-btn {
-    padding: 0.32rem 0.6rem;
-    font-size: 0.6875rem;
+  .persona-desc {
+    font-size: 0.88rem !important;
   }
 
-  .hero-phone-vcard-btn {
-    padding: 0.52rem;
-    font-size: 0.75rem;
-    margin-bottom: 0.65rem;
+  .persona-features-list {
+    margin-bottom: 1.5rem !important;
   }
 
-  .hero-phone-link-row {
-    padding: 0.42rem 0.7rem;
-    font-size: 0.6875rem;
-    margin-bottom: 0.35rem;
+  .persona-feature-item {
+    font-size: 0.85rem !important;
+    gap: 0.65rem !important;
   }
 
-  /* Spec pills: clean 2-column grid on mobile */
-  .hero-dual-specs-strip {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 1.25rem;
-    width: 100%;
-    max-width: 276px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-card-spec-pill {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.72rem;
-    font-weight: 500;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  /* Cards inner padding on mobile */
-  .clarity-card,
-  .step-card,
-  .persona-card,
-  .spec-box,
-  .price-card {
-    padding: 1.85rem 1.5rem;
-    border-radius: 20px;
-  }
-
-  /* Persona actions full-width on mobile */
   .persona-actions {
-    flex-direction: column;
-    width: 100%;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
   }
+
   .persona-actions .btn {
-    width: 100%;
+    width: 100% !important;
+    min-height: 48px !important;
+    border-radius: 9999px !important;
+    font-weight: 600 !important;
+  }
+
+  /* Specs Grid */
+  .specs-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .spec-box {
+    padding: 1.15rem 0.9rem !important;
+    border-radius: 16px !important;
+  }
+
+  .spec-title {
+    font-size: 0.92rem !important;
+  }
+
+  .spec-desc {
+    font-size: 0.78rem !important;
+    line-height: 1.5 !important;
   }
 
   .hardware-callout-note {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.5rem 1.25rem;
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 1.25rem 1.1rem !important;
+    border-radius: 18px !important;
+    margin-top: 1.5rem !important;
   }
+
   .hardware-callout-note .btn {
-    width: 100%;
+    width: 100% !important;
+    min-height: 44px !important;
+    border-radius: 9999px !important;
   }
 
+  /* Showcase Grid */
   .showcase-grid {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
   }
 
+  /* Web Suite */
   .suite-card {
-    padding: 2rem 1.5rem;
+    padding: 1.75rem 1.25rem !important;
+    border-radius: 22px !important;
+  }
+
+  /* Pricing */
+  .pricing-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.35rem !important;
+  }
+
+  .price-card {
+    padding: 1.75rem 1.25rem !important;
+    border-radius: 22px !important;
+  }
+
+  .price-card-btn {
+    min-height: 48px !important;
+    border-radius: 9999px !important;
+  }
+
+  /* FAQ */
+  .accordion-trigger {
+    padding: 1.1rem 0 !important;
+    min-height: 52px !important;
+    font-size: 0.95rem !important;
+  }
+
+  /* Final CTA */
+  .cta-box {
+    padding: 2.25rem 1.25rem !important;
+    border-radius: 24px !important;
+    text-align: center !important;
+  }
+
+  .cta-title {
+    font-size: 1.65rem !important;
+  }
+
+  .cta-desc {
+    font-size: 0.9rem !important;
+    margin-bottom: 1.35rem !important;
+  }
+
+  .cta-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .cta-actions .btn {
+    width: 100% !important;
+    min-height: 50px !important;
+    border-radius: 9999px !important;
+    font-weight: 700 !important;
   }
 }
 
