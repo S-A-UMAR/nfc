@@ -37,11 +37,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Core Design System CSS -->
-  <link rel="stylesheet" href="{% static 'css/variables.css' %}?v=1.7">
-  <link rel="stylesheet" href="{% static 'css/base.css' %}?v=1.7">
-  <link rel="stylesheet" href="{% static 'css/components.css' %}?v=1.7">
-  <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=1.7">
-  <link rel="stylesheet" href="{% static 'css/pages.css' %}?v=1.7">
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}?v=1.8">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}?v=1.8">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}?v=1.8">
+  <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=1.8">
+  <link rel="stylesheet" href="{% static 'css/pages.css' %}?v=1.8">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -117,7 +117,9 @@
           </svg>
           <span>UZYRA</span>
         </a>
-        <button class="drawer-close" aria-label="Close navigation menu" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:50%;color:var(--text-secondary);font-size:1.25rem;cursor:pointer;flex-shrink:0;transition:all 0.15s ease;">&times;</button>
+        <button class="drawer-close" aria-label="Close navigation menu">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
       {% if user.is_authenticated %}
@@ -125,13 +127,17 @@
         <div class="drawer-user-badge">
           <div class="drawer-user-avatar">
             {% if user_profile and user_profile.profile_image %}
-              <img src="{{ user_profile.profile_image.url }}" alt="{{ user.display_name }}" width="38" height="38" loading="lazy" decoding="async">
+              <img src="{{ user_profile.profile_image.url }}" alt="{{ user.display_name }}" width="42" height="42" loading="lazy" decoding="async">
             {% else %}
               <span>{{ user.first_name|default:user.email|make_list|first|upper }}</span>
             {% endif %}
+            <span class="avatar-dot" aria-hidden="true"></span>
           </div>
           <div class="drawer-user-info">
-            <div class="drawer-user-name">{{ user.first_name|default:user.display_name }}</div>
+            <div class="d-flex items-center gap-2">
+              <span class="drawer-user-name">{{ user.first_name|default:user.display_name }}</span>
+              <span class="drawer-user-pill">Active</span>
+            </div>
             <div class="drawer-user-email">{{ user.email }}</div>
           </div>
         </div>
@@ -248,15 +254,18 @@
     <div class="drawer-footer">
       {% if user.is_authenticated %}
         {% if user_profile and user_profile.slug %}
-          <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" class="btn btn-secondary btn-block">
+          <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" class="btn btn-secondary btn-block drawer-action-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             <span>View Public Profile</span>
           </a>
         {% endif %}
-        <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-block" style="color: var(--text-muted);">Sign Out</a>
+        <a href="{% url 'accounts:logout' %}" class="drawer-logout-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </a>
       {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-block">Sign In</a>
-        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-block">Create Digital Profile</a>
+        <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-block drawer-action-btn">Sign In</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-block drawer-action-btn">Create Digital Profile</a>
       {% endif %}
     </div>
   </aside>
