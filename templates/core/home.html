@@ -580,55 +580,107 @@
 </section>
 
 <!-- ==========================================================================
-     SECTION 8: PRICING PREVIEW (Dynamic from Real ProductPackage Data)
+     SECTION 8: PRICING PREVIEW — E-Commerce Product Card Layout
      ========================================================================== -->
-<section id="pricing" class="pricing-section" aria-label="Packages and Pricing">
-  <div class="pricing-watermark" aria-hidden="true">PRICING</div>
+<section id="pricing" class="pc-section" aria-label="Packages and Pricing">
+  <div class="pricing-watermark" aria-hidden="true">SHOP</div>
   <div class="container">
-    <div class="section-header-row mb-10">
-      <div>
-        <div class="badge-pill mb-3">Transparent Plans</div>
-        <h2>Available Packages</h2>
-        <p class="text-secondary mt-2">Start free with your digital profile, or upgrade with a physical smart card.</p>
+
+    <!-- Section Header -->
+    <div class="pc-header-wrap">
+      <div class="pc-header-top">
+        <div class="badge-pill">Smart Hardware</div>
+        <h2 class="pc-headline">Built for Your Brand</h2>
+        <p class="pc-subline">One tap. Your entire digital identity. Ships to your door.</p>
       </div>
-      <a href="{% url 'core:pricing' %}" class="btn btn-ghost btn-sm">All Packages &rarr;</a>
+      <div class="pc-header-sub">
+        <span class="pc-sub-label">
+          <span class="pc-dot"></span> Ready to ship &middot; Order in one click
+        </span>
+        <a href="{% url 'core:pricing' %}" class="pc-all-link">View all packages &rarr;</a>
+      </div>
     </div>
 
     {% if packages %}
-      <div class="pricing-cards-grid">
+      <div class="pc-grid">
         {% for package in packages %}
-        <div class="price-card {% if package.badge %}featured{% endif %}">
-          <div>
-            {% if package.badge %}
-              <div class="price-badge-tag">{{ package.badge }}</div>
+        <!-- Product Card -->
+        <article class="pc-card {% if package.badge %}pc-card--featured{% endif %}" aria-label="{{ package.name }}">
+
+          <!-- Product Image -->
+          <div class="pc-img-wrap">
+            {% if package.code == 'smart-nfc' or package.code == 'basic' or package.code == 'starter' %}
+              <img src="{% static 'img/cards/card-single.jpg' %}" alt="{{ package.name }} NFC card product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
+            {% elif package.code == 'bundle' or package.code == 'duo' or package.code == 'double' %}
+              <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="{{ package.name }} NFC card bundle product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
+            {% else %}
+              <img src="{% static 'img/cards/card-premium.jpg' %}" alt="{{ package.name }} premium NFC card product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
             {% endif %}
-            <h3 class="price-name">{{ package.name }}</h3>
-            <div class="price-figure">₦{{ package.price_ngn|floatformat:0 }}</div>
-            <p class="price-desc">{{ package.description|truncatewords:14 }}</p>
-            <hr class="divider" style="margin: var(--space-4) 0 var(--space-5);">
-            <ul class="price-features-list">
-              {% for feature in package.feature_list|slice:":4" %}
-                <li>
-                  <span class="price-feature-check" aria-hidden="true">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  </span>
-                  <span>{{ feature }}</span>
+            {% if package.badge %}
+              <span class="pc-img-badge">{{ package.badge }}</span>
+            {% elif forloop.first %}
+              <span class="pc-img-badge pc-img-badge--green">Popular</span>
+            {% endif %}
+          </div>
+
+          <!-- Card Body -->
+          <div class="pc-body">
+            <h3 class="pc-name">{{ package.name }}</h3>
+            <p class="pc-desc">{{ package.description|truncatewords:10 }}</p>
+
+            <!-- Feature list -->
+            <ul class="pc-features">
+              {% for feature in package.feature_list|slice:":3" %}
+                <li class="pc-feature-item">
+                  <svg class="pc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{ feature }}
                 </li>
               {% endfor %}
             </ul>
+
+            <!-- Price Row -->
+            <div class="pc-price-row">
+              <span class="pc-price">₦{{ package.price_ngn|floatformat:0 }}</span>
+              <span class="pc-price-note">one-time</span>
+            </div>
+
+            <!-- CTA -->
+            <a href="{% url 'orders:checkout' package.code %}"
+               class="pc-order-btn {% if package.badge %}pc-order-btn--primary{% endif %}"
+               aria-label="Order {{ package.name }}">
+              Order &rarr;
+            </a>
+
           </div>
-          <a href="{% url 'orders:checkout' package.code %}" class="btn {% if package.badge %}btn-primary btn-glow{% else %}btn-secondary{% endif %} btn-block btn-pill">
-            Get Started
-          </a>
-        </div>
+        </article>
         {% endfor %}
       </div>
+
     {% else %}
-      <div class="text-center p-8 card price-card">
-        <p class="text-secondary mb-4">View our full packages and customization options on our pricing page.</p>
-        <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-pill">View Packages & Pricing</a>
+      <!-- Fallback: no packages in DB -->
+      <div class="pc-grid">
+        <article class="pc-card pc-card--featured">
+          <div class="pc-img-wrap pc-img-wrap--fallback">
+            <span class="pc-img-badge pc-img-badge--green">Popular</span>
+          </div>
+          <div class="pc-body">
+            <h3 class="pc-name">Smart NFC Card</h3>
+            <p class="pc-desc">Your digital profile, one tap away.</p>
+            <ul class="pc-features">
+              <li class="pc-feature-item"><svg class="pc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>NFC tap-to-share</li>
+              <li class="pc-feature-item"><svg class="pc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>Digital profile included</li>
+              <li class="pc-feature-item"><svg class="pc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>Ships in 5&ndash;7 days</li>
+            </ul>
+            <div class="pc-price-row">
+              <span class="pc-price">₦15000</span>
+              <span class="pc-price-note">one-time</span>
+            </div>
+            <a href="{% url 'core:pricing' %}" class="pc-order-btn pc-order-btn--primary">View Packages &rarr;</a>
+          </div>
+        </article>
       </div>
     {% endif %}
+
   </div>
 </section>
 
