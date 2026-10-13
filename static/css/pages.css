@@ -361,6 +361,11 @@
   50% { transform: perspective(1000px) rotateY(-4deg) rotateX(2deg) translateY(-14px); }
 }
 
+@keyframes floatCardMobile {
+  0% { transform: perspective(800px) rotateX(2deg) translateY(0); }
+  100% { transform: perspective(800px) rotateX(4deg) translateY(-5px); }
+}
+
 @keyframes sheenSweep {
   0% { transform: translateX(-100%) rotate(20deg); }
   40%, 100% { transform: translateX(100%) rotate(20deg); }
@@ -3791,8 +3796,8 @@ html, body {
   /* ── Interactive Scene on Mobile: Integrated, Luxury Showcase ── */
   .hero-stage-wrap {
     width: 100% !important;
-    max-width: 330px !important;
-    margin: 1.25rem auto 0 !important;
+    max-width: 320px !important;
+    margin: 1rem auto 0 !important;
     position: relative !important;
   }
 
@@ -3802,7 +3807,7 @@ html, body {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 0.65rem !important;
+    gap: 0.55rem !important;
     padding: 0 !important;
     width: 100% !important;
   }
@@ -3811,30 +3816,56 @@ html, body {
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    transform: none !important;
-    animation: none !important;
     width: 100% !important;
-    max-width: 240px !important;
+    max-width: 255px !important;
     aspect-ratio: 1.586 / 1 !important;
-    border-radius: 16px !important;
-    padding: 0.95rem !important;
+    border-radius: 18px !important;
+    padding: 1.05rem 1.15rem !important;
     margin: 0 auto !important;
-    background: linear-gradient(145deg, #1f2028 0%, #0d0e12 60%, #171821 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.35) !important;
+    background: linear-gradient(145deg, #22232c 0%, #0d0e13 55%, #181923 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    box-shadow: 
+      0 20px 48px -10px rgba(0, 0, 0, 0.95), 
+      0 0 28px rgba(255, 255, 255, 0.08), 
+      inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.8) !important;
+    transform: perspective(800px) rotateX(2deg) translateY(0) !important;
+    animation: floatCardMobile 5s ease-in-out infinite alternate !important;
+    overflow: hidden !important;
+  }
+
+  .hero-card-floating .card-chip-icon {
+    width: 26px !important;
+    height: 19px !important;
+    background: linear-gradient(135deg, #e6c875 0%, #caa452 45%, #f9e29a 65%, #a88230 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.5) !important;
   }
 
   .hero-tap-wave-connector {
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    margin: 0.25rem auto !important;
+    margin: 0.15rem auto !important;
     transform: none !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 6px !important;
-    padding: 0.35rem 0.85rem !important;
-    font-size: 0.72rem !important;
+    gap: 7px !important;
+    padding: 0.36rem 0.95rem !important;
+    background: rgba(12, 26, 18, 0.95) !important;
+    border: 1px solid rgba(74, 222, 128, 0.55) !important;
+    border-radius: 9999px !important;
+    box-shadow: 
+      0 0 20px rgba(34, 197, 94, 0.35), 
+      0 4px 14px rgba(0, 0, 0, 0.6),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    color: #4ade80 !important;
+    letter-spacing: 0.03em !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
   }
 
   .hero-phone-preview {
@@ -3842,59 +3873,135 @@ html, body {
     margin-left: 0 !important;
     margin-top: 0 !important;
     width: 100% !important;
-    max-width: 260px !important;
-    border-radius: 26px !important;
-    padding: 0.8rem 0.8rem 1rem !important;
-    border: 2px solid rgba(255, 255, 255, 0.16) !important;
-    background: linear-gradient(160deg, #181922 0%, #0d0e12 100%) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1.5px 2px rgba(255, 255, 255, 0.2) !important;
+    max-width: 270px !important;
+    border-radius: 32px !important;
+    padding: 0.85rem 0.85rem 1.15rem !important;
+    border: 2.5px solid rgba(255, 255, 255, 0.18) !important;
+    background: linear-gradient(165deg, #171822 0%, #0c0d12 100%) !important;
+    box-shadow: 
+      0 28px 70px rgba(0, 0, 0, 0.95), 
+      0 0 35px rgba(255, 255, 255, 0.05),
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.22),
+      inset 0 0 0 1.5px #0a0b0e !important;
+    overflow: hidden !important;
   }
 
   .hero-phone-notch {
-    width: 52px !important;
-    height: 9px !important;
-    margin: 0 auto 0.55rem !important;
+    width: 62px !important;
+    height: 12px !important;
+    background: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 9999px !important;
+    margin: 0 auto 0.65rem !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8) !important;
   }
 
   .hero-phone-avatar-circle {
-    width: 48px !important;
-    height: 48px !important;
-    font-size: 1.2rem !important;
-    margin: 0 auto 0.35rem !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(40, 42, 54, 0.9) 60%, rgba(18, 19, 26, 0.95) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.32) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: var(--font-heading) !important;
+    font-weight: 800 !important;
+    font-size: 1.35rem !important;
+    color: #FFFFFF !important;
+    margin: 0 auto 0.45rem !important;
+    box-shadow: 
+      0 8px 20px rgba(0, 0, 0, 0.6),
+      inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  }
+
+  .hero-phone-identity {
+    text-align: center !important;
+    margin-bottom: 0.65rem !important;
   }
 
   .hero-phone-name {
-    font-size: 0.92rem !important;
+    font-family: var(--font-heading) !important;
+    font-size: 0.98rem !important;
+    font-weight: 800 !important;
+    color: #FFFFFF !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.2 !important;
+    margin-bottom: 2px !important;
   }
 
   .hero-phone-role {
-    font-size: 0.7rem !important;
+    font-size: 0.72rem !important;
+    color: #94A3B8 !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
   }
 
   .hero-phone-company {
-    font-size: 0.65rem !important;
+    font-size: 0.66rem !important;
+    color: #64748B !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
   }
 
   .hero-phone-actions-row {
-    margin-bottom: 0.55rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 5px !important;
+    margin-bottom: 0.6rem !important;
+    width: 100% !important;
   }
 
   .hero-phone-action-btn {
-    padding: 0.3rem 0.55rem !important;
-    font-size: 0.65rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 0.42rem 0.2rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    color: #E2E8F0 !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .hero-phone-action-btn svg {
+    width: 11px !important;
+    height: 11px !important;
+    color: var(--silver-accent, #BFC5CF) !important;
   }
 
   .hero-phone-vcard-btn {
-    padding: 0.48rem !important;
-    font-size: 0.72rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 0.52rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #0A0B0E !important;
+    background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%) !important;
+    border-radius: 12px !important;
     margin-bottom: 0.55rem !important;
+    box-shadow: 
+      0 4px 18px rgba(255, 255, 255, 0.22),
+      0 2px 6px rgba(0, 0, 0, 0.4) !important;
   }
 
   .hero-phone-link-row {
-    padding: 0.38rem 0.65rem !important;
-    font-size: 0.65rem !important;
-    margin-bottom: 0.3rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.42rem 0.7rem !important;
+    font-size: 0.67rem !important;
+    font-weight: 500 !important;
+    color: #CBD5E1 !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    margin-bottom: 0.32rem !important;
   }
 
   .hero-dual-specs-strip {
@@ -3902,19 +4009,40 @@ html, body {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 6px !important;
     width: 100% !important;
-    max-width: 260px !important;
+    max-width: 270px !important;
     margin: 0.85rem auto 0 !important;
   }
 
   .hero-card-spec-pill {
-    padding: 0.35rem 0.5rem !important;
-    font-size: 0.68rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
     justify-content: center !important;
+    gap: 5px !important;
+    padding: 0.38rem 0.55rem !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    color: #94A3B8 !important;
+    background: rgba(20, 21, 28, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 9999px !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .hero-card-spec-pill .spec-dot {
+    width: 5px !important;
+    height: 5px !important;
+    border-radius: 50% !important;
+    background: #22C55E !important;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.9) !important;
   }
 
   /* ── 2. Sections 2–10 Mobile Refinements ── */
-  .clarity-strip-section,
+  .clarity-strip-section {
+    padding: 2.25rem 0 !important;
+  }
+
   .how-section,
   .persona-section,
   .product-section,
@@ -3923,7 +4051,7 @@ html, body {
   .pricing-section,
   .faq-section,
   .cta-section {
-    padding: 3.25rem 0 !important;
+    padding: 3rem 0 !important;
   }
 
   .section-title,
