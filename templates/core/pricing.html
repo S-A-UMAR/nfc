@@ -47,12 +47,26 @@
     <div class="pricing-cards-grid mb-12">
       {% for pkg in packages %}
       <div class="price-card {% if pkg.badge %}featured{% endif %}" data-category="{{ pkg.package_type }}">
+        <!-- Card Product Mockup Image -->
+        <div class="price-card-media">
+          {% if pkg.package_type == 'card_only' or pkg.code == 'smart-nfc' or pkg.code == 'basic' %}
+            <img src="{% static 'img/cards/card-single.jpg' %}" alt="{{ pkg.name }} mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          {% elif pkg.package_type == 'personal_website' or pkg.code == 'bundle' %}
+            <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="{{ pkg.name }} mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          {% else %}
+            <img src="{% static 'img/cards/card-premium.jpg' %}" alt="{{ pkg.name }} mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          {% endif %}
+          {% if pkg.badge %}
+            <span class="price-badge-pill price-badge-floating">{{ pkg.badge }}</span>
+          {% endif %}
+        </div>
+
         <div class="price-card-inner">
-          <!-- Top Meta Row: Category Tag & Unclipped Badge Pill -->
+          <!-- Top Meta Row: Category Tag -->
           <div class="price-card-topbar">
             <span class="price-category-tag">{% if pkg.package_type == 'card_only' %}Smart NFC Card{% elif pkg.package_type == 'personal_website' %}Personal Identity{% elif pkg.package_type == 'business_website' %}Business Suite{% elif pkg.package_type == 'corporate' %}Corporate Fleet{% else %}{{ pkg.name }}{% endif %}</span>
-            {% if pkg.badge %}
-            <span class="price-badge-pill">{{ pkg.badge }}</span>
+            {% if not pkg.badge and forloop.first %}
+            <span class="price-badge-pill price-badge-subtle">Popular</span>
             {% endif %}
           </div>
 
@@ -96,6 +110,9 @@
     <!-- Placeholder pricing when no packages are seeded yet -->
     <div class="pricing-cards-grid mb-12">
       <div class="price-card">
+        <div class="price-card-media">
+          <img src="{% static 'img/cards/card-single.jpg' %}" alt="Smart NFC Card mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+        </div>
         <div class="price-card-inner">
           <div class="price-card-topbar">
             <span class="price-category-tag">Smart NFC Card</span>
@@ -118,10 +135,13 @@
         </div>
       </div>
       <div class="price-card featured">
+        <div class="price-card-media">
+          <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="Personal Package mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          <span class="price-badge-pill price-badge-floating">RECOMMENDED</span>
+        </div>
         <div class="price-card-inner">
           <div class="price-card-topbar">
             <span class="price-category-tag">Personal Identity</span>
-            <span class="price-badge-pill">RECOMMENDED</span>
           </div>
           <h3 class="price-name">Personal Package</h3>
           <div class="price-figure"><span class="price-currency">₦</span>65,000<span class="price-period">one-time</span></div>
@@ -141,6 +161,9 @@
         </div>
       </div>
       <div class="price-card">
+        <div class="price-card-media">
+          <img src="{% static 'img/cards/card-premium.jpg' %}" alt="Business Suite mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+        </div>
         <div class="price-card-inner">
           <div class="price-card-topbar">
             <span class="price-category-tag">Business Suite</span>

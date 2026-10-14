@@ -1528,7 +1528,7 @@
   border-width: 1.5px;
   border-color: rgba(255, 255, 255, 0.26) rgba(255, 255, 255, 0.13) rgba(255, 255, 255, 0.06) rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-xl);
-  padding: var(--space-8) var(--space-6);
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1591,11 +1591,51 @@
     inset 0 2px 2px 0 #FFFFFF;
 }
 
+/* Card Mockup Media Header */
+.price-card-media {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  background: linear-gradient(135deg, #181920 0%, #0d0e12 100%);
+  overflow: hidden;
+  border-top-left-radius: calc(var(--radius-xl) - 1.5px);
+  border-top-right-radius: calc(var(--radius-xl) - 1.5px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.price-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+
+.price-card:hover .price-card-img {
+  transform: scale(1.05);
+}
+
+.price-badge-floating {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+}
+
+.price-badge-subtle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #E2E8F0;
+  box-shadow: none;
+}
+
 /* Card Internal Layout */
 .price-card-inner {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  padding: var(--space-6) var(--space-6) var(--space-4);
 }
 
 .price-card-topbar {
@@ -1603,8 +1643,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  margin-bottom: var(--space-4);
-  min-height: 28px;
+  margin-bottom: var(--space-3);
+  min-height: 24px;
 }
 
 .price-category-tag {
@@ -1731,6 +1771,7 @@
 
 .price-card-action {
   margin-top: auto;
+  padding: 0 var(--space-6) var(--space-6);
 }
 
 /* Enterprise / Corporate Liquid Glass Banner */
@@ -4576,15 +4617,27 @@ html, body {
     min-height: 48px !important;
   }
 
-  /* Pricing */
+  /* Pricing Page Cards — Mobile */
   .pricing-cards-grid {
     grid-template-columns: 1fr !important;
     gap: 1.35rem !important;
   }
 
   .price-card {
-    padding: 1.75rem 1.25rem !important;
-    border-radius: 22px !important;
+    padding: 0 !important;
+    border-radius: 20px !important;
+  }
+
+  .price-card-media {
+    height: 170px !important;
+  }
+
+  .price-card-inner {
+    padding: 1.25rem 1.15rem 0.75rem !important;
+  }
+
+  .price-card-action {
+    padding: 0 1.15rem 1.25rem !important;
   }
 
   .price-card-btn {
