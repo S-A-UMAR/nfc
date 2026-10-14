@@ -62,6 +62,7 @@
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+  padding-bottom: 5rem; /* clearance for fixed bottom dock */
 }
 
 @media (min-width: 480px) {
@@ -1537,17 +1538,21 @@
    MOBILE BOTTOM APP DOCK BAR
    ========================================================================== */
 .prf-app-dock {
-  position: sticky;
+  position: fixed;
   bottom: 0;
-  z-index: 50;
-  background: rgba(12, 12, 16, 0.94);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  max-width: 460px;
+  margin: 0 auto;
+  background: rgba(12, 12, 16, 0.96);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-top: 1px solid rgba(255, 255, 255, 0.10);
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .prf-dock-item {
