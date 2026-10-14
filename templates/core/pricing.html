@@ -74,7 +74,7 @@
           <h3 class="price-name">{{ pkg.name }}</h3>
           
           <div class="price-figure">
-            <span class="price-currency">₦</span>{{ pkg.price_ngn|intcomma }}
+            <span class="price-currency">₦</span><span class="price-num">{{ pkg.price_ngn|intcomma }}</span>
             <span class="price-period">one-time</span>
           </div>
 
@@ -87,7 +87,7 @@
               {% for feature in pkg.feature_list %}
               <li>
                 <span class="price-feature-check" aria-hidden="true">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
                 <span class="price-feature-text">{{ feature }}</span>
               </li>
@@ -98,9 +98,9 @@
 
         <!-- Action CTA Button (pinned to bottom) -->
         <div class="price-card-action">
-          <a href="{% url 'orders:checkout' pkg.code %}" class="btn {% if pkg.badge %}btn-primary btn-glow{% else %}btn-secondary{% endif %} btn-block btn-pill">
-            <span>Get Started</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <a href="{% url 'orders:checkout' pkg.code %}" class="price-cta-btn {% if pkg.badge %}price-cta-btn--featured{% endif %}">
+            <span>Order Package</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
       </div>
@@ -118,20 +118,23 @@
             <span class="price-category-tag">Smart NFC Card</span>
           </div>
           <h3 class="price-name">Smart NFC Card</h3>
-          <div class="price-figure"><span class="price-currency">₦</span>25,000<span class="price-period">one-time</span></div>
+          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">25,000</span><span class="price-period">one-time</span></div>
           <hr class="price-divider">
           <div class="price-features-wrapper">
             <div class="price-features-caption">INCLUDED FEATURES</div>
             <ul class="price-features-list">
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Matte Graphite NFC Card</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">QR Code Backup</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Digital Profile Page</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Lifetime Information Updates</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Matte Graphite NFC Card</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">QR Code Backup</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Digital Profile Page</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Lifetime Information Updates</span></li>
             </ul>
           </div>
         </div>
         <div class="price-card-action">
-          <a href="{% url 'accounts:register' %}" class="btn btn-secondary btn-block btn-pill">Get Started</a>
+          <a href="{% url 'accounts:register' %}" class="price-cta-btn">
+            <span>Order Card</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
       <div class="price-card featured">
@@ -144,20 +147,23 @@
             <span class="price-category-tag">Personal Identity</span>
           </div>
           <h3 class="price-name">Personal Package</h3>
-          <div class="price-figure"><span class="price-currency">₦</span>65,000<span class="price-period">one-time</span></div>
+          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">65,000</span><span class="price-period">one-time</span></div>
           <hr class="price-divider">
           <div class="price-features-wrapper">
             <div class="price-features-caption">INCLUDED FEATURES</div>
             <ul class="price-features-list">
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Smart NFC Card Included</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Personal Brand Website</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Portfolio / Bio Sections</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Mobile Responsive Design</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Smart NFC Card Included</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Personal Brand Website</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Portfolio / Bio Sections</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Mobile Responsive Design</span></li>
             </ul>
           </div>
         </div>
         <div class="price-card-action">
-          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-glow btn-block btn-pill">Get Started</a>
+          <a href="{% url 'accounts:register' %}" class="price-cta-btn price-cta-btn--featured">
+            <span>Order Package</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
       <div class="price-card">
@@ -169,20 +175,23 @@
             <span class="price-category-tag">Business Suite</span>
           </div>
           <h3 class="price-name">Business Suite</h3>
-          <div class="price-figure"><span class="price-currency">₦</span>95,000<span class="price-period">one-time</span></div>
+          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">95,000</span><span class="price-period">one-time</span></div>
           <hr class="price-divider">
           <div class="price-features-wrapper">
             <div class="price-features-caption">INCLUDED FEATURES</div>
             <ul class="price-features-list">
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Smart NFC Card Included</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Full Business Website</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">Product Showcase & Catalog</span></li>
-              <li><span class="price-feature-check">✓</span><span class="price-feature-text">WhatsApp Order Integration</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Smart NFC Card Included</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Full Business Website</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Product Showcase & Catalog</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">WhatsApp Order Integration</span></li>
             </ul>
           </div>
         </div>
         <div class="price-card-action">
-          <a href="{% url 'accounts:register' %}" class="btn btn-secondary btn-block btn-pill">Get Started</a>
+          <a href="{% url 'accounts:register' %}" class="price-cta-btn">
+            <span>Order Suite</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
     </div>
