@@ -474,3 +474,45 @@ class BrevoEmailService:
             profile.full_name,
         )
 
+    # 13. Contact Exchange Visitor Confirmation
+    # -------------------------------------------------------------------------
+    @classmethod
+    def send_contact_exchange_visitor_confirmation(cls, contact_exchange):
+        """
+        Confirmation sent to the visitor after they submit their contact details.
+        Only sent when the visitor provided an email address.
+        """
+        if not contact_exchange.email:
+            return  # No email to send to
+
+        profile = contact_exchange.profile
+        site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+        profile_url = f"{site_url}/u/{profile.slug}/"
+
+        body = f"""
+        <p>Hi <strong>{contact_exchange.full_name}</strong>,</p>
+        <p>Your contact details have been shared with <strong>{profile.full_name}</strong> through their UZYRA digital profile. They'll be in touch soon!</p>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
+            <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">What you shared</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
+                <tr><td style="padding: 6px 0; color: #8E95A3; width: 40%;">Name</td><td style="padding: 6px 0; font-weight: 600; color: #FFFFFF;">{contact_exchange.full_name}</td></tr>
+                <tr><td style="padding: 6px 0; color: #8E95A3;">Email</td><td style="padding: 6px 0;">{contact_exchange.email}</td></tr>
+                {'<tr><td style="padding: 6px 0; color: #8E95A3;">Phone</td><td style="padding: 6px 0;">' + contact_exchange.phone + '</td></tr>' if contact_exchange.phone else ''}
+                {'<tr><td style="padding: 6px 0; color: #8E95A3;">Company</td><td style="padding: 6px 0;">' + contact_exchange.business_name + '</td></tr>' if contact_exchange.business_name else ''}
+            </table>
+        </div>
+        <p style="font-size: 13px; color: #A1A1AA;">If you didn't submit this, you can safely ignore this email.</p>
+        """
+        html = _render_email_template(
+            title="Contact Submitted ✓",
+            subtitle=f"You shared your details with {profile.full_name}.",
+            body_html=body,
+            cta_text=f"View {profile.full_name}'s Profile",
+            cta_url=profile_url
+        )
+        return cls.send_transactional_email(
+            contact_exchange.email,
+            f"Your contact was shared with {profile.full_name} — UZYRA",
+            html,
+            contact_exchange.full_name,
+        )

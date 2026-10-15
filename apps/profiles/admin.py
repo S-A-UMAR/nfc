@@ -59,3 +59,19 @@ class ProfileTestimonialAdmin(admin.ModelAdmin):
     list_display = ('profile', 'client_name', 'client_title', 'rating', 'order')
     search_fields = ('profile__full_name', 'client_name', 'client_title', 'content')
 
+
+@admin.register(ContactExchange)
+class ContactExchangeAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'profile', 'email', 'phone', 'business_name', 'is_read', 'consent_given', 'created_at')
+    list_filter = ('is_read', 'consent_given', 'created_at')
+    search_fields = ('full_name', 'email', 'phone', 'business_name', 'profile__full_name', 'notes')
+    readonly_fields = ('profile', 'full_name', 'email', 'phone', 'business_name', 'notes',
+                       'consent_given', 'ip_address', 'user_agent', 'created_at', 'is_read', 'read_at')
+    date_hierarchy = 'created_at'
+    ordering = ('-created_at',)
+
+    def has_add_permission(self, request):
+        return False  # Contacts are only created by visitors, never manually
+
+    def has_change_permission(self, request, obj=None):
+        return False  # Read-only in admin — changes happen via dashboard only

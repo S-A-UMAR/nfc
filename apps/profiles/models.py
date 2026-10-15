@@ -257,6 +257,8 @@ class ContactExchange(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    is_read = models.BooleanField(default=False, db_index=True, help_text="Whether the profile owner has viewed this contact")
+    read_at = models.DateTimeField(null=True, blank=True, help_text="When the profile owner first viewed this contact")
 
     class Meta:
         ordering = ['-created_at']
@@ -265,4 +267,12 @@ class ContactExchange(models.Model):
 
     def __str__(self):
         return f"Lead: {self.full_name} -> {self.profile.full_name}"
+
+    def mark_read(self):
+        """Mark this contact as read if not already read."""
+        if not self.is_read:
+            from django.utils import timezone
+            self.is_read = True
+            self.read_at = timezone.now()
+            self.save(update_fields=['is_read', 'read_at'])
 

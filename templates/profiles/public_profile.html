@@ -946,7 +946,7 @@
     </div>
     <p style="font-size: 0.825rem; color: #A1A1AA; margin-bottom: 1.15rem;">Send your contact details to <strong>{{ profile.full_name }}</strong> so they can reach back out to you.</p>
 
-    <form id="exchange-form" method="POST">
+    <form id="exchange-form" method="POST" action="{% url 'profiles:submit_contact_exchange' profile.slug %}">
       {% csrf_token %}
       <div style="margin-bottom: 0.75rem;">
         <input type="text" name="full_name" class="form-control" placeholder="Your Full Name *" required style="width: 100%; background: #18181C; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.7rem 0.85rem; color: #FFFFFF; font-size: 0.875rem;" />

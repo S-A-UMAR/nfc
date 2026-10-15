@@ -598,7 +598,14 @@ def submit_contact_exchange_view(request, slug):
             BrevoEmailService.send_contact_exchange_notification(contact_exchange)
         except Exception as e:
             import logging
-            logging.getLogger('uzyra.contact_exchange').error(f"Contact exchange email notification failed: {e}")
+            logging.getLogger('uzyra.contact_exchange').error(f"Contact exchange owner notification failed: {e}")
+
+        # Send confirmation to the visitor (only if they provided an email)
+        try:
+            BrevoEmailService.send_contact_exchange_visitor_confirmation(contact_exchange)
+        except Exception as e:
+            import logging
+            logging.getLogger('uzyra.contact_exchange').error(f"Contact exchange visitor confirmation failed: {e}")
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
             return JsonResponse({'success': True, 'message': f'Your contact details have been shared with {profile.full_name}. Thank you!'})
@@ -619,13 +626,22 @@ def dashboard_contacts_view(request):
     Dashboard Received Contacts (/dashboard/contacts/).
     Displays leads submitted to request.user.profile via contact exchange.
     Enforces strict user isolation (IDOR protection).
+    Marks all unread contacts as read when page is visited.
     """
+    from django.utils import timezone
     profile = request.user.profile
     contacts = profile.received_contacts.all()
+
+    # Bulk mark all unread contacts as read on page visit
+    unread_qs = contacts.filter(is_read=False)
+    unread_count = unread_qs.count()
+    if unread_count > 0:
+        unread_qs.update(is_read=True, read_at=timezone.now())
 
     return render(request, 'dashboard/contacts.html', {
         'profile': profile,
         'contacts': contacts,
+        'new_count': unread_count,  # how many were newly read this visit
     })
 
 

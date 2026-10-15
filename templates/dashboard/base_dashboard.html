@@ -60,6 +60,9 @@
         <a href="{% url 'dashboard:contacts_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Contacts Received</span>
+          {% if unread_contacts_count > 0 %}
+          <span style="margin-left: auto; background: #A855F7; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 999px; min-width: 1.3rem; text-align: center; line-height: 1.6;">{{ unread_contacts_count }}</span>
+          {% endif %}
         </a>
         <a href="{% url 'dashboard:appearance' %}" class="sidebar-link {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
@@ -177,9 +180,10 @@
     <div class="mobile-dash-sheet-body">
       <div class="sheet-category-title">Growth &amp; Interactions</div>
       <div class="sheet-nav-grid">
-        <a href="{% url 'dashboard:contacts_list' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}">
+        <a href="{% url 'dashboard:contacts_list' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}" style="position: relative;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Contacts Received</span>
+          {% if unread_contacts_count > 0 %}<span style="position: absolute; top: 6px; right: 6px; background: #A855F7; color: #fff; font-size: 0.6rem; font-weight: 700; padding: 0.05rem 0.35rem; border-radius: 999px; line-height: 1.5;">{{ unread_contacts_count }}</span>{% endif %}
         </a>
         <a href="{% url 'dashboard:appearance' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
