@@ -1,7 +1,6 @@
 /* ==========================================================================
-   UZYRA MINIMAL EXECUTIVE ADMIN THEME
-   Inspired by Linear / Vercel / Stripe design systems.
-   Clean, refined, smooth, distraction-free.
+   UZYRA DESKTOP-OPTIMIZED MINIMAL ADMIN THEME
+   Refined Linear / Vercel design system for wide modern displays.
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@600;700&display=swap');
@@ -16,10 +15,10 @@ html[data-theme="light"] {
   --body-loud-color: #FFFFFF !important;
 
   /* Surfaces & Neutral Cards */
-  --surface-base: #111218 !important;
+  --surface-base: #101117 !important;
   --surface-card: #13141B !important;
-  --surface-card-hover: #181922 !important;
-  --darkened-bg: #15161E !important;
+  --surface-card-hover: #171823 !important;
+  --darkened-bg: #14151D !important;
   --selected-bg: rgba(168, 85, 247, 0.08) !important;
   --selected-row: rgba(168, 85, 247, 0.05) !important;
 
@@ -27,12 +26,11 @@ html[data-theme="light"] {
   --border-color: rgba(255, 255, 255, 0.07) !important;
   --hairline-color: rgba(255, 255, 255, 0.04) !important;
 
-  /* Brand Accents — Used Sparingly */
-  --primary: #111218 !important;
+  /* Brand Accents */
+  --primary: #101117 !important;
   --primary-fg: #FFFFFF !important;
   --accent: #A855F7 !important;
   --accent-hover: #9333EA !important;
-  --accent-subtle: rgba(168, 85, 247, 0.12) !important;
 
   /* Links */
   --link-fg: #D4D4D8 !important;
@@ -62,7 +60,7 @@ html[data-theme="light"] {
 }
 
 /* ==========================================================================
-   RESET & TYPOGRAPHY
+   RESET DJANGO FLOATS & CONTAINER LAYOUT FOR DESKTOP
    ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -77,20 +75,59 @@ body {
   letter-spacing: -0.011em !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#container {
+  width: 100% !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#container > .main {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#content {
+  width: 100% !important;
+  max-width: 1680px !important;
+  margin: 0 auto !important;
+  padding: 2.5rem 3.5rem !important;
+  float: none !important;
+  flex: 1 !important;
+}
+
+#content-main {
+  width: 100% !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
+#content-related {
+  display: none !important; /* Replaced by custom full-width panel */
 }
 
 /* ==========================================================================
-   MINIMAL HEADER & TOP NAVIGATION
+   HEADER & TOP NAVIGATION
    ========================================================================== */
 #header {
   background: #0E0F14 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
-  padding: 0.75rem 2rem !important;
-  height: 60px !important;
+  padding: 0 3.5rem !important;
+  height: 62px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   box-shadow: none !important;
+  width: 100% !important;
 }
 
 #branding {
@@ -107,7 +144,7 @@ body {
 #branding a {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 0.6rem !important;
+  gap: 0.65rem !important;
   text-decoration: none !important;
   color: #FFFFFF !important;
 }
@@ -130,6 +167,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
   padding: 0.15rem 0.5rem !important;
   border-radius: 6px !important;
+  margin-left: 0.35rem;
 }
 
 #user-tools {
@@ -155,6 +193,20 @@ body {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
+.uzyra-nav-divider {
+  color: rgba(255, 255, 255, 0.1);
+  margin: 0 0.15rem;
+}
+
+.uzyra-user-badge {
+  color: #71717A;
+  font-size: 0.775rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .uzyra-btn-logout {
   background: transparent !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -175,72 +227,87 @@ body {
 }
 
 /* ==========================================================================
-   BREADCRUMBS
+   PAGE HEADER
    ========================================================================== */
-.breadcrumbs {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  padding: 0.75rem 2rem !important;
-  font-size: 0.8rem !important;
-  color: #52525B !important;
+.uzyra-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.breadcrumbs a {
-  color: #8E8E93 !important;
-  text-decoration: none !important;
-  transition: color 0.15s ease;
-}
-
-.breadcrumbs a:hover {
-  color: #FFFFFF !important;
-}
-
-/* ==========================================================================
-   CONTAINER & DASHBOARD LAYOUT
-   ========================================================================== */
-#content {
-  padding: 2rem !important;
-  max-width: 1440px !important;
-  margin: 0 auto !important;
-}
-
-#content h1 {
+.uzyra-page-title {
   font-family: 'Inter', sans-serif !important;
-  font-size: 1.35rem !important;
+  font-size: 1.45rem !important;
   font-weight: 600 !important;
   color: #FFFFFF !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.025em !important;
   margin: 0 0 0.35rem 0 !important;
 }
 
 .uzyra-page-subtitle {
-  font-size: 0.825rem;
-  color: #71717A;
-  margin-bottom: 1.75rem;
+  font-size: 0.85rem !important;
+  color: #71717A !important;
+  margin: 0 !important;
+}
+
+.uzyra-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+}
+
+.uzyra-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
 }
 
 /* ==========================================================================
-   MINIMAL STAT CARDS (TOP ROW)
+   DESKTOP 4-CARD KPI ROW
    ========================================================================== */
 .uzyra-kpi-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.25rem !important;
+  margin-bottom: 2.25rem !important;
+}
+
+@media (max-width: 1200px) {
+  .uzyra-kpi-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .uzyra-kpi-row {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .uzyra-kpi-card {
   background: #111218;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 11px;
-  padding: 1.1rem 1.25rem;
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
   text-decoration: none;
   display: block;
   transition: all 0.15s ease;
 }
 
 .uzyra-kpi-card:hover {
-  background: #14161F;
+  background: #14151F;
   border-color: rgba(255, 255, 255, 0.12);
   transform: translateY(-1px);
 }
@@ -254,7 +321,7 @@ body {
 
 .uzyra-kpi-label {
   font-size: 0.72rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #71717A;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -267,36 +334,42 @@ body {
 
 .uzyra-kpi-card:hover .uzyra-kpi-arrow {
   color: #A855F7;
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
-.uzyra-kpi-value {
+.uzyra-kpi-title {
   font-size: 1.15rem;
   font-weight: 600;
   color: #FFFFFF;
   letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.uzyra-kpi-desc {
+  font-size: 0.75rem;
+  color: #71717A;
 }
 
 /* ==========================================================================
-   MINIMAL 2-COLUMN APP MODULE GRID (NO MORE FULL-WIDTH SLABS)
+   DESKTOP 3-COLUMN APPS GRID
    ========================================================================== */
-.uzyra-grid-layout {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 1.75rem;
-  align-items: start;
+.uzyra-apps-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 1.5rem !important;
+  margin-bottom: 2.25rem !important;
 }
 
-@media (max-width: 1024px) {
-  .uzyra-grid-layout {
-    grid-template-columns: 1fr;
+@media (max-width: 1280px) {
+  .uzyra-apps-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
-.uzyra-apps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.25rem;
+@media (max-width: 768px) {
+  .uzyra-apps-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .uzyra-app-card {
@@ -408,57 +481,69 @@ body {
 }
 
 /* ==========================================================================
-   MINIMAL RECENT ACTIVITY SIDEBAR
+   DESKTOP FULL-WIDTH RECENT ACTIVITY PANEL
    ========================================================================== */
-.uzyra-sidebar-card {
+.uzyra-activity-panel {
   background: #111218;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   overflow: hidden;
+  margin-top: 1.5rem;
 }
 
-.uzyra-sidebar-header {
-  padding: 0.9rem 1.25rem;
+.uzyra-activity-header {
+  padding: 1rem 1.4rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: rgba(255, 255, 255, 0.015);
 }
 
-.uzyra-sidebar-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #D4D4D8;
+.uzyra-activity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.uzyra-activity-list {
-  padding: 0.5rem 0;
-  list-style: none;
-  margin: 0;
+@media (max-width: 1200px) {
+  .uzyra-activity-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .uzyra-activity-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .uzyra-activity-item {
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  font-size: 0.775rem;
-  line-height: 1.4;
-  color: #A1A1AA;
+  background: #111218;
+  padding: 1.1rem 1.25rem;
+  transition: background 0.12s ease;
 }
 
-.uzyra-activity-item:last-child {
-  border-bottom: none;
+.uzyra-activity-item:hover {
+  background: #14151F;
 }
 
-.uzyra-activity-item a {
+.uzyra-activity-name {
   color: #FFFFFF;
   font-weight: 500;
   text-decoration: none;
+  font-size: 0.825rem;
 }
 
-.uzyra-activity-item a:hover {
+.uzyra-activity-name:hover {
   text-decoration: underline;
+}
+
+.uzyra-activity-meta {
+  font-size: 0.72rem;
+  color: #52525B;
+  margin-top: 0.2rem;
 }
 
 .uzyra-activity-type {
@@ -468,7 +553,6 @@ body {
   font-weight: 600;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  margin-right: 0.35rem;
 }
 
 .uzyra-type-add { background: rgba(16, 185, 129, 0.12); color: #34D399; }
@@ -494,7 +578,7 @@ body {
   color: #FFFFFF !important;
   padding: 0.55rem 0.85rem !important;
   font-size: 0.84rem !important;
-  width: 280px !important;
+  width: 320px !important;
   transition: all 0.15s ease !important;
 }
 

@@ -8,21 +8,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/admin_modern.css' %}?v=2.0">
+  <link rel="stylesheet" href="{% static 'css/admin_modern.css' %}?v=3.5">
 {% endblock %}
 
 {% block branding %}
 <div id="site-name">
   <a href="{% url 'admin:index' %}">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#A855F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M12 6V18M12 12L20 7.5M12 12L4 7.5" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
     <span class="uzyra-nav-logo">UZYRA</span>
-    <span class="uzyra-nav-tag">Admin</span>
+    <span class="uzyra-nav-tag">Admin Console</span>
   </a>
 </div>
 {% endblock %}
+
+{% block welcome-msg %}{% endblock %}
 
 {% block userlinks %}
   <a href="/" target="_blank" title="View customer website">
@@ -31,8 +33,8 @@
   <a href="/dashboard/" target="_blank" title="Open customer dashboard">
     Dashboard &nearr;
   </a>
-  <span style="color: rgba(255,255,255,0.1); margin: 0 0.15rem;">|</span>
-  <span style="color: #71717A; font-size: 0.775rem;">{{ user.email|default:user.get_username }}</span>
+  <span class="uzyra-nav-divider">|</span>
+  <span class="uzyra-user-badge">{{ user.email|default:user.get_username }}</span>
   <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="display: inline;">
     {% csrf_token %}
     <button type="submit" class="uzyra-btn-logout">

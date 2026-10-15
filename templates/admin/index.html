@@ -6,20 +6,29 @@
 {% block nav-breadcrumbs %}{% endblock %}
 {% block nav-sidebar %}{% endblock %}
 
-{% block content %}
-<div style="margin-bottom: 1.5rem;">
-  <h1 style="font-family: 'Inter', sans-serif; font-size: 1.35rem; font-weight: 600; color: #FFFFFF; letter-spacing: -0.02em; margin: 0 0 0.25rem 0;">Overview</h1>
-  <p class="uzyra-page-subtitle">Manage platform entities, NFC hardware, customer profiles, and operations.</p>
+{% block content_title %}
+<div class="uzyra-page-header">
+  <div>
+    <h1 class="uzyra-page-title">Platform Operations</h1>
+    <p class="uzyra-page-subtitle">Manage hardware, client profiles, commerce, and platform configuration.</p>
+  </div>
+  <div class="uzyra-header-badge">
+    <span class="uzyra-pulse-dot"></span>
+    System Healthy &middot; Active
+  </div>
 </div>
+{% endblock %}
 
-<!-- Compact KPI Quick Access Cards -->
+{% block content %}
+<!-- KPI Quick Access Bar (4 Clean Cards Across Desktop) -->
 <div class="uzyra-kpi-row">
   <a href="{% url 'admin:accounts_user_changelist' %}" class="uzyra-kpi-card">
     <div class="uzyra-kpi-header">
-      <span class="uzyra-kpi-label">User Accounts</span>
+      <span class="uzyra-kpi-label">Directory</span>
       <span class="uzyra-kpi-arrow">&rarr;</span>
     </div>
-    <div class="uzyra-kpi-value">Directory</div>
+    <div class="uzyra-kpi-title">User Accounts</div>
+    <div class="uzyra-kpi-desc">Staff &amp; customer profiles</div>
   </a>
 
   <a href="{% url 'admin:cards_card_changelist' %}" class="uzyra-kpi-card">
@@ -27,7 +36,8 @@
       <span class="uzyra-kpi-label">NFC Hardware</span>
       <span class="uzyra-kpi-arrow">&rarr;</span>
     </div>
-    <div class="uzyra-kpi-value">Smart Cards</div>
+    <div class="uzyra-kpi-title">Smart Cards</div>
+    <div class="uzyra-kpi-desc">Physical UIDs &amp; activations</div>
   </a>
 
   <a href="{% url 'admin:orders_order_changelist' %}" class="uzyra-kpi-card">
@@ -35,7 +45,8 @@
       <span class="uzyra-kpi-label">Commerce</span>
       <span class="uzyra-kpi-arrow">&rarr;</span>
     </div>
-    <div class="uzyra-kpi-value">Orders &amp; Shipments</div>
+    <div class="uzyra-kpi-title">Orders &amp; Shipments</div>
+    <div class="uzyra-kpi-desc">Hardware &amp; website tiers</div>
   </a>
 
   <a href="{% url 'admin:profiles_contactexchange_changelist' %}" class="uzyra-kpi-card">
@@ -43,87 +54,83 @@
       <span class="uzyra-kpi-label">Networking</span>
       <span class="uzyra-kpi-arrow">&rarr;</span>
     </div>
-    <div class="uzyra-kpi-value">Contact Leads</div>
+    <div class="uzyra-kpi-title">Contact Leads</div>
+    <div class="uzyra-kpi-desc">Two-way visitor submissions</div>
   </a>
 </div>
 
-<!-- Main 2-Column Dashboard Grid: Apps on Left, Activity on Right -->
-<div class="uzyra-grid-layout">
+<!-- 3-Column Desktop Apps & Models Grid -->
+<div class="uzyra-apps-grid">
+  {% for app in app_list %}
+  <div class="uzyra-app-card">
+    <div class="uzyra-app-header">
+      <span class="uzyra-app-title">{{ app.name }}</span>
+      <span class="uzyra-app-count">{{ app.models|length }} item{{ app.models|length|pluralize }}</span>
+    </div>
 
-  <!-- Left: App Cards Grid -->
-  <div class="uzyra-apps-grid">
-    {% for app in app_list %}
-    <div class="uzyra-app-card">
-      <div class="uzyra-app-header">
-        <span class="uzyra-app-title">{{ app.name }}</span>
-        <span class="uzyra-app-count">{{ app.models|length }} item{{ app.models|length|pluralize }}</span>
-      </div>
-
-      <div class="uzyra-model-list">
-        {% for model in app.models %}
-        <div class="uzyra-model-row">
-          <a href="{{ model.admin_url }}" class="uzyra-model-link">{{ model.name }}</a>
-          <div class="uzyra-model-actions">
-            {% if model.add_url %}
-            <a href="{{ model.add_url }}" class="uzyra-action-add" title="Add new {{ model.name }}">+ Add</a>
-            {% endif %}
-            {% if model.admin_url %}
-            <a href="{{ model.admin_url }}" class="uzyra-action-view" title="Manage {{ model.name }}">View</a>
-            {% endif %}
-          </div>
+    <div class="uzyra-model-list">
+      {% for model in app.models %}
+      <div class="uzyra-model-row">
+        <a href="{{ model.admin_url }}" class="uzyra-model-link">{{ model.name }}</a>
+        <div class="uzyra-model-actions">
+          {% if model.add_url %}
+          <a href="{{ model.add_url }}" class="uzyra-action-add" title="Add new {{ model.name }}">+ Add</a>
+          {% endif %}
+          {% if model.admin_url %}
+          <a href="{{ model.admin_url }}" class="uzyra-action-view" title="Manage {{ model.name }}">View</a>
+          {% endif %}
         </div>
-        {% endfor %}
       </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Full-width Recent Staff Actions Activity Trail -->
+<div class="uzyra-activity-panel">
+  <div class="uzyra-activity-header">
+    <span class="uzyra-app-title">Recent Staff Activity &middot; Audit Trail</span>
+    <span style="font-size: 0.72rem; color: #71717A;">Latest operations logged</span>
+  </div>
+
+  {% get_admin_log 8 as admin_log for_user user %}
+  {% if not admin_log %}
+  <div style="padding: 2.25rem; text-align: center; color: #52525B; font-size: 0.8rem;">
+    No recent administrative actions recorded in this session.
+  </div>
+  {% else %}
+  <div class="uzyra-activity-grid">
+    {% for entry in admin_log %}
+    <div class="uzyra-activity-item">
+      <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+        {% if entry.is_addition %}
+          <span class="uzyra-activity-type uzyra-type-add">Added</span>
+        {% elif entry.is_change %}
+          <span class="uzyra-activity-type uzyra-type-change">Edited</span>
+        {% elif entry.is_deletion %}
+          <span class="uzyra-activity-type uzyra-type-delete">Deleted</span>
+        {% endif %}
+
+        {% if entry.is_deletion or not entry.get_admin_url %}
+          <span class="uzyra-activity-name">{{ entry.object_repr|truncatechars:28 }}</span>
+        {% else %}
+          <a href="{{ entry.get_admin_url }}" class="uzyra-activity-name">{{ entry.object_repr|truncatechars:28 }}</a>
+        {% endif %}
+      </div>
+
+      {% if entry.content_type %}
+        <div class="uzyra-activity-meta">
+          {{ entry.content_type.name|capfirst }}
+        </div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
-
-  <!-- Right: Minimal Activity Trail -->
-  <div>
-    <div class="uzyra-sidebar-card">
-      <div class="uzyra-sidebar-header">
-        <span class="uzyra-sidebar-title">Recent Activity</span>
-      </div>
-
-      {% get_admin_log 8 as admin_log for_user user %}
-      {% if not admin_log %}
-      <div style="padding: 1.5rem 1.25rem; text-align: center; color: #52525B; font-size: 0.775rem;">
-        No recent audit actions recorded.
-      </div>
-      {% else %}
-      <ul class="uzyra-activity-list">
-        {% for entry in admin_log %}
-        <li class="uzyra-activity-item">
-          <div>
-            {% if entry.is_addition %}
-              <span class="uzyra-activity-type uzyra-type-add">Added</span>
-            {% elif entry.is_change %}
-              <span class="uzyra-activity-type uzyra-type-change">Edited</span>
-            {% elif entry.is_deletion %}
-              <span class="uzyra-activity-type uzyra-type-delete">Deleted</span>
-            {% endif %}
-
-            {% if entry.is_deletion or not entry.get_admin_url %}
-              <span>{{ entry.object_repr }}</span>
-            {% else %}
-              <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
-            {% endif %}
-          </div>
-          {% if entry.content_type %}
-            <div style="font-size: 0.7rem; color: #52525B; margin-top: 0.2rem;">
-              {{ entry.content_type.name|capfirst }}
-            </div>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-    </div>
-  </div>
-
+  {% endif %}
 </div>
 {% endblock %}
 
 {% block sidebar %}
-<!-- Handled inside the main 2-column grid above -->
+<!-- Handled inside full-width activity panel above -->
 {% endblock %}
