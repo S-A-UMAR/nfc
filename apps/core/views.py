@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.conf import settings
 from apps.orders.models import ProductPackage
 from apps.profiles.models import Profile
 from .forms import ContactForm, BusinessInquiryForm
@@ -100,6 +101,7 @@ def robots_txt_view(request):
         "Disallow: /dashboard/",
         "Disallow: /operations/",
         "Disallow: /admin/",
+        f"Disallow: /{getattr(settings, 'ADMIN_URL_PATH', 'manage-hq-9842')}/",
         "Disallow: /accounts/",
         "Disallow: /payments/",
         "Disallow: /orders/",

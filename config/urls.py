@@ -17,8 +17,14 @@ SITEMAPS = {
     "websites": WebsiteSitemap,
 }
 
+# Custom Branded Admin Site Headers
+admin.site.site_header = "UZYRA Command Center"
+admin.site.site_title = "UZYRA Admin HQ"
+admin.site.index_title = "Platform Management & Operations"
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Obscured Admin URL (Shielded against automated bots scanning /admin/)
+    path(f'{settings.ADMIN_URL_PATH}/', admin.site.urls),
 
     # SEO
     path('robots.txt', robots_txt_view, name='robots_txt'),

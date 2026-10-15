@@ -42,6 +42,10 @@ else:
     # Development fallback
     CSRF_TRUSTED_ORIGINS = []
 
+# Obscured Admin URL Path (Prevents automated bots and unauthorized visitors from discovering /admin/)
+# Set DJANGO_ADMIN_URL in environment if you want a custom secret slug.
+ADMIN_URL_PATH = os.environ.get('DJANGO_ADMIN_URL', 'manage-hq-9842').strip('/')
+
 # Render reverse proxy — required so Django knows requests arrive via HTTPS
 # Render terminates SSL and forwards requests as HTTP internally
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -1,0 +1,588 @@
+/* ==========================================================================
+   UZYRA MODERN ADMIN THEME (OBSIDIAN & PURPLE EXECUTIVE SYSTEM)
+   Custom stylesheet overriding Django 5.x admin tokens and layouts.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@600;700;800&display=swap');
+
+:root,
+html[data-theme="dark"],
+html[data-theme="light"] {
+  /* Dark Obsidian Palette */
+  --body-bg: #090A0E !important;
+  --body-fg: #E4E4E7 !important;
+  --body-quiet-color: #A1A1AA !important;
+  --body-loud-color: #FFFFFF !important;
+
+  /* Brand Accents */
+  --primary: #12131A !important;
+  --primary-fg: #FFFFFF !important;
+  --accent: #A855F7 !important;
+  --accent-hover: #9333EA !important;
+  --accent-light: #C084FC !important;
+
+  /* Surfaces & Cards */
+  --surface-card: #121319 !important;
+  --surface-card-hover: #171821 !important;
+  --darkened-bg: #15161E !important;
+  --selected-bg: rgba(168, 85, 247, 0.12) !important;
+  --selected-row: rgba(168, 85, 247, 0.08) !important;
+
+  /* Borders & Dividers */
+  --border-color: rgba(255, 255, 255, 0.08) !important;
+  --hairline-color: rgba(255, 255, 255, 0.05) !important;
+
+  /* Links & Highlights */
+  --link-fg: #C084FC !important;
+  --link-hover-color: #E9D5FF !important;
+  --link-selected-fg: #A855F7 !important;
+
+  /* Header & Breadcrumbs */
+  --header-bg: #0C0D12 !important;
+  --header-color: #FFFFFF !important;
+  --breadcrumbs-bg: #0E0F15 !important;
+  --breadcrumbs-link-fg: #A1A1AA !important;
+
+  /* Buttons */
+  --button-bg: #A855F7 !important;
+  --button-hover-bg: #9333EA !important;
+  --button-fg: #FFFFFF !important;
+  --default-button-bg: #1C1D26 !important;
+  --default-button-hover-bg: #272835 !important;
+
+  /* Messages */
+  --message-success-bg: rgba(16, 185, 129, 0.15) !important;
+  --message-warning-bg: rgba(245, 158, 11, 0.15) !important;
+  --message-error-bg: rgba(239, 68, 68, 0.15) !important;
+  --error-fg: #F87171 !important;
+
+  color-scheme: dark !important;
+}
+
+/* ==========================================================================
+   GLOBAL BASE & TYPOGRAPHY
+   ========================================================================== */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  background: var(--body-bg) !important;
+  color: var(--body-fg) !important;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* ==========================================================================
+   HEADER & TOP NAVIGATION
+   ========================================================================== */
+#header {
+  background: #0C0D12 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 0.9rem 1.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+#branding {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+#branding h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#branding h1 a {
+  font-family: 'Sora', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+  letter-spacing: 0.02em !important;
+  color: #FFFFFF !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  text-decoration: none !important;
+}
+
+#branding h1 a::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+}
+
+.uzyra-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  color: #C084FC;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  margin-left: 0.75rem;
+}
+
+#user-tools {
+  font-size: 0.8rem !important;
+  color: #A1A1AA !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+}
+
+#user-tools a {
+  color: #D4D4D8 !important;
+  text-decoration: none !important;
+  padding: 0.35rem 0.75rem !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  transition: all 0.15s ease !important;
+  font-weight: 500 !important;
+}
+
+#user-tools a:hover {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+#user-tools strong {
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   BREADCRUMBS
+   ========================================================================== */
+.breadcrumbs {
+  background: #0E0F15 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 0.75rem 1.75rem !important;
+  font-size: 0.825rem !important;
+  color: #71717A !important;
+}
+
+.breadcrumbs a {
+  color: #A1A1AA !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease;
+}
+
+.breadcrumbs a:hover {
+  color: #C084FC !important;
+}
+
+/* ==========================================================================
+   MAIN CONTENT AREA & DASHBOARD MODULES
+   ========================================================================== */
+#content {
+  padding: 1.75rem !important;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#content h1 {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Dashboard App Modules (Cards) */
+.module {
+  background: #121319 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.module:hover {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+.module caption,
+.module h2 {
+  background: #161720 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 0.85rem 1.25rem !important;
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #C084FC !important;
+  text-align: left !important;
+}
+
+.module caption a,
+.module h2 a {
+  color: #C084FC !important;
+  text-decoration: none !important;
+}
+
+.module table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.module tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  transition: background 0.15s ease !important;
+}
+
+.module tr:last-child {
+  border-bottom: none !important;
+}
+
+.module tr:hover {
+  background: rgba(168, 85, 247, 0.04) !important;
+}
+
+.module th,
+.module td {
+  padding: 0.85rem 1.25rem !important;
+  font-size: 0.875rem !important;
+}
+
+.module th a {
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease;
+}
+
+.module th a:hover {
+  color: #C084FC !important;
+}
+
+/* Action Links (Add & Change buttons) */
+.module .addlink,
+.module .changelink,
+.module .viewlink {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  padding: 0.25rem 0.65rem !important;
+  border-radius: 8px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.module .addlink {
+  background: rgba(168, 85, 247, 0.12) !important;
+  border: 1px solid rgba(168, 85, 247, 0.3) !important;
+  color: #C084FC !important;
+}
+
+.module .addlink:hover {
+  background: #A855F7 !important;
+  color: #FFFFFF !important;
+}
+
+.module .changelink {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #D4D4D8 !important;
+}
+
+.module .changelink:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.module .viewlink {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  color: #34D399 !important;
+}
+
+/* Recent Actions Sidebar */
+#content-related {
+  margin-right: 0 !important;
+  width: 300px !important;
+}
+
+#content-related .module {
+  background: #121319 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  padding: 1rem 1.25rem !important;
+}
+
+#content-related h2 {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 0 0.85rem 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-bottom: 0.85rem !important;
+}
+
+.actionlist {
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.actionlist li {
+  padding: 0.5rem 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
+  color: #A1A1AA !important;
+}
+
+/* ==========================================================================
+   TABLE CHANGE LISTS & SEARCH
+   ========================================================================== */
+#toolbar {
+  background: #121319 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 0.85rem 1rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+#searchbar {
+  background: #171822 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  padding: 0.5rem 0.85rem !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+}
+
+#searchbar:focus {
+  border-color: #A855F7 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25) !important;
+}
+
+#toolbar input[type="submit"] {
+  background: #A855F7 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease !important;
+}
+
+#toolbar input[type="submit"]:hover {
+  background: #9333EA !important;
+}
+
+/* Tables */
+#changelist table {
+  background: #121319 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+#changelist thead th {
+  background: #161722 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #A1A1AA !important;
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 0.85rem 1rem !important;
+}
+
+#changelist thead th a {
+  color: #A1A1AA !important;
+}
+
+#changelist thead th.sorted {
+  color: #C084FC !important;
+}
+
+#changelist tbody tr {
+  transition: background 0.15s ease !important;
+}
+
+#changelist tbody tr:hover {
+  background: rgba(168, 85, 247, 0.06) !important;
+}
+
+#changelist tbody td,
+#changelist tbody th {
+  padding: 0.85rem 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  font-size: 0.875rem !important;
+  color: #E4E4E7 !important;
+}
+
+/* Filter Sidebar */
+#changelist-filter {
+  background: #121319 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  padding: 1.25rem !important;
+}
+
+#changelist-filter h2 {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: #C084FC !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-bottom: 0.75rem !important;
+  margin-bottom: 1rem !important;
+}
+
+#changelist-filter h3 {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: #A1A1AA !important;
+  margin-top: 1rem !important;
+}
+
+#changelist-filter ul {
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+#changelist-filter li.selected a {
+  color: #A855F7 !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   FORMS & INPUTS
+   ========================================================================== */
+fieldset {
+  background: #121319 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  padding: 1.25rem 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+fieldset h2 {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding-bottom: 0.75rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select {
+  background: #171822 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  padding: 0.55rem 0.85rem !important;
+  font-size: 0.875rem !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #A855F7 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25) !important;
+}
+
+.submit-row {
+  background: rgba(18, 19, 25, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.25rem !important;
+  margin-top: 2rem !important;
+}
+
+.submit-row input[type="submit"] {
+  background: #A855F7 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  padding: 0.6rem 1.25rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease !important;
+}
+
+.submit-row input[type="submit"]:hover {
+  background: #9333EA !important;
+}
+
+.submit-row a.deletelink {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #F87171 !important;
+  padding: 0.55rem 1rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+.submit-row a.deletelink:hover {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   BUTTONS & OBJECT TOOLS
+   ========================================================================== */
+.object-tools a {
+  background: #A855F7 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  padding: 0.55rem 1.1rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.3) !important;
+  transition: all 0.15s ease !important;
+}
+
+.object-tools a:hover {
+  background: #9333EA !important;
+  transform: translateY(-1px);
+}

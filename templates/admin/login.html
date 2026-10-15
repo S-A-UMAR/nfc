@@ -1,0 +1,201 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Sign In | UZYRA Command Center{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    body.login {
+      background:
+        radial-gradient(1000px 600px at 50% -10%, rgba(168, 85, 247, 0.12) 0%, rgba(12, 13, 18, 0.95) 60%),
+        #090A0E !important;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #header {
+      display: none !important;
+    }
+
+    #content {
+      width: 100% !important;
+      max-width: 440px !important;
+      margin: 0 auto !important;
+      padding: 1.5rem !important;
+    }
+
+    .uzyra-login-card {
+      background: rgba(18, 19, 25, 0.9) !important;
+      backdrop-filter: blur(24px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 20px !important;
+      padding: 2.25rem !important;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+      text-align: center;
+    }
+
+    .uzyra-login-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(192, 132, 252, 0.08));
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+      box-shadow: 0 0 24px rgba(168, 85, 247, 0.25);
+    }
+
+    .uzyra-login-title {
+      font-family: 'Sora', sans-serif !important;
+      font-size: 1.35rem !important;
+      font-weight: 800 !important;
+      color: #FFFFFF !important;
+      letter-spacing: 0.02em !important;
+      margin-bottom: 0.35rem !important;
+    }
+
+    .uzyra-login-sub {
+      font-size: 0.8rem !important;
+      color: #A1A1AA !important;
+      margin-bottom: 1.75rem !important;
+    }
+
+    #login-form {
+      text-align: left;
+    }
+
+    #login-form .form-row {
+      margin-bottom: 1rem !important;
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    #login-form label {
+      display: block !important;
+      font-size: 0.775rem !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.06em !important;
+      color: #A1A1AA !important;
+      margin-bottom: 0.4rem !important;
+    }
+
+    #login-form input[type="text"],
+    #login-form input[type="password"] {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      background: #14151D !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 10px !important;
+      padding: 0.75rem 1rem !important;
+      color: #FFFFFF !important;
+      font-size: 0.9rem !important;
+    }
+
+    #login-form input[type="text"]:focus,
+    #login-form input[type="password"]:focus {
+      border-color: #A855F7 !important;
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25) !important;
+      outline: none !important;
+    }
+
+    #login-form .submit-row {
+      margin-top: 1.5rem !important;
+      padding: 0 !important;
+      background: none !important;
+      border: none !important;
+    }
+
+    #login-form input[type="submit"] {
+      width: 100% !important;
+      background: linear-gradient(135deg, #A855F7 0%, #7E22CE 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 10px !important;
+      padding: 0.85rem !important;
+      font-family: 'Sora', sans-serif !important;
+      font-size: 0.9rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.03em !important;
+      color: #FFFFFF !important;
+      cursor: pointer !important;
+      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #login-form input[type="submit"]:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 12px 28px rgba(168, 85, 247, 0.5) !important;
+    }
+
+    .uzyra-login-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      color: #71717A;
+      margin-top: 1.5rem;
+    }
+  </style>
+{% endblock %}
+
+{% block bodyclass %}login{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="uzyra-login-card">
+  <div class="uzyra-login-logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#C084FC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 6V18M12 12L20 7.5M12 12L4 7.5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h1 class="uzyra-login-title">UZYRA Command Center</h1>
+  <p class="uzyra-login-sub">Restricted Staff &amp; Systems Management Console</p>
+
+  {% if form.errors and not form.non_field_errors %}
+  <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.8rem; color: #F87171; margin-bottom: 1rem; text-align: left;">
+    Please enter your valid staff email and password.
+  </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+  {% for error in form.non_field_errors %}
+  <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.8rem; color: #F87171; margin-bottom: 1rem; text-align: left;">
+    {{ error }}
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <form action="{{ app_path }}" method="post" id="login-form">
+    {% csrf_token %}
+    <div class="form-row">
+      <label for="id_username">Staff Email</label>
+      <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" placeholder="admin@uzyra.com">
+    </div>
+    <div class="form-row">
+      <label for="id_password">Security Key (Password)</label>
+      <input type="password" name="password" autocomplete="current-password" required id="id_password" placeholder="••••••••••••">
+      <input type="hidden" name="next" value="{{ next }}">
+    </div>
+    <div class="submit-row">
+      <input type="submit" value="Authenticate &rarr;">
+    </div>
+  </form>
+
+  <div class="uzyra-login-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span>Authorized Personnel Only · All Attempts Logged</span>
+  </div>
+</div>
+{% endblock %}

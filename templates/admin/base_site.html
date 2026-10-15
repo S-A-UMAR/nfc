@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"UZYRA Admin HQ" }}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/admin_modern.css' %}?v=1.2">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name" style="display: flex; align-items: center; gap: 0.75rem;">
+  <a href="{% url 'admin:index' %}" style="display: inline-flex; align-items: center; gap: 0.65rem; text-decoration: none;">
+    <!-- UZYRA Hex Logo Icon -->
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#A855F7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 6V18M12 12L20 7.5M12 12L4 7.5" stroke="#C084FC" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.15rem; color: #FFFFFF; letter-spacing: 0.02em;">UZYRA</span>
+    <span style="font-size: 0.8rem; font-weight: 600; color: #A1A1AA; text-transform: uppercase; letter-spacing: 0.08em; border-left: 1px solid rgba(255,255,255,0.15); padding-left: 0.65rem;">Command Center</span>
+  </a>
+  <span class="uzyra-status-badge">
+    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
+    Secure Staff Portal
+  </span>
+</div>
+{% endblock %}
+
+{% block userlinks %}
+  <a href="/" target="_blank" style="display: inline-flex; align-items: center; gap: 0.35rem;" title="View public customer website">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    Public Site
+  </a>
+  <a href="/dashboard/" target="_blank" style="display: inline-flex; align-items: center; gap: 0.35rem;" title="Open customer dashboard">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  {% if has_permission %}
+    <a href="{% url 'admin:password_change' %}">Change Password</a>
+  {% endif %}
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); color: #F87171; border-radius: 8px; padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseleave="this.style.background='rgba(239, 68, 68, 0.12)'">
+      Log Out
+    </button>
+  </form>
+{% endblock %}
