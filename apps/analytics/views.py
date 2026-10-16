@@ -42,9 +42,18 @@ def track_event_api(request):
         if event_type not in ALLOWED_EVENT_TYPES:
             return JsonResponse({'status': 'error', 'message': 'Invalid event type'}, status=400)
 
-        profile = Profile.objects.filter(slug=slug).first()
+        profile = Profile.objects.filter(slug=slug).select_related('user').first()
         if not profile:
             return JsonResponse({'status': 'error', 'message': 'Profile not found'}, status=404)
+
+        # Filter out owner actions (authenticated user == profile.user OR owner cookie present OR data['is_owner'] is True)
+        is_owner = (
+            (request.user.is_authenticated and profile.user and request.user == profile.user)
+            or (request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1')
+            or data.get('is_owner') is True
+        )
+        if is_owner:
+            return JsonResponse({'status': 'ignored_owner', 'message': 'Owner actions are excluded from analytics'})
 
         AnalyticsEvent.objects.create(
             profile=profile,

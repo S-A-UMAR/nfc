@@ -191,6 +191,11 @@ function initAnalyticsTracking() {
 
       if (!eventType || !profileSlug) return;
 
+      // Suppress beacon if visitor is identified as the profile owner
+      if (window.UZYRA_IS_OWNER === true || (typeof getCookie === 'function' && getCookie('uzyra_owner_' + profileSlug) === '1')) {
+        return;
+      }
+
       // Asynchronously send tracking beacon
       const payload = {
         profile_slug: profileSlug,

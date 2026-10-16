@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
@@ -12,11 +13,11 @@ def nfc_redirect_view(request, card_code):
     When an NFC card or QR code is tapped/scanned:
     1. Look up the card code in the database.
     2. Check status (ACTIVE, UNASSIGNED, RESERVED, LOST, SUSPENDED, REPLACED).
-    3. Log event.
-    4. Route appropriately.
+    3. Filter owner taps & log non-owner events.
+    4. Route appropriately with sensory feedback trigger (?tap=1 or ?scan=1).
     """
     try:
-        card = Card.objects.select_related('profile', 'replacement_for').get(card_code__iexact=card_code.strip())
+        card = Card.objects.select_related('profile', 'profile__user', 'user', 'replacement_for').get(card_code__iexact=card_code.strip())
     except Card.DoesNotExist:
         return render(request, 'cards/card_not_found.html', {'card_code': card_code}, status=404)
 
@@ -24,25 +25,41 @@ def nfc_redirect_view(request, card_code):
     is_qr = request.GET.get('source') == 'qr'
     event_type = CardEvent.EVENT_QR if is_qr else CardEvent.EVENT_NFC
 
-    # Log Card Event
-    CardEvent.objects.create(
-        card=card,
-        event_type=event_type,
-        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
-    )
+    # Check if visitor is the owner of this card/profile
+    is_owner = False
+    if request.user.is_authenticated:
+        if (card.user and request.user == card.user) or (card.profile and card.profile.user and request.user == card.profile.user):
+            is_owner = True
+    if not is_owner and card.profile and request.COOKIES.get(f'uzyra_owner_{card.profile.slug}') == '1':
+        is_owner = True
+
+    # Log Card Event only if visitor is not the owner
+    if not is_owner:
+        CardEvent.objects.create(
+            card=card,
+            event_type=event_type,
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+        )
 
     # Status Routing Engine
     if card.status == Card.STATUS_ACTIVE:
         if card.profile and card.profile.slug:
-            # Also log analytics event for the profile owner
-            AnalyticsEvent.objects.create(
-                profile=card.profile,
-                card=card,
-                event_type=AnalyticsEvent.TYPE_CARD_TAP if not is_qr else AnalyticsEvent.TYPE_QR_SCAN,
-                user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
-                referer=request.META.get('HTTP_REFERER', '')[:255]
-            )
-            return redirect('profiles:public_profile', slug=card.profile.slug)
+            # Also log analytics event for the profile owner only for external taps
+            if not is_owner:
+                AnalyticsEvent.objects.create(
+                    profile=card.profile,
+                    card=card,
+                    event_type=AnalyticsEvent.TYPE_CARD_TAP if not is_qr else AnalyticsEvent.TYPE_QR_SCAN,
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
+                    referer=request.META.get('HTTP_REFERER', '')[:255]
+                )
+            target_url = reverse('profiles:public_profile', kwargs={'slug': card.profile.slug})
+            response = redirect(target_url)
+            # Short-lived sensory feedback cookie consumed upon profile load (30 seconds)
+            response.set_cookie('uzyra_tap', '1', max_age=30, samesite='Lax')
+            if is_owner:
+                response.set_cookie(f'uzyra_owner_{card.profile.slug}', '1', max_age=365 * 24 * 3600, samesite='Lax')
+            return response
         else:
             return render(request, 'cards/card_unlinked.html', {'card': card})
 

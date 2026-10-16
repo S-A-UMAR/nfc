@@ -6,6 +6,10 @@ from apps.profiles.models import Profile
 from .forms import ContactForm, BusinessInquiryForm
 
 def home_view(request):
+    # Auto-redirect authenticated users to dashboard workspace unless explicitly requesting public landing
+    if request.user.is_authenticated and not request.GET.get('public'):
+        return redirect('dashboard:overview')
+
     packages = ProductPackage.objects.filter(is_active=True)[:4]
     demo_profile = Profile.objects.first()
     return render(request, 'core/home.html', {

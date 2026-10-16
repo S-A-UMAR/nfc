@@ -24,15 +24,23 @@ def public_profile_view(request, slug):
     gallery_items = profile.gallery_items.all()
     testimonials = profile.testimonials.all()
 
-    # Log anonymous profile view analytics event
-    AnalyticsEvent.objects.create(
-        profile=profile,
-        event_type=AnalyticsEvent.TYPE_PROFILE_VIEW,
-        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
-        referer=request.META.get('HTTP_REFERER', '')[:255]
-    )
+    # Determine if visitor is the owner (via session or owner identification cookie)
+    is_owner = False
+    if request.user.is_authenticated and profile.user and request.user == profile.user:
+        is_owner = True
+    elif request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1':
+        is_owner = True
 
-    return render(request, 'profiles/public_profile.html', {
+    # Log anonymous profile view analytics event only if visitor is NOT the owner
+    if not is_owner:
+        AnalyticsEvent.objects.create(
+            profile=profile,
+            event_type=AnalyticsEvent.TYPE_PROFILE_VIEW,
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
+            referer=request.META.get('HTTP_REFERER', '')[:255]
+        )
+
+    response = render(request, 'profiles/public_profile.html', {
         'profile': profile,
         'social_links': social_links,
         'custom_links': custom_links,
@@ -40,7 +48,19 @@ def public_profile_view(request, slug):
         'gallery_items': gallery_items,
         'testimonials': testimonials,
         'qr_url': reverse('profiles:download_profile_qr', kwargs={'slug': profile.slug}),
+        'is_owner': is_owner,
     })
+
+    # If authenticated owner, refresh the long-lived owner cookie
+    if request.user.is_authenticated and profile.user and request.user == profile.user:
+        response.set_cookie(
+            f'uzyra_owner_{profile.slug}',
+            '1',
+            max_age=365 * 24 * 3600,
+            samesite='Lax'
+        )
+
+    return response
 
 
 def download_vcard_view(request, slug):
@@ -48,15 +68,22 @@ def download_vcard_view(request, slug):
     Generates an RFC 2426 compliant .vcf contact card file.
     When tapped on mobile, iOS / Android prompts the user to save the contact directly to phone contacts.
     """
-    profile = get_object_or_404(Profile, slug=slug)
+    profile = get_object_or_404(Profile.objects.select_related('user'), slug=slug)
 
-    # Log vCard download analytics event
-    AnalyticsEvent.objects.create(
-        profile=profile,
-        event_type=AnalyticsEvent.TYPE_VCARD,
-        target_label="vCard Download",
-        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+    # Check if visitor is the profile owner
+    is_owner = (
+        (request.user.is_authenticated and profile.user and request.user == profile.user)
+        or (request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1')
     )
+
+    # Log vCard download analytics event only if visitor is NOT the owner
+    if not is_owner:
+        AnalyticsEvent.objects.create(
+            profile=profile,
+            event_type=AnalyticsEvent.TYPE_VCARD,
+            target_label="vCard Download",
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+        )
 
     def _clean_vcard(text):
         if not text:

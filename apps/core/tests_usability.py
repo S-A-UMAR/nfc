@@ -334,9 +334,14 @@ class Phase1HomepageRedesignTests(TestCase):
         self.assertContains(response, checkout_url)
 
     def test_authenticated_user_hero_actions(self):
-        """Logged in user sees direct profile management CTA."""
+        """Logged in user auto-redirects to dashboard on root, and sees profile CTA when explicitly viewing public landing."""
         self.client.login(email=self.user.email, password=self.user_password)
-        response = self.client.get(reverse('core:home'))
+        # 1. Root access auto-redirects to dashboard overview
+        root_response = self.client.get(reverse('core:home'))
+        self.assertRedirects(root_response, reverse('dashboard:overview'))
+
+        # 2. Explicit public view allows viewing landing page while authenticated
+        response = self.client.get(reverse('core:home') + '?public=1')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Go to Your Digital Profile")
         self.assertContains(response, reverse('dashboard:profile_edit'))

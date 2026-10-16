@@ -551,3 +551,97 @@ class WebsiteCTATrackTests(TestCase):
         )
         response = self._post({'website_slug': 'draft-cta-site'})
         self.assertEqual(response.status_code, 404)
+
+
+class ProfileOwnerFilterAndSensoryTests(TestCase):
+    """
+    Unit tests for:
+    1. Auto-Redirect to Dashboard when Logged In.
+    2. Sensory Feedback trigger on Card Tap & Cookie generation.
+    3. Profile View Counter Filter (Filtering out owner's own visits, taps, and beacons).
+    """
+
+    def setUp(self):
+        self.owner, self.profile = _make_user('owner@example.com', 'Owner User')
+        self.visitor, _ = _make_user('visitor@example.com', 'Visitor User')
+        from apps.cards.models import Card
+        self.card = Card.objects.create(
+            card_code='TAP-CARD-99',
+            user=self.owner,
+            profile=self.profile,
+            status=Card.STATUS_ACTIVE,
+        )
+
+    def test_anonymous_visitor_creates_profile_view_event(self):
+        initial = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count()
+        response = self.client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count(), initial + 1)
+        self.assertFalse(response.context.get('is_owner'))
+
+    def test_authenticated_owner_view_does_not_create_event_and_sets_cookie(self):
+        self.client.login(email='owner@example.com', password='TestPass123!')
+        initial = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count()
+        response = self.client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(response.status_code, 200)
+        # Self-view is filtered out
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count(), initial)
+        self.assertTrue(response.context.get('is_owner'))
+        # Long-lived owner cookie is set on the response
+        self.assertIn(f'uzyra_owner_{self.profile.slug}', response.cookies)
+        self.assertEqual(response.cookies[f'uzyra_owner_{self.profile.slug}'].value, '1')
+
+    def test_cookie_owner_view_does_not_create_event(self):
+        self.client.cookies[f'uzyra_owner_{self.profile.slug}'] = '1'
+        initial = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count()
+        response = self.client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count(), initial)
+        self.assertTrue(response.context.get('is_owner'))
+
+    def test_card_tap_sets_sensory_tap_cookie_and_creates_event_for_guest(self):
+        initial_card = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count()
+        response = self.client.get(f'/c/{self.card.card_code}/')
+        self.assertEqual(response.status_code, 302)
+        # Must set sensory tap cookie for micro-chime and haptic trigger
+        self.assertIn('uzyra_tap', response.cookies)
+        self.assertEqual(response.cookies['uzyra_tap'].value, '1')
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count(), initial_card + 1)
+
+    def test_card_tap_by_owner_does_not_create_analytics_event(self):
+        self.client.login(email='owner@example.com', password='TestPass123!')
+        initial_card = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count()
+        response = self.client.get(f'/c/{self.card.card_code}/')
+        self.assertEqual(response.status_code, 302)
+        # Owner tap must be filtered out
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count(), initial_card)
+        # Still receives sensory feedback tap cookie so owner can experience the luxury haptic & chime
+        self.assertIn('uzyra_tap', response.cookies)
+
+    def test_track_event_api_ignores_owner(self):
+        self.client.login(email='owner@example.com', password='TestPass123!')
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        response = self.client.post(
+            reverse('analytics:track_event'),
+            data=json.dumps({
+                'profile_slug': self.profile.slug,
+                'event_type': AnalyticsEvent.TYPE_VCARD,
+                'target_label': 'Save Contact'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data.get('status'), 'ignored_owner')
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial)
+
+    def test_home_auto_redirect_for_logged_in_user(self):
+        self.client.login(email='owner@example.com', password='TestPass123!')
+        # Hitting root / auto-redirects to dashboard
+        response = self.client.get(reverse('core:home'))
+        self.assertRedirects(response, reverse('dashboard:overview'))
+
+        # Passing ?public=1 allows viewing marketing landing while logged in
+        response_public = self.client.get(reverse('core:home') + '?public=1')
+        self.assertEqual(response_public.status_code, 200)
+
