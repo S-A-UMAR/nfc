@@ -12,12 +12,18 @@
       <h1 class="dash-page-title">Profile Appearance</h1>
       <p class="dash-page-subtitle">Choose your profile type, layout, and colour theme. Every change is live on your public profile.</p>
     </div>
-    {% if profile.slug %}
-    <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      Preview Live Profile
-    </a>
-    {% endif %}
+    <div style="display:flex; align-items:center; gap:0.625rem; flex-wrap:wrap;">
+      {% if profile.slug %}
+      <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Preview Live Profile
+      </a>
+      {% endif %}
+      <button type="submit" form="appearance-form" class="btn btn-primary btn-sm appearance-submit-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Save Appearance</span>
+      </button>
+    </div>
   </div>
 
   <!-- Messages -->
@@ -181,7 +187,19 @@
       </div>
     </section>
 
-    <!-- ── Save Bar ──────────────────────────────────────────────────────── -->
+    <!-- ── Inline Save Section (Document Flow) ────────────────────────── -->
+    <div class="appearance-inline-save-card glass">
+      <div class="appearance-inline-save-text">
+        <h3 class="appearance-inline-title">Ready to apply these visual changes?</h3>
+        <p class="appearance-inline-desc">Your selections will update your public link and digital business card instantly.</p>
+      </div>
+      <button type="submit" class="btn btn-primary btn-md appearance-submit-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Save Appearance</span>
+      </button>
+    </div>
+
+    <!-- ── Floating Save Bar ─────────────────────────────────────────────── -->
     <div class="appearance-save-bar glass">
       <div class="appearance-save-summary">
         <span>Profile Type: <strong id="summary-type">{{ profile.get_profile_type_display }}</strong></span>
@@ -190,9 +208,9 @@
         <span class="appearance-save-sep">·</span>
         <span>Theme: <strong id="summary-theme">{{ profile.get_theme_display }}</strong></span>
       </div>
-      <button type="submit" class="btn btn-primary">
+      <button type="submit" class="btn btn-primary appearance-submit-btn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save Appearance
+        <span>Save Appearance</span>
       </button>
     </div>
 
@@ -327,29 +345,81 @@
 .appearance-theme-name { font-family: var(--font-heading); font-size: 0.825rem; font-weight: 600; margin-bottom: 0.2rem; }
 .appearance-theme-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.35; }
 
-/* ── Save Bar ───────────────────────────────────────────────────────────── */
+/* ── Inline Save Section ────────────────────────────────────────────────── */
+.appearance-inline-save-card {
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+}
+.appearance-inline-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+.appearance-inline-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Floating Save Bar ──────────────────────────────────────────────────── */
 .appearance-save-bar {
   position: fixed;
-  bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   width: calc(100% - 3rem);
-  max-width: 900px;
+  max-width: 880px;
   border-radius: var(--radius-lg);
   padding: 1rem 1.5rem;
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  z-index: 1005; /* higher than mobile bottom bar (1000) */
   flex-wrap: wrap;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 .appearance-save-summary { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8125rem; color: var(--text-muted); }
 .appearance-save-summary strong { color: var(--text-primary); }
 .appearance-save-sep { color: var(--border-primary); }
 
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
 /* Responsive */
+@media (max-width: 900px) {
+  .appearance-save-bar {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+    transform: none !important;
+    padding: 0.85rem 1rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+}
+
 @media (max-width: 540px) {
   .appearance-type-grid { grid-template-columns: 1fr 1fr; }
   .appearance-layout-grid { grid-template-columns: repeat(2, 1fr); }
   .appearance-themes-grid { grid-template-columns: repeat(2, 1fr); }
-  .appearance-save-bar { bottom: 0; left: 0; right: 0; width: 100%; transform: none; border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 0.875rem 1rem; }
-  .appearance-save-summary { font-size: 0.75rem; }
+  .appearance-save-summary { font-size: 0.72rem; }
+  .appearance-inline-save-card { padding: 1.25rem 1rem; }
 }
 </style>
 
@@ -385,10 +455,6 @@
     if (summaryTheme)  summaryTheme.textContent  = themeLabels[themeInput.value]   || themeInput.value;
   }
 
-  function setActive(cards, value) {
-    cards.forEach(c => c.classList.toggle('active', c.dataset.value === value));
-  }
-
   function switchType(type) {
     typeInput.value = type;
     // Show/hide layout & theme groups
@@ -404,10 +470,11 @@
     document.querySelectorAll('.appearance-layout-card').forEach(c => {
       c.classList.toggle('active', c.dataset.value === firstLayout && c.dataset.type === type);
     });
-    // Auto-select graphite theme (UZYRA Default) for both types
-    themeInput.value = 'graphite';
+    // Auto-select first theme for the type (graphite for personal, executive for business)
+    const firstTheme = type === 'personal' ? 'graphite' : 'executive';
+    themeInput.value = firstTheme;
     document.querySelectorAll('.appearance-theme-card').forEach(c => {
-      c.classList.toggle('active', c.dataset.value === 'graphite' && c.dataset.type === type);
+      c.classList.toggle('active', c.dataset.value === firstTheme && c.dataset.type === type);
     });
     updateSummary();
   }
@@ -442,6 +509,40 @@
       updateSummary();
     });
   });
+
+  // Initial synchronization check for legacy/mismatched values
+  const currentType = typeInput.value || 'personal';
+  const activeLayout = document.querySelector(`.appearance-layout-card[data-type="${currentType}"].active`);
+  if (!activeLayout) {
+    const fallbackLayout = currentType === 'personal' ? 'classic' : 'executive_layout';
+    layoutInput.value = fallbackLayout;
+    document.querySelectorAll(`.appearance-layout-card[data-type="${currentType}"]`).forEach(c => {
+      c.classList.toggle('active', c.dataset.value === fallbackLayout);
+    });
+  }
+
+  const activeTheme = document.querySelector(`.appearance-theme-card[data-type="${currentType}"].active`);
+  if (!activeTheme) {
+    const fallbackTheme = currentType === 'personal' ? 'graphite' : 'executive';
+    themeInput.value = fallbackTheme;
+    document.querySelectorAll(`.appearance-theme-card[data-type="${currentType}"]`).forEach(c => {
+      c.classList.toggle('active', c.dataset.value === fallbackTheme);
+    });
+  }
+
+  // Handle form submit state
+  if (form) {
+    form.addEventListener('submit', () => {
+      document.querySelectorAll('.appearance-submit-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+          <span>Saving...</span>
+        `;
+      });
+    });
+  }
 
   updateSummary();
 })();

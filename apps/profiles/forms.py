@@ -118,7 +118,17 @@ class ProfileAppearanceForm(forms.ModelForm):
     Only saves profile_type, theme, and profile_layout — nothing else.
     This prevents accidental mass-assignment of other profile fields through
     the appearance endpoint.
+    Includes backward-compatible fallback for legacy theme/layout values.
     """
+    profile_type = forms.CharField(widget=forms.HiddenInput(), required=False)
+    theme = forms.CharField(widget=forms.HiddenInput(), required=False)
+    profile_layout = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    LEGACY_THEME_MAP = {
+        'minimal': 'graphite',
+        'light': 'graphite',
+    }
+
     class Meta:
         model = Profile
         fields = ['profile_type', 'theme', 'profile_layout']
@@ -127,6 +137,42 @@ class ProfileAppearanceForm(forms.ModelForm):
             'theme': forms.HiddenInput(),
             'profile_layout': forms.HiddenInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            valid_themes = dict(Profile.THEME_CHOICES)
+            valid_layouts = dict(Profile.LAYOUT_CHOICES)
+            # Normalize legacy/invalid initial values
+            if self.instance.theme in self.LEGACY_THEME_MAP:
+                self.initial['theme'] = self.LEGACY_THEME_MAP[self.instance.theme]
+            elif self.instance.theme not in valid_themes:
+                self.initial['theme'] = 'executive' if self.instance.profile_type == 'business' else 'graphite'
+
+            if self.instance.profile_layout not in valid_layouts:
+                self.initial['profile_layout'] = 'executive_layout' if self.instance.profile_type == 'business' else 'classic'
+
+    def clean_profile_type(self):
+        ptype = self.cleaned_data.get('profile_type', '').strip()
+        return ptype if ptype in ('personal', 'business') else 'personal'
+
+    def clean_theme(self):
+        theme = self.cleaned_data.get('theme', '').strip()
+        if theme in self.LEGACY_THEME_MAP:
+            return self.LEGACY_THEME_MAP[theme]
+        valid_themes = dict(Profile.THEME_CHOICES)
+        if theme not in valid_themes:
+            ptype = self.cleaned_data.get('profile_type') or self.data.get('profile_type', 'personal')
+            return 'executive' if ptype == 'business' else 'graphite'
+        return theme
+
+    def clean_profile_layout(self):
+        layout = self.cleaned_data.get('profile_layout', '').strip()
+        valid_layouts = dict(Profile.LAYOUT_CHOICES)
+        if layout not in valid_layouts:
+            ptype = self.cleaned_data.get('profile_type') or self.data.get('profile_type', 'personal')
+            return 'executive_layout' if ptype == 'business' else 'classic'
+        return layout
 
 
 class ContactExchangeForm(forms.ModelForm):

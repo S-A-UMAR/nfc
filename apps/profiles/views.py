@@ -513,7 +513,15 @@ def profile_appearance_view(request):
     Saves: profile_type, theme, profile_layout ONLY.
     Full IDOR protection: always uses request.user.profile.
     """
-    profile = request.user.profile
+    profile = getattr(request.user, 'profile', None)
+    if profile is None:
+        profile, _ = Profile.objects.get_or_create(
+            user=request.user,
+            defaults={
+                'full_name': request.user.get_full_name() or request.user.email.split('@')[0],
+                'email': request.user.email,
+            }
+        )
 
     if request.method == 'POST':
         form = ProfileAppearanceForm(request.POST, instance=profile)
@@ -521,7 +529,11 @@ def profile_appearance_view(request):
             form.save()
             messages.success(request, "Appearance settings saved. Your public profile has been updated.")
         else:
-            messages.error(request, "Could not save appearance. Please try again.")
+            err_details = []
+            for field, errs in form.errors.items():
+                err_details.append(f"{field}: {', '.join(errs)}")
+            err_msg = "Could not save appearance. " + " ".join(err_details) if err_details else "Could not save appearance. Please try again."
+            messages.error(request, err_msg)
         return redirect('dashboard:appearance')
 
     form = ProfileAppearanceForm(instance=profile)
