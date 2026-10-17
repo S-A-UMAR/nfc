@@ -44,6 +44,24 @@ def nfc_redirect_view(request, card_code):
     # Status Routing Engine
     if card.status == Card.STATUS_ACTIVE:
         if card.profile and card.profile.slug:
+            # Direct Link Mode: bypass full profile to open chosen destination immediately
+            if card.profile.direct_link_enabled and card.profile.direct_link_url:
+                if not is_owner:
+                    label = card.profile.direct_link_label or card.profile.direct_link_url
+                    AnalyticsEvent.objects.create(
+                        profile=card.profile,
+                        card=card,
+                        event_type=AnalyticsEvent.TYPE_CARD_TAP if not is_qr else AnalyticsEvent.TYPE_QR_SCAN,
+                        target_label=f"Direct Link: {label}"[:150],
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
+                        referer=request.META.get('HTTP_REFERER', '')[:255]
+                    )
+                response = redirect(card.profile.direct_link_url)
+                if is_owner:
+                    response.set_cookie(f'uzyra_owner_{card.profile.slug}', '1', max_age=365 * 24 * 3600, samesite='Lax')
+                return response
+
+            # Standard Profile Route
             # Also log analytics event for the profile owner only for external taps
             if not is_owner:
                 AnalyticsEvent.objects.create(

@@ -86,6 +86,24 @@ class Profile(models.Model):
     theme = models.CharField(max_length=25, choices=THEME_CHOICES, default='graphite')
     profile_layout = models.CharField(max_length=25, choices=LAYOUT_CHOICES, default='classic')
     is_search_indexed = models.BooleanField(default=True, help_text="Allow search engines to index profile")
+
+    # Direct Link Mode (Bypass Profile to open single destination on tap)
+    direct_link_enabled = models.BooleanField(
+        default=False,
+        help_text="When enabled, tapping your smart card immediately redirects visitors to your direct link"
+    )
+    direct_link_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Target URL for Direct Link Mode (e.g. LinkedIn, Instagram, WhatsApp, Calendly, Portfolio)"
+    )
+    direct_link_label = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="Descriptive label, e.g. 'My LinkedIn', 'Instagram', 'Book Meeting'"
+    )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

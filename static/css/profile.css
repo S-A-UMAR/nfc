@@ -1940,3 +1940,218 @@
   font-style: italic;
 }
 
+/* ==========================================================================
+   DIRECT LINK MODE TOP BANNER
+   ========================================================================== */
+.prf-direct-mode-banner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(18, 18, 22, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  padding: 0.5rem 1rem;
+}
+
+.prf-direct-mode-content {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.775rem;
+  color: #E4E4E7;
+}
+
+.prf-direct-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 10px #F59E0B;
+  animation: prfPulse 1.8s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+.prf-direct-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prf-direct-text strong {
+  color: #FBBF24;
+}
+
+.prf-direct-edit-link {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #09090B;
+  background: #F59E0B;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.prf-direct-edit-link:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   INTERACTIVE 3D GYROSCOPE & SPECULAR GLARE
+   ========================================================================== */
+.profile-viewport {
+  perspective: 1200px;
+  perspective-origin: center 35%;
+}
+
+.profile-card {
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.4, 1);
+  will-change: transform;
+  position: relative;
+}
+
+.prf-gyro-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 6;
+  background: radial-gradient(
+    700px circle at var(--glare-x, 50%) var(--glare-y, 30%),
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.04) 32%,
+    transparent 65%
+  );
+  mix-blend-mode: overlay;
+  opacity: var(--glare-opacity, 0.65);
+  transition: opacity 0.3s ease;
+}
+
+/* ==========================================================================
+   3D VIRTUAL SMART CARD INSPECTOR MODAL
+   ========================================================================== */
+.prf-3d-scene {
+  perspective: 1000px;
+  width: 100%;
+  height: 220px;
+  margin: 1.25rem 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+
+.prf-3d-scene:active {
+  cursor: grabbing;
+}
+
+.prf-3d-card {
+  width: 320px;
+  height: 200px;
+  border-radius: 16px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(255, 255, 255, 0.05);
+}
+
+.prf-3d-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.prf-3d-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.prf-3d-face-front {
+  background: linear-gradient(135deg, #18191D 0%, #0D0E11 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.prf-3d-face-front::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--vcard-glare-x, 40%) var(--vcard-glare-y, 30%), rgba(255, 255, 255, 0.18) 0%, transparent 60%);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.prf-3d-face-back {
+  background: linear-gradient(135deg, #121316 0%, #09090B 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transform: rotateY(180deg);
+  padding: 1rem 1.25rem;
+}
+
+.prf-3d-magstripe {
+  height: 38px;
+  margin: -1rem -1.25rem 0.75rem;
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.prf-3d-chip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prf-3d-chip {
+  width: 36px;
+  height: 28px;
+  background: linear-gradient(135deg, #E5B558 0%, #C8912E 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
+}
+
+.prf-3d-chip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.4);
+}
+
+.prf-3d-card-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.prf-3d-card-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #A1A1AA;
+  letter-spacing: 0.08em;
+}
+
+

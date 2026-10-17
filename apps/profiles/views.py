@@ -31,6 +31,19 @@ def public_profile_view(request, slug):
     elif request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1':
         is_owner = True
 
+    # Direct Link Mode routing (bypasses full profile unless visitor is owner or previewing via ?preview=1 or ?full=1)
+    if profile.direct_link_enabled and profile.direct_link_url:
+        is_preview = bool(request.GET.get('preview') or request.GET.get('full'))
+        if not is_owner and not is_preview:
+            AnalyticsEvent.objects.create(
+                profile=profile,
+                event_type=AnalyticsEvent.TYPE_PROFILE_VIEW,
+                target_label=f"Direct Link: {profile.direct_link_label or profile.direct_link_url}"[:150],
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
+                referer=request.META.get('HTTP_REFERER', '')[:255]
+            )
+            return redirect(profile.direct_link_url)
+
     # Log anonymous profile view analytics event only if visitor is NOT the owner
     if not is_owner:
         AnalyticsEvent.objects.create(
@@ -49,6 +62,7 @@ def public_profile_view(request, slug):
         'testimonials': testimonials,
         'qr_url': reverse('profiles:download_profile_qr', kwargs={'slug': profile.slug}),
         'is_owner': is_owner,
+        'direct_link_active': profile.direct_link_enabled and bool(profile.direct_link_url),
     })
 
     # If authenticated owner, refresh the long-lived owner cookie
@@ -364,6 +378,43 @@ def links_manage_view(request):
         'social_form': social_form,
         'custom_form': custom_form,
     })
+
+
+@login_required
+@require_POST
+def toggle_direct_link_view(request):
+    """Update Direct Link Mode configuration."""
+    profile = request.user.profile
+    enabled = request.POST.get('direct_link_enabled') in ('on', 'true', '1', True)
+    url = request.POST.get('direct_link_url', '').strip()
+    label = request.POST.get('direct_link_label', '').strip()
+
+    if enabled and not url:
+        messages.error(request, "Please enter a valid destination URL to enable Direct Link Mode.")
+        return redirect('dashboard:links_manage')
+
+    if url and not (url.startswith('http://') or url.startswith('https://')):
+        url = 'https://' + url
+
+    profile.direct_link_enabled = enabled
+    profile.direct_link_url = url
+    profile.direct_link_label = label
+    profile.save(update_fields=['direct_link_enabled', 'direct_link_url', 'direct_link_label'])
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
+        return JsonResponse({
+            'success': True,
+            'enabled': profile.direct_link_enabled,
+            'url': profile.direct_link_url,
+            'label': profile.direct_link_label,
+            'message': "Direct Link Mode updated successfully."
+        })
+
+    if enabled:
+        messages.success(request, f"⚡ Direct Link Mode enabled! Card taps will route directly to {label or url}.")
+    else:
+        messages.info(request, "Direct Link Mode disabled. Full digital profile restored.")
+    return redirect('dashboard:links_manage')
 
 
 @login_required

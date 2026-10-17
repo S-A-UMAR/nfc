@@ -19,6 +19,7 @@ urlpatterns = [
     path('profile/testimonial/add/', prof_views.add_profile_testimonial_view, name='profile_testimonial_add'),
     path('profile/testimonial/delete/<int:item_id>/', prof_views.delete_profile_testimonial_view, name='profile_testimonial_delete'),
     path('links/', prof_views.links_manage_view, name='links_manage'),
+    path('links/direct/', prof_views.toggle_direct_link_view, name='toggle_direct_link'),
     path('links/social/add/', prof_views.add_social_link_view, name='add_social_link'),
     path('links/social/edit/<int:link_id>/', prof_views.edit_social_link_view, name='edit_social_link'),
     path('links/social/toggle/<int:link_id>/', prof_views.toggle_social_link_view, name='toggle_social_link'),

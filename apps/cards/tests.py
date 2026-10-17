@@ -44,6 +44,23 @@ class Phase6SmartCardTests(TestCase):
         self.assertTrue(CardEvent.objects.filter(card=self.card).exists())
         self.assertTrue(AnalyticsEvent.objects.filter(profile=self.profile, card=self.card).exists())
 
+    def test_active_card_with_direct_link_mode_redirects_to_direct_url(self):
+        """Active card with direct link mode routes visitor directly to target URL and logs analytics."""
+        self.profile.direct_link_enabled = True
+        self.profile.direct_link_url = 'https://calendly.com/cardowner/30min'
+        self.profile.save()
+
+        url = f'/c/{self.card.card_code}/'
+        response = self.client.get(url, follow=False)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, 'https://calendly.com/cardowner/30min')
+
+        # Verify analytics and tap event still properly tracked
+        self.assertTrue(CardEvent.objects.filter(card=self.card).exists())
+        self.assertTrue(AnalyticsEvent.objects.filter(profile=self.profile, card=self.card).exists())
+
+
     def test_2_lost_card_renders_security_notice(self):
         """TEST 2: Change status to LOST — profile does NOT open, lost notice rendered."""
         self.card.status = Card.STATUS_LOST

@@ -763,3 +763,105 @@ class ProfileCustomizationV2Tests(TestCase):
         self.assertContains(response, 'appearance-layout-grid')
         self.assertContains(response, 'appearance-themes-grid')
         self.assertContains(response, 'appearance-save-bar')
+
+
+class DirectLinkAnd3DCardTests(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(
+            email='owner3d@example.com',
+            password='Password123!',
+            first_name='Elena',
+            last_name='Rostova'
+        )
+        self.profile = self.owner.profile
+        self.profile.slug = 'elena-rostova'
+        self.profile.save()
+
+        self.visitor_client = Client()
+        self.owner_client = Client()
+        self.owner_client.force_login(self.owner)
+
+    def test_direct_link_toggle_enable_and_disable(self):
+        """Owner can toggle direct link mode on and off via dashboard."""
+        url = reverse('dashboard:toggle_direct_link')
+        
+        # Turn ON
+        res_on = self.owner_client.post(url, {
+            'direct_link_enabled': 'true',
+            'direct_link_url': 'https://linkedin.com/in/elenarostova',
+            'direct_link_label': 'My LinkedIn',
+        })
+        self.assertEqual(res_on.status_code, 302)
+        self.profile.refresh_from_db()
+        self.assertTrue(self.profile.direct_link_enabled)
+        self.assertEqual(self.profile.direct_link_url, 'https://linkedin.com/in/elenarostova')
+        self.assertEqual(self.profile.direct_link_label, 'My LinkedIn')
+
+        # Turn OFF
+        res_off = self.owner_client.post(url, {
+            'direct_link_enabled': 'false',
+            'direct_link_url': 'https://linkedin.com/in/elenarostova',
+            'direct_link_label': 'My LinkedIn',
+        })
+        self.assertEqual(res_off.status_code, 302)
+        self.profile.refresh_from_db()
+        self.assertFalse(self.profile.direct_link_enabled)
+
+    def test_direct_link_url_protocol_normalization(self):
+        """Entering URL without http(s) automatically prepends https://."""
+        url = reverse('dashboard:toggle_direct_link')
+        self.owner_client.post(url, {
+            'direct_link_enabled': 'true',
+            'direct_link_url': 'instagram.com/elena_design',
+            'direct_link_label': 'Instagram',
+        })
+        self.profile.refresh_from_db()
+        self.assertTrue(self.profile.direct_link_enabled)
+        self.assertEqual(self.profile.direct_link_url, 'https://instagram.com/elena_design')
+
+    def test_direct_link_redirects_public_visitor(self):
+        """Public visitor visiting /u/<slug>/ is redirected to direct_link_url when enabled."""
+        self.profile.direct_link_enabled = True
+        self.profile.direct_link_url = 'https://linkedin.com/in/elenarostova'
+        self.profile.save()
+
+        res = self.visitor_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res['Location'], 'https://linkedin.com/in/elenarostova')
+
+    def test_direct_link_preview_bypasses_redirect(self):
+        """Adding ?preview=1 or ?full=1 bypasses direct link redirect and shows banner."""
+        self.profile.direct_link_enabled = True
+        self.profile.direct_link_url = 'https://linkedin.com/in/elenarostova'
+        self.profile.save()
+
+        res = self.visitor_client.get(
+            reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}) + '?preview=1'
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'prf-direct-mode-banner')
+        self.assertContains(res, 'Direct Link Active:')
+
+    def test_direct_link_owner_bypasses_redirect_with_banner(self):
+        """Logged-in owner sees full profile with banner without being redirected."""
+        self.profile.direct_link_enabled = True
+        self.profile.direct_link_url = 'https://linkedin.com/in/elenarostova'
+        self.profile.save()
+
+        res = self.owner_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'prf-direct-mode-banner')
+        self.assertContains(res, 'Direct Link Active:')
+
+    def test_3d_smart_card_elements_rendered(self):
+        """Public profile contains 3D Gyroscope and 3D Smart Card inspector elements."""
+        res = self.visitor_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'btn-top-3d')
+        self.assertContains(res, 'prf-gyro-glare')
+        self.assertContains(res, 'modal-3d-card')
+        self.assertContains(res, 'prf-3d-scene')
+        self.assertContains(res, 'prf-interactive-card')
+        self.assertContains(res, 'btn-flip-3d-card')
+        self.assertContains(res, 'btn-reset-3d-card')
+
