@@ -995,6 +995,100 @@
   background: rgba(244, 114, 182, 0.12);
 }
 
+.prf-action-hub-btn.exchange .prf-hub-icon-circle {
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.prf-action-hub-btn.exchange:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15);
+}
+
+/* Inline Contact Exchange Callout Card */
+.prf-exchange-callout {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(147, 51, 234, 0.06) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 16px;
+  padding: 1.15rem;
+  margin: 1.15rem 0 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.prf-exchange-callout-header {
+  margin-bottom: 0.9rem;
+}
+
+.prf-exchange-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.2rem 0.6rem;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 999px;
+  font-size: 0.675rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #FBBF24;
+  margin-bottom: 0.5rem;
+}
+
+.prf-exchange-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
+  animation: prfPulse 1.8s infinite ease-in-out;
+}
+
+.prf-exchange-callout-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.25rem;
+}
+
+.prf-exchange-callout-desc {
+  font-size: 0.8rem;
+  color: #A1A1AA;
+  line-height: 1.45;
+}
+
+.prf-btn-exchange-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.75rem 1.15rem;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #09090B;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+.prf-btn-exchange-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+  filter: brightness(1.08);
+}
+
+.prf-btn-exchange-primary:active {
+  transform: translateY(0);
+}
+
 /* Bio Pitch / Teaser */
 .prf-hero-bio {
   font-size: 0.875rem;
