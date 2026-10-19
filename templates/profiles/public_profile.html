@@ -181,19 +181,19 @@
           <span>Save Contact</span>
         </a>
 
-        <button type="button" class="prf-action-hub-btn exchange" id="btn-hub-exchange"
-                data-track-event="exchange_click" data-profile-slug="{{ profile.slug }}" data-track-label="Exchange Contact"
-                aria-label="Exchange Contact">
+        <button type="button" class="prf-action-hub-btn share" id="btn-hub-share" aria-label="Share">
           <div class="prf-hub-icon-circle">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
             </svg>
           </div>
-          <span>Exchange</span>
+          <span>Share</span>
         </button>
+
 
         {% if profile.whatsapp %}
           <a href="https://wa.me/{{ profile.clean_whatsapp }}" target="_blank" rel="noopener noreferrer"
@@ -309,30 +309,11 @@
     <div class="prf-tab-panel active" id="tab-about">
       <h2 class="prf-section-heading">About Me</h2>
       <div class="prf-about-text">
-        {{ profile.bio|default:"Welcome to my verified digital profile on UZYRA. Connect with me, explore my services and portfolio, or exchange your contact details directly below."|linebreaksbr }}
+        {{ profile.bio|default:"Welcome to my verified digital profile on UZYRA. Connect with me and explore my services and portfolio."|linebreaksbr }}
       </div>
 
-      <!-- Direct Two-Way Contact Exchange Callout Card -->
-      <div class="prf-exchange-callout">
-        <div class="prf-exchange-callout-header">
-          <div class="prf-exchange-badge">
-            <span class="prf-exchange-pulse"></span>
-            <span>Two-Way Networking</span>
-          </div>
-          <div class="prf-exchange-callout-title">Exchange Contact with {{ profile.first_name|default:profile.full_name }}</div>
-          <div class="prf-exchange-callout-desc">Send your contact card back directly so {{ profile.first_name|default:profile.full_name }} receives your details in their UZYRA dashboard.</div>
-        </div>
-        <button type="button" class="prf-btn-exchange-primary" id="btn-about-exchange"
-                data-track-event="exchange_click" data-profile-slug="{{ profile.slug }}" data-track-label="About Exchange CTA">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>Share Your Details Now</span>
-        </button>
-      </div>
+      <!-- Two-Way Contact Exchange Callout Card — shelved for v2 -->
+
 
       <!-- What I Do / Services List -->
       <h2 class="prf-section-heading">What I Do</h2>
@@ -416,11 +397,18 @@
           <span>⚡</span>
           <span>{{ profile.cta_banner_text|default:"Let's build something great together." }}</span>
         </div>
-        <button type="button" class="prf-btn-send-msg" id="btn-cta-send-msg"
-                data-track-event="exchange_click" data-profile-slug="{{ profile.slug }}" data-track-label="CTA Exchange Banner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Exchange Contact Details</span>
-        </button>
+        {% if profile.email %}
+          <a href="mailto:{{ profile.email }}" class="prf-btn-send-msg" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;"
+             data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>Get in Touch</span>
+          </a>
+        {% elif profile.whatsapp %}
+          <a href="https://wa.me/{{ profile.clean_whatsapp }}" target="_blank" rel="noopener noreferrer" class="prf-btn-send-msg" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;"
+             data-track-event="whatsapp_click" data-profile-slug="{{ profile.slug }}">
+            <span>Connect on WhatsApp</span>
+          </a>
+        {% endif %}
       </div>
     </div>
 
@@ -547,18 +535,8 @@
          ====================================================================== -->
     <div class="prf-tab-panel" id="tab-more">
       <div class="prf-more-menu-list">
-        <button type="button" class="prf-more-menu-item" id="btn-open-sheet-business">
-          <div class="prf-more-item-left">
-            <div class="prf-more-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            </div>
-            <div>
-              <div class="prf-more-item-title">Business Details</div>
-              <div class="prf-more-item-subtitle">{{ profile.business_name|default:"Company, role & location" }}</div>
-            </div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
+        <!-- Business Details menu item — shelved for v2 -->
+
 
         <button type="button" class="prf-more-menu-item" id="btn-open-sheet-testimonials">
           <div class="prf-more-item-left">
@@ -692,13 +670,8 @@
         </a>
       {% endif %}
 
-      <button type="button" class="prf-sheet-action-row" id="btn-sheet-send-msg" style="border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.08);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <div style="display: flex; flex-direction: column; text-align: left;">
-          <span style="font-weight: 600; color: #FFFFFF;">Exchange Contact Details</span>
-          <span style="font-size: 0.725rem; color: #FBBF24;">Share your details back with {{ profile.first_name|default:profile.full_name }}</span>
-        </div>
-      </button>
+      <!-- Exchange Contact row — shelved for v2 -->
+
 
       {% if profile.email %}
         <a href="mailto:{{ profile.email }}" class="prf-sheet-action-row"
@@ -777,70 +750,8 @@
   </div>
 </div>
 
-<!-- SHEET 3: BUSINESS DETAILS SHEET -->
-<div class="prf-sheet-overlay" id="sheet-business">
-  <div class="prf-sheet-box">
-    <div class="prf-sheet-handle"></div>
-    <div class="prf-sheet-header">
-      <h3 class="prf-sheet-title">Business Details</h3>
-      <button type="button" class="prf-sheet-close" data-sheet-close>&times;</button>
-    </div>
+<!-- SHEET 3: BUSINESS DETAILS SHEET — shelved for v2 -->
 
-    <div class="prf-contact-sheet-list">
-      {% if profile.business_name %}
-        <div class="prf-sheet-action-row" style="background: rgba(255,255,255,0.03);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          <div>
-            <div style="font-size: 0.75rem; color: #71717A;">Company / Brand</div>
-            <div style="color: #FFF;">{{ profile.business_name }}</div>
-          </div>
-        </div>
-      {% endif %}
-
-      {% if profile.title %}
-        <div class="prf-sheet-action-row" style="background: rgba(255,255,255,0.03);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <div>
-            <div style="font-size: 0.75rem; color: #71717A;">Role / Position</div>
-            <div style="color: #FFF;">{{ profile.title }}</div>
-          </div>
-        </div>
-      {% endif %}
-
-      {% if profile.location or profile.address %}
-        <div class="prf-sheet-action-row" style="background: rgba(255,255,255,0.03);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <div>
-            <div style="font-size: 0.75rem; color: #71717A;">Location</div>
-            <div style="color: #FFF;">{{ profile.location|default:profile.address }}</div>
-          </div>
-        </div>
-      {% endif %}
-
-      {% if profile.website_url %}
-        <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-sheet-action-row" style="background: rgba(255,255,255,0.03);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <div>
-            <div style="font-size: 0.75rem; color: #71717A;">Website</div>
-            <div style="color: #FFF;">{{ profile.website_url }}</div>
-          </div>
-        </a>
-      {% endif %}
-
-      {% if profile.business_description %}
-        <div style="padding: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; font-size: 0.85rem; line-height: 1.5; color: #D4D4D8;">
-          <div style="font-size: 0.75rem; color: #71717A; margin-bottom: 0.35rem; font-weight: 600;">About the Organization</div>
-          {{ profile.business_description|linebreaksbr }}
-        </div>
-      {% endif %}
-
-      <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-btn-dock-save" style="margin-top: 0.5rem;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>Save Contact</span>
-      </a>
-    </div>
-  </div>
-</div>
 
 <!-- SHEET 4: TESTIMONIALS SHEET -->
 <div class="prf-sheet-overlay" id="sheet-testimonials">
@@ -976,55 +887,8 @@
   </div>
 </div>
 
-<!-- ==========================================================================
-     TWO-WAY CONTACT EXCHANGE MODAL FORM
-     ========================================================================== -->
-<div class="prf-sheet-overlay" id="exchange-modal">
-  <div class="prf-sheet-box" style="border-radius: 24px;">
-    <div class="prf-sheet-handle"></div>
-    <div class="prf-sheet-header">
-      <div>
-        <div style="font-size: 0.725rem; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.2rem;">Two-Way Contact Exchange</div>
-        <h3 class="prf-sheet-title">Share Your Contact</h3>
-      </div>
-      <button type="button" class="prf-sheet-close" id="close-exchange-modal">&times;</button>
-    </div>
-    <p style="font-size: 0.825rem; color: #A1A1AA; margin-bottom: 1.15rem;">Send your contact details to <strong>{{ profile.full_name }}</strong> so they can reach back out to you.</p>
+<!-- exchange-modal — shelved for v2 -->
 
-    <form id="exchange-form" method="POST" action="{% url 'profiles:submit_contact_exchange' profile.slug %}">
-      {% csrf_token %}
-      <div style="margin-bottom: 0.75rem;">
-        <input type="text" name="full_name" class="form-control" placeholder="Your Full Name *" required style="width: 100%; background: #18181C; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.7rem 0.85rem; color: #FFFFFF; font-size: 0.875rem;" />
-      </div>
-
-      <div style="display: flex; gap: 0.65rem; margin-bottom: 0.75rem;">
-        <input type="email" name="email" class="form-control" placeholder="Email Address" style="flex: 1; background: #18181C; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.7rem 0.85rem; color: #FFFFFF; font-size: 0.875rem;" />
-        <input type="tel" name="phone" class="form-control" placeholder="Phone Number" style="flex: 1; background: #18181C; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.7rem 0.85rem; color: #FFFFFF; font-size: 0.875rem;" />
-      </div>
-
-      <div style="margin-bottom: 0.75rem;">
-        <input type="text" name="business_name" class="form-control" placeholder="Company / Business (Optional)" style="width: 100%; background: #18181C; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.7rem 0.85rem; color: #FFFFFF; font-size: 0.875rem;" />
-      </div>
-
-      <div style="margin-bottom: 0.85rem;">
-        <textarea name="notes" rows="2" class="form-control" placeholder="Short note or message (Optional)" style="width: 100%; background: #18181C; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.7rem 0.85rem; color: #FFFFFF; font-size: 0.875rem; resize: vertical;"></textarea>
-      </div>
-
-      <div style="margin-bottom: 1.15rem; display: flex; align-items: flex-start; gap: 0.5rem;">
-        <input type="checkbox" name="consent_given" id="consent_check" required style="margin-top: 3px;" />
-        <label for="consent_check" style="font-size: 0.75rem; color: #A1A1AA; line-height: 1.4;">
-          I consent to sharing my submitted contact details directly with {{ profile.full_name }} in accordance with UZYRA's <a href="{% url 'legal:privacy' %}" target="_blank" style="color: #FFFFFF; text-decoration: underline;">Privacy Policy</a>.
-        </label>
-      </div>
-
-      <div id="exchange-status-msg" style="display: none; font-size: 0.8rem; margin-bottom: 0.85rem;"></div>
-
-      <button type="submit" class="prf-btn-send-msg" style="width: 100%; justify-content: center;">
-        Send Contact Details
-      </button>
-    </form>
-  </div>
-</div>
 
 <!-- Instant Toast for Share / Copy Link -->
 
@@ -1204,11 +1068,7 @@
     const btnTopShare = document.getElementById('btn-top-share');
     const btnHubSave = document.getElementById('btn-hub-save');
     const btnHubShare = document.getElementById('btn-hub-share');
-    const btnHubExchange = document.getElementById('btn-hub-exchange');
-    const btnAboutExchange = document.getElementById('btn-about-exchange');
     const btnHubContactFallback = document.getElementById('btn-hub-contact-fallback');
-    const btnCtaSendMsg = document.getElementById('btn-cta-send-msg');
-    const btnSheetSendMsg = document.getElementById('btn-sheet-send-msg');
 
     if (btnTopContact) btnTopContact.addEventListener('click', () => openSheet('sheet-contact'));
     if (btnHubContactFallback) btnHubContactFallback.addEventListener('click', () => openSheet('sheet-contact'));
@@ -1217,24 +1077,12 @@
     if (btnTopShare) btnTopShare.addEventListener('click', () => openSheet('sheet-share'));
     if (btnHubShare) btnHubShare.addEventListener('click', () => openSheet('sheet-share'));
 
-    if (btnHubExchange) btnHubExchange.addEventListener('click', () => openSheet('exchange-modal'));
-    if (btnAboutExchange) btnAboutExchange.addEventListener('click', () => openSheet('exchange-modal'));
-    if (btnCtaSendMsg) btnCtaSendMsg.addEventListener('click', () => openSheet('exchange-modal'));
-    if (btnSheetSendMsg) {
-      btnSheetSendMsg.addEventListener('click', () => {
-        closeSheet('sheet-contact');
-        setTimeout(() => openSheet('exchange-modal'), 200);
-      });
-    }
-
     // "More" Menu Sheet Triggers
-    const btnOpenBusiness = document.getElementById('btn-open-sheet-business');
     const btnOpenTestimonials = document.getElementById('btn-open-sheet-testimonials');
     const btnOpenSocialProof = document.getElementById('btn-open-sheet-social-proof');
     const btnOpenPreferences = document.getElementById('btn-open-sheet-preferences');
     const btnOpenSafety = document.getElementById('btn-open-sheet-safety');
 
-    if (btnOpenBusiness) btnOpenBusiness.addEventListener('click', () => openSheet('sheet-business'));
     if (btnOpenTestimonials) btnOpenTestimonials.addEventListener('click', () => openSheet('sheet-testimonials'));
     if (btnOpenSocialProof) btnOpenSocialProof.addEventListener('click', () => openSheet('sheet-social-proof'));
     if (btnOpenPreferences) btnOpenPreferences.addEventListener('click', () => openSheet('sheet-preferences'));
@@ -1301,64 +1149,8 @@
       });
     }
 
-    // 6. Two-Way Contact Exchange AJAX Form
-    const closeExchangeModal = document.getElementById('close-exchange-modal');
-    if (closeExchangeModal) {
-      closeExchangeModal.addEventListener('click', () => closeSheet('exchange-modal'));
-    }
+    // 6. Contact Exchange — shelved for v2
 
-    const exchangeForm = document.getElementById('exchange-form');
-    const exchangeStatus = document.getElementById('exchange-status-msg');
-
-    if (exchangeForm) {
-      exchangeForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = exchangeForm.querySelector('button[type="submit"]');
-        if (submitBtn) submitBtn.disabled = true;
-
-        if (exchangeStatus) {
-          exchangeStatus.style.display = 'block';
-          exchangeStatus.style.color = 'var(--text-secondary)';
-          exchangeStatus.textContent = 'Submitting your contact details...';
-        }
-
-        const formData = new FormData(exchangeForm);
-        try {
-          const resp = await fetch('{% url "profiles:submit_contact_exchange" profile.slug %}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          });
-          const data = await resp.json();
-
-          if (data.success) {
-            if (exchangeStatus) {
-              exchangeStatus.style.color = '#10B981';
-              exchangeStatus.textContent = data.message;
-            }
-            exchangeForm.reset();
-            setTimeout(() => {
-              closeSheet('exchange-modal');
-              showToast('Contact details shared with {{ profile.full_name|escapejs }}!');
-            }, 1800);
-          } else {
-            if (exchangeStatus) {
-              exchangeStatus.style.color = '#EF4444';
-              exchangeStatus.textContent = data.message || 'Could not submit contact details.';
-            }
-          }
-        } catch (err) {
-          if (exchangeStatus) {
-            exchangeStatus.style.color = '#EF4444';
-            exchangeStatus.textContent = 'A network error occurred. Please try again.';
-          }
-        } finally {
-          if (submitBtn) submitBtn.disabled = false;
-        }
-      });
-    }
 
     // 7. Sensory Feedback Engine (Web Audio Micro-Chime & Haptics)
     const urlParams = new URLSearchParams(window.location.search);

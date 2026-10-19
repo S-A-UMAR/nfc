@@ -739,17 +739,10 @@ class ProfileCustomizationV2Tests(TestCase):
         self.profile_a.refresh_from_db()
         self.assertEqual(self.profile_a.profile_layout, original_layout)
 
-    # ── 9. Website Builder Coming Soon ───────────────────────────────────────
+    # ── 9. Website Builder Coming Soon — shelved for v2 ──────────────────────
+    # def test_website_builder_shows_coming_soon_banner(self):
+    #     ...
 
-    def test_website_builder_shows_coming_soon_banner(self):
-        """Website Builder is locked — accessing the URL redirects to dashboard overview."""
-        self.client_a.force_login(self.user_a)
-        response = self.client_a.get(reverse('dashboard:website_manage'))
-        # Locked with redirect — Coming Soon
-        self.assertEqual(response.status_code, 302)
-        # Follow redirect — lands on dashboard (still 200)
-        response = self.client_a.get(reverse('dashboard:website_manage'), follow=True)
-        self.assertEqual(response.status_code, 200)
 
 
     # ── 10. Mobile responsive — appearance page loads without error ───────────
@@ -853,15 +846,8 @@ class DirectLinkAnd3DCardTests(TestCase):
         self.assertContains(res, 'prf-direct-mode-banner')
         self.assertContains(res, 'Direct Link Active:')
 
-    def test_3d_smart_card_elements_rendered(self):
-        """Public profile contains 3D Gyroscope and 3D Smart Card inspector elements."""
-        res = self.visitor_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
-        self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'btn-top-3d')
-        self.assertContains(res, 'prf-gyro-glare')
-        self.assertContains(res, 'modal-3d-card')
-        self.assertContains(res, 'prf-3d-scene')
-        self.assertContains(res, 'prf-interactive-card')
-        self.assertContains(res, 'btn-flip-3d-card')
-        self.assertContains(res, 'btn-reset-3d-card')
+    # def test_3d_smart_card_elements_rendered(self):
+    #     """Shelved for v2."""
+    #     pass
+
 
