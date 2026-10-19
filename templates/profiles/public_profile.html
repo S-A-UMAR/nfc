@@ -81,10 +81,9 @@
 
 <div class="profile-viewport">
   <main class="profile-card" id="profile-card-container">
-    <!-- Holographic Gyroscope Specular Glare Layer -->
-    <div class="prf-gyro-glare" id="prf-gyro-glare" aria-hidden="true"></div>
 
     <!-- Ambient Glow / Cover Header -->
+
     {% if profile.cover_image %}
       <div class="profile-cover">
         <img src="{{ profile.cover_image.url }}" alt="Cover background" class="profile-cover-img" width="480" height="180" fetchpriority="high" decoding="async">
@@ -111,14 +110,6 @@
       </a>
 
       <div class="prf-app-top-actions">
-        <button type="button" class="prf-app-icon-btn" id="btn-top-3d" aria-label="3D Smart Card" title="3D Smart Card Inspector">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="3"/>
-            <line x1="2" y1="10" x2="22" y2="10"/>
-            <circle cx="6" cy="15" r="1.5"/>
-            <path d="M16 14a2 2 0 0 1 2 2"/>
-          </svg>
-        </button>
         <button type="button" class="prf-app-icon-btn" id="btn-top-contact" aria-label="Quick contact" title="Contact options">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -1035,70 +1026,8 @@
   </div>
 </div>
 
-<!-- ==========================================================================
-     INTERACTIVE 3D VIRTUAL SMART CARD MODAL
-     ========================================================================== -->
-<div class="prf-sheet-overlay" id="modal-3d-card">
-  <div class="prf-sheet-box" style="border-radius: 24px; text-align: center;">
-    <div class="prf-sheet-handle"></div>
-    <div class="prf-sheet-header">
-      <div>
-        <div style="font-size: 0.725rem; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.2rem;">Physical Hardware Simulation</div>
-        <h3 class="prf-sheet-title">UZYRA 3D Smart Card</h3>
-      </div>
-      <button type="button" class="prf-sheet-close" id="close-3d-card-modal">&times;</button>
-    </div>
-    <p style="font-size: 0.8rem; color: #A1A1AA; margin-bottom: 0.5rem;">
-      Drag with your finger or tilt your device to inspect the contactless physical card in 3D.
-    </p>
-
-    <!-- 3D Interactive Canvas Scene -->
-    <div class="prf-3d-scene" id="prf-3d-scene">
-      <div class="prf-3d-card" id="prf-interactive-card">
-        <!-- Front Face -->
-        <div class="prf-3d-face prf-3d-face-front">
-          <div class="d-flex items-center justify-between">
-            <span style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.15em; color: #FFF;">UZYRA</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2"><path d="M6 18a10 10 0 0 1 0-12"/><path d="M9 15a6 6 0 0 1 0-6"/><path d="M12 12a2 2 0 0 1 0 0"/></svg>
-          </div>
-          <div class="prf-3d-chip-row">
-            <div class="prf-3d-chip"></div>
-          </div>
-          <div>
-            <div class="prf-3d-card-name">{{ profile.full_name|truncatechars:22 }}</div>
-            <div class="prf-3d-card-code">SMART NFC • ENCRYPTED</div>
-          </div>
-        </div>
-
-        <!-- Back Face -->
-        <div class="prf-3d-face prf-3d-face-back">
-          <div class="prf-3d-magstripe"></div>
-          <div class="d-flex items-center justify-between gap-3 mt-1">
-            <div style="text-align: left;">
-              <div style="font-size: 0.65rem; color: #71717A; text-transform: uppercase;">Hardware Key</div>
-              <div class="prf-3d-card-code" style="color: #E4E4E7;">{{ profile.slug|upper }}</div>
-              <div style="font-size: 0.625rem; color: #52525B; margin-top: 4px;">Tap against any smartphone to connect instantly.</div>
-            </div>
-            <img src="{{ qr_url }}" alt="QR Code" width="60" height="60" style="border-radius: 8px; background: #FFF; padding: 4px;" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Controls -->
-    <div class="d-flex items-center justify-center gap-2 mt-2">
-      <button type="button" class="btn btn-secondary btn-sm" id="btn-flip-3d-card" style="border-radius: 999px; font-size: 0.8rem; padding: 0.45rem 1rem;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        <span>Flip Card (Front / Back)</span>
-      </button>
-      <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-3d-card" style="border-radius: 999px; font-size: 0.8rem; padding: 0.45rem 0.8rem;">
-        <span>Reset</span>
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- Instant Toast for Share / Copy Link -->
+
 <div id="profile-toast" class="profile-toast" role="status" aria-live="polite">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="20 6 9 17 4 12"/>
@@ -1541,213 +1470,8 @@
     document.querySelectorAll(interactiveSelectors.join(', ')).forEach(el => {
       el.addEventListener('click', () => triggerHaptic(18), { passive: true });
     });
-
-    // 8. Interactive 3D Virtual Card & Gyroscopic Parallax Engine
-    const btnTop3d = document.getElementById('btn-top-3d');
-    const close3dBtn = document.getElementById('close-3d-card-modal');
-    const prf3dScene = document.getElementById('prf-3d-scene');
-    const prf3dCard = document.getElementById('prf-interactive-card');
-    const btnFlip3d = document.getElementById('btn-flip-3d-card');
-    const btnReset3d = document.getElementById('btn-reset-3d-card');
-    const profileCardContainer = document.getElementById('profile-card-container');
-
-    // 8A. Virtual Card 3D Inspector Controls
-    let cardRotX = 12;
-    let cardRotY = -18;
-    let targetCardRotX = 12;
-    let targetCardRotY = -18;
-    let isDraggingCard = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let isFlipped = false;
-
-    function applyCardTransform() {
-      if (!prf3dCard) return;
-      prf3dCard.style.transform = `rotateX(${cardRotX.toFixed(2)}deg) rotateY(${cardRotY.toFixed(2)}deg)`;
-      const glareX = 50 + (cardRotY * 0.8);
-      const glareY = 30 - (cardRotX * 0.8);
-      prf3dCard.style.setProperty('--vcard-glare-x', `${Math.max(10, Math.min(90, glareX))}%`);
-      prf3dCard.style.setProperty('--vcard-glare-y', `${Math.max(10, Math.min(90, glareY))}%`);
-    }
-
-    if (prf3dScene && prf3dCard) {
-      applyCardTransform();
-
-      const onPointerDown = (e) => {
-        isDraggingCard = true;
-        dragStartX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-        dragStartY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-        prf3dCard.style.transition = 'none';
-      };
-
-      const onPointerMove = (e) => {
-        if (!isDraggingCard) return;
-        const currentX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-        const currentY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-        const deltaX = currentX - dragStartX;
-        const deltaY = currentY - dragStartY;
-
-        targetCardRotY += deltaX * 0.65;
-        targetCardRotX -= deltaY * 0.65;
-        targetCardRotX = Math.max(-60, Math.min(60, targetCardRotX));
-
-        cardRotX = targetCardRotX;
-        cardRotY = targetCardRotY;
-        applyCardTransform();
-
-        dragStartX = currentX;
-        dragStartY = currentY;
-      };
-
-      const onPointerUp = () => {
-        if (!isDraggingCard) return;
-        isDraggingCard = false;
-        prf3dCard.style.transition = 'transform 0.25s ease-out';
-      };
-
-      prf3dScene.addEventListener('mousedown', onPointerDown);
-      window.addEventListener('mousemove', onPointerMove);
-      window.addEventListener('mouseup', onPointerUp);
-
-      prf3dScene.addEventListener('touchstart', onPointerDown, { passive: true });
-      window.addEventListener('touchmove', onPointerMove, { passive: true });
-      window.addEventListener('touchend', onPointerUp, { passive: true });
-
-      if (btnFlip3d) {
-        btnFlip3d.addEventListener('click', () => {
-          isFlipped = !isFlipped;
-          targetCardRotY += 180;
-          cardRotY = targetCardRotY;
-          prf3dCard.style.transition = 'transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1)';
-          applyCardTransform();
-          setTimeout(() => {
-            if (prf3dCard) prf3dCard.style.transition = '';
-          }, 680);
-          triggerHaptic([20, 40]);
-        });
-      }
-
-      if (btnReset3d) {
-        btnReset3d.addEventListener('click', () => {
-          isFlipped = false;
-          targetCardRotX = 12;
-          targetCardRotY = -18;
-          cardRotX = 12;
-          cardRotY = -18;
-          prf3dCard.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
-          applyCardTransform();
-          setTimeout(() => {
-            if (prf3dCard) prf3dCard.style.transition = '';
-          }, 520);
-          triggerHaptic(18);
-        });
-      }
-    }
-
-    function requestGyroscopeAccess() {
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-          .then(state => {
-            if (state === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation, { passive: true });
-            }
-          })
-          .catch(() => {});
-      } else if ('ondeviceorientation' in window) {
-        window.addEventListener('deviceorientation', handleOrientation, { passive: true });
-      }
-    }
-
-    if (btnTop3d) {
-      btnTop3d.addEventListener('click', () => {
-        openSheet('modal-3d-card');
-        requestGyroscopeAccess();
-      });
-    }
-    if (close3dBtn) {
-      close3dBtn.addEventListener('click', () => {
-        closeSheet('modal-3d-card');
-      });
-    }
-
-    // 8B. Ultra-Luxury Gyroscopic Tilt & Holographic Specular Glare Loop
-    let handleOrientation = null;
-    if (profileCardContainer) {
-      let targetTiltX = 0;
-      let targetTiltY = 0;
-      let currentTiltX = 0;
-      let currentTiltY = 0;
-
-      let targetGlareX = 50;
-      let targetGlareY = 30;
-      let currentGlareX = 50;
-      let currentGlareY = 30;
-
-      let isGyroActive = false;
-
-      function renderTiltFrame() {
-        // Damping / Linear Interpolation
-        currentTiltX += (targetTiltX - currentTiltX) * 0.12;
-        currentTiltY += (targetTiltY - currentTiltY) * 0.12;
-        currentGlareX += (targetGlareX - currentGlareX) * 0.12;
-        currentGlareY += (targetGlareY - currentGlareY) * 0.12;
-
-        profileCardContainer.style.setProperty('--tilt-x', `${currentTiltX.toFixed(2)}deg`);
-        profileCardContainer.style.setProperty('--tilt-y', `${currentTiltY.toFixed(2)}deg`);
-        profileCardContainer.style.setProperty('--glare-x', `${currentGlareX.toFixed(2)}%`);
-        profileCardContainer.style.setProperty('--glare-y', `${currentGlareY.toFixed(2)}%`);
-
-        requestAnimationFrame(renderTiltFrame);
-      }
-      requestAnimationFrame(renderTiltFrame);
-
-      // Desktop Mouse Parallax
-      window.addEventListener('pointermove', (e) => {
-        if (isGyroActive || e.pointerType === 'touch') return;
-        const normX = (e.clientX / window.innerWidth) - 0.5; // -0.5 to 0.5
-        const normY = (e.clientY / window.innerHeight) - 0.5; // -0.5 to 0.5
-
-        targetTiltY = normX * 10; // -5 to +5 deg
-        targetTiltX = -normY * 10; // -5 to +5 deg
-
-        targetGlareX = 50 + (normX * 60);
-        targetGlareY = 30 + (normY * 50);
-      }, { passive: true });
-
-      window.addEventListener('mouseleave', () => {
-        if (!isGyroActive) {
-          targetTiltX = 0;
-          targetTiltY = 0;
-          targetGlareX = 50;
-          targetGlareY = 30;
-        }
-      });
-
-      // Mobile Device Orientation Gyroscope
-      handleOrientation = function(e) {
-        if (e.beta === null || e.gamma === null) return;
-        isGyroActive = true;
-
-        // Normal holding posture: ~45 deg pitch, 0 deg roll
-        const pitch = Math.max(-25, Math.min(25, e.beta - 45));
-        const roll = Math.max(-25, Math.min(25, e.gamma));
-
-        targetTiltX = -(pitch / 25) * 6.5; // -6.5 to +6.5 deg
-        targetTiltY = (roll / 25) * 6.5;
-
-        targetGlareX = 50 + (roll / 25) * 40;
-        targetGlareY = 30 + (pitch / 25) * 35;
-      };
-
-      // Auto-attach gyroscope if non-permissioned (Android / standard web)
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') {
-        window.addEventListener('deviceorientation', handleOrientation, { passive: true });
-      }
-
-      // On first mobile touch or click, attempt activation for iOS
-      document.addEventListener('touchstart', () => requestGyroscopeAccess(), { once: true, passive: true });
-    }
   });
+
 </script>
 
 </body>
