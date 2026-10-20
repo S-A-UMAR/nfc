@@ -4643,9 +4643,44 @@ html, body {
 }
 
 .profile-mode-option .mode-icon {
-  font-size: 1.35rem;
-  line-height: 1;
-  padding-top: 2px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #BFC5CF;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.profile-mode-option.selected .mode-icon {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
+}
+
+.profile-mode-option .mode-check {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition: all 0.2s ease;
+}
+
+.profile-mode-option.selected .mode-check {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #000000;
 }
 
 .profile-mode-option .mode-title {

@@ -135,6 +135,20 @@ class Phase3ProfileTests(TestCase):
         self.assertEqual(self.user_b.profile.full_name, 'Bob Jones')
         self.assertNotEqual(self.user_b.profile.full_name, 'Attempted Hacked Name')
 
+    def test_6_profile_edit_page_renders_clean_ui_without_emojis_and_with_cover_image(self):
+        """Confirm /dashboard/profile/ renders clean SVG icons, no raw emojis, and includes cover image."""
+        self.client_a.force_login(self.user_a)
+        response = self.client_a.get(self.profile_url)
+        self.assertEqual(response.status_code, 200)
+        # Check emojis are removed
+        self.assertNotContains(response, '👤')
+        self.assertNotContains(response, '🏢')
+        # Check key UI elements are present
+        self.assertContains(response, 'id_cover_image')
+        self.assertContains(response, 'btn-copy-live-link')
+        self.assertContains(response, 'profile-sticky-save-bar')
+        self.assertContains(response, 'prf-quick-nav')
+
 
 class Phase4LinksTests(TestCase):
     def setUp(self):

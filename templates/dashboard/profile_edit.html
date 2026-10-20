@@ -4,22 +4,31 @@
 
 {% block dashboard_content %}
 <!-- ==========================================================================
-     HEADER: Title, Slug & Public Profile Link
+     HEADER: Title, Live URL with 1-Click Copy & Actions
      ========================================================================== -->
-<div class="dashboard-header">
+<div class="dashboard-header mb-4">
   <div>
     <h1 class="dashboard-title">Edit Digital Profile</h1>
-    <p class="dashboard-subtitle">
+    <div class="d-flex items-center gap-2 flex-wrap mt-1">
       {% if profile.slug %}
-        Live URL: <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="text-silver" style="font-family: var(--font-mono);">{{ request.get_host }}/u/{{ profile.slug }}/</a>
+        <span class="text-caption" style="color: var(--text-muted);">Live URL:</span>
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="prf-url-pill" id="profile-live-url">
+          <span>{{ request.get_host }}/u/{{ profile.slug }}/</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
       {% else %}
-        Save your personal details to generate your unique public profile link.
+        <p class="dashboard-subtitle">Save your personal details to generate your unique public profile link.</p>
       {% endif %}
-    </p>
+    </div>
   </div>
   <div class="dashboard-header-actions d-flex gap-2">
     {% if profile.slug %}
-      <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-secondary btn-sm">
+      <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-live-link" data-url="{{ request.scheme }}://{{ request.get_host }}/u/{{ profile.slug }}/" title="Copy public link to clipboard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="icon-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" aria-hidden="true" class="icon-copied" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="btn-copy-text">Copy Link</span>
+      </button>
+      <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         <span>View Live</span>
       </a>
@@ -31,6 +40,43 @@
   </div>
 </div>
 
+<!-- ==========================================================================
+     QUICK SECTION NAVIGATION (Mobile & Desktop Jump Bar)
+     ========================================================================== -->
+<nav class="prf-quick-nav" aria-label="Page Sections Jump Navigation">
+  <a href="#sec-format" class="prf-nav-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>1. Identity</span>
+  </a>
+  <a href="#sec-photos" class="prf-nav-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    <span>2. Photos</span>
+  </a>
+  <a href="#sec-contacts" class="prf-nav-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span>3. Contacts</span>
+  </a>
+  <a href="#sec-business" class="prf-nav-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+    <span>4. Business</span>
+  </a>
+  <a href="#sec-highlights" class="prf-nav-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>5. Badges</span>
+  </a>
+  <a href="#sec-privacy" class="prf-nav-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span>6. Privacy</span>
+  </a>
+  <a href="#sec-interactive-modules" class="prf-nav-chip" style="border-color: rgba(255,255,255,0.18); color: #FFF;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    <span>Interactive Modules &darr;</span>
+  </a>
+</nav>
+
+<!-- ==========================================================================
+     CORE DIGITAL PROFILE FORM (Sections 1 through 6)
+     ========================================================================== -->
 <form id="profile-edit-form" method="post" action="{% url 'dashboard:profile_edit' %}" enctype="multipart/form-data" novalidate>
   {% csrf_token %}
 
@@ -41,37 +87,48 @@
   {% endif %}
 
   <!-- ========================================================================
-       SECTION 1: PERSONAL IDENTITY & IMAGES
+       SECTION 1: PROFILE TYPE & PERSONAL IDENTITY
        ======================================================================== -->
-  <div class="card mb-6">
+  <div class="card mb-6" id="sec-format">
     <div class="card-header">
       <div>
-        <h2 class="card-title">1. Profile Type & Personal Identity</h2>
-        <p class="text-caption mb-0">Choose your profile format and enter your core identity details.</p>
+        <h2 class="card-title">1. Profile Type &amp; Personal Identity</h2>
+        <p class="text-caption mb-0">Select your profile mode and configure your primary name, role, and bio.</p>
       </div>
     </div>
 
-    <!-- Profile Type / Mode Selector -->
+    <!-- Profile Type / Mode Selector (Emoji-Free SVG UI) -->
     <div class="mb-6 pb-6" style="border-bottom: 1px solid var(--border-primary);">
       <div class="d-flex items-center justify-between mb-2">
-        <label class="form-label mb-0" style="font-weight: 700;">Profile Type</label>
-        <span class="text-caption" style="color: var(--text-muted);">Select how your card is branded</span>
+        <label class="form-label mb-0" style="font-weight: 700;">Profile Format</label>
+        <span class="text-caption" style="color: var(--text-muted);">Adapts card structure &amp; tabs</span>
       </div>
       <div class="profile-type-switcher">
         <label class="profile-mode-option {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}selected{% endif %}" id="edit-mode-personal">
           <input type="radio" name="profile_type" value="personal" {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
-          <div class="mode-icon">👤</div>
-          <div>
+          <div class="mode-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div style="flex: 1; min-width: 0;">
             <div class="mode-title">Personal Profile</div>
-            <div class="mode-desc">Best for founders, executives, creators, freelancers, and professionals.</div>
+            <div class="mode-desc">For executives, founders, creators, freelancers, and professionals.</div>
+          </div>
+          <div class="mode-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
         </label>
+
         <label class="profile-mode-option {% if form.instance.profile_type == 'business' %}selected{% endif %}" id="edit-mode-business">
           <input type="radio" name="profile_type" value="business" {% if form.instance.profile_type == 'business' %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
-          <div class="mode-icon">🏢</div>
-          <div>
+          <div class="mode-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/><path d="M14 9h1"/><path d="M14 13h1"/><path d="M14 17h1"/></svg>
+          </div>
+          <div style="flex: 1; min-width: 0;">
             <div class="mode-title">Business Profile</div>
-            <div class="mode-desc">Best for companies, agencies, retail stores, brands, and sales teams.</div>
+            <div class="mode-desc">For companies, agencies, retail stores, brands, and corporate sales teams.</div>
+          </div>
+          <div class="mode-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
         </label>
       </div>
@@ -82,37 +139,12 @@
       {% endif %}
     </div>
 
-    <!-- Profile Image Upload UI -->
-    <div class="mb-6 pb-6" style="border-bottom: 1px solid var(--border-primary);">
-      <label for="id_profile_image" class="form-label mb-3">Profile Photo</label>
-      <div class="d-flex items-center gap-4 flex-wrap">
-        <div class="profile-status-avatar" style="width: 72px; height: 72px; font-size: 1.75rem;">
-          {% if profile.profile_image %}
-            <img id="profile-img-preview" src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}">
-          {% else %}
-            <img id="profile-img-preview" src="" alt="" style="display: none;">
-            <span>{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
-          {% endif %}
-        </div>
-        <div class="flex-1" style="min-width: 220px;">
-          <div class="form-group mb-1">
-            {{ form.profile_image }}
-          </div>
-          <div class="form-hint">JPG, PNG, or WebP. Square image recommended.</div>
-          {% if form.profile_image.errors %}
-            <div class="form-error" role="alert">
-              <span>{{ form.profile_image.errors|first }}</span>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Name & Title -->
+    <!-- Name & Professional Title -->
     <div class="grid-2 mb-4">
       <div class="form-group mb-0">
-        <label for="id_full_name" class="form-label">Full Name</label>
+        <label for="id_full_name" class="form-label">Full Name *</label>
         {{ form.full_name }}
+        <div class="form-hint">Displayed as your headline name on your smart card and saved contact vCard.</div>
         {% if form.full_name.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.full_name.errors|first }}</span>
@@ -120,8 +152,9 @@
         {% endif %}
       </div>
       <div class="form-group mb-0">
-        <label for="id_title" class="form-label">Professional Title</label>
+        <label for="id_title" class="form-label">Professional Title / Headline</label>
         {{ form.title }}
+        <div class="form-hint">e.g. Managing Partner, Creative Director, Senior Software Engineer</div>
         {% if form.title.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.title.errors|first }}</span>
@@ -130,39 +163,119 @@
       </div>
     </div>
 
-    <!-- Bio -->
-    <div class="form-group mb-4">
-      <label for="id_bio" class="form-label">Bio & Professional Summary</label>
+    <!-- Bio & Summary -->
+    <div class="form-group mb-0">
+      <label for="id_bio" class="form-label">Bio &amp; Professional Summary</label>
       {{ form.bio }}
-      <div class="form-hint">A brief description shown directly below your name on your public profile.</div>
+      <div class="form-hint">A concise 1-3 sentence summary displayed directly below your name on your public profile.</div>
       {% if form.bio.errors %}
         <div class="form-error" role="alert">
           <span>{{ form.bio.errors|first }}</span>
         </div>
       {% endif %}
     </div>
+  </div>
 
-    <!-- Appearance — managed from Appearance page -->
-    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+  <!-- ========================================================================
+       SECTION 2: PHOTOS & VISUAL BRANDING
+       ======================================================================== -->
+  <div class="card mb-6" id="sec-photos">
+    <div class="card-header">
       <div>
-        <div style="font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.55); margin-bottom: 0.2rem;">Profile Type · Layout · Colour Theme</div>
-        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.30);">Managed from the Appearance page — changes apply live to your public profile.</div>
+        <h2 class="card-title">2. Photos &amp; Visual Branding</h2>
+        <p class="text-caption mb-0">Upload your profile avatar and optional header cover banner image.</p>
       </div>
-      <a href="{% url 'dashboard:appearance' %}" class="btn btn-sm btn-ghost" style="white-space:nowrap; flex-shrink:0;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="margin-right:5px;"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        Appearance
+    </div>
+
+    <div class="prf-branding-grid mb-4">
+      <!-- Profile Photo Upload Card -->
+      <div class="prf-brand-card">
+        <label for="id_profile_image" class="form-label mb-2" style="font-weight: 600;">Profile Photo (Avatar)</label>
+        <p class="text-caption mb-3" style="color: var(--text-muted); font-size: 0.775rem;">Shown on your digital profile hero and avatar badges.</p>
+        
+        <div class="d-flex items-center gap-3 mb-3">
+          <div class="profile-status-avatar" style="width: 72px; height: 72px; font-size: 1.75rem; border: 2px solid rgba(255,255,255,0.2);">
+            {% if profile.profile_image %}
+              <img id="profile-img-preview" src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}">
+              <span id="profile-img-fallback" style="display: none;">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
+            {% else %}
+              <img id="profile-img-preview" src="" alt="" style="display: none;">
+              <span id="profile-img-fallback">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
+            {% endif %}
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div class="form-group mb-1">
+              {{ form.profile_image }}
+            </div>
+            <div class="form-hint" style="font-size: 0.725rem;">Square JPG, PNG, or WebP. Max 5MB.</div>
+          </div>
+        </div>
+        {% if form.profile_image.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.profile_image.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Cover Banner Upload Card -->
+      <div class="prf-brand-card">
+        <label for="id_cover_image" class="form-label mb-2" style="font-weight: 600;">Header Cover Banner <span class="form-label-hint">(Optional)</span></label>
+        <p class="text-caption mb-3" style="color: var(--text-muted); font-size: 0.775rem;">Panoramic background banner at the top of your public profile.</p>
+
+        <div class="cover-img-preview-box mb-3">
+          {% if profile.cover_image %}
+            <img id="cover-img-preview" src="{{ profile.cover_image.url }}" alt="Cover background">
+            <div id="cover-img-placeholder" class="cover-img-placeholder" style="display: none;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>No cover uploaded</span>
+            </div>
+          {% else %}
+            <img id="cover-img-preview" src="" alt="" style="display: none;">
+            <div id="cover-img-placeholder" class="cover-img-placeholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>No cover uploaded</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-1">
+          {{ form.cover_image }}
+        </div>
+        <div class="form-hint" style="font-size: 0.725rem;">Recommended 1200&times;400px (3:1 ratio). Max 5MB.</div>
+        {% if form.cover_image.errors %}
+          <div class="form-error" role="alert">
+            <span>{{ form.cover_image.errors|first }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Themes & Style Guidance Banner (Replaces Duplicate Appearance Snippet) -->
+    <div class="prf-styling-card">
+      <div class="d-flex items-center gap-3">
+        <div class="prf-styling-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
+        </div>
+        <div>
+          <div class="prf-styling-title">Looking to customise colors, theme styles, or card layout?</div>
+          <div class="prf-styling-desc">Choose from 15+ luxury palettes (Midnight, Emerald, Obsidian, Navy) in the visual designer.</div>
+        </div>
+      </div>
+      <a href="{% url 'dashboard:appearance' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap; flex-shrink: 0;">
+        <span>Themes &amp; Style</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
     </div>
   </div>
 
   <!-- ========================================================================
-       SECTION 2: CONTACT INFORMATION
+       SECTION 3: CONTACT INFORMATION
        ======================================================================== -->
-  <div class="card mb-6">
+  <div class="card mb-6" id="sec-contacts">
     <div class="card-header">
       <div>
-        <h2 class="card-title">2. Contact Details</h2>
-        <p class="text-caption mb-0">Direct 1-tap contact buttons (Call, WhatsApp, Email, vCard export).</p>
+        <h2 class="card-title">3. Contact Details &amp; vCard Export</h2>
+        <p class="text-caption mb-0">These details power your 1-tap direct action buttons (Call, WhatsApp, Email) and are saved to phone contacts.</p>
       </div>
     </div>
 
@@ -170,6 +283,7 @@
       <div class="form-group mb-0">
         <label for="id_phone" class="form-label">Phone Number</label>
         {{ form.phone }}
+        <div class="form-hint">Used for the 1-tap Call button and exported vCard.</div>
         {% if form.phone.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.phone.errors|first }}</span>
@@ -179,7 +293,7 @@
       <div class="form-group mb-0">
         <label for="id_whatsapp" class="form-label">WhatsApp Number</label>
         {{ form.whatsapp }}
-        <div class="form-hint">Include international country code (e.g. +234...)</div>
+        <div class="form-hint">Include country code with no spaces, e.g. +2348012345678</div>
         {% if form.whatsapp.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.whatsapp.errors|first }}</span>
@@ -190,8 +304,9 @@
 
     <div class="grid-2 mb-4">
       <div class="form-group mb-0">
-        <label for="id_email" class="form-label">Public Email Address</label>
+        <label for="id_email" class="form-label">Public Contact Email</label>
         {{ form.email }}
+        <div class="form-hint">Publicly displayed email for inquiries (separate from login).</div>
         {% if form.email.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.email.errors|first }}</span>
@@ -201,6 +316,7 @@
       <div class="form-group mb-0">
         <label for="id_website_url" class="form-label">Website / Portfolio URL</label>
         {{ form.website_url }}
+        <div class="form-hint">Your primary website, company link, or digital portfolio.</div>
         {% if form.website_url.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.website_url.errors|first }}</span>
@@ -213,6 +329,7 @@
       <div class="form-group mb-0">
         <label for="id_location" class="form-label">Location <span class="form-label-hint">(City, Country)</span></label>
         {{ form.location }}
+        <div class="form-hint">e.g. London, United Kingdom &middot; Lagos, Nigeria &middot; New York, USA</div>
         {% if form.location.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.location.errors|first }}</span>
@@ -220,8 +337,9 @@
         {% endif %}
       </div>
       <div class="form-group mb-0">
-        <label for="id_address" class="form-label">Physical Office Address</label>
+        <label for="id_address" class="form-label">Office / Store Physical Address <span class="form-label-hint">(Optional)</span></label>
         {{ form.address }}
+        <div class="form-hint">Physical headquarters, boutique, or office location.</div>
         {% if form.address.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.address.errors|first }}</span>
@@ -229,32 +347,49 @@
         {% endif %}
       </div>
     </div>
+
+    <!-- Dedicated Social Links Guidance Box -->
+    <div class="prf-links-helper-box">
+      <div class="d-flex items-center gap-2 mb-1">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span style="font-weight: 600; font-size: 0.85rem; color: #FFF;">Looking to add Social Media Profiles &amp; Custom Action Buttons?</span>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.65rem;">
+        Add your Instagram, LinkedIn, X (Twitter), YouTube, TikTok, and custom booking/payment links on the dedicated Links &amp; Socials page.
+      </p>
+      <a href="{% url 'dashboard:links_manage' %}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 0.775rem;">
+        <span>Manage Links &amp; Socials</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
   </div>
 
   <!-- ========================================================================
-       SECTION 3: BUSINESS INFORMATION
+       SECTION 4: BUSINESS INFORMATION
        ======================================================================== -->
-  <div class="card mb-6" id="business-section">
+  <div class="card mb-6" id="sec-business">
     <div class="card-header">
       <div>
-        <h2 class="card-title d-flex items-center gap-2">
-          <span>3. Business & Brand Details</span>
+        <h2 class="card-title d-flex items-center gap-2 flex-wrap">
+          <span>4. Business &amp; Brand Details</span>
           <span class="badge" id="biz-mode-badge" style="{% if profile.profile_type != 'business' %}display: none;{% endif %} font-size: 0.72rem; background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3);">Active for Business Mode</span>
+          <span class="badge badge-silver" id="personal-biz-hint" style="{% if profile.profile_type == 'business' %}display: none;{% endif %} font-size: 0.72rem;">Optional for Personal Profiles</span>
         </h2>
-        <p class="text-caption mb-0">Showcase your company name, business pitch, and company logo.</p>
+        <p class="text-caption mb-0">Showcase your company name, industry category, corporate summary, and brand logo.</p>
       </div>
     </div>
 
-    <!-- Business Logo Upload UI -->
+    <!-- Business Logo Upload UI with Instant Preview -->
     <div class="mb-6 pb-6" style="border-bottom: 1px solid var(--border-primary);">
       <label for="id_business_logo" class="form-label mb-3">Company / Brand Logo</label>
       <div class="d-flex items-center gap-4 flex-wrap">
-        <div class="profile-status-avatar" style="width: 72px; height: 72px; border-radius: var(--radius-sm);">
+        <div class="profile-status-avatar" style="width: 72px; height: 72px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);">
           {% if profile.business_logo %}
             <img id="logo-img-preview" src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="padding: 4px; object-fit: contain;">
+            <svg id="logo-img-placeholder" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" style="display: none;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           {% else %}
-            <img id="logo-img-preview" src="" alt="" style="display: none;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <img id="logo-img-preview" src="" alt="" style="display: none; padding: 4px; object-fit: contain;">
+            <svg id="logo-img-placeholder" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           {% endif %}
         </div>
         <div class="flex-1" style="min-width: 220px;">
@@ -282,8 +417,9 @@
         {% endif %}
       </div>
       <div class="form-group mb-0">
-        <label for="id_business_category" class="form-label">Business Category</label>
+        <label for="id_business_category" class="form-label">Business Category / Industry</label>
         {{ form.business_category }}
+        <div class="form-hint">e.g. Technology, Architecture, Legal, Hospitality</div>
         {% if form.business_category.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.business_category.errors|first }}</span>
@@ -293,9 +429,9 @@
     </div>
 
     <div class="form-group mb-0">
-      <label for="id_business_description" class="form-label">Business Description & Offerings</label>
+      <label for="id_business_description" class="form-label">Business Description &amp; Offerings</label>
       {{ form.business_description }}
-      <div class="form-hint">Displayed in the business section of your digital profile.</div>
+      <div class="form-hint">Displayed in the company highlight section of your digital card.</div>
       {% if form.business_description.errors %}
         <div class="form-error" role="alert">
           <span>{{ form.business_description.errors|first }}</span>
@@ -305,21 +441,21 @@
   </div>
 
   <!-- ========================================================================
-       SECTION 4: HIGHLIGHTS, SKILLS & LIVE PROFILE BADGES
+       SECTION 5: HIGHLIGHTS, SKILLS & LIVE PROFILE BADGES
        ======================================================================== -->
-  <div class="card mb-6">
+  <div class="card mb-6" id="sec-highlights">
     <div class="card-header">
       <div>
-        <h2 class="card-title">4. Highlights, Skills & Social Proof</h2>
-        <p class="text-caption mb-0">Customise the live badges, tags, and stats shown on your app-style profile.</p>
+        <h2 class="card-title">5. Highlights, Skills &amp; Credibility Badges</h2>
+        <p class="text-caption mb-0">Customise the live proof metrics, skill tags, and call-to-action banner shown on your profile.</p>
       </div>
     </div>
 
     <div class="grid-2 mb-4">
       <div class="form-group mb-0">
-        <label for="id_skills_tags" class="form-label">Skills / Category Tags</label>
+        <label for="id_skills_tags" class="form-label">Skills &amp; Specialties Tags</label>
         {{ form.skills_tags }}
-        <div class="form-hint">Comma-separated, e.g. Design, Product, Tech</div>
+        <div class="form-hint">Comma-separated tags shown as badges, e.g. Strategy, Fintech, AI Systems</div>
         {% if form.skills_tags.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.skills_tags.errors|first }}</span>
@@ -329,7 +465,7 @@
       <div class="form-group mb-0">
         <label for="id_languages" class="form-label">Languages Spoken</label>
         {{ form.languages }}
-        <div class="form-hint">Comma-separated, e.g. English, Spanish, French</div>
+        <div class="form-hint">Comma-separated, e.g. English, French, Spanish, Arabic</div>
         {% if form.languages.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.languages.errors|first }}</span>
@@ -338,11 +474,12 @@
       </div>
     </div>
 
+    <!-- 3 Credibility Stats -->
     <div class="grid-3 mb-4">
       <div class="form-group mb-0">
         <label for="id_stat_experience" class="form-label">Experience Stat</label>
         {{ form.stat_experience }}
-        <div class="form-hint">e.g. 5+ Years</div>
+        <div class="form-hint">e.g. 8+ Years</div>
         {% if form.stat_experience.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.stat_experience.errors|first }}</span>
@@ -350,9 +487,9 @@
         {% endif %}
       </div>
       <div class="form-group mb-0">
-        <label for="id_stat_projects" class="form-label">Projects Stat</label>
+        <label for="id_stat_projects" class="form-label">Projects / Deals Stat</label>
         {{ form.stat_projects }}
-        <div class="form-hint">e.g. 50+ Projects</div>
+        <div class="form-hint">e.g. 120+ Completed</div>
         {% if form.stat_projects.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.stat_projects.errors|first }}</span>
@@ -362,7 +499,7 @@
       <div class="form-group mb-0">
         <label for="id_stat_followers" class="form-label">Network / Clients Stat</label>
         {{ form.stat_followers }}
-        <div class="form-hint">e.g. 10K+ Network</div>
+        <div class="form-hint">e.g. 25K+ Clients</div>
         {% if form.stat_followers.errors %}
           <div class="form-error" role="alert">
             <span>{{ form.stat_followers.errors|first }}</span>
@@ -374,7 +511,7 @@
     <div class="form-group mb-0">
       <label for="id_cta_banner_text" class="form-label">Call-To-Action Banner Text</label>
       {{ form.cta_banner_text }}
-      <div class="form-hint">Highlighted banner above your message prompt, e.g. Let's build something great together.</div>
+      <div class="form-hint">Highlighted banner above your direct action buttons, e.g. "Available for select advisory roles in Q1."</div>
       {% if form.cta_banner_text.errors %}
         <div class="form-error" role="alert">
           <span>{{ form.cta_banner_text.errors|first }}</span>
@@ -384,21 +521,24 @@
   </div>
 
   <!-- ========================================================================
-       SECTION 5: SEARCH ENGINE VISIBILITY
+       SECTION 6: SEARCH ENGINE VISIBILITY
        ======================================================================== -->
-  <div class="card mb-6">
+  <div class="card mb-6" id="sec-privacy">
     <div class="card-header">
       <div>
-        <h2 class="card-title">5. Privacy & Indexing</h2>
-        <p class="text-caption mb-0">Control search engine discovery of your public URL.</p>
+        <h2 class="card-title">6. Privacy &amp; Search Visibility</h2>
+        <p class="text-caption mb-0">Control search engine discovery and indexation of your public digital profile.</p>
       </div>
     </div>
 
-    <label class="form-check">
+    <label class="form-check d-flex items-center gap-3" style="cursor: pointer;">
       {{ form.is_search_indexed }}
-      <span class="text-secondary" style="font-size: 0.875rem;">
-        Allow search engines (Google, Bing) to index and display my public digital profile in search results.
-      </span>
+      <div>
+        <div style="font-weight: 600; color: #FFF; font-size: 0.9rem;">Allow search engines (Google, Bing) to index this profile</div>
+        <div class="text-secondary" style="font-size: 0.8rem; margin-top: 2px;">
+          When enabled, your public profile URL can appear in web search results. When disabled, your card is only accessible via direct tap or link sharing.
+        </div>
+      </div>
     </label>
     {% if form.is_search_indexed.errors %}
       <div class="form-error mt-2" role="alert">
@@ -408,26 +548,41 @@
   </div>
 
   <!-- ========================================================================
-       SAVE ACTION BAR
+       PRIMARY SAVE ACTION BAR (Form Completion)
        ======================================================================== -->
-  <div class="d-flex items-center gap-3 flex-wrap mb-8">
-    <button type="submit" class="btn btn-primary btn-lg">
+  <div class="d-flex items-center gap-3 flex-wrap mb-6">
+    <button type="submit" class="btn btn-primary btn-lg" id="btn-save-profile-primary">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       <span>Save Profile Changes</span>
     </button>
-    <a href="{% url 'dashboard:overview' %}" class="btn btn-secondary btn-lg">Cancel</a>
+    <a href="{% url 'dashboard:overview' %}" class="btn btn-secondary btn-lg">Back to Workspace</a>
   </div>
 
 </form>
 
 <!-- ==========================================================================
-     SECTION 6: "WHAT I DO" SERVICES MANAGER
+     SECTION DIVIDER: INTERACTIVE PROFILE MODULES
      ========================================================================== -->
-<div class="card mb-6">
+<div class="prf-section-divider" id="sec-interactive-modules">
+  <div class="prf-divider-line"></div>
+  <div class="prf-divider-badge">Interactive Profile Modules</div>
+  <div class="prf-divider-line"></div>
+</div>
+
+<div class="mb-6">
+  <p class="text-secondary" style="font-size: 0.875rem; margin-bottom: 0;">
+    The sections below power the <strong>Services</strong>, <strong>Portfolio Gallery</strong>, and <strong>Testimonials</strong> tabs on your public profile. Each item saves instantly when added or deleted.
+  </p>
+</div>
+
+<!-- ==========================================================================
+     MODULE 7: "WHAT I DO" SERVICES MANAGER
+     ========================================================================== -->
+<div class="card mb-6" id="sec-services">
   <div class="card-header">
     <div>
-      <h2 class="card-title">6. What I Do (Services & Offerings)</h2>
-      <p class="text-caption mb-0">Highlighted services with custom icons displayed in your profile About tab.</p>
+      <h2 class="card-title">7. What I Do (Services &amp; Offerings)</h2>
+      <p class="text-caption mb-0">Highlighted services with custom icons displayed in your public profile About tab.</p>
     </div>
     <button class="btn btn-primary btn-sm" data-modal-target="modal-add-service">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -448,7 +603,7 @@
               <div style="color: var(--text-secondary); font-size: 0.8rem;">{{ srv.description }} &middot; Icon: {{ srv.get_icon_display }}</div>
             </div>
           </div>
-          <form method="post" action="{% url 'dashboard:profile_service_delete' srv.id %}" onsubmit="return confirm('Remove service {{ srv.title }}?')">
+          <form method="post" action="{% url 'dashboard:profile_service_delete' srv.id %}" onsubmit="return confirm('Remove service {{ srv.title|escapejs }}?')">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger btn-sm">Remove</button>
           </form>
@@ -457,20 +612,20 @@
     </div>
   {% else %}
     <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
-      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No custom services added yet. Add items like Product Design, Strategy, or Speaking.</p>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No custom services added yet. Add items like Product Design, Strategic Advisory, or Speaking.</p>
       <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-service">+ Add First Service</button>
     </div>
   {% endif %}
 </div>
 
 <!-- ==========================================================================
-     SECTION 7: "MY WORK" PORTFOLIO GALLERY MANAGER
+     MODULE 8: "MY WORK" PORTFOLIO GALLERY MANAGER
      ========================================================================== -->
-<div class="card mb-6">
+<div class="card mb-6" id="sec-gallery">
   <div class="card-header">
     <div>
-      <h2 class="card-title">7. My Work (Portfolio Gallery)</h2>
-      <p class="text-caption mb-0">Showcase design samples, case studies, or photography in your Gallery tab.</p>
+      <h2 class="card-title">8. My Work (Portfolio Gallery)</h2>
+      <p class="text-caption mb-0">Showcase design samples, case studies, or photography in your public Gallery tab.</p>
     </div>
     <button class="btn btn-primary btn-sm" data-modal-target="modal-add-gallery">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -479,22 +634,22 @@
   </div>
 
   {% if gallery_items %}
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; padding: 1rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; padding: 1rem;">
       {% for item in gallery_items %}
         <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-primary); border-radius: 12px; overflow: hidden; position: relative;">
           {% if item.image %}
-            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 120px; object-fit: cover;">
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 130px; object-fit: cover;">
           {% elif item.image_url %}
-            <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 120px; object-fit: cover;">
+            <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 130px; object-fit: cover;">
           {% else %}
-            <div style="width: 100%; height: 120px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">No Image</div>
+            <div style="width: 100%; height: 130px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">No Image</div>
           {% endif %}
-          <div style="padding: 0.75rem;">
-            <div style="font-weight: 600; color: #FFF; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.title|default:"Gallery Item" }}</div>
+          <div style="padding: 0.85rem;">
+            <div style="font-weight: 600; color: #FFF; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.title|default:"Gallery Item" }}</div>
             {% if item.link_url %}
-              <div style="font-size: 0.75rem; color: var(--silver-steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.link_url }}</div>
+              <div style="font-size: 0.75rem; color: var(--silver-steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">{{ item.link_url }}</div>
             {% endif %}
-            <form method="post" action="{% url 'dashboard:profile_gallery_delete' item.id %}" onsubmit="return confirm('Remove gallery item?')" style="margin-top: 0.5rem;">
+            <form method="post" action="{% url 'dashboard:profile_gallery_delete' item.id %}" onsubmit="return confirm('Remove gallery item?')" style="margin-top: 0.65rem;">
               {% csrf_token %}
               <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Remove</button>
             </form>
@@ -504,20 +659,20 @@
     </div>
   {% else %}
     <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
-      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No portfolio items added yet. Showcase your past work and projects.</p>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No portfolio items added yet. Showcase your past work, products, or creative projects.</p>
       <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-gallery">+ Add First Work Item</button>
     </div>
   {% endif %}
 </div>
 
 <!-- ==========================================================================
-     SECTION 8: CLIENT TESTIMONIALS MANAGER
+     MODULE 9: CLIENT TESTIMONIALS MANAGER
      ========================================================================== -->
-<div class="card mb-6">
+<div class="card mb-6" id="sec-testimonials">
   <div class="card-header">
     <div>
-      <h2 class="card-title">8. Client Testimonials & Reviews</h2>
-      <p class="text-caption mb-0">Client feedback, star ratings, and recommendations displayed in your More tab.</p>
+      <h2 class="card-title">9. Client Testimonials &amp; Reviews</h2>
+      <p class="text-caption mb-0">Client feedback, star ratings, and recommendations displayed on your public profile.</p>
     </div>
     <button class="btn btn-primary btn-sm" data-modal-target="modal-add-testimonial">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -530,12 +685,16 @@
       {% for test in testimonials %}
         <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border-primary); gap: 1rem;">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
               <span style="font-weight: 600; color: #FFF;">{{ test.client_name }}</span>
               {% if test.client_title %}
                 <span style="color: var(--text-secondary); font-size: 0.8rem;">&middot; {{ test.client_title }}</span>
               {% endif %}
-              <span style="color: #F59E0B; font-size: 0.85rem;">★ {{ test.rating }}/5</span>
+              <!-- Clean SVG Star Rating (Emoji-Free) -->
+              <span style="display: inline-flex; align-items: center; gap: 3px; color: #F59E0B; font-size: 0.825rem; font-weight: 600;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>{{ test.rating }}/5</span>
+              </span>
             </div>
             <div style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">"{{ test.content }}"</div>
           </div>
@@ -552,6 +711,30 @@
       <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-testimonial">+ Add First Testimonial</button>
     </div>
   {% endif %}
+</div>
+
+<!-- ==========================================================================
+     STICKY QUICK-SAVE ACTION BAR (Mobile & Desktop)
+     ========================================================================== -->
+<div class="profile-sticky-save-bar" id="profile-sticky-save-bar" aria-label="Quick Actions">
+  <div class="sticky-bar-inner">
+    <div class="sticky-bar-status">
+      <span class="status-indicator-dot" id="sticky-status-dot"></span>
+      <span class="status-indicator-text" id="sticky-bar-text">Profile Synced</span>
+    </div>
+    <div class="sticky-bar-actions">
+      {% if profile.slug %}
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="View live profile in a new tab">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>Live Card</span>
+        </a>
+      {% endif %}
+      <button type="submit" form="profile-edit-form" class="btn btn-primary btn-sm" id="btn-sticky-save">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Save Changes</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- ==========================================================================
@@ -683,41 +866,165 @@
   </div>
 </div>
 
+<!-- ==========================================================================
+     INTERACTIVE ENHANCEMENTS JAVASCRIPT
+     ========================================================================== -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const personalOpt = document.getElementById('edit-mode-personal');
-    const businessOpt = document.getElementById('edit-mode-business');
-    const bizBadge = document.getElementById('biz-mode-badge');
+document.addEventListener('DOMContentLoaded', function() {
+  // ── 1. Profile Type Switcher UI & Business Indicator ───────────────────────
+  const personalOpt = document.getElementById('edit-mode-personal');
+  const businessOpt = document.getElementById('edit-mode-business');
+  const bizBadge = document.getElementById('biz-mode-badge');
+  const personalHint = document.getElementById('personal-biz-hint');
+  const businessSection = document.getElementById('sec-business');
 
-    function updateProfileTypeUI() {
-      const isBiz = document.querySelector('input[name="profile_type"]:checked')?.value === 'business';
-      if (personalOpt && businessOpt) {
-        if (isBiz) {
-          personalOpt.classList.remove('selected');
-          businessOpt.classList.add('selected');
-        } else {
-          personalOpt.classList.add('selected');
-          businessOpt.classList.remove('selected');
+  function updateProfileTypeUI() {
+    const isBiz = document.querySelector('input[name="profile_type"]:checked')?.value === 'business';
+    if (personalOpt && businessOpt) {
+      if (isBiz) {
+        personalOpt.classList.remove('selected');
+        businessOpt.classList.add('selected');
+      } else {
+        personalOpt.classList.add('selected');
+        businessOpt.classList.remove('selected');
+      }
+    }
+    if (bizBadge) {
+      bizBadge.style.display = isBiz ? 'inline-flex' : 'none';
+    }
+    if (personalHint) {
+      personalHint.style.display = isBiz ? 'none' : 'inline-flex';
+    }
+    if (businessSection) {
+      if (isBiz) {
+        businessSection.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+      } else {
+        businessSection.style.borderColor = '';
+      }
+    }
+  }
+
+  if (personalOpt && businessOpt) {
+    personalOpt.addEventListener('click', function() {
+      const radio = personalOpt.querySelector('input');
+      if (radio) { radio.checked = true; markFormDirty(); }
+      updateProfileTypeUI();
+    });
+    businessOpt.addEventListener('click', function() {
+      const radio = businessOpt.querySelector('input');
+      if (radio) { radio.checked = true; markFormDirty(); }
+      updateProfileTypeUI();
+    });
+    updateProfileTypeUI();
+  }
+
+  // ── 2. Live Image Upload Previews ──────────────────────────────────────────
+  function setupImagePreview(inputId, previewImgId, placeholderId) {
+    const input = document.getElementById(inputId);
+    const previewImg = document.getElementById(previewImgId);
+    const placeholder = placeholderId ? document.getElementById(placeholderId) : null;
+
+    if (!input || !previewImg) return;
+
+    input.addEventListener('change', function() {
+      const file = this.files && this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+          if (placeholder) {
+            placeholder.style.display = 'none';
+          }
+        };
+        reader.readAsDataURL(file);
+        markFormDirty();
+      }
+    });
+  }
+
+  setupImagePreview('id_profile_image', 'profile-img-preview', 'profile-img-fallback');
+  setupImagePreview('id_cover_image', 'cover-img-preview', 'cover-img-placeholder');
+  setupImagePreview('id_business_logo', 'logo-img-preview', 'logo-img-placeholder');
+
+  // ── 3. One-Click Copy Profile URL with Animated Feedback ──────────────────
+  const btnCopy = document.getElementById('btn-copy-live-link');
+  if (btnCopy) {
+    btnCopy.addEventListener('click', function() {
+      const url = this.getAttribute('data-url');
+      if (!url) return;
+
+      const copyIcon = this.querySelector('.icon-copy');
+      const copiedIcon = this.querySelector('.icon-copied');
+      const textSpan = this.querySelector('.btn-copy-text');
+
+      navigator.clipboard.writeText(url).then(function() {
+        if (copyIcon) copyIcon.style.display = 'none';
+        if (copiedIcon) copiedIcon.style.display = 'inline';
+        if (textSpan) textSpan.textContent = 'Copied!';
+
+        setTimeout(function() {
+          if (copyIcon) copyIcon.style.display = 'inline';
+          if (copiedIcon) copiedIcon.style.display = 'none';
+          if (textSpan) textSpan.textContent = 'Copy Link';
+        }, 2200);
+      }).catch(function() {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (textSpan) textSpan.textContent = 'Copied!';
+        setTimeout(function() {
+          if (textSpan) textSpan.textContent = 'Copy Link';
+        }, 2200);
+      });
+    });
+  }
+
+  // ── 4. Unsaved Changes Tracking & Sticky Bar Feedback ─────────────────────
+  let formDirty = false;
+  const stickyDot = document.getElementById('sticky-status-dot');
+  const stickyText = document.getElementById('sticky-bar-text');
+  const profileForm = document.getElementById('profile-edit-form');
+
+  function markFormDirty() {
+    if (!formDirty) {
+      formDirty = true;
+      if (stickyDot) stickyDot.classList.add('dirty');
+      if (stickyText) {
+        stickyText.textContent = 'Unsaved Changes';
+        stickyText.style.color = '#F59E0B';
+      }
+    }
+  }
+
+  if (profileForm) {
+    profileForm.querySelectorAll('input, textarea, select').forEach(function(field) {
+      field.addEventListener('input', markFormDirty);
+      field.addEventListener('change', markFormDirty);
+    });
+
+    profileForm.addEventListener('submit', function() {
+      formDirty = false;
+    });
+  }
+
+  // ── 5. Smooth Scroll for Quick-Jump Nav Chips ─────────────────────────────
+  document.querySelectorAll('.prf-nav-chip').forEach(function(chip) {
+    chip.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      if (targetId && targetId.startsWith('#')) {
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
-      if (bizBadge) {
-        bizBadge.style.display = isBiz ? 'inline-flex' : 'none';
-      }
-    }
-
-    if (personalOpt && businessOpt) {
-      personalOpt.addEventListener('click', function() {
-        const radio = personalOpt.querySelector('input');
-        if (radio) { radio.checked = true; }
-        updateProfileTypeUI();
-      });
-      businessOpt.addEventListener('click', function() {
-        const radio = businessOpt.querySelector('input');
-        if (radio) { radio.checked = true; }
-        updateProfileTypeUI();
-      });
-      updateProfileTypeUI();
-    }
+    });
   });
+});
 </script>
 {% endblock %}

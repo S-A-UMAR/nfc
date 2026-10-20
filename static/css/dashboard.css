@@ -2006,3 +2006,246 @@
   }
 }
 
+/* ==========================================================================
+   EDIT DIGITAL PROFILE DASHBOARD ENHANCEMENTS
+   ========================================================================== */
+
+/* ── Section Quick-Jump Nav ────────────────────────────────────────────── */
+.prf-quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0 1rem;
+  margin-bottom: 1.25rem;
+  scrollbar-width: none;
+}
+.prf-quick-nav::-webkit-scrollbar {
+  display: none;
+}
+.prf-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.prf-nav-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+}
+
+/* ── Live URL Pill & Action Buttons ────────────────────────────────────── */
+.prf-url-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.825rem;
+  color: var(--silver-steel);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.prf-url-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+}
+
+/* ── Visual Branding Grid (Avatar & Cover) ─────────────────────────────── */
+.prf-branding-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+@media (max-width: 768px) {
+  .prf-branding-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.prf-brand-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.cover-img-preview-box {
+  width: 100%;
+  height: 110px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(18, 19, 24, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.cover-img-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Themes & Style Tip Banner ─────────────────────────────────────────── */
+.prf-styling-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(18, 19, 26, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.prf-styling-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+.prf-styling-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 0.15rem;
+}
+.prf-styling-desc {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+}
+@media (max-width: 640px) {
+  .prf-styling-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+}
+
+/* ── Links & Socials Guidance Box ──────────────────────────────────────── */
+.prf-links-helper-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.95rem 1.15rem;
+  margin-top: 1.25rem;
+}
+
+/* ── Divider between Form and Interactive Modules ──────────────────────── */
+.prf-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0 1.25rem;
+}
+.prf-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+.prf-divider-badge {
+  font-size: 0.725rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--silver-steel);
+  padding: 0.35rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* ── Sticky Bottom Save Bar (Mobile & Desktop) ─────────────────────────── */
+.profile-sticky-save-bar {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 990;
+  background: rgba(18, 19, 26, 0.94);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  padding: 8px 14px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.profile-sticky-save-bar .sticky-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.profile-sticky-save-bar .sticky-bar-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding-left: 6px;
+}
+.profile-sticky-save-bar .status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.profile-sticky-save-bar .status-indicator-dot.dirty {
+  background: #F59E0B;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+}
+.profile-sticky-save-bar .sticky-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 768px) {
+  .profile-sticky-save-bar {
+    left: 12px;
+    right: 12px;
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    border-radius: 14px;
+    padding: 8px 12px;
+  }
+  .profile-sticky-save-bar .sticky-bar-inner {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .profile-sticky-save-bar .sticky-bar-status {
+    font-size: 0.75rem;
+    padding-left: 2px;
+  }
+}
+
+
