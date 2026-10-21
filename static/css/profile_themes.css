@@ -5,116 +5,269 @@
    The default (UZYRA Default / graphite) is defined in profile.css :root.
    ========================================================================== */
 
-/* ── SHARED LAYOUT RESETS ─────────────────────────────────────────────────── */
+/* ── SHARED LAYOUT RESETS & MODERN .prf-* SELECTORS ─────────────────────── */
 /* Centred layout */
-[data-layout="centered"] .profile-header-content {
+[data-layout="centered"] .profile-header-content,
+[data-layout="centered"] .prf-hero-section {
   align-items: center;
   text-align: center;
 }
-[data-layout="centered"] .profile-avatar-container {
+[data-layout="centered"] .profile-avatar-container,
+[data-layout="centered"] .prf-avatar-wrap {
   margin: 0 auto;
 }
-[data-layout="centered"] .profile-meta-chips {
+[data-layout="centered"] .profile-meta-chips,
+[data-layout="centered"] .prf-name-row,
+[data-layout="centered"] .prf-tag-chips-row,
+[data-layout="centered"] .prf-action-hub-row {
   justify-content: center;
 }
 [data-layout="centered"] .profile-actions-grid {
   justify-content: center;
 }
-[data-layout="centered"] .profile-bio {
+[data-layout="centered"] .profile-bio,
+[data-layout="centered"] .prf-bio-text {
   text-align: center;
 }
 
 /* Minimal layout — stripped-back typographic focus */
 [data-layout="minimal_layout"] .profile-ambient-glow,
-[data-layout="minimal_layout"] .profile-cover { display: none; }
-[data-layout="minimal_layout"] .profile-avatar { width: 60px; height: 60px; font-size: 1.25rem; }
-[data-layout="minimal_layout"] .profile-card {
+[data-layout="minimal_layout"] .profile-cover,
+[data-layout="minimal_layout"] .prf-cover-wrap,
+[data-layout="minimal_layout"] .prf-ambient-glow { display: none !important; }
+[data-layout="minimal_layout"] .profile-avatar,
+[data-layout="minimal_layout"] .prf-avatar-wrap { 
+  width: 68px !important; 
+  height: 68px !important; 
+  font-size: 1.25rem; 
+  margin: 0.5rem 0;
+}
+[data-layout="minimal_layout"] .profile-card,
+[data-layout="minimal_layout"] .prf-card-viewport {
   background: var(--prf-bg-canvas, #09090B) !important;
   backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 [data-layout="minimal_layout"] .profile-section-block,
 [data-layout="minimal_layout"] .profile-contact-hub,
-[data-layout="minimal_layout"] .profile-action-btn {
-  border-radius: 6px !important;
+[data-layout="minimal_layout"] .profile-action-btn,
+[data-layout="minimal_layout"] .prf-action-hub-btn,
+[data-layout="minimal_layout"] .prf-custom-link-btn {
+  border-radius: 8px !important;
 }
-[data-layout="minimal_layout"] .profile-header-content {
-  padding-top: 2rem;
+[data-layout="minimal_layout"] .profile-header-content,
+[data-layout="minimal_layout"] .prf-hero-section {
+  padding-top: 1.75rem;
 }
 
 /* Social layout — large social grid prominence */
-[data-layout="social"] .profile-socials-grid {
+[data-layout="social"] .profile-socials-grid,
+[data-layout="social"] .prf-social-grid {
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 0.75rem !important;
 }
-[data-layout="social"] .profile-social-item {
+[data-layout="social"] .profile-social-item,
+[data-layout="social"] .prf-social-btn {
   aspect-ratio: 1;
   border-radius: 16px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0.85rem;
 }
-[data-layout="social"] .profile-social-item svg {
+[data-layout="social"] .profile-social-item svg,
+[data-layout="social"] .prf-social-btn svg {
   width: 26px;
   height: 26px;
 }
 
 /* Card layout — compact, credential-card feel */
-[data-layout="card"] .profile-card { max-width: 400px !important; }
-[data-layout="card"] .profile-header-content {
+[data-layout="card"] .profile-card,
+[data-layout="card"] .prf-card-viewport { max-width: 440px !important; }
+[data-layout="card"] .profile-header-content,
+[data-layout="card"] .prf-hero-section {
   flex-direction: row !important;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.5rem 1.25rem 1rem;
+  align-items: center;
+  text-align: left;
+  gap: 1.25rem;
+  padding: 1.5rem 1.25rem 0.85rem;
 }
-[data-layout="card"] .profile-avatar { width: 64px; height: 64px; font-size: 1.2rem; flex-shrink: 0; }
-[data-layout="card"] .profile-name { font-size: 1.15rem; }
-[data-layout="card"] .profile-meta-chips { flex-wrap: wrap; }
+[data-layout="card"] .profile-avatar,
+[data-layout="card"] .prf-avatar-wrap { 
+  width: 72px !important; 
+  height: 72px !important; 
+  font-size: 1.2rem; 
+  flex-shrink: 0; 
+  margin: 0;
+}
+[data-layout="card"] .profile-name,
+[data-layout="card"] .prf-name-row { 
+  font-size: 1.15rem; 
+  justify-content: flex-start;
+}
+[data-layout="card"] .prf-hero-title,
+[data-layout="card"] .prf-hero-company {
+  text-align: left;
+}
+[data-layout="card"] .profile-meta-chips,
+[data-layout="card"] .prf-tag-chips-row { 
+  justify-content: flex-start;
+  flex-wrap: wrap; 
+}
 
 /* Executive layout — structured, authority */
-[data-layout="executive_layout"] .profile-header-content { padding-bottom: 0; }
-[data-layout="executive_layout"] .profile-avatar { border-radius: 4px; }
+[data-layout="executive_layout"] .profile-header-content,
+[data-layout="executive_layout"] .prf-hero-section { 
+  padding-bottom: 0.5rem;
+  text-align: left;
+  align-items: flex-start;
+  border-left: 3px solid var(--prf-accent-silver, #C9A84C);
+  padding-left: 1.25rem;
+}
+[data-layout="executive_layout"] .profile-avatar,
+[data-layout="executive_layout"] .prf-avatar-wrap,
+[data-layout="executive_layout"] .prf-avatar-ring,
+[data-layout="executive_layout"] .prf-avatar-inner { 
+  border-radius: 12px !important; 
+}
+[data-layout="executive_layout"] .prf-name-row {
+  justify-content: flex-start;
+}
+[data-layout="executive_layout"] .prf-hero-company {
+  color: var(--prf-accent-silver, #C9A84C);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
 [data-layout="executive_layout"] .profile-section-block {
-  border-left: 3px solid var(--prf-accent-silver, #BFC5CF);
+  border-left: 3px solid var(--prf-accent-silver, #C9A84C);
   padding-left: 1rem;
   border-radius: 0 var(--prf-radius-md) var(--prf-radius-md) 0 !important;
 }
 
 /* Brand Header layout — logo-first */
-[data-layout="brand_header"] .profile-avatar {
-  border-radius: 8px;
-  width: 80px;
-  height: 80px;
+[data-layout="brand_header"] .profile-avatar,
+[data-layout="brand_header"] .prf-avatar-wrap,
+[data-layout="brand_header"] .prf-avatar-ring,
+[data-layout="brand_header"] .prf-avatar-inner {
+  border-radius: 16px !important;
+  width: 90px !important;
+  height: 90px !important;
 }
-[data-layout="brand_header"] .profile-name {
-  font-size: 1.6rem;
+[data-layout="brand_header"] .profile-name,
+[data-layout="brand_header"] .prf-hero-name {
+  font-size: 1.55rem;
   letter-spacing: -0.02em;
 }
-[data-layout="brand_header"] .profile-header-content {
+[data-layout="brand_header"] .profile-header-content,
+[data-layout="brand_header"] .prf-hero-section {
   align-items: center;
   text-align: center;
 }
-[data-layout="brand_header"] .profile-avatar-container { margin: 0 auto; }
-[data-layout="brand_header"] .profile-meta-chips { justify-content: center; }
+[data-layout="brand_header"] .profile-avatar-container,
+[data-layout="brand_header"] .prf-avatar-wrap { 
+  margin: 0 auto 0.75rem; 
+}
+[data-layout="brand_header"] .profile-meta-chips,
+[data-layout="brand_header"] .prf-name-row,
+[data-layout="brand_header"] .prf-tag-chips-row { 
+  justify-content: center; 
+}
 
 /* Business Card layout — tight, traditional */
-[data-layout="business_card"] .profile-card { max-width: 420px !important; }
-[data-layout="business_card"] .profile-header-content {
+[data-layout="business_card"] .profile-card,
+[data-layout="business_card"] .prf-card-viewport { 
+  max-width: 440px !important; 
+  border: 1.5px solid var(--prf-border-active, rgba(201, 168, 76, 0.4)) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(201, 168, 76, 0.12) !important;
+}
+[data-layout="business_card"] .profile-header-content,
+[data-layout="business_card"] .prf-hero-section {
   flex-direction: row;
   align-items: flex-start;
+  text-align: left;
   gap: 1.25rem;
   padding: 1.75rem 1.25rem 1rem;
 }
-[data-layout="business_card"] .profile-avatar {
-  width: 72px; height: 72px; border-radius: 8px; flex-shrink: 0;
+[data-layout="business_card"] .profile-avatar,
+[data-layout="business_card"] .prf-avatar-wrap,
+[data-layout="business_card"] .prf-avatar-ring,
+[data-layout="business_card"] .prf-avatar-inner {
+  width: 76px !important; 
+  height: 76px !important; 
+  border-radius: 12px !important; 
+  flex-shrink: 0;
 }
 [data-layout="business_card"] .profile-avatar-container { flex-shrink: 0; }
+[data-layout="business_card"] .prf-name-row { justify-content: flex-start; }
+[data-layout="business_card"] .prf-hero-title,
+[data-layout="business_card"] .prf-hero-company { text-align: left; }
 
 /* Business Catalog layout — services/products prominence */
-[data-layout="business_catalog"] .profile-header-content { padding-bottom: 0.5rem; }
-[data-layout="business_catalog"] .profile-avatar { border-radius: 6px; }
+[data-layout="business_catalog"] .profile-header-content,
+[data-layout="business_catalog"] .prf-hero-section { 
+  padding-bottom: 0.5rem; 
+}
+[data-layout="business_catalog"] .profile-avatar,
+[data-layout="business_catalog"] .prf-avatar-wrap,
+[data-layout="business_catalog"] .prf-avatar-ring,
+[data-layout="business_catalog"] .prf-avatar-inner { 
+  border-radius: 10px !important; 
+}
 [data-layout="business_catalog"] .profile-section-block:last-of-type {
   border: 2px solid var(--prf-border-active, rgba(255,255,255,0.32));
+}
+
+/* ── DISTINCT PROFILE TYPE STYLING (Personal vs Business) ──────────────────── */
+/* Business Profile Type Identity */
+[data-profile-type="business"] .prf-card-viewport {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+[data-profile-type="business"] .prf-avatar-ring {
+  border-radius: 14px;
+}
+[data-profile-type="business"] .prf-avatar-inner {
+  border-radius: 12px;
+}
+[data-profile-type="business"] .prf-badge-verified {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #09090B;
+}
+[data-profile-type="business"] .prf-hero-company {
+  font-weight: 700;
+  color: #FFFFFF;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+[data-profile-type="business"] .prf-badge-business-entity {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 9999px;
+  color: #FCD34D;
+  font-size: 0.725rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  margin-top: 6px;
+}
+
+/* Personal Profile Type Identity */
+[data-profile-type="personal"] .prf-avatar-ring {
+  border-radius: 50%;
+}
+[data-profile-type="personal"] .prf-avatar-inner {
+  border-radius: 50%;
+}
+[data-profile-type="personal"] .prf-badge-verified {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
 }
 
 /* ── PERSONAL THEMES ──────────────────────────────────────────────────────── */

@@ -62,7 +62,7 @@
   <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=4.0">
   <link rel="stylesheet" href="{% static 'css/profile_themes.css' %}?v=4.0">
 </head>
-<body class="profile-body" data-theme="{{ profile.theme|default:'graphite' }}" data-layout="{{ profile.profile_layout|default:'classic' }}">
+<body class="profile-body" data-theme="{{ profile.theme|default:'graphite' }}" data-layout="{{ profile.profile_layout|default:'classic' }}" data-profile-type="{{ profile.profile_type|default:'personal' }}">
 
 {% if direct_link_active %}
   <!-- Direct Link Active Notification Banner -->
