@@ -345,97 +345,6 @@
       </form>
     </div>
 
-    <!-- ── Right Column: Sticky Live Mobile Simulator ──────────────────── -->
-    <div class="appearance-preview-col">
-      <div class="appearance-preview-sticky">
-        <div class="preview-header-pill">
-          <span class="preview-live-indicator"></span>
-          <span>Live Phone Simulator</span>
-          <span class="badge badge-silver" style="font-size: 0.65rem; margin-left: auto;">Syncs Live</span>
-        </div>
-
-        <!-- Interactive Phone Mockup Frame -->
-        <div class="sim-phone-frame" id="sim-phone">
-          <!-- Dynamic Theme Ambient Glow -->
-          <div class="sim-phone-glow" id="sim-glow"></div>
-
-          <!-- Camera Notch & Status Bar -->
-          <div class="sim-phone-notch">
-            <span class="sim-speaker"></span>
-          </div>
-
-          <!-- Simulated Profile Card Content -->
-          <div class="sim-card-body" id="sim-body">
-            
-            <!-- Simulated Cover Banner -->
-            <div class="sim-cover-banner" id="sim-cover">
-              {% if profile.cover_image %}
-                <img src="{{ profile.cover_image.url }}" alt="Cover">
-              {% endif %}
-            </div>
-
-            <!-- Simulated Avatar / Brand Emblem -->
-            <div class="sim-avatar-container" id="sim-avatar-wrap">
-              <div class="sim-avatar-ring" id="sim-avatar-ring">
-                {% if profile.profile_image %}
-                  <img id="sim-avatar-img" src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}">
-                {% else %}
-                  <div class="sim-avatar-placeholder" id="sim-avatar-letter">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</div>
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- Identity Rows -->
-            <div class="sim-identity-wrap" id="sim-identity">
-              <div class="sim-name-row">
-                <span class="sim-name" id="sim-name">{{ profile.full_name|default:'Alex Morgan' }}</span>
-                <span class="sim-verified-badge" id="sim-verified">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                </span>
-              </div>
-              <div class="sim-title" id="sim-title">{{ profile.title|default:'Founder & Creative Director' }}</div>
-              <div class="sim-company" id="sim-company" style="{% if not profile.business_name %}display: none;{% endif %}">{{ profile.business_name|default:'Studio & Labs' }}</div>
-            </div>
-
-            <!-- Action Buttons Strip -->
-            <div class="sim-actions-grid" id="sim-actions">
-              <div class="sim-action-btn primary" id="sim-action-primary">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
-                <span id="sim-action-text">Save Contact</span>
-              </div>
-              <div class="sim-action-btn secondary">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                <span>Share</span>
-              </div>
-              <div class="sim-action-btn secondary">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                <span>Call</span>
-              </div>
-            </div>
-
-            <!-- Social / Links Mini Preview -->
-            <div class="sim-social-strip" id="sim-social-preview">
-              <span class="sim-social-icon"></span>
-              <span class="sim-social-icon"></span>
-              <span class="sim-social-icon"></span>
-              <span class="sim-social-icon"></span>
-            </div>
-
-            <!-- Bio Preview lines -->
-            <div class="sim-bio-lines" id="sim-bio-preview">
-              <div class="sim-bio-bar" style="width: 88%;"></div>
-              <div class="sim-bio-bar" style="width: 72%;"></div>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="text-caption text-center mt-3" style="color: var(--text-muted); font-size: 0.725rem;">
-          Shows how your digital profile renders live on smartphones.
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <!-- ── Floating Bottom Save Bar (Responsive Glass) ───────────────────── -->
@@ -463,25 +372,16 @@
      ========================================================================== -->
 <style>
 /* ── Appearance Page Main Container ── */
-.appearance-page { max-width: 1220px; padding-bottom: 7rem; }
+.appearance-page { max-width: 1100px; padding-bottom: 7rem; margin: 0 auto; }
 .dash-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
 .dash-page-title { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .dash-page-subtitle { color: var(--text-muted); font-size: 0.875rem; margin: 0; max-width: 640px; }
 
-/* ── 2-Column Layout Grid (Controls on Left, Phone Simulator on Right) ── */
+/* ── Centered Controls Layout (Device Simulator Removed) ── */
 .appearance-layout-container {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 2rem;
-  align-items: start;
-}
-@media (max-width: 1040px) {
-  .appearance-layout-container {
-    grid-template-columns: 1fr;
-  }
-  .appearance-preview-col {
-    display: none; /* Collapses to cleaner mobile experience */
-  }
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .appearance-section {
@@ -706,135 +606,6 @@
   flex-direction: column;
   align-items: center;
 }
-.preview-header-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
-  font-size: 0.775rem;
-  color: var(--text-secondary);
-  margin-bottom: 1.25rem;
-  width: 290px;
-}
-.preview-live-indicator {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
-  animation: pulse-dot 1.8s infinite;
-}
-@keyframes pulse-dot {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.8; }
-}
-
-.sim-phone-frame {
-  width: 290px;
-  height: 540px;
-  background: #09090B;
-  border: 7px solid #20222B;
-  border-radius: 36px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.sim-phone-notch {
-  width: 100px; height: 16px;
-  background: #20222B;
-  border-radius: 0 0 10px 10px;
-  position: absolute; top: 0; left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  display: flex; align-items: center; justify-content: center;
-}
-.sim-speaker { width: 32px; height: 3px; border-radius: 2px; background: #3B3E4D; }
-
-.sim-phone-glow {
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 1;
-  transition: background 0.3s ease;
-}
-
-.sim-card-body {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  padding-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  overflow-y: hidden;
-  transition: all 0.3s ease;
-}
-.sim-cover-banner {
-  width: 100%; height: 60px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.6) 100%);
-  position: absolute; top: 0; left: 0;
-  overflow: hidden;
-}
-.sim-cover-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-
-.sim-avatar-container {
-  margin-top: 28px;
-  margin-bottom: 8px;
-  position: relative;
-  z-index: 3;
-}
-.sim-avatar-ring {
-  width: 62px; height: 62px; border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-  background: #1C1E26;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-  transition: border-radius 0.25s ease;
-}
-.sim-avatar-ring img { width: 100%; height: 100%; object-fit: cover; }
-.sim-avatar-placeholder { font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700; color: #FFF; }
-
-.sim-identity-wrap { padding: 0 1rem; margin-bottom: 12px; }
-.sim-name-row { display: flex; align-items: center; justify-content: center; gap: 4px; }
-.sim-name { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #FFF; }
-.sim-verified-badge {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: #10B981; color: #FFF;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.sim-title { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
-.sim-company { font-size: 0.68rem; color: #F59E0B; font-weight: 600; margin-top: 2px; }
-
-.sim-actions-grid {
-  display: flex; gap: 6px; padding: 0 1rem; width: 100%; justify-content: center;
-  margin-bottom: 14px;
-}
-.sim-action-btn {
-  flex: 1; padding: 6px 4px; border-radius: 8px;
-  font-size: 0.68rem; font-weight: 600;
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-}
-.sim-action-btn.primary { background: #FFFFFF; color: #000000; }
-.sim-action-btn.secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #FFF; }
-
-.sim-social-strip {
-  display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;
-}
-.sim-social-icon {
-  width: 26px; height: 26px; border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sim-bio-lines {
-  display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%;
-}
-.sim-bio-bar { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.1); }
-
 /* ── Inline Save Section ── */
 .appearance-inline-save-card {
   border-radius: var(--radius-lg);
@@ -919,31 +690,10 @@
 </style>
 
 <!-- ==========================================================================
-     INTERACTIVE ENGINE: Real-Time Phone Simulator & Form Synchronizer
+     INTERACTIVE ENGINE: Form Synchronizer & Card Selection
      ========================================================================== -->
 <script>
 (function() {
-  // Theme metadata dictionary for real-time simulator rendering
-  const themeDetails = {
-    // Personal themes
-    graphite:  { bg: '#09090B', accent: '#BFC5CF', text: '#F5F5F7', label: 'UZYRA Default' },
-    midnight:  { bg: '#0a0e1a', accent: '#3B82F6', text: '#E2E8F0', label: 'Midnight' },
-    ocean:     { bg: '#020d1a', accent: '#06B6D4', text: '#E0F7FA', label: 'Ocean' },
-    violet:    { bg: '#0d0a1a', accent: '#8B5CF6', text: '#EDE9FE', label: 'Violet' },
-    emerald:   { bg: '#071a0e', accent: '#10B981', text: '#D1FAE5', label: 'Emerald' },
-    rose:      { bg: '#13090d', accent: '#F43F5E', text: '#FFE4E6', label: 'Rose' },
-    arctic:    { bg: '#091318', accent: '#BAE6FD', text: '#F0F9FF', label: 'Arctic' },
-    sand:      { bg: '#14100a', accent: '#D97706', text: '#FEF3C7', label: 'Sand' },
-    // Business themes
-    executive: { bg: '#0f0f0f', accent: '#C9A84C', text: '#F5F0E8', label: 'Executive' },
-    navy:      { bg: '#020918', accent: '#FFFFFF', text: '#F1F5F9', label: 'Navy' },
-    emerald_business: { bg: '#051a0d', accent: '#34D399', text: '#ECFDF5', label: 'Emerald Business' },
-    royal:     { bg: '#05091f', accent: '#F59E0B', text: '#FFF8E1', label: 'Royal' },
-    burgundy:  { bg: '#12040a', accent: '#D1D5DB', text: '#FDF2F8', label: 'Burgundy' },
-    luxury:    { bg: '#090909', accent: '#E8B4B8', text: '#FFF5F5', label: 'Luxury' },
-    platinum:  { bg: '#0a0a0a', accent: '#E2E8F0', text: '#F8FAFC', label: 'Platinum' }
-  };
-
   const layoutLabels = {
     classic: 'Classic', centered: 'Centered', minimal_layout: 'Minimal',
     social: 'Social', card: 'Card',
@@ -951,7 +701,16 @@
     business_card: 'Business Card', business_catalog: 'Business Catalog'
   };
 
-  const typeLabels = { personal: 'Personal', business: 'Business' };
+  const themeLabels = {
+    graphite: 'UZYRA Default',
+    midnight: 'Midnight',
+    ocean: 'Ocean',
+    violet: 'Violet',
+    emerald: 'Emerald',
+    rose: 'Rose',
+    arctic: 'Arctic',
+    sand: 'Sand'
+  };
 
   const form          = document.getElementById('appearance-form');
   const typeInput     = form.querySelector('input[name="profile_type"]');
@@ -962,183 +721,46 @@
   const summaryTheme  = document.getElementById('summary-theme');
   const saveStatusDot = document.getElementById('save-status-dot');
 
-  // Simulator elements
-  const simPhone     = document.getElementById('sim-phone');
-  const simGlow      = document.getElementById('sim-glow');
-  const simBody      = document.getElementById('sim-body');
-  const simCover     = document.getElementById('sim-cover');
-  const simAvatarWrap= document.getElementById('sim-avatar-wrap');
-  const simAvatarRing= document.getElementById('sim-avatar-ring');
-  const simIdentity  = document.getElementById('sim-identity');
-  const simName      = document.getElementById('sim-name');
-  const simVerified  = document.getElementById('sim-verified');
-  const simTitle     = document.getElementById('sim-title');
-  const simCompany   = document.getElementById('sim-company');
-  const simActions   = document.getElementById('sim-actions');
-  const simActionPri = document.getElementById('sim-action-primary');
-  const simActionTxt = document.getElementById('sim-action-text');
-  const simSocials   = document.getElementById('sim-social-preview');
-
-  // Update simulator in real-time
-  function updateSimulator() {
-    const curType   = typeInput.value || 'personal';
-    const curLayout = layoutInput.value || (curType === 'personal' ? 'classic' : 'executive_layout');
-    const curTheme  = themeInput.value  || (curType === 'personal' ? 'graphite' : 'executive');
-    const theme     = themeDetails[curTheme] || themeDetails['graphite'];
-
-    // 1. Theme colors applied to simulator
-    if (simPhone) {
-      simPhone.style.backgroundColor = theme.bg;
-    }
-    if (simGlow) {
-      simGlow.style.background = `radial-gradient(circle at 50% 0%, ${theme.accent}33 0%, transparent 65%)`;
-    }
-    if (simActionPri) {
-      simActionPri.style.backgroundColor = theme.accent;
-      simActionPri.style.color = (theme.accent === '#FFFFFF' || theme.accent === '#E2E8F0' || theme.accent === '#BAE6FD') ? '#09090B' : '#FFFFFF';
-    }
-
-    // 2. Profile Type mode adjustments (Personal vs Business)
-    if (curType === 'business') {
-      if (simAvatarRing) simAvatarRing.style.borderRadius = '12px';
-      if (simVerified) {
-        simVerified.style.background = '#F59E0B';
-        simVerified.style.color = '#000000';
-      }
-      if (simActionTxt) simActionTxt.textContent = 'Save Company';
-      if (simCompany) simCompany.style.display = 'block';
-    } else {
-      if (simAvatarRing) simAvatarRing.style.borderRadius = '50%';
-      if (simVerified) {
-        simVerified.style.background = '#10B981';
-        simVerified.style.color = '#FFFFFF';
-      }
-      if (simActionTxt) simActionTxt.textContent = 'Save Contact';
-    }
-
-    // 3. Layout architecture adjustments in simulator
-    if (simBody && simAvatarWrap && simIdentity && simCover) {
-      // Reset any layout overrides
-      simBody.style.flexDirection = 'column';
-      simBody.style.alignItems = 'center';
-      simBody.style.textAlign = 'center';
-      simAvatarWrap.style.margin = '28px auto 8px';
-      simIdentity.style.textAlign = 'center';
-      simCover.style.display = 'block';
-
-      if (curLayout === 'centered') {
-        simAvatarWrap.style.margin = '32px auto 10px';
-      } else if (curLayout === 'minimal_layout') {
-        simCover.style.display = 'none';
-        simAvatarWrap.style.margin = '16px auto 6px';
-      } else if (curLayout === 'card' || curLayout === 'business_card') {
-        simAvatarWrap.style.margin = '32px 0 6px 12px';
-        simAvatarWrap.style.alignSelf = 'flex-start';
-        simIdentity.style.textAlign = 'left';
-        simIdentity.style.alignSelf = 'flex-start';
-        simIdentity.style.paddingLeft = '12px';
-      } else if (curLayout === 'social') {
-        if (simSocials) simSocials.style.display = 'flex';
-      } else if (curLayout === 'brand_header') {
-        if (simAvatarRing) simAvatarRing.style.borderRadius = '16px';
-        simAvatarWrap.style.margin = '22px auto 6px';
-      } else if (curLayout === 'executive_layout') {
-        simIdentity.style.textAlign = 'left';
-        simIdentity.style.alignSelf = 'flex-start';
-        simIdentity.style.paddingLeft = '14px';
-        simIdentity.style.borderLeft = `2px solid ${theme.accent}`;
-      }
-    }
-  }
-
   function updateSummary() {
-    if (summaryType)   summaryType.textContent   = typeLabels[typeInput.value]     || typeInput.value;
+    if (summaryType)   summaryType.textContent   = typeInput.value === 'business' ? 'Business' : 'Personal';
     if (summaryLayout) summaryLayout.textContent = layoutLabels[layoutInput.value] || layoutInput.value;
-    if (summaryTheme)  summaryTheme.textContent  = (themeDetails[themeInput.value] && themeDetails[themeInput.value].label) || themeInput.value;
+    if (summaryTheme)  summaryTheme.textContent  = themeLabels[themeInput.value] || themeInput.value;
     if (saveStatusDot) {
       saveStatusDot.style.background = '#F59E0B';
       saveStatusDot.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.7)';
     }
-    updateSimulator();
   }
 
-  function switchType(type) {
-    typeInput.value = type;
-    // Show/hide layout & theme groups
-    document.querySelectorAll('.appearance-layout-group').forEach(g => {
-      g.style.display = g.dataset.forType === type ? '' : 'none';
-    });
-    document.querySelectorAll('.appearance-themes-group').forEach(g => {
-      g.style.display = g.dataset.forType === type ? '' : 'none';
-    });
-
-    // Auto-select first layout for the type
-    const firstLayout = type === 'personal' ? 'classic' : 'executive_layout';
-    layoutInput.value = firstLayout;
-    document.querySelectorAll('.appearance-layout-card').forEach(c => {
-      c.classList.toggle('active', c.dataset.value === firstLayout && c.dataset.type === type);
-    });
-
-    // Auto-select first theme for the type (graphite for personal, executive for business)
-    const firstTheme = type === 'personal' ? 'graphite' : 'executive';
-    themeInput.value = firstTheme;
-    document.querySelectorAll('.appearance-theme-card').forEach(c => {
-      c.classList.toggle('active', c.dataset.value === firstTheme && c.dataset.type === type);
-    });
-
-    updateSummary();
-  }
-
-  // Profile type buttons
-  document.querySelectorAll('.appearance-type-card').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.appearance-type-card').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      switchType(btn.dataset.value);
-    });
-  });
-
-  // Layout buttons
+  // Layout selection buttons
   document.querySelectorAll('.appearance-layout-card').forEach(btn => {
     btn.addEventListener('click', () => {
-      const type = typeInput.value;
-      document.querySelectorAll(`.appearance-layout-card[data-type="${type}"]`).forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.appearance-layout-card').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       layoutInput.value = btn.dataset.value;
       updateSummary();
     });
   });
 
-  // Theme buttons
+  // Theme selection buttons
   document.querySelectorAll('.appearance-theme-card').forEach(btn => {
     btn.addEventListener('click', () => {
-      const type = typeInput.value;
-      document.querySelectorAll(`.appearance-theme-card[data-type="${type}"]`).forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.appearance-theme-card').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       themeInput.value = btn.dataset.value;
       updateSummary();
     });
   });
 
-  // Initial synchronization check for legacy/mismatched values
-  const currentType = typeInput.value || 'personal';
-  const activeLayout = document.querySelector(`.appearance-layout-card[data-type="${currentType}"].active`);
-  if (!activeLayout) {
-    const fallbackLayout = currentType === 'personal' ? 'classic' : 'executive_layout';
-    layoutInput.value = fallbackLayout;
-    document.querySelectorAll(`.appearance-layout-card[data-type="${currentType}"]`).forEach(c => {
-      c.classList.toggle('active', c.dataset.value === fallbackLayout);
-    });
-  }
-
-  const activeTheme = document.querySelector(`.appearance-theme-card[data-type="${currentType}"].active`);
-  if (!activeTheme) {
-    const fallbackTheme = currentType === 'personal' ? 'graphite' : 'executive';
-    themeInput.value = fallbackTheme;
-    document.querySelectorAll(`.appearance-theme-card[data-type="${currentType}"]`).forEach(c => {
-      c.classList.toggle('active', c.dataset.value === fallbackTheme);
-    });
-  }
+  // Initial sync check
+  const curLayout = layoutInput.value || 'classic';
+  const curTheme = themeInput.value || 'graphite';
+  document.querySelectorAll('.appearance-layout-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.value === curLayout);
+  });
+  document.querySelectorAll('.appearance-theme-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.value === curTheme);
+  });
+  updateSummary();
 
   // Handle form submit state
   if (form) {
@@ -1153,9 +775,6 @@
       });
     });
   }
-
-  // Initial simulator render
-  updateSimulator();
 })();
 </script>
 {% endblock %}

@@ -211,3 +211,25 @@ class ProfileAppLayoutTests(TestCase):
         self.assertEqual(self.profile.languages, 'English, German')
         self.assertEqual(self.profile.stat_experience, '8+ Years')
         self.assertEqual(self.profile.cta_banner_text, 'Open for advisory roles.')
+
+    def test_appearance_page_has_no_phone_simulator(self):
+        self.client.force_login(self.user)
+        resp = self.client.get(reverse('dashboard:appearance'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, 'sim-phone-frame')
+        self.assertNotContains(resp, 'Live Phone Simulator')
+        self.assertNotContains(resp, 'sim-body')
+        self.assertContains(resp, 'appearance-layout-container')
+
+    def test_all_themes_render_public_profile_with_atmosphere(self):
+        for theme_key, theme_label in Profile.THEME_CHOICES:
+            self.profile.theme = theme_key
+            self.profile.save()
+            url = reverse('profiles:public_profile', kwargs={'slug': self.profile.slug})
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200)
+            self.assertContains(resp, f'data-theme="{theme_key}"')
+            self.assertContains(resp, 'prf-theme-atmosphere')
+            self.assertContains(resp, 'prf-aura-orb')
+            self.assertContains(resp, 'prf-particle-dust')
+
