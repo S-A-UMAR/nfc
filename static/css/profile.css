@@ -818,8 +818,8 @@
   height: 100px;
   border-radius: 50%;
   padding: 3px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(139, 92, 246, 0.5) 50%, rgba(255, 255, 255, 0.15) 100%);
-  box-shadow: 0 0 25px rgba(139, 92, 246, 0.25), inset 0 0 15px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(191, 197, 207, 0.35) 50%, rgba(255, 255, 255, 0.15) 100%);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.12), inset 0 0 15px rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -922,9 +922,9 @@
 }
 
 .prf-tag-chip.active {
-  background: rgba(139, 92, 246, 0.18);
-  border-color: rgba(139, 92, 246, 0.45);
-  color: #DDD6FE;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #FFFFFF;
 }
 
 /* 4 Quick Action Hub Buttons Row */
@@ -986,8 +986,9 @@
 }
 
 .prf-action-hub-btn.save .prf-hub-icon-circle {
-  color: #C084FC;
-  background: rgba(192, 132, 252, 0.12);
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .prf-action-hub-btn.share .prf-hub-icon-circle {
@@ -1009,7 +1010,7 @@
 .prf-exchange-callout {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(147, 51, 234, 0.06) 100%);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
   border: 1px solid rgba(245, 158, 11, 0.25);
   border-radius: 16px;
   padding: 1.15rem;
@@ -1188,18 +1189,18 @@
 
 .prf-tab-btn.active {
   color: #FFFFFF;
-  border-bottom-color: #A855F7;
+  border-bottom-color: #FFFFFF;
 }
 
 .prf-tab-btn.active::after {
   content: '';
   position: absolute;
   bottom: -1px;
-  left: 20%;
-  right: 20%;
+  left: 15%;
+  right: 15%;
   height: 2px;
-  background: linear-gradient(90deg, #A855F7, #6366F1);
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+  background: linear-gradient(90deg, #FFFFFF, #BFC5CF);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 /* Tab Panels */
@@ -1278,9 +1279,9 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: rgba(139, 92, 246, 0.15);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  color: #DDD6FE;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #E2E8F0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1327,10 +1328,10 @@
 }
 
 .prf-lang-pill.highlight {
-  background: rgba(139, 92, 246, 0.25);
-  border-color: rgba(139, 92, 246, 0.5);
-  color: #EDE9FE;
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
 }
 
 /* Stats 3-Column Bar */
@@ -1366,8 +1367,8 @@
 
 /* CTA Highlight Banner Card */
 .prf-cta-banner-box {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.18) 0%, rgba(59, 130, 246, 0.12) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 16px;
   padding: 1.15rem;
   text-align: center;
@@ -1378,7 +1379,7 @@
 .prf-cta-banner-text {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #EDE9FE;
+  color: #F5F5F7;
   margin-bottom: 0.85rem;
   display: flex;
   align-items: center;
@@ -1389,15 +1390,15 @@
 .prf-btn-send-msg {
   width: 100%;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
-  color: #FFFFFF;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E8ECF2 42%, #C2C8D2 100%);
+  color: #09090B;
   border: none;
   border-radius: 12px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1405,8 +1406,9 @@
 }
 
 .prf-btn-send-msg:hover {
-  filter: brightness(1.1);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F6F8 50%, #D4D9E2 100%);
   transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(255, 255, 255, 0.32);
 }
 
 /* ==========================================================================
@@ -1607,10 +1609,10 @@
 .prf-btn-dock-save {
   width: 100%;
   padding: 0.9rem 1.25rem;
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #E8ECF2 42%, #C2C8D2 100%);
   border: none;
   border-radius: 14px;
-  color: #FFFFFF;
+  color: #09090B;
   font-weight: 700;
   font-size: 0.925rem;
   display: flex;
@@ -1619,13 +1621,14 @@
   gap: 0.5rem;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
   transition: all 0.2s ease;
 }
 
 .prf-btn-dock-save:hover {
-  filter: brightness(1.1);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F6F8 50%, #D4D9E2 100%);
   transform: translateY(-2px);
+  box-shadow: 0 6px 26px rgba(255, 255, 255, 0.35);
 }
 
 /* ==========================================================================
@@ -1671,11 +1674,11 @@
 }
 
 .prf-dock-item.active {
-  color: #A855F7;
+  color: #FFFFFF;
 }
 
 .prf-dock-item.active svg {
-  stroke: #A855F7;
+  stroke: #FFFFFF;
 }
 
 /* ==========================================================================
@@ -1840,7 +1843,7 @@
 
 .prf-share-channel-circle.wa { background: #25D366; }
 .prf-share-channel-circle.tg { background: #229ED9; }
-.prf-share-channel-circle.copy { background: #8B5CF6; }
+.prf-share-channel-circle.copy { background: rgba(255, 255, 255, 0.2); }
 .prf-share-channel-circle.more { background: rgba(255, 255, 255, 0.15); }
 
 /* QR Code Display Container */

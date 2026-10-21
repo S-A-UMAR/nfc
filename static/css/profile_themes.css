@@ -272,7 +272,22 @@
 
 /* ── PERSONAL THEMES ──────────────────────────────────────────────────────── */
 
-/* graphite = UZYRA Default — no overrides needed (profile.css defines it) */
+/* graphite = UZYRA Default — signature obsidian, liquid glass & platinum silver */
+[data-theme="graphite"] {
+  --prf-bg-canvas:      #09090B;
+  --prf-card-bg:        rgba(18, 18, 22, 0.88);
+  --prf-surface-1:      rgba(255, 255, 255, 0.045);
+  --prf-surface-2:      rgba(255, 255, 255, 0.08);
+  --prf-surface-hover:  rgba(255, 255, 255, 0.12);
+  --prf-border:         rgba(255, 255, 255, 0.10);
+  --prf-border-hover:   rgba(255, 255, 255, 0.22);
+  --prf-border-active:  rgba(255, 255, 255, 0.35);
+  --prf-text-primary:   #FFFFFF;
+  --prf-text-secondary: #A1A1AA;
+  --prf-text-muted:     #71717A;
+  --prf-accent-silver:  #BFC5CF;
+  --prf-shadow-card:    0 20px 50px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.10);
+}
 
 /* midnight — deep dark / cool blue accents */
 [data-theme="midnight"] {
