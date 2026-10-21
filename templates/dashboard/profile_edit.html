@@ -118,6 +118,7 @@
           </div>
         </label>
 
+        {# Hashed out for upcoming feature release: Business Profile
         <label class="profile-mode-option {% if form.instance.profile_type == 'business' %}selected{% endif %}" id="edit-mode-business">
           <input type="radio" name="profile_type" value="business" {% if form.instance.profile_type == 'business' %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
           <div class="mode-icon">
@@ -131,6 +132,7 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
         </label>
+        #}
       </div>
       {% if form.profile_type.errors %}
         <div class="form-error mt-2" role="alert">
@@ -904,19 +906,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  if (personalOpt && businessOpt) {
+  if (personalOpt) {
     personalOpt.addEventListener('click', function() {
       const radio = personalOpt.querySelector('input');
       if (radio) { radio.checked = true; markFormDirty(); }
       updateProfileTypeUI();
     });
+  }
+  if (businessOpt) {
     businessOpt.addEventListener('click', function() {
       const radio = businessOpt.querySelector('input');
       if (radio) { radio.checked = true; markFormDirty(); }
       updateProfileTypeUI();
     });
-    updateProfileTypeUI();
   }
+  updateProfileTypeUI();
 
   // ── 2. Live Image Upload Previews ──────────────────────────────────────────
   function setupImagePreview(inputId, previewImgId, placeholderId) {

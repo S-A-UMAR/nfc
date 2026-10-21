@@ -58,9 +58,9 @@
               <p class="appearance-section-desc">Choose between an individual personal card or a verified corporate entity.</p>
             </div>
           </div>
-          <div class="appearance-type-grid">
+          <div class="appearance-type-grid" style="grid-template-columns: 1fr; max-width: 580px;">
             <button type="button"
-              class="appearance-type-card {% if profile.profile_type == 'personal' %}active{% endif %}"
+              class="appearance-type-card active"
               data-value="personal" data-field="profile_type" id="type-btn-personal">
               <div class="appearance-type-badge-row">
                 <div class="appearance-type-icon personal-icon">
@@ -80,6 +80,7 @@
               </div>
             </button>
 
+            {# Hashed out for upcoming feature release: Business Profile
             <button type="button"
               class="appearance-type-card {% if profile.profile_type == 'business' %}active{% endif %}"
               data-value="business" data-field="profile_type" id="type-btn-business">
@@ -100,6 +101,7 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
             </button>
+            #}
           </div>
         </section>
 
@@ -187,7 +189,8 @@
             </div>
           </div>
 
-          <!-- Business layouts (shown when type = business) -->
+          <!-- Business layouts (hashed out for upcoming feature release) -->
+          {#
           <div class="appearance-layout-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
             <div class="appearance-layout-grid">
               {% for layout in business_layouts %}
@@ -249,6 +252,7 @@
               {% endfor %}
             </div>
           </div>
+          #}
         </section>
 
         <!-- ── STEP 3: Curated Luxury Colour Themes ─────────────────────── -->
@@ -292,7 +296,8 @@
             </div>
           </div>
 
-          <!-- Business themes -->
+          <!-- Business themes (hashed out for upcoming feature release) -->
+          {#
           <div class="appearance-themes-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
             <div class="appearance-themes-grid">
               {% for theme in business_themes %}
@@ -322,6 +327,7 @@
               {% endfor %}
             </div>
           </div>
+          #}
         </section>
 
         <!-- ── Inline Save Section (Document Flow) ────────────────────── -->

@@ -570,18 +570,21 @@ BUSINESS_THEMES = [
 
 PERSONAL_LAYOUTS = [
     {'key': 'classic',       'label': 'Classic',       'desc': 'Current UZYRA default layout',          'icon': '◼◼'},
-    {'key': 'centered',      'label': 'Centered',      'desc': 'Centered symmetrical identity',          'icon': '◈◈'},
-    {'key': 'minimal_layout','label': 'Minimal',       'desc': 'Ultra-clean typographic focus',          'icon': '▬▬'},
-    {'key': 'social',        'label': 'Social',        'desc': 'Social-first with large link grid',      'icon': '⊞⊞'},
-    {'key': 'card',          'label': 'Card',          'desc': 'Compact card with contact strip',        'icon': '▣▣'},
+    # Hashed out for upcoming version:
+    # {'key': 'centered',      'label': 'Centered',      'desc': 'Centered symmetrical identity',          'icon': '◈◈'},
+    # {'key': 'minimal_layout','label': 'Minimal',       'desc': 'Ultra-clean typographic focus',          'icon': '▬▬'},
+    # {'key': 'social',        'label': 'Social',        'desc': 'Social-first with large link grid',      'icon': '⊞⊞'},
+    # {'key': 'card',          'label': 'Card',          'desc': 'Compact card with contact strip',        'icon': '▣▣'},
 ]
 
-BUSINESS_LAYOUTS = [
-    {'key': 'executive_layout',   'label': 'Executive',       'desc': 'Structured authority layout',           'icon': '▤▤'},
-    {'key': 'brand_header',       'label': 'Brand Header',    'desc': 'Logo-first brand statement',            'icon': '◧◧'},
-    {'key': 'business_card',      'label': 'Business Card',   'desc': 'Traditional card inspired',             'icon': '▥▥'},
-    {'key': 'business_catalog',   'label': 'Business Catalog','desc': 'Products & services prominence',        'icon': '▦▦'},
-]
+# Hashed out for upcoming feature:
+# BUSINESS_LAYOUTS = [
+#     {'key': 'executive_layout',   'label': 'Executive',       'desc': 'Structured authority layout',           'icon': '▤▤'},
+#     {'key': 'brand_header',       'label': 'Brand Header',    'desc': 'Logo-first brand statement',            'icon': '◧◧'},
+#     {'key': 'business_card',      'label': 'Business Card',   'desc': 'Traditional card inspired',             'icon': '▥▥'},
+#     {'key': 'business_catalog',   'label': 'Business Catalog','desc': 'Products & services prominence',        'icon': '▦▦'},
+# ]
+BUSINESS_LAYOUTS = []
 
 
 @login_required
