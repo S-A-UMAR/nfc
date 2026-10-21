@@ -105,9 +105,9 @@
             <p class="auth-subtitle">Select the format that best fits how you present yourself.</p>
           </div>
 
-          <div class="profile-type-grid">
+          <div class="profile-type-grid" style="grid-template-columns: 1fr; max-width: 540px; margin: 0 auto;">
             <!-- Option 1: Personal -->
-            <div id="card-type-personal" class="profile-type-card {% if profile.profile_type != 'business' %}selected{% endif %}" onclick="selectProfileType('personal')" role="radio" aria-checked="{% if profile.profile_type != 'business' %}true{% else %}false{% endif %}" tabindex="0">
+            <div id="card-type-personal" class="profile-type-card selected" onclick="selectProfileType('personal')" role="radio" aria-checked="true" tabindex="0">
               <div>
                 <div class="profile-type-icon" aria-hidden="true">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -120,7 +120,7 @@
               </div>
             </div>
 
-            <!-- Option 2: Business -->
+            {% comment %} Option 2: Business Profile — shelved for v2
             <div id="card-type-business" class="profile-type-card {% if profile.profile_type == 'business' %}selected{% endif %}" onclick="selectProfileType('business')" role="radio" aria-checked="{% if profile.profile_type == 'business' %}true{% else %}false{% endif %}" tabindex="0">
               <div>
                 <div class="profile-type-icon" aria-hidden="true">
@@ -133,6 +133,7 @@
                 <span id="badge-check-business">{% if profile.profile_type == 'business' %}✓ Selected{% else %}Select Option{% endif %}</span>
               </div>
             </div>
+            {% endcomment %}
           </div>
 
           <div class="onboarding-nav-row">
@@ -358,25 +359,34 @@ function selectProfileType(type) {
   var badgePersonal = document.getElementById('badge-check-personal');
   var badgeBusiness = document.getElementById('badge-check-business');
 
-  if (type === 'business') {
+  if (type === 'business' && cardBusiness) {
     cardBusiness.classList.add('selected');
     cardBusiness.setAttribute('aria-checked', 'true');
-    cardPersonal.classList.remove('selected');
-    cardPersonal.setAttribute('aria-checked', 'false');
-    badgeBusiness.textContent = '✓ Selected';
-    badgePersonal.textContent = 'Select Option';
+    if (cardPersonal) {
+      cardPersonal.classList.remove('selected');
+      cardPersonal.setAttribute('aria-checked', 'false');
+    }
+    if (badgeBusiness) badgeBusiness.textContent = '✓ Selected';
+    if (badgePersonal) badgePersonal.textContent = 'Select Option';
 
     // Show business fields in Step 3
-    document.getElementById('wrap_business_fields').style.display = 'block';
-    document.getElementById('step-3-title').textContent = 'Enter Business Details';
-    document.getElementById('step-3-subtitle').textContent = 'Provide your business information and primary contact channels.';
+    var wrapBiz = document.getElementById('wrap_business_fields');
+    if (wrapBiz) wrapBiz.style.display = 'block';
+    var s3Title = document.getElementById('step-3-title');
+    if (s3Title) s3Title.textContent = 'Enter Business Details';
+    var s3Sub = document.getElementById('step-3-subtitle');
+    if (s3Sub) s3Sub.textContent = 'Provide your business information and primary contact channels.';
   } else {
-    cardPersonal.classList.add('selected');
-    cardPersonal.setAttribute('aria-checked', 'true');
-    cardBusiness.classList.remove('selected');
-    cardBusiness.setAttribute('aria-checked', 'false');
-    badgePersonal.textContent = '✓ Selected';
-    badgeBusiness.textContent = 'Select Option';
+    if (cardPersonal) {
+      cardPersonal.classList.add('selected');
+      cardPersonal.setAttribute('aria-checked', 'true');
+    }
+    if (cardBusiness) {
+      cardBusiness.classList.remove('selected');
+      cardBusiness.setAttribute('aria-checked', 'false');
+    }
+    if (badgePersonal) badgePersonal.textContent = '✓ Selected';
+    if (badgeBusiness) badgeBusiness.textContent = 'Select Option';
 
     // Hide business fields in Step 3
     document.getElementById('wrap_business_fields').style.display = 'none';

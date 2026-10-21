@@ -55,7 +55,7 @@
             <div class="appearance-step-badge">1</div>
             <div>
               <h2 class="appearance-section-title">Profile Identity &amp; Mode</h2>
-              <p class="appearance-section-desc">Choose between an individual personal card or a verified corporate entity.</p>
+              <p class="appearance-section-desc">Active format: Personal Profile mode.</p>
             </div>
           </div>
           <div class="appearance-type-grid" style="grid-template-columns: 1fr; max-width: 580px;">
@@ -80,7 +80,7 @@
               </div>
             </button>
 
-            {# Hashed out for upcoming feature release: Business Profile
+            {% comment %} Hashed out for upcoming feature release: Business Profile
             <button type="button"
               class="appearance-type-card {% if profile.profile_type == 'business' %}active{% endif %}"
               data-value="business" data-field="profile_type" id="type-btn-business">
@@ -101,7 +101,7 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
             </button>
-            #}
+            {% endcomment %}
           </div>
         </section>
 
@@ -190,7 +190,7 @@
           </div>
 
           <!-- Business layouts (hashed out for upcoming feature release) -->
-          {#
+          {% comment %}
           <div class="appearance-layout-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
             <div class="appearance-layout-grid">
               {% for layout in business_layouts %}
@@ -252,7 +252,7 @@
               {% endfor %}
             </div>
           </div>
-          #}
+          {% endcomment %}
         </section>
 
         <!-- ── STEP 3: Curated Luxury Colour Themes ─────────────────────── -->
@@ -297,7 +297,7 @@
           </div>
 
           <!-- Business themes (hashed out for upcoming feature release) -->
-          {#
+          {% comment %}
           <div class="appearance-themes-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
             <div class="appearance-themes-grid">
               {% for theme in business_themes %}
@@ -327,7 +327,7 @@
               {% endfor %}
             </div>
           </div>
-          #}
+          {% endcomment %}
         </section>
 
         <!-- ── Inline Save Section (Document Flow) ────────────────────── -->
