@@ -313,7 +313,7 @@ class Phase1HomepageRedesignTests(TestCase):
         self.assertContains(response, "Elevate Your Personal Brand")
         self.assertContains(response, "For Teams & Companies")
         self.assertContains(response, "Empower Your Entire Fleet")
-        self.assertContains(response, reverse('core:business'))
+        self.assertContains(response, reverse('core:contact'))
 
     def test_nfc_card_hardware_specifications(self):
         """Physical card companion clearly explained as independent from digital profile."""
@@ -493,11 +493,12 @@ class Phase2OnboardingRedesignTests(TestCase):
         self.client.login(email=self.user.email, password=self.password)
         response = self.client.get(reverse('dashboard:profile_edit'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Profile Type & Personal Identity")
+        self.assertContains(response, "Profile Type")
         self.assertContains(response, "Personal Profile")
-        self.assertContains(response, "Business Profile")
+        # Business Profile mode selector shelved for v2 — not rendered in switcher
+        self.assertNotContains(response, "edit-mode-business")
 
-        # Submit change to business profile
+        # Submit change to business profile (backend still accepts it)
         edit_data = {
             'profile_type': 'business',
             'full_name': 'Ada Lovelace',

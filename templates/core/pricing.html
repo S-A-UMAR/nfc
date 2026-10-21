@@ -2,22 +2,45 @@
 {% load static humanize %}
 
 {% block title %}Pricing & Packages — {{ BRAND_NAME }}{% endblock %}
-{% block meta_description %}Choose from UZYRA's NFC smart card packages — from solo professionals to business teams. Premium cards, digital profiles, and custom websites.{% endblock %}
+{% block meta_description %}Transparent one-time pricing for UZYRA NFC smart cards and digital identity profiles. Zero monthly fees, lifetime updates, Paystack secured.{% endblock %}
 {% block og_title %}UZYRA Pricing — NFC Smart Cards & Digital Profiles{% endblock %}
-{% block og_description %}Explore UZYRA's pricing: smart NFC business cards, digital profiles, and professional websites. One-time investment, lifetime identity.{% endblock %}
+{% block og_description %}Explore UZYRA's transparent pricing: smart NFC business cards and verified digital profiles. One-time investment, lifetime identity.{% endblock %}
 
 {% block content %}
 <section class="pricing-section">
   <div class="pricing-watermark" aria-hidden="true">PRICING</div>
   <div class="container">
-    <!-- Header with generous navbar clearance -->
+
+    <!-- ======================================================================
+         1. HERO HEADER WITH TRUST REASSURANCE STRIP
+         ====================================================================== -->
     <div class="pricing-header-wrap text-center">
-      <div class="label-overline mb-2">Transparent Investment</div>
+      <div class="label-overline mb-2">Transparent &amp; One-Time Investment</div>
       <h1 class="text-display">Choose Your Package</h1>
       <p class="text-secondary pricing-subtitle">
-        Premium engineering for modern professionals and growing businesses.<br class="d-none d-md-block">
-        One-time investment. No hidden fees. No recurring software subscriptions.
+        Hardware-grade NFC smart cards paired with a lifetime verified digital profile.<br class="d-none d-md-block">
+        Order once, update your information anytime in real time. Zero monthly subscriptions.
       </p>
+
+      <!-- Trust Strip -->
+      <div class="pricing-trust-strip" aria-label="Customer Guarantees">
+        <div class="pricing-trust-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Paystack 256-Bit SSL Secured</span>
+        </div>
+        <div class="pricing-trust-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <span>Tracked Nationwide Delivery</span>
+        </div>
+        <div class="pricing-trust-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Instant Digital Profile Setup</span>
+        </div>
+        <div class="pricing-trust-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Unlimited Real-Time Updates</span>
+        </div>
+      </div>
 
       {% if packages %}
       <!-- Segmented Category Filter Tabs -->
@@ -42,19 +65,21 @@
       {% endif %}
     </div>
 
-    {% if packages %}
+    <!-- ======================================================================
+         2. PRODUCT PACKAGES GRID (REDESIGNED)
+         ====================================================================== -->
     <h2 class="sr-only">Available Packages</h2>
     <div class="pricing-cards-grid mb-12">
       {% for pkg in packages %}
-      <div class="price-card {% if pkg.badge %}featured{% endif %}" data-category="{{ pkg.package_type }}">
-        <!-- Card Product Mockup Image -->
+      <div class="price-card {% if pkg.badge == 'Most Popular' or pkg.code == 'personal-suite' %}featured{% endif %}" data-category="{{ pkg.package_type }}">
+        <!-- Card Product Mockup Photography -->
         <div class="price-card-media">
-          {% if pkg.package_type == 'card_only' or pkg.code == 'smart-nfc' or pkg.code == 'basic' %}
-            <img src="{% static 'img/cards/card-single.jpg' %}" alt="{{ pkg.name }} mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
-          {% elif pkg.package_type == 'personal_website' or pkg.code == 'bundle' %}
-            <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="{{ pkg.name }} mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          {% if pkg.package_type == 'card_only' or pkg.code == 'smart-card' or pkg.code == 'starter' %}
+            <img src="{% static 'img/cards/card-single.jpg' %}" alt="{{ pkg.name }} product photo" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          {% elif pkg.package_type == 'personal_website' or pkg.code == 'personal-suite' or pkg.code == 'personal' %}
+            <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="{{ pkg.name }} product photo" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
           {% else %}
-            <img src="{% static 'img/cards/card-premium.jpg' %}" alt="{{ pkg.name }} mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+            <img src="{% static 'img/cards/card-premium.jpg' %}" alt="{{ pkg.name }} product photo" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
           {% endif %}
           {% if pkg.badge %}
             <span class="price-badge-pill price-badge-floating">{{ pkg.badge }}</span>
@@ -64,25 +89,58 @@
         <div class="price-card-inner">
           <!-- Top Meta Row: Category Tag -->
           <div class="price-card-topbar">
-            <span class="price-category-tag">{% if pkg.package_type == 'card_only' %}Smart NFC Card{% elif pkg.package_type == 'personal_website' %}Personal Identity{% elif pkg.package_type == 'business_website' %}Business Suite{% elif pkg.package_type == 'corporate' %}Corporate Fleet{% else %}{{ pkg.name }}{% endif %}</span>
+            <span class="price-category-tag">
+              {% if pkg.package_type == 'card_only' %}Smart NFC Card
+              {% elif pkg.package_type == 'personal_website' %}Personal Identity
+              {% elif pkg.package_type == 'business_website' %}Business Suite
+              {% elif pkg.package_type == 'corporate' %}Corporate Fleet
+              {% else %}{{ pkg.name }}
+              {% endif %}
+            </span>
             {% if not pkg.badge and forloop.first %}
-            <span class="price-badge-pill price-badge-subtle">Popular</span>
+            <span class="price-badge-pill price-badge-subtle">Essential</span>
             {% endif %}
           </div>
 
           <!-- Package Identity & Price -->
           <h3 class="price-name">{{ pkg.name }}</h3>
-          
+
           <div class="price-figure">
             <span class="price-currency">₦</span><span class="price-num">{{ pkg.price_ngn|intcomma }}</span>
             <span class="price-period">one-time</span>
           </div>
 
+          <!-- Lead Value Summary -->
+          <p class="price-desc-lead">{{ pkg.description }}</p>
+
+          <!-- Delivery Speed Badge -->
+          {% if pkg.code == 'smart-card' or pkg.package_type == 'card_only' %}
+            <div class="price-card-shipping-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Standard 3–5 day nationwide tracked delivery</span>
+            </div>
+          {% elif pkg.code == 'personal-suite' or pkg.package_type == 'personal_website' %}
+            <div class="price-card-shipping-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Express priority delivery &amp; custom engraving</span>
+            </div>
+          {% elif pkg.code == 'business-suite' or pkg.package_type == 'business_website' %}
+            <div class="price-card-shipping-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Priority 48-hour card dispatch &amp; brand review</span>
+            </div>
+          {% else %}
+            <div class="price-card-shipping-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Delivered in luxury presentation gift box</span>
+            </div>
+          {% endif %}
+
           <hr class="price-divider">
 
           <!-- Features Checklist -->
           <div class="price-features-wrapper">
-            <div class="price-features-caption">INCLUDED FEATURES</div>
+            <div class="price-features-caption">INCLUDED WITH THIS PACKAGE</div>
             <ul class="price-features-list">
               {% for feature in pkg.feature_list %}
               <li>
@@ -96,156 +154,527 @@
           </div>
         </div>
 
-        <!-- Action CTA Button (pinned to bottom) -->
+        <!-- Action CTA Button (Direct to Checkout) -->
         <div class="price-card-action">
-          <a href="{% url 'orders:checkout' pkg.code %}" class="price-cta-btn {% if pkg.badge %}price-cta-btn--featured{% endif %}">
-            <span>Order Package</span>
+          <a href="{% url 'orders:checkout' pkg.code %}" class="price-cta-btn {% if pkg.badge == 'Most Popular' or pkg.code == 'personal-suite' %}price-cta-btn--featured{% endif %}">
+            <span>
+              {% if pkg.code == 'smart-card' %}Order Smart Card
+              {% elif pkg.code == 'personal-suite' %}Order Personal Suite
+              {% elif pkg.code == 'business-suite' %}Order Business Suite
+              {% elif pkg.code == 'corporate-fleet' %}Order Fleet (10 Cards)
+              {% else %}Proceed to Checkout
+              {% endif %}
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <!-- Resilient Guaranteed Fallback Cards (Direct to Checkout) -->
+      <div class="price-card">
+        <div class="price-card-media">
+          <img src="{% static 'img/cards/card-single.jpg' %}" alt="Smart NFC Card mockup" class="price-card-img" loading="lazy">
+          <span class="price-badge-pill price-badge-floating">Essential</span>
+        </div>
+        <div class="price-card-inner">
+          <div class="price-card-topbar"><span class="price-category-tag">Smart NFC Card</span></div>
+          <h3 class="price-name">Smart NFC Card</h3>
+          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">25,000</span><span class="price-period">one-time</span></div>
+          <p class="price-desc-lead">Sleek matte-black physical NFC smart card paired with a lifetime digital profile.</p>
+          <div class="price-card-shipping-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Standard nationwide tracked delivery</span>
+          </div>
+          <hr class="price-divider">
+          <div class="price-features-wrapper">
+            <div class="price-features-caption">INCLUDED FEATURES</div>
+            <ul class="price-features-list">
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Matte Obsidian NFC Card</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Embedded NTAG216 Chip</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Dynamic QR Code Backup</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Lifetime Digital Profile &amp; Updates</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="price-card-action">
+          <a href="{% url 'orders:checkout' 'smart-card' %}" class="price-cta-btn">
+            <span>Order Smart Card</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-card-media">
+          <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="Personal Identity Suite mockup" class="price-card-img" loading="lazy">
+          <span class="price-badge-pill price-badge-floating">Most Popular</span>
+        </div>
+        <div class="price-card-inner">
+          <div class="price-card-topbar"><span class="price-category-tag">Personal Identity</span></div>
+          <h3 class="price-name">Personal Identity Suite</h3>
+          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">65,000</span><span class="price-period">one-time</span></div>
+          <p class="price-desc-lead">For executives, creators, and consultants wanting complete personal branding.</p>
+          <div class="price-card-shipping-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Express priority delivery &amp; custom engraving</span>
+          </div>
+          <hr class="price-divider">
+          <div class="price-features-wrapper">
+            <div class="price-features-caption">INCLUDED FEATURES</div>
+            <ul class="price-features-list">
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Smart NFC Card Included</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Custom Laser-Engraved Full Name</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Direct Link Mode &amp; Luxury Themes</span></li>
+              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Real-time Tap &amp; Scan Analytics</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="price-card-action">
+          <a href="{% url 'orders:checkout' 'personal-suite' %}" class="price-cta-btn price-cta-btn--featured">
+            <span>Order Personal Suite</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
       </div>
       {% endfor %}
     </div>
-    {% else %}
-    <!-- Placeholder pricing when no packages are seeded yet -->
-    <div class="pricing-cards-grid mb-12">
-      <div class="price-card">
-        <div class="price-card-media">
-          <img src="{% static 'img/cards/card-single.jpg' %}" alt="Smart NFC Card mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
-        </div>
-        <div class="price-card-inner">
-          <div class="price-card-topbar">
-            <span class="price-category-tag">Smart NFC Card</span>
-          </div>
-          <h3 class="price-name">Smart NFC Card</h3>
-          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">25,000</span><span class="price-period">one-time</span></div>
-          <hr class="price-divider">
-          <div class="price-features-wrapper">
-            <div class="price-features-caption">INCLUDED FEATURES</div>
-            <ul class="price-features-list">
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Matte Graphite NFC Card</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">QR Code Backup</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Digital Profile Page</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Lifetime Information Updates</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="price-card-action">
-          <a href="{% url 'accounts:register' %}" class="price-cta-btn">
-            <span>Order Card</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
+
+    <!-- ======================================================================
+         3. WHY ONE-TIME PURCHASE? (ZERO SUBSCRIPTIONS GUARANTEE)
+         ====================================================================== -->
+    <div class="pricing-guarantee-wrap">
+      <!-- Competitor Model -->
+      <div class="pricing-comp-card">
+        <h3 class="pricing-comp-title" style="color: #94A3B8;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span>Other Digital Card Apps</span>
+        </h3>
+        <ul class="pricing-comp-list">
+          <li>
+            <span class="pricing-comp-icon-neg">✕</span>
+            <span>Recurring subscription fee of ₦5,000 – ₦15,000 every single month.</span>
+          </li>
+          <li>
+            <span class="pricing-comp-icon-neg">✕</span>
+            <span>Your card stops working immediately if you cancel your subscription.</span>
+          </li>
+          <li>
+            <span class="pricing-comp-icon-neg">✕</span>
+            <span>Unnecessary mobile app required for both you and your clients.</span>
+          </li>
+          <li>
+            <span class="pricing-comp-icon-neg">✕</span>
+            <span>Reprinting costs every time your title, phone, or company changes.</span>
+          </li>
+        </ul>
       </div>
-      <div class="price-card featured">
-        <div class="price-card-media">
-          <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="Personal Package mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
-          <span class="price-badge-pill price-badge-floating">RECOMMENDED</span>
-        </div>
-        <div class="price-card-inner">
-          <div class="price-card-topbar">
-            <span class="price-category-tag">Personal Identity</span>
-          </div>
-          <h3 class="price-name">Personal Package</h3>
-          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">65,000</span><span class="price-period">one-time</span></div>
-          <hr class="price-divider">
-          <div class="price-features-wrapper">
-            <div class="price-features-caption">INCLUDED FEATURES</div>
-            <ul class="price-features-list">
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Smart NFC Card Included</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Personal Brand Website</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Portfolio / Bio Sections</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Mobile Responsive Design</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="price-card-action">
-          <a href="{% url 'accounts:register' %}" class="price-cta-btn price-cta-btn--featured">
-            <span>Order Package</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="price-card-media">
-          <img src="{% static 'img/cards/card-premium.jpg' %}" alt="Business Suite mockup" class="price-card-img" loading="lazy" onerror="this.parentElement.style.display='none'">
-        </div>
-        <div class="price-card-inner">
-          <div class="price-card-topbar">
-            <span class="price-category-tag">Business Suite</span>
-          </div>
-          <h3 class="price-name">Business Suite</h3>
-          <div class="price-figure"><span class="price-currency">₦</span><span class="price-num">95,000</span><span class="price-period">one-time</span></div>
-          <hr class="price-divider">
-          <div class="price-features-wrapper">
-            <div class="price-features-caption">INCLUDED FEATURES</div>
-            <ul class="price-features-list">
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Smart NFC Card Included</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Full Business Website</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">Product Showcase & Catalog</span></li>
-              <li><span class="price-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="price-feature-text">WhatsApp Order Integration</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="price-card-action">
-          <a href="{% url 'accounts:register' %}" class="price-cta-btn">
-            <span>Order Suite</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
+
+      <!-- UZYRA Model -->
+      <div class="pricing-comp-card pricing-comp-card--uzyra">
+        <h3 class="pricing-comp-title" style="color: #10B981;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>The UZYRA Advantage</span>
+        </h3>
+        <ul class="pricing-comp-list">
+          <li>
+            <span class="pricing-comp-icon-pos">✓</span>
+            <span><strong>One-Time Investment:</strong> Buy once, your card &amp; digital profile work forever.</span>
+          </li>
+          <li>
+            <span class="pricing-comp-icon-pos">✓</span>
+            <span><strong>Zero Monthly Fees:</strong> No subscriptions, renewal charges, or surprise fees.</span>
+          </li>
+          <li>
+            <span class="pricing-comp-icon-pos">✓</span>
+            <span><strong>Zero Apps Required:</strong> Opens instantly in native Safari, Chrome, and Samsung Internet.</span>
+          </li>
+          <li>
+            <span class="pricing-comp-icon-pos">✓</span>
+            <span><strong>Unlimited Real-Time Updates:</strong> Edit links, phone, and bio anytime with zero reprinting.</span>
+          </li>
+        </ul>
       </div>
     </div>
-    {% endif %}
 
-    <!-- Corporate / Fleet Solutions Liquid Glass Callout -->
+    <!-- ======================================================================
+         4. DEEP SIDE-BY-SIDE FEATURE MATRIX COMPARISON TABLE
+         ====================================================================== -->
+    <div class="pricing-matrix-wrap" id="feature-matrix">
+      <div class="pricing-matrix-header text-center">
+        <div class="label-overline mb-2">Deep Feature Matrix</div>
+        <h2 style="font-size: 1.75rem; color: #FFFFFF; font-weight: 800;">Compare All Package Capabilities</h2>
+        <p class="text-secondary" style="font-size: 0.9rem; margin-top: 4px;">Detailed breakdown of hardware, digital platform, and enterprise options.</p>
+      </div>
+
+      <table class="pricing-matrix-table" aria-label="Package Comparison Matrix">
+        <thead>
+          <tr>
+            <th scope="col">Features &amp; Specifications</th>
+            <th scope="col">
+              <span class="matrix-th-name">Smart NFC Card</span>
+              <span class="matrix-th-price">₦25,000</span>
+            </th>
+            <th scope="col" class="matrix-th-featured">
+              <span class="matrix-th-name">Personal Suite</span>
+              <span class="matrix-th-price">₦65,000</span>
+            </th>
+            <th scope="col">
+              <span class="matrix-th-name">Business Suite</span>
+              <span class="matrix-th-price">₦120,000</span>
+            </th>
+            <th scope="col">
+              <span class="matrix-th-name">Corporate Fleet</span>
+              <span class="matrix-th-price">₦280,000</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Category 1: Hardware -->
+          <tr class="matrix-category-row">
+            <th colspan="5">Physical NFC Card Hardware</th>
+          </tr>
+          <tr>
+            <td>Physical NFC Cards Included</td>
+            <td>1 Card</td>
+            <td class="matrix-td-featured">1 Card</td>
+            <td>1 Card</td>
+            <td><strong>10 Custom Cards</strong></td>
+          </tr>
+          <tr>
+            <td>NTAG216 High-Speed Microchip</td>
+            <td><span class="matrix-check">✓</span></td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Laser Dynamic QR Code Backup</td>
+            <td><span class="matrix-check">✓</span></td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Custom Laser Engraving (Name / Title)</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Company Brand Logo on Card Face</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+
+          <!-- Category 2: Digital Identity Profile -->
+          <tr class="matrix-category-row">
+            <th colspan="5">Digital Profile &amp; Software Hub</th>
+          </tr>
+          <tr>
+            <td>Permanent Verified Profile Link</td>
+            <td><span class="matrix-check">✓</span></td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>1-Tap Save to Phonebook (.vcf)</td>
+            <td><span class="matrix-check">✓</span></td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Direct Link Mode (Instant 1-Tap Routing)</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>15+ Luxury Theme Palettes &amp; Layouts</td>
+            <td>Standard Dark</td>
+            <td class="matrix-td-featured"><strong>Full Customizer</strong></td>
+            <td><strong>Full Customizer</strong></td>
+            <td><strong>Corporate Palette</strong></td>
+          </tr>
+          <tr>
+            <td>Real-Time Profile Updates</td>
+            <td>Unlimited</td>
+            <td class="matrix-td-featured">Unlimited</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+
+          <!-- Category 3: Business & Analytics -->
+          <tr class="matrix-category-row">
+            <th colspan="5">Analytics &amp; Team Management</th>
+          </tr>
+          <tr>
+            <td>Tap &amp; Interaction Analytics</td>
+            <td>Basic Views</td>
+            <td class="matrix-td-featured"><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><strong>Consolidated Fleet</strong></td>
+          </tr>
+          <tr>
+            <td>Lead Capture Inquiry Box</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Interactive Office Location &amp; Hours</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-check">✓</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Centralized Corporate Management Portal</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Employee Reassignment / Card Transfer</td>
+            <td><span class="matrix-dash">—</span></td>
+            <td class="matrix-td-featured"><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-dash">—</span></td>
+            <td><span class="matrix-check">✓</span></td>
+          </tr>
+
+          <!-- Category 4: Fulfillment & Billing -->
+          <tr class="matrix-category-row">
+            <th colspan="5">Fulfillment &amp; Support</th>
+          </tr>
+          <tr>
+            <td>Shipping &amp; Delivery</td>
+            <td>Standard Tracked</td>
+            <td class="matrix-td-featured">Express Priority</td>
+            <td>48-Hour Priority</td>
+            <td>VIP Express (Fleet Box)</td>
+          </tr>
+          <tr>
+            <td>Customer Support</td>
+            <td>Standard Support</td>
+            <td class="matrix-td-featured">Priority Support</td>
+            <td>VIP Concierge Support</td>
+            <td>Dedicated Account Mgr</td>
+          </tr>
+          <tr>
+            <td>Monthly Subscription Fee</td>
+            <td><strong>₦0 / None</strong></td>
+            <td class="matrix-td-featured"><strong>₦0 / None</strong></td>
+            <td><strong>₦0 / None</strong></td>
+            <td><strong>₦0 / None</strong></td>
+          </tr>
+          <tr>
+            <td>Action</td>
+            <td>
+              <a href="{% url 'orders:checkout' 'smart-card' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Order Card</a>
+            </td>
+            <td class="matrix-td-featured">
+              <a href="{% url 'orders:checkout' 'personal-suite' %}" class="btn btn-primary btn-sm" style="white-space: nowrap;">Order Suite</a>
+            </td>
+            <td>
+              <a href="{% url 'orders:checkout' 'business-suite' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Order Suite</a>
+            </td>
+            <td>
+              <a href="{% url 'orders:checkout' 'corporate-fleet' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Order Fleet</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ======================================================================
+         5. CORPORATE / BESPOKE FLEET CALLOUT
+         ====================================================================== -->
     <div class="enterprise-banner">
       <div class="enterprise-banner-left">
         <div class="enterprise-icon-box" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 11h4M6 15h4M14 11h4M14 15h4M9 21v-4h6v4M12 3l9 4H3l9-4z"/></svg>
         </div>
         <div>
-          <h3 class="enterprise-title">Corporate & Team Solutions</h3>
-          <p class="enterprise-desc">For organizations ordering 5+ cards for executive teams or sales workforces. Includes bespoke laser engraving, centralized company portal, standardized corporate directory, and dedicated account manager support.</p>
+          <h3 class="enterprise-title">Need 20+ Cards or Bespoke Custom Finishes?</h3>
+          <p class="enterprise-desc">For larger corporate enterprises, commercial sales workforces, or bespoke metal &amp; wood smart cards. Includes volume tiered discounts, custom packaging, and centralized team onboarding.</p>
         </div>
       </div>
       <div class="enterprise-banner-right">
         <a href="{% url 'core:contact' %}" class="btn btn-secondary btn-pill">
-          <span>Request Custom Solution</span>
+          <span>Inquire for Enterprise</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
       </div>
     </div>
+
+    <!-- ======================================================================
+         6. INTERACTIVE FAQ ACCORDION
+         ====================================================================== -->
+    <div style="max-width: 860px; margin: var(--space-20) auto 0;">
+      <div class="text-center mb-8">
+        <div class="label-overline mb-2">Common Inquiries</div>
+        <h2 style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF;">Frequently Asked Questions</h2>
+        <p class="text-secondary" style="font-size: 0.95rem;">Everything you need to know about purchasing and using your UZYRA smart card.</p>
+      </div>
+
+      <div class="faq-container">
+        <div class="accordion-item">
+          <button type="button" class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-1">
+            <span>Does the person tapping my card need to install an app?</span>
+            <span class="accordion-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+          <div id="faq-ans-1" class="accordion-panel">
+            <div class="accordion-content">
+              No. Zero apps are required. When you tap your card on any modern iPhone or Android phone, your verified digital profile opens instantly in their native mobile web browser (Safari, Google Chrome, Samsung Internet).
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-2">
+            <span>How does payment work?</span>
+            <span class="accordion-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+          <div id="faq-ans-2" class="accordion-panel">
+            <div class="accordion-content">
+              Payment is processed securely through Paystack. You can pay with any Nigerian bank debit/credit card (Mastercard, Visa, Verve), direct Bank Transfer, or USSD code. Your order and digital profile are confirmed immediately.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-3">
+            <span>Can I update my details after receiving my physical card?</span>
+            <span class="accordion-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+          <div id="faq-ans-3" class="accordion-panel">
+            <div class="accordion-content">
+              Yes — unlimited times! Log in to your UZYRA dashboard anytime to update your phone number, WhatsApp, email, links, bio, or themes. All changes take effect immediately in real time with zero reprinting costs.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-4">
+            <span>What if someone's phone doesn't have NFC?</span>
+            <span class="accordion-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+          <div id="faq-ans-4" class="accordion-panel">
+            <div class="accordion-content">
+              Every UZYRA physical card includes a high-contrast dynamic laser QR code on the back. For older phones or cameras, the visitor simply opens their camera app and scans the code to open the exact same profile page.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-5">
+            <span>How fast is delivery within Nigeria?</span>
+            <span class="accordion-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+          <div id="faq-ans-5" class="accordion-panel">
+            <div class="accordion-content">
+              Once you confirm your engraving details, delivery takes typically 3–5 business days within Lagos and 5–8 business days to other states across Nigeria with door-to-door courier tracking.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-6">
+            <span>Are there really no monthly or annual subscription fees?</span>
+            <span class="accordion-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </button>
+          <div id="faq-ans-6" class="accordion-panel">
+            <div class="accordion-content">
+              Yes, 100%. When you purchase any UZYRA package, you pay once. Your digital profile, custom link, dynamic QR code, and dashboard access are yours for life.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
-{% if packages %}
+<!-- Segmented Filter & Accordion Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // 1. Segmented Category Filter Tabs
   var filterBtns = document.querySelectorAll('.pricing-filter-btn');
   var cards = document.querySelectorAll('.pricing-cards-grid .price-card');
-  if (!filterBtns.length || !cards.length) return;
 
-  filterBtns.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      filterBtns.forEach(function(b) { 
-        b.classList.remove('active'); 
-        b.setAttribute('aria-selected', 'false');
+  if (filterBtns.length && cards.length) {
+    filterBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(function(b) { 
+          b.classList.remove('active'); 
+          b.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+        var filter = this.getAttribute('data-filter');
+
+        cards.forEach(function(card) {
+          var cat = card.getAttribute('data-category');
+          if (filter === 'all' || cat === filter) {
+            card.classList.remove('card-hidden');
+          } else {
+            card.classList.add('card-hidden');
+          }
+        });
       });
-      this.classList.add('active');
-      this.setAttribute('aria-selected', 'true');
-      var filter = this.getAttribute('data-filter');
+    });
+  }
 
-      cards.forEach(function(card) {
-        var cat = card.getAttribute('data-category');
-        if (filter === 'all' || cat === filter) {
-          card.classList.remove('card-hidden');
-        } else {
-          card.classList.add('card-hidden');
+  // 2. FAQ Accordion
+  var accordionTriggers = document.querySelectorAll('.accordion-trigger');
+  accordionTriggers.forEach(function(trigger) {
+    trigger.addEventListener('click', function() {
+      var item = this.closest('.accordion-item');
+      var panel = item.querySelector('.accordion-panel');
+      var isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+      // Close all other panels
+      document.querySelectorAll('.accordion-item').forEach(function(otherItem) {
+        if (otherItem !== item) {
+          otherItem.classList.remove('active');
+          var otherTrigger = otherItem.querySelector('.accordion-trigger');
+          var otherPanel = otherItem.querySelector('.accordion-panel');
+          if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+          if (otherPanel) otherPanel.style.maxHeight = null;
         }
       });
+
+      // Toggle current panel
+      if (!isExpanded) {
+        item.classList.add('active');
+        this.setAttribute('aria-expanded', 'true');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+      } else {
+        item.classList.remove('active');
+        this.setAttribute('aria-expanded', 'false');
+        panel.style.maxHeight = null;
+      }
     });
   });
 });
 </script>
-{% endif %}
 {% endblock %}

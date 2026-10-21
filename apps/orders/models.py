@@ -37,6 +37,103 @@ class ProductPackage(models.Model):
     def feature_list(self):
         return [f.strip() for f in self.features.split('\n') if f.strip()]
 
+    @classmethod
+    def ensure_default_packages(cls, force=False):
+        """
+        Ensures the 4 standard production packages exist and are active in the database.
+        Safe to call on any environment to prevent empty packages or broken checkout redirects.
+        """
+        defaults = [
+            {
+                'code': 'smart-card',
+                'name': 'Smart NFC Card',
+                'package_type': cls.TYPE_CARD,
+                'price_ngn': 25000,
+                'description': 'Sleek matte-black physical NFC smart card paired with a lifetime digital profile. One-time purchase, zero monthly fees.',
+                'features': (
+                    'Matte Obsidian NFC Card with Silver Finish\n'
+                    'Embedded NTAG216 High-Speed Microchip\n'
+                    'High-Contrast Dynamic Laser QR Backup\n'
+                    'Lifetime Verified Mobile Digital Profile\n'
+                    '1-Tap Save Contact (.vcf) to Phonebook\n'
+                    'Unlimited Real-time Profile Updates\n'
+                    'Compatible with all iPhones & Androids (No App Required)\n'
+                    'Zero Monthly or Annual Subscription Fees'
+                ),
+                'badge': 'Essential',
+                'is_active': True,
+                'order_index': 1,
+            },
+            {
+                'code': 'personal-suite',
+                'name': 'Personal Identity Suite',
+                'package_type': cls.TYPE_PERSONAL,
+                'price_ngn': 65000,
+                'description': 'For executives, creators, and consultants wanting complete personal branding, direct link mode, and interactive networking.',
+                'features': (
+                    'Premium Matte Obsidian NFC Smart Card Included\n'
+                    'Custom Laser-Engraved Full Name & Handle\n'
+                    'Verified Digital Profile with Custom Username Link\n'
+                    'Direct Link Mode (Instant Routing to WhatsApp/LinkedIn)\n'
+                    '15+ Luxury Theme Styles & Custom Color Palettes\n'
+                    'Bio, Services & Project Showcase Hub\n'
+                    'Real-time Tap & Scan Interaction Analytics\n'
+                    'Free Express Tracked Delivery Nationwide\n'
+                    'Lifetime Access — Buy Once, Own Forever'
+                ),
+                'badge': 'Most Popular',
+                'is_active': True,
+                'order_index': 2,
+            },
+            {
+                'code': 'business-suite',
+                'name': 'Business Growth Suite',
+                'package_type': cls.TYPE_BUSINESS,
+                'price_ngn': 120000,
+                'description': 'For business owners, directors, and corporate brands requiring company emblem branding, inquiry lead capture, and priority fulfillment.',
+                'features': (
+                    'Executive Laser-Engraved NFC Smart Card with Company Emblem\n'
+                    'Verified Corporate Brand Profile with Company Identity\n'
+                    'Direct Lead Capture Inquiry Box (Email & WhatsApp alert)\n'
+                    'Interactive Google Maps Office Location & Operating Hours\n'
+                    'Multi-Channel Social & Service Catalog Highlights\n'
+                    'Advanced Profile Interaction & Visitor Insights\n'
+                    'High-Priority Production (2-3 Business Days Dispatch)\n'
+                    'Dedicated VIP Concierge & Setup Assistance'
+                ),
+                'badge': 'Best for Business',
+                'is_active': True,
+                'order_index': 3,
+            },
+            {
+                'code': 'corporate-fleet',
+                'name': 'Corporate Team Fleet',
+                'package_type': cls.TYPE_CORPORATE,
+                'price_ngn': 280000,
+                'description': 'For corporate organizations, executive boards, and sales teams ordering 10 cards with centralized management and unified company branding.',
+                'features': (
+                    '10 Custom Laser-Engraved NFC Cards with Company Branding\n'
+                    'Centralized Company Management Portal\n'
+                    'Standardized Corporate Identity for All Staff\n'
+                    'Team Tap, Engagement & Networking Analytics\n'
+                    'Rapid Card Reassignment for New Employees\n'
+                    'Dedicated Corporate Account Manager & Priority Support\n'
+                    'Luxury Presentation Gift Box Packaging\n'
+                    'Free Express Delivery for Whole Fleet'
+                ),
+                'badge': 'Enterprise Fleet',
+                'is_active': True,
+                'order_index': 4,
+            },
+        ]
+
+        has_active = cls.objects.filter(is_active=True).exists()
+        if force or not has_active:
+            for pdata in defaults:
+                cls.objects.update_or_create(code=pdata['code'], defaults=pdata)
+            # Deactivate legacy packages if they exist to keep list clean
+            cls.objects.filter(code__in=['starter', 'personal', 'business', 'business-pro']).update(is_active=False)
+
 
 class Order(models.Model):
     PAYMENT_PENDING = 'pending'

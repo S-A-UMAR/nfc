@@ -18,56 +18,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("Starting UZYRA platform seed...")
 
-        # 1. Product Packages (Matching exact image tiers)
-        packages_data = [
-            {
-                'code': 'starter',
-                'name': 'Starter',
-                'package_type': 'card_only',
-                'price_ngn': 15000,
-                'description': 'Smart cards, digital profile, and seamless networking for individual professionals.',
-                'features': 'Smart Card (NFC + QR)\nDigital Profile\nBasic Support',
-                'badge': '',
-                'order_index': 1,
-            },
-            {
-                'code': 'personal',
-                'name': 'Personal',
-                'package_type': 'personal_website',
-                'price_ngn': 45000,
-                'description': 'Complete personal identity suite with dedicated personal brand website.',
-                'features': 'Smart Card\nPersonal Website\nDigital Profile\n1 Year Hosting',
-                'badge': '',
-                'order_index': 2,
-            },
-            {
-                'code': 'business',
-                'name': 'Business',
-                'package_type': 'business_website',
-                'price_ngn': 80000,
-                'description': 'Corporate business website, product catalogue, and smart business cards.',
-                'features': 'Smart Card\nBusiness Website\nDigital Profile\nProduct Catalogue\n1 Year Hosting',
-                'badge': '',
-                'order_index': 3,
-            },
-            {
-                'code': 'business-pro',
-                'name': 'Business Pro',
-                'package_type': 'business_website',
-                'price_ngn': 150000,
-                'description': 'Advanced bespoke enterprise design, custom card engraving, and priority engineering.',
-                'features': 'Smart Card (Custom)\nAdvanced Website\nProduct Catalogue\nAnalytics Dashboard\nDomain + Hosting (1yr)\nPriority Support',
-                'badge': 'Popular',
-                'order_index': 4,
-            },
-        ]
-
-        for pdata in packages_data:
-            pkg, created = ProductPackage.objects.update_or_create(
-                code=pdata['code'],
-                defaults=pdata
-            )
-            self.stdout.write(f"  Package: {pkg.name} (₦{pkg.price_ngn:,})")
+        # 1. Product Packages (4 Canonical Premier Tiers)
+        ProductPackage.ensure_default_packages(force=True)
+        for pkg in ProductPackage.objects.filter(is_active=True).order_by('order_index'):
+            self.stdout.write(f"  Package: {pkg.name} (₦{pkg.price_ngn:,}) [code: {pkg.code}]")
 
         # 2. Superuser
         admin_email = "admin@uzyra.com"
@@ -229,7 +183,7 @@ class Command(BaseCommand):
                 'template_choice': 'modern_business',
                 'domain': 'www.ahmedibrahim.com',
                 'live_url': 'https://ahmedibrahim.com',
-                'status': Website.STATUS_LIVE,
+                'status': Website.STATUS_PUBLISHED,
             }
         )
 

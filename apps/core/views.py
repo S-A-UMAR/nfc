@@ -10,6 +10,7 @@ def home_view(request):
     if request.user.is_authenticated and not request.GET.get('public'):
         return redirect('dashboard:overview')
 
+    ProductPackage.ensure_default_packages()
     packages = ProductPackage.objects.filter(is_active=True)[:4]
     demo_profile = Profile.objects.first()
     return render(request, 'core/home.html', {
@@ -28,7 +29,8 @@ def how_it_works_view(request):
     return render(request, 'core/how_it_works.html')
 
 def pricing_view(request):
-    packages = ProductPackage.objects.filter(is_active=True)
+    ProductPackage.ensure_default_packages()
+    packages = ProductPackage.objects.filter(is_active=True).order_by('order_index', 'price_ngn')
     return render(request, 'core/pricing.html', {'packages': packages})
 
 def about_view(request):

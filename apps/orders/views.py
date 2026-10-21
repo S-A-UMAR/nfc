@@ -10,8 +10,24 @@ logger = logging.getLogger('uzyra.orders')
 
 @login_required
 def checkout_view(request, package_code):
-    """Checkout page for ordering smart cards and website packages."""
-    package = get_object_or_404(ProductPackage, code=package_code, is_active=True)
+    """Checkout page for ordering smart cards and identity packages."""
+    # Ensure package exists; auto-seed defaults if database is unseeded
+    package = ProductPackage.objects.filter(code=package_code, is_active=True).first()
+    if not package:
+        ProductPackage.ensure_default_packages(force=True)
+        package = ProductPackage.objects.filter(code=package_code, is_active=True).first()
+
+    # Fallback by id or normalized slug if needed
+    if not package and str(package_code).isdigit():
+        package = ProductPackage.objects.filter(id=int(package_code), is_active=True).first()
+    if not package:
+        package = ProductPackage.objects.filter(code__iexact=package_code.replace('_', '-'), is_active=True).first()
+    if not package:
+        package = ProductPackage.objects.filter(is_active=True).first()
+
+    if not package:
+        messages.error(request, "The selected package is currently unavailable. Please choose an active package below.")
+        return redirect('core:pricing')
     profile = getattr(request.user, 'profile', None)
 
     if request.method == 'POST':

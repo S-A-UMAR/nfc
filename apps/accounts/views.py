@@ -42,6 +42,13 @@ def referral_join_view(request):
 def register_view(request):
     """Register new customer, dispatch welcome email + OTP, and auto-provision digital profile."""
     if request.user.is_authenticated:
+        next_url = request.GET.get('next') or request.POST.get('next')
+        if next_url and url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure()
+        ):
+            return redirect(next_url)
         return redirect('dashboard:overview')
 
     ip = get_client_ip(request)
@@ -68,6 +75,15 @@ def register_view(request):
                 profile.phone = user.phone
                 profile.whatsapp = user.phone
             profile.save()
+
+            # Preserve next_url for post-verification redirection if present
+            next_url = request.GET.get('next') or request.POST.get('next')
+            if next_url and url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure()
+            ):
+                request.session['auth_next'] = next_url
 
             # Process Referral Attribution if a valid referral code exists in session or cookie
             ref_code = request.session.get('referral_code') or request.COOKIES.get('uzyra_ref')
@@ -223,6 +239,14 @@ def verify_email_otp_view(request):
                     del request.session['pending_verification_email']
 
                 messages.success(request, "Email verified successfully! Your account is now fully active.")
+                next_url = request.session.pop('auth_next', None)
+                if next_url and url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure()
+                ):
+                    return redirect(next_url)
+
                 user_profile = getattr(verified_user, 'profile', None)
                 if user_profile and not user_profile.title and not user_profile.business_name:
                     return redirect('dashboard:onboarding')

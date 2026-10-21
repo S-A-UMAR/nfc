@@ -1332,6 +1332,34 @@
   color: #94A3B8;
 }
 
+/* Pricing Trust Reassurance Strip */
+.pricing-trust-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.pricing-trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #CBD5E1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+}
+
+.pricing-trust-item svg {
+  color: #10B981;
+  flex-shrink: 0;
+}
+
 /* Category Filter Bar */
 .pricing-filter-bar {
   display: inline-flex;
@@ -1582,6 +1610,34 @@
   letter-spacing: 0;
 }
 
+.price-desc-lead {
+  font-size: 0.8125rem;
+  color: #94A3B8;
+  line-height: 1.5;
+  margin: 0.35rem 0 0.75rem;
+  min-height: 38px;
+}
+
+.price-card-shipping-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7125rem;
+  font-weight: 600;
+  color: #CBD5E1;
+  padding: 0.35rem 0.65rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.85rem;
+  width: 100%;
+}
+
+.price-card-shipping-pill svg {
+  color: #10B981;
+  flex-shrink: 0;
+}
+
 .price-divider {
   border: none;
   height: 1px;
@@ -1758,6 +1814,189 @@
 
 .enterprise-banner-right {
   flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   8B. PRICING FEATURE MATRIX & GUARANTEE
+   ───────────────────────────────────────────────────────────────────────── */
+.pricing-matrix-wrap {
+  max-width: 1280px;
+  margin: var(--space-16) auto var(--space-12);
+  background: linear-gradient(180deg, rgba(20, 22, 28, 0.8) 0%, rgba(12, 13, 17, 0.95) 100%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: var(--space-8);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  overflow-x: auto;
+}
+
+.pricing-matrix-header {
+  margin-bottom: var(--space-6);
+}
+
+.pricing-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.pricing-matrix-table th,
+.pricing-matrix-table td {
+  padding: 14px 16px;
+  text-align: center;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pricing-matrix-table th:first-child,
+.pricing-matrix-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: #F1F5F9;
+  min-width: 220px;
+}
+
+.pricing-matrix-table thead th {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #FFFFFF;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 18px;
+}
+
+.pricing-matrix-table thead th.matrix-th-featured {
+  background: rgba(16, 185, 129, 0.08);
+  border-top: 2px solid #10B981;
+  border-radius: 12px 12px 0 0;
+}
+
+.pricing-matrix-table tbody td.matrix-td-featured {
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.pricing-matrix-table thead th .matrix-th-name {
+  font-size: 1.05rem;
+  display: block;
+}
+
+.pricing-matrix-table thead th .matrix-th-price {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #10B981;
+  margin-top: 2px;
+  display: block;
+}
+
+.pricing-matrix-table tr.matrix-category-row th {
+  background: rgba(255, 255, 255, 0.03);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.725rem;
+  color: #94A3B8;
+  padding: 12px 16px;
+  text-align: left;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.matrix-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34D399;
+}
+
+.matrix-dash {
+  color: #475569;
+  font-size: 1.1rem;
+}
+
+/* Why One-Time Investment / Guarantee Comparison */
+.pricing-guarantee-wrap {
+  max-width: 1280px;
+  margin: var(--space-12) auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.pricing-comp-card {
+  padding: var(--space-8);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pricing-comp-card--uzyra {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 35px rgba(16, 185, 129, 0.08);
+}
+
+.pricing-comp-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pricing-comp-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: #CBD5E1;
+}
+
+.pricing-comp-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.pricing-comp-icon-neg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pricing-comp-icon-pos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .pricing-guarantee-wrap {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
