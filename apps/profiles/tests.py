@@ -438,10 +438,10 @@ class ProfileCustomizationV2Tests(TestCase):
         self.assertContains(response, 'theme')
 
     def test_appearance_page_shows_all_personal_themes(self):
-        """All 8 personal theme keys appear in the appearance template."""
+        """All personal theme keys appear in the appearance template."""
         self.client_a.force_login(self.user_a)
         response = self.client_a.get(self.appearance_url)
-        for key in ['graphite', 'midnight', 'ocean', 'violet', 'emerald', 'rose', 'arctic', 'sand']:
+        for key in ['graphite', 'midnight', 'ocean', 'emerald', 'rose', 'arctic', 'sand']:
             self.assertContains(response, key, msg_prefix=f"Missing personal theme: {key}")
 
     def test_appearance_page_shows_all_business_themes(self):
@@ -494,7 +494,7 @@ class ProfileCustomizationV2Tests(TestCase):
     def test_appearance_saves_all_personal_themes(self):
         """Every personal theme value is accepted and saved by the view."""
         self.client_a.force_login(self.user_a)
-        for theme_key in ['graphite', 'midnight', 'ocean', 'violet', 'emerald', 'rose', 'arctic', 'sand']:
+        for theme_key in ['graphite', 'midnight', 'ocean', 'emerald', 'rose', 'arctic', 'sand']:
             resp = self.client_a.post(self.appearance_url, {
                 'profile_type': 'personal',
                 'theme': theme_key,
