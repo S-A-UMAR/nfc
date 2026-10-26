@@ -7,9 +7,9 @@ logger = logging.getLogger('uzyra.email_service')
 
 def _render_email_template(title: str, subtitle: str, body_html: str, cta_text: str = None, cta_url: str = None) -> str:
     """
-    Renders high-contrast luxury graphite/silver branded HTML email template for UZYRA.
+    Renders high-contrast luxury graphite/silver branded HTML email template for STRIDE.
     """
-    brand_name = getattr(settings, 'BRAND_NAME', 'UZYRA')
+    brand_name = getattr(settings, 'BRAND_NAME', 'STRIDE')
     support_email = getattr(settings, 'BRAND_SUPPORT_EMAIL', 'contact@uzyra.com')
 
     cta_section = ""
@@ -91,7 +91,7 @@ class BrevoEmailService:
     @classmethod
     def get_sender(cls) -> dict:
         sender_email = os.environ.get('BREVO_SENDER_EMAIL') or getattr(settings, 'BREVO_SENDER_EMAIL', 'contact@uzyra.com')
-        sender_name = os.environ.get('BREVO_SENDER_NAME') or getattr(settings, 'BREVO_SENDER_NAME', 'UZYRA')
+        sender_name = os.environ.get('BREVO_SENDER_NAME') or getattr(settings, 'BREVO_SENDER_NAME', 'STRIDE')
         return {"name": sender_name, "email": sender_email}
 
     @classmethod
@@ -156,18 +156,18 @@ class BrevoEmailService:
 
         body = f"""
         <p>Hello {first_name},</p>
-        <p>Welcome to UZYRA. Your digital identity account and contactless NFC ecosystem have been initialized.</p>
+        <p>Welcome to STRIDE. Your digital identity account and contactless NFC ecosystem have been initialized.</p>
         {otp_block}
         <p>From your dashboard, you can customize your digital business profile, link custom web presence packages, and manage your physical smart cards.</p>
         """
         html = _render_email_template(
-            title="Welcome to UZYRA",
+            title="Welcome to STRIDE",
             subtitle="Your luxury digital identity platform",
             body_html=body,
             cta_text="Access Your Dashboard",
             cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/"
         )
-        return cls.send_transactional_email(user.email, "Welcome to UZYRA — Your Digital Identity", html, user.display_name)
+        return cls.send_transactional_email(user.email, "Welcome to STRIDE — Your Digital Identity", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 2. Email Verification OTP
@@ -187,10 +187,10 @@ class BrevoEmailService:
         """
         html = _render_email_template(
             title="Verify Your Email Address",
-            subtitle="UZYRA One-Time Verification Code",
+            subtitle="STRIDE One-Time Verification Code",
             body_html=body
         )
-        return cls.send_transactional_email(email, f"{code} is your UZYRA verification code", html, user_name)
+        return cls.send_transactional_email(email, f"{code} is your STRIDE verification code", html, user_name)
 
     # -------------------------------------------------------------------------
     # 3. Password Reset Request
@@ -200,7 +200,7 @@ class BrevoEmailService:
         first_name = user.first_name or "there"
         body = f"""
         <p>Hello {first_name},</p>
-        <p>We received a request to reset the password for your UZYRA account associated with <strong>{user.email}</strong>.</p>
+        <p>We received a request to reset the password for your STRIDE account associated with <strong>{user.email}</strong>.</p>
         <p>Click the button below to choose a new password. For security reasons, this link is single-use and will expire in 30 minutes:</p>
         """
         html = _render_email_template(
@@ -210,7 +210,7 @@ class BrevoEmailService:
             cta_text="Reset Password",
             cta_url=reset_url
         )
-        return cls.send_transactional_email(user.email, "Reset Your UZYRA Password", html, user.display_name)
+        return cls.send_transactional_email(user.email, "Reset Your STRIDE Password", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 4. Password Changed Notification
@@ -220,7 +220,7 @@ class BrevoEmailService:
         first_name = user.first_name or "there"
         body = f"""
         <p>Hello {first_name},</p>
-        <p>The password for your UZYRA account (<strong>{user.email}</strong>) was successfully updated.</p>
+        <p>The password for your STRIDE account (<strong>{user.email}</strong>) was successfully updated.</p>
         <p>If you made this change, no further action is required.</p>
         <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 16px; margin: 20px 0; color: #FCA5A5; font-size: 13px;">
             <strong>Important:</strong> If you did NOT initiate this change, your account may be compromised. Please contact support immediately to lock your account.
@@ -231,7 +231,7 @@ class BrevoEmailService:
             subtitle="Account Security Notification",
             body_html=body
         )
-        return cls.send_transactional_email(user.email, "Security Alert: UZYRA Password Changed", html, user.display_name)
+        return cls.send_transactional_email(user.email, "Security Alert: STRIDE Password Changed", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 5. Card Activation Confirmation
@@ -256,7 +256,7 @@ class BrevoEmailService:
             cta_text="Manage Card Settings",
             cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/card/"
         )
-        return cls.send_transactional_email(user.email, f"Smart Card {card.card_code} Activated — UZYRA", html, user.display_name)
+        return cls.send_transactional_email(user.email, f"Smart Card {card.card_code} Activated — STRIDE", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 6. Order Confirmation
@@ -283,7 +283,7 @@ class BrevoEmailService:
             cta_text="View Order Details",
             cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + f"/dashboard/orders/{order.order_number}/"
         )
-        return cls.send_transactional_email(user.email, f"Order Confirmed: #{order.order_number} — UZYRA", html, user.display_name)
+        return cls.send_transactional_email(user.email, f"Order Confirmed: #{order.order_number} — STRIDE", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 7. Payment Confirmation
@@ -310,7 +310,7 @@ class BrevoEmailService:
             cta_text="Submit Design Information",
             cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + f"/dashboard/orders/{order.order_number}/submit-info/"
         )
-        return cls.send_transactional_email(user.email, f"Payment Confirmed for #{order.order_number} — UZYRA", html, user.display_name)
+        return cls.send_transactional_email(user.email, f"Payment Confirmed for #{order.order_number} — STRIDE", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 8. Card Status Change (Lost / Suspended)
@@ -342,7 +342,7 @@ class BrevoEmailService:
         first_name = user.first_name or "there"
         body = f"""
         <p>Hello {first_name},</p>
-        <p>We detected a security event associated with your UZYRA account:</p>
+        <p>We detected a security event associated with your STRIDE account:</p>
         <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 20px; margin: 20px 0; color: #FFFFFF;">
             <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">{alert_type}</div>
             <div style="font-size: 13px; color: #D4D4D8;">{details}</div>
@@ -351,12 +351,12 @@ class BrevoEmailService:
         """
         html = _render_email_template(
             title="Account Security Alert",
-            subtitle="Important notice regarding your UZYRA account",
+            subtitle="Important notice regarding your STRIDE account",
             body_html=body,
             cta_text="Security Settings",
             cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/settings/"
         )
-        return cls.send_transactional_email(user.email, f"Security Alert: {alert_type} — UZYRA", html, user.display_name)
+        return cls.send_transactional_email(user.email, f"Security Alert: {alert_type} — STRIDE", html, user.display_name)
 
     # -------------------------------------------------------------------------
     # 10. Business Inquiry — Customer Confirmation
@@ -368,7 +368,7 @@ class BrevoEmailService:
         service_label = inquiry.get_service_type_display()
         body = f"""
         <p>Hello {name},</p>
-        <p>Thank you for reaching out to UZYRA. We've received your inquiry about <strong>{service_label}</strong> and will get back to you within <strong>24–48 hours</strong>.</p>
+        <p>Thank you for reaching out to STRIDE. We've received your inquiry about <strong>{service_label}</strong> and will get back to you within <strong>24–48 hours</strong>.</p>
         <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
             <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">Your Inquiry Summary</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
@@ -382,14 +382,14 @@ class BrevoEmailService:
         """
         html = _render_email_template(
             title="We've Received Your Inquiry",
-            subtitle="A member of the UZYRA team will contact you shortly.",
+            subtitle="A member of the STRIDE team will contact you shortly.",
             body_html=body,
             cta_text="WhatsApp Us",
-            cta_url="https://wa.me/2348000000000?text=Hello+UZYRA%2C+I+submitted+a+business+inquiry."
+            cta_url="https://wa.me/2348000000000?text=Hello+STRIDE%2C+I+submitted+a+business+inquiry."
         )
         return cls.send_transactional_email(
             inquiry.email,
-            f"Your UZYRA Business Inquiry — {service_label}",
+            f"Your STRIDE Business Inquiry — {service_label}",
             html,
             inquiry.full_name,
         )
@@ -399,11 +399,11 @@ class BrevoEmailService:
     # -------------------------------------------------------------------------
     @classmethod
     def send_business_inquiry_admin_alert(cls, inquiry):
-        """Internal alert email sent to UZYRA staff when a new business inquiry arrives."""
+        """Internal alert email sent to STRIDE staff when a new business inquiry arrives."""
         service_label = inquiry.get_service_type_display()
         admin_email = getattr(settings, 'BREVO_SENDER_EMAIL', 'contact@uzyra.com')
         body = f"""
-        <p>A new business inquiry has been submitted on the UZYRA platform.</p>
+        <p>A new business inquiry has been submitted on the STRIDE platform.</p>
         <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
             <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">Inquiry Details</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
@@ -431,9 +431,9 @@ class BrevoEmailService:
         )
         return cls.send_transactional_email(
             admin_email,
-            f"[UZYRA] New Business Inquiry — {service_label} from {inquiry.full_name}",
+            f"[STRIDE] New Business Inquiry — {service_label} from {inquiry.full_name}",
             html,
-            "UZYRA Operations",
+            "STRIDE Operations",
         )
 
     # -------------------------------------------------------------------------
@@ -448,7 +448,7 @@ class BrevoEmailService:
         dashboard_url = f"{site_url}/dashboard/contacts/"
 
         body = f"""
-        <p>Someone shared their contact information with you on your UZYRA digital profile (<b>{profile.full_name}</b>)!</p>
+        <p>Someone shared their contact information with you on your STRIDE digital profile (<b>{profile.full_name}</b>)!</p>
         <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
             <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">Contact Details Shared</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
@@ -458,7 +458,7 @@ class BrevoEmailService:
                 <tr><td style="padding: 6px 0; color: #8E95A3;">Phone</td><td style="padding: 6px 0;">{contact_exchange.phone or "—"}</td></tr>
             </table>
         </div>
-        <p style="font-size: 13px; color: #A1A1AA;">Log in to your UZYRA dashboard to view all received contacts, export vCards, or follow up directly.</p>
+        <p style="font-size: 13px; color: #A1A1AA;">Log in to your STRIDE dashboard to view all received contacts, export vCards, or follow up directly.</p>
         """
         html = _render_email_template(
             title="New Contact Received",
@@ -469,7 +469,7 @@ class BrevoEmailService:
         )
         return cls.send_transactional_email(
             owner_email,
-            f"New Contact Shared: {contact_exchange.full_name} via UZYRA",
+            f"New Contact Shared: {contact_exchange.full_name} via STRIDE",
             html,
             profile.full_name,
         )
@@ -491,7 +491,7 @@ class BrevoEmailService:
 
         body = f"""
         <p>Hi <strong>{contact_exchange.full_name}</strong>,</p>
-        <p>Your contact details have been shared with <strong>{profile.full_name}</strong> through their UZYRA digital profile. They'll be in touch soon!</p>
+        <p>Your contact details have been shared with <strong>{profile.full_name}</strong> through their STRIDE digital profile. They'll be in touch soon!</p>
         <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
             <div style="font-size: 12px; letter-spacing: 0.1em; color: #8E95A3; text-transform: uppercase; margin-bottom: 12px;">What you shared</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #D4D4D8;">
@@ -512,7 +512,7 @@ class BrevoEmailService:
         )
         return cls.send_transactional_email(
             contact_exchange.email,
-            f"Your contact was shared with {profile.full_name} — UZYRA",
+            f"Your contact was shared with {profile.full_name} — STRIDE",
             html,
             contact_exchange.full_name,
         )

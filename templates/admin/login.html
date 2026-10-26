@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block title %}Sign In | UZYRA Command Center{% endblock %}
+{% block title %}Sign In | STRIDE Command Center{% endblock %}
 
 {% block extrastyle %}
   {{ block.super }}
@@ -160,7 +160,7 @@
       <path d="M12 6V18M12 12L20 7.5M12 12L4 7.5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
   </div>
-  <h1 class="uzyra-login-title">UZYRA Command Center</h1>
+  <h1 class="uzyra-login-title">STRIDE Command Center</h1>
   <p class="uzyra-login-sub">Restricted Staff &amp; Systems Management Console</p>
 
   {% if form.errors and not form.non_field_errors %}
@@ -181,7 +181,7 @@
     {% csrf_token %}
     <div class="form-row">
       <label for="id_username">Staff Email</label>
-      <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" placeholder="admin@uzyra.com">
+      <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" placeholder="admin@stride.id">
     </div>
     <div class="form-row">
       <label for="id_password">Security Key (Password)</label>

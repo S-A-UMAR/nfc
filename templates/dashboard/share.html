@@ -1,13 +1,13 @@
 {% extends "dashboard/base_dashboard.html" %}
 {% load static %}
 
-{% block dashboard_title %}Share Digital Profile & QR — UZYRA{% endblock %}
+{% block dashboard_title %}Share Digital Profile & QR — {{ BRAND_NAME }}{% endblock %}
 
 {% block dashboard_content %}
 <div class="dashboard-page-header">
   <div>
     <h1 class="dashboard-page-title">Share Digital Profile</h1>
-    <p class="dashboard-page-subtitle">Share your UZYRA profile via direct link, downloadable QR code, or mobile native sharing.</p>
+    <p class="dashboard-page-subtitle">Share your {{ BRAND_NAME }} profile via direct link, downloadable QR code, or mobile native sharing.</p>
   </div>
 </div>
 
@@ -56,7 +56,7 @@
         Native Mobile Share
       </button>
 
-      <a href="https://wa.me/?text=Check%20out%20my%20digital%20profile%20on%20UZYRA%3A%20{{ public_url|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%; justify-content: center; background: rgba(37, 211, 102, 0.1); border-color: rgba(37, 211, 102, 0.3); color: #25D366;">
+      <a href="https://wa.me/?text=Check%20out%20my%20digital%20profile%20on%20STRIDE%3A%20{{ public_url|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%; justify-content: center; background: rgba(37, 211, 102, 0.1); border-color: rgba(37, 211, 102, 0.3); color: #25D366;">
         Share via WhatsApp
       </a>
     </div>
@@ -65,7 +65,7 @@
       <div style="font-size: 0.75rem; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.35rem;">Growth & Referrals</div>
       <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">Invite Another Business Owner</h4>
       <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-        Invite colleagues to create their free digital profile on UZYRA and earn ₦2,000 purchase credits when they order a smart NFC card.
+        Invite colleagues to create their free digital profile on {{ BRAND_NAME }} and earn ₦2,000 purchase credits when they order a smart NFC card.
       </p>
 
       <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-primary); border-radius: var(--radius-md); padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
@@ -99,8 +99,8 @@ function copyToClipboard(text, btn) {
 function shareProfile(title, url) {
   if (navigator.share) {
     navigator.share({
-      title: title + ' — UZYRA Profile',
-      text: 'View my UZYRA digital profile:',
+      title: title + ' — STRIDE Profile',
+      text: 'View my STRIDE digital profile:',
       url: url
     }).catch(function(e){});
   } else {

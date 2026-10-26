@@ -132,7 +132,7 @@ def settings_view(request):
                     BrevoEmailService.send_security_alert_email(
                         user, 
                         "Account Email Address Changed", 
-                        f"The primary email address for your UZYRA account was changed from {old_email} to {user.email}."
+                        f"The primary email address for your STRIDE account was changed from {old_email} to {user.email}."
                     )
                 messages.success(request, "Account details updated successfully.")
                 return redirect('dashboard:settings_view')

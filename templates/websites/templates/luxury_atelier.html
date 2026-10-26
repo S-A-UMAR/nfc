@@ -341,7 +341,7 @@
     {% endif %}
     <div style="color: #64748b; font-size: 0.85rem; letter-spacing: 0.05em;">
       <p>&copy; {% now "Y" %} {{ website.title }}. All rights reserved.</p>
-      <p style="margin-top: 0.65rem; font-size: 0.78rem;">Powered by <a href="https://uzyra.com" style="color: var(--site-primary);">UZYRA</a></p>
+      <p style="margin-top: 0.65rem; font-size: 0.78rem;">Powered by <a href="{% url 'core:home' %}" style="color: var(--site-primary);">STRIDE</a></p>
     </div>
   </div>
 </footer>

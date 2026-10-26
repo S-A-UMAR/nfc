@@ -1,7 +1,7 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
 
-{% block page_title %}Themes &amp; Style — UZYRA{% endblock %}
+{% block page_title %}Themes &amp; Style — {{ BRAND_NAME }}{% endblock %}
 
 {% block dashboard_content %}
 <div class="appearance-page">
@@ -702,10 +702,9 @@
   };
 
   const themeLabels = {
-    graphite: 'UZYRA Default',
+    graphite: 'STRIDE Default',
     midnight: 'Midnight',
     ocean: 'Ocean',
-    violet: 'Violet',
     emerald: 'Emerald',
     rose: 'Rose',
     arctic: 'Arctic',

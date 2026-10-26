@@ -233,7 +233,7 @@ def onboarding_view(request):
             )
 
         request.session['onboarding_completed'] = True
-        messages.success(request, f"Welcome to UZYRA! Your {profile.get_profile_type_display()} is set up and ready to share.")
+        messages.success(request, f"Welcome to STRIDE! Your {profile.get_profile_type_display()} is set up and ready to share.")
         return redirect('dashboard:overview')
 
     # GET request
@@ -533,22 +533,20 @@ def toggle_custom_link_view(request, link_id):
 
 # Theme metadata used by the appearance template to render visual cards.
 PERSONAL_THEMES = [
-    {'key': 'graphite',  'label': 'UZYRA Default', 'desc': 'Dark obsidian · Platinum silver · Glass',
+    {'key': 'graphite',  'label': 'STRIDE Default', 'desc': 'Dark obsidian · Platinum silver · Glass',
      'bg': '#09090B', 'accent': '#BFC5CF', 'text': '#F5F5F7'},
-    {'key': 'midnight',  'label': 'Midnight',      'desc': 'Deep dark · Cool blue accents',
-     'bg': '#0a0e1a', 'accent': '#3B82F6', 'text': '#E2E8F0'},
-    {'key': 'ocean',     'label': 'Ocean',          'desc': 'Deep blue · Cyan premium palette',
-     'bg': '#020d1a', 'accent': '#06B6D4', 'text': '#E0F7FA'},
-    {'key': 'violet',    'label': 'Violet',         'desc': 'Deep violet · Soft purple',
-     'bg': '#0d0a1a', 'accent': '#8B5CF6', 'text': '#EDE9FE'},
-    {'key': 'emerald',   'label': 'Emerald',        'desc': 'Deep green · Muted emerald',
-     'bg': '#071a0e', 'accent': '#10B981', 'text': '#D1FAE5'},
-    {'key': 'rose',      'label': 'Rose',           'desc': 'Dark neutral · Sophisticated rose',
-     'bg': '#13090d', 'accent': '#F43F5E', 'text': '#FFE4E6'},
-    {'key': 'arctic',    'label': 'Arctic',         'desc': 'Dark slate · Ice blue',
-     'bg': '#091318', 'accent': '#BAE6FD', 'text': '#F0F9FF'},
-    {'key': 'sand',      'label': 'Sand',           'desc': 'Warm dark · Warm amber gold',
-     'bg': '#14100a', 'accent': '#D97706', 'text': '#FEF3C7'},
+    {'key': 'midnight',  'label': 'Midnight',       'desc': 'Deep dark · Electric cobalt pulses',
+     'bg': '#080D1A', 'accent': '#3B82F6', 'text': '#E2E8F0'},
+    {'key': 'ocean',     'label': 'Ocean',          'desc': 'Marine abyss · Bioluminescent cyan',
+     'bg': '#020E1A', 'accent': '#06B6D4', 'text': '#E0F7FA'},
+    {'key': 'emerald',   'label': 'Emerald',        'desc': 'Obsidian forest · Neon cyber jade',
+     'bg': '#04160C', 'accent': '#10B981', 'text': '#D1FAE5'},
+    {'key': 'rose',      'label': 'Rose',           'desc': 'Midnight noir · Vivid ruby petals',
+     'bg': '#14070D', 'accent': '#F43F5E', 'text': '#FFE4E6'},
+    {'key': 'arctic',    'label': 'Arctic',         'desc': 'Crystalline obsidian · Polar aurora',
+     'bg': '#06121D', 'accent': '#38BDF8', 'text': '#F0F9FF'},
+    {'key': 'sand',      'label': 'Sand',           'desc': 'Desert twilight · Molten amber gold',
+     'bg': '#140E06', 'accent': '#F59E0B', 'text': '#FEF3C7'},
 ]
 
 BUSINESS_THEMES = [
@@ -569,7 +567,7 @@ BUSINESS_THEMES = [
 ]
 
 PERSONAL_LAYOUTS = [
-    {'key': 'classic',       'label': 'Classic',       'desc': 'Current UZYRA default layout',          'icon': '◼◼'},
+    {'key': 'classic',       'label': 'Classic',       'desc': 'Current STRIDE default layout',          'icon': '◼◼'},
     # Hashed out for upcoming version:
     # {'key': 'centered',      'label': 'Centered',      'desc': 'Centered symmetrical identity',          'icon': '◈◈'},
     # {'key': 'minimal_layout','label': 'Minimal',       'desc': 'Ultra-clean typographic focus',          'icon': '▬▬'},

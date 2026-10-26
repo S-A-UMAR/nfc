@@ -99,7 +99,7 @@ class AdminAuditLog(models.Model):
 class BusinessInquiry(models.Model):
     """
     Lightweight inquiry record for businesses and organisations requesting
-    custom NFC / digital solutions from UZYRA.
+    custom NFC / digital solutions from STRIDE.
 
     Intentionally lean — no automatic provisioning, quotations or contracts.
     Future: may be linked to a formal Business/Account entity once demand exists.

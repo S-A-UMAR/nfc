@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 32" fill="none" role="img" aria-label="STRIDE">
+  <defs>
+    <!-- Graphite & Charcoal Gradient for Light Surfaces -->
+    <linearGradient id="stride-ribbon-light-a" x1="2" y1="5" x2="22" y2="15" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#09090B"/>
+      <stop offset="60%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#27272A"/>
+    </linearGradient>
+    <linearGradient id="stride-ribbon-light-b" x1="22" y1="15" x2="2" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#27272A"/>
+      <stop offset="50%" stop-color="#3F3F46"/>
+      <stop offset="100%" stop-color="#18181B"/>
+    </linearGradient>
+    <linearGradient id="stride-text-light" x1="28" y1="5" x2="148" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#09090B"/>
+      <stop offset="100%" stop-color="#18181B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular Ribbon "S" Mark -->
+  <g class="stride-mark">
+    <!-- Top Fold / Upper Blade -->
+    <path d="M 6.5 5.5 L 21.5 5.5 L 21.5 9.5 L 10 9.5 C 7.2 9.5 5.5 10.8 5.5 12.3 C 5.5 13.6 6.5 14.6 8 15.2 L 16.5 18 C 19.8 19.1 22 21.6 22 24.8 C 22 28.5 18.8 30.5 14.5 30.5 L 2.5 30.5 L 2.5 26.5 L 14.5 26.5 C 16.8 26.5 18 25.4 18 24.5 C 18 23.2 17 22.2 15.5 21.7 L 7 18.8 C 3.8 17.8 1.5 15.2 1.5 12 C 1.5 8.2 4.2 5.5 6.5 5.5 Z" fill="url(#stride-ribbon-light-a)"/>
+    <!-- Facet Sheen Accent -->
+    <path d="M 12 16.5 L 18 18.5 L 14 23 L 8 20.5 Z" fill="url(#stride-ribbon-light-b)" opacity="0.85"/>
+  </g>
+
+  <!-- Integrated Wordmark: TRIDE -->
+  <g class="stride-word" fill="url(#stride-text-light)">
+    <!-- T -->
+    <path d="M 30 7 H 44 V 11 H 39 V 29 H 35 V 11 H 30 V 7 Z"/>
+    <!-- R -->
+    <path d="M 48 7 H 58.5 C 62.5 7 65 9.2 65 12.5 C 65 15.2 63.2 17 60.5 17.7 L 65.5 29 H 60.8 L 56.2 18.2 H 52 V 29 H 48 V 7 Z M 52 11 V 15 H 58 C 59.8 15 61 14.2 61 12.8 C 61 11.5 59.8 11 58 11 H 52 Z"/>
+    <!-- I -->
+    <path d="M 70 7 H 74 V 29 H 70 V 7 Z"/>
+    <!-- D -->
+    <path d="M 80 7 H 89.5 C 95.5 7 99.5 11.2 99.5 18 C 99.5 24.8 95.5 29 89.5 29 H 80 V 7 Z M 84 11 V 25 H 89.2 C 93 25 95.2 22.2 95.2 18 C 95.2 13.8 93 11 89.2 11 H 84 Z"/>
+    <!-- E -->
+    <path d="M 105 7 H 119 V 11 H 109 V 16 H 118 V 20 H 109 V 25 H 119.5 V 29 H 105 V 7 Z"/>
+  </g>
+</svg>

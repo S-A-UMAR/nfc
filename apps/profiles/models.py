@@ -13,10 +13,9 @@ class Profile(models.Model):
     # ── Business themes ──────────────────────────────────────────────────────
     THEME_CHOICES = (
         # Personal
-        ('graphite',  'UZYRA Default'),
+        ('graphite',  'STRIDE Default'),
         ('midnight',  'Midnight'),
         ('ocean',     'Ocean'),
-        ('violet',    'Violet'),
         ('emerald',   'Emerald'),
         ('rose',      'Rose'),
         ('arctic',    'Arctic'),
@@ -262,7 +261,7 @@ class CustomLink(models.Model):
 
 class ContactExchange(models.Model):
     """
-    Two-way contact exchange lead submitted by a visitor on a public UZYRA profile.
+    Two-way contact exchange lead submitted by a visitor on a public STRIDE profile.
     Strictly isolated: viewable only by the receiving profile's owner.
     """
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='received_contacts')

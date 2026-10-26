@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Business & Custom Solutions — UZYRA{% endblock %}
-{% block meta_description %}UZYRA provides custom NFC card solutions for businesses, events, event centers, and security teams. Request a tailored NFC solution for your organisation.{% endblock %}
+{% block title %}Business & Custom Solutions — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}{{ BRAND_NAME }} provides custom NFC card solutions for businesses, events, event centers, and security teams. Request a tailored NFC solution for your organisation.{% endblock %}
 
 {% block content %}
 
@@ -313,7 +313,7 @@
   </p>
 
   <div style="display:flex;gap:0.875rem;justify-content:center;flex-wrap:wrap;">
-    <a href="#inquiry-form" class="biz-btn-primary">Talk to UZYRA</a>
+    <a href="#inquiry-form" class="biz-btn-primary">Talk to {{ BRAND_NAME }}</a>
     <a href="{% url 'core:smart_card' %}" class="biz-btn-secondary">View NFC Cards</a>
   </div>
 </section>
@@ -327,7 +327,7 @@
   <div style="text-align:center; margin-bottom: 3rem;">
     <div class="biz-section-label">Solutions</div>
     <h2 class="biz-section-title">What we can build for you</h2>
-    <p class="biz-section-subtitle" style="margin: 0 auto;">Each solution is custom-scoped and delivered personally by the UZYRA team.</p>
+    <p class="biz-section-subtitle" style="margin: 0 auto;">Each solution is custom-scoped and delivered personally by the {{ BRAND_NAME }} team.</p>
   </div>
 
   <div class="biz-grid-3">
@@ -386,7 +386,7 @@
         <p style="font-size:0.8rem;color:rgba(255,255,255,0.38);line-height:1.65;margin:0;">Tell us about your project using the form below.</p>
       {% elif forloop.counter == 2 %}
         <h3 style="font-family:var(--font-heading);font-size:0.875rem;font-weight:700;margin:0 0 0.4rem;color:#fff;">We Contact You</h3>
-        <p style="font-size:0.8rem;color:rgba(255,255,255,0.38);line-height:1.65;margin:0;">The UZYRA team reaches out within 24–48 hours.</p>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.38);line-height:1.65;margin:0;">The {{ BRAND_NAME }} team reaches out within 24–48 hours.</p>
       {% elif forloop.counter == 3 %}
         <h3 style="font-family:var(--font-heading);font-size:0.875rem;font-weight:700;margin:0 0 0.4rem;color:#fff;">Consultation</h3>
         <p style="font-size:0.8rem;color:rgba(255,255,255,0.38);line-height:1.65;margin:0;">We scope your requirements and prepare a custom proposal.</p>
@@ -427,7 +427,7 @@
             <a href="https://wa.me/{{ whatsapp_number }}?text={{ whatsapp_message|urlencode }}"
                target="_blank" rel="noopener noreferrer"
                style="display:inline-flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;color:#25D366;background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.18);border-radius:999px;padding:0.4rem 1rem;text-decoration:none;transition:background 0.2s;"
-               aria-label="Contact UZYRA on WhatsApp">
+               aria-label="Contact {{ BRAND_NAME }} on WhatsApp">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.570-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
               Chat on WhatsApp
             </a>
@@ -545,7 +545,7 @@
         </button>
 
         <p style="font-size:0.75rem;color:rgba(255,255,255,0.22);text-align:center;margin-top:1rem;">
-          By submitting this form you agree to be contacted by UZYRA about your inquiry.
+          By submitting this form you agree to be contacted by {{ BRAND_NAME }} about your inquiry.
         </p>
       </form>
     </div>

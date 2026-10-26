@@ -257,15 +257,15 @@ LOGOUT_REDIRECT_URL = 'core:home'
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
 
 # Brand Customization
-BRAND_NAME = os.environ.get('BRAND_NAME', 'UZYRA')
-BRAND_TAGLINE = 'YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH.'
+BRAND_NAME = os.environ.get('BRAND_NAME', 'STRIDE')
+BRAND_TAGLINE = os.environ.get('BRAND_TAGLINE', 'Modern Identity. Seamless Connection.')
 BRAND_SUPPORT_EMAIL = 'contact@uzyra.com'
 BRAND_SUPPORT_PHONE = '+234 800 000 0000'
 
 # Brevo Transactional Email Configuration
 BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
 BREVO_SENDER_EMAIL = os.environ.get('BREVO_SENDER_EMAIL', 'contact@uzyra.com')
-BREVO_SENDER_NAME = os.environ.get('BREVO_SENDER_NAME', 'UZYRA')
+BREVO_SENDER_NAME = os.environ.get('BREVO_SENDER_NAME', 'STRIDE')
 
 # Paystack Config
 # Use TEST keys (pk_test_... / sk_test_...) for this staging deployment

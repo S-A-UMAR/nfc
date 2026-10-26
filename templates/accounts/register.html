@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Create Your Account — UZYRA{% endblock %}
-{% block meta_description %}Create your free UZYRA digital profile and start sharing your contact details, portfolio, and social links instantly.{% endblock %}
+{% block title %}Create Your Account — STRIDE{% endblock %}
+{% block meta_description %}Create your free STRIDE digital profile and start sharing your contact details, portfolio, and social links instantly.{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
@@ -10,18 +10,8 @@
 
     <!-- Brand Header -->
     <div class="auth-header">
-      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
-        <svg width="24" height="28" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-reg-silver)"/>
-          <defs>
-            <linearGradient id="uzyra-reg-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFFFFF"/>
-              <stop offset="0.55" stop-color="#BFC5CF"/>
-              <stop offset="1" stop-color="#8E95A3"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>UZYRA</span>
+      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="STRIDE Home">
+        {% include 'components/brand_logo.html' with variant='dark' height='28' %}
       </a>
       <h1 class="auth-title">Create Your Account</h1>
       <p class="auth-subtitle">Set up your free digital profile in under 60 seconds.</p>

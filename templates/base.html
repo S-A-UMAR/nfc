@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}UZYRA — YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH.{% endblock %}</title>
+  <title>{% block title %}STRIDE — Modern Identity. Seamless Connection.{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}Smart cards, professional websites and digital profiles — everything your business needs, all in one place.{% endblock %}">
 
   {% block canonical_url %}
@@ -14,20 +14,20 @@
   {% block robots_meta %}{% endblock %}
 
   <!-- Open Graph / Social Sharing -->
-  <meta property="og:site_name" content="UZYRA">
+  <meta property="og:site_name" content="STRIDE">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-  <meta property="og:title" content="{% block og_title %}UZYRA — NFC Smart Business Cards & Digital Profiles{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Smart cards, professional websites and digital profiles — everything your business needs, all in one place.{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}STRIDE — NFC Smart Business Cards & Digital Profiles{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Modern NFC smart cards, digital identity and connected business profiles.{% endblock %}">
   <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
-  <meta property="og:image" content="{% block og_image %}{% static 'img/uzyra-og-default.png' %}{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% static 'img/stride-og-default.png' %}{% endblock %}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{% block twitter_title %}UZYRA — NFC Smart Business Cards{% endblock %}">
-  <meta name="twitter:description" content="{% block twitter_description %}Smart cards, professional websites and digital profiles.{% endblock %}">
-  <meta name="twitter:image" content="{% block twitter_image %}{% static 'img/uzyra-og-default.png' %}{% endblock %}">
+  <meta name="twitter:title" content="{% block twitter_title %}STRIDE — NFC Smart Business Cards{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Modern NFC smart cards, digital identity and connected business profiles.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{% static 'img/stride-og-default.png' %}{% endblock %}">
 
   {% block structured_data %}{% endblock %}
 
@@ -51,19 +51,9 @@
   <!-- MASTER NAVBAR (Floating Glassmorphism Pill) -->
   <div class="navbar-wrapper">
     <header class="navbar" role="banner">
-      <!-- UZYRA Brand Logo -->
-      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
-        <svg width="20" height="24" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-nav-silver)"/>
-          <defs>
-            <linearGradient id="uzyra-nav-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFFFFF"/>
-              <stop offset="0.55" stop-color="#BFC5CF"/>
-              <stop offset="1" stop-color="#8E95A3"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>UZYRA</span>
+      <!-- STRIDE Brand Logo -->
+      <a href="{% url 'core:home' %}" class="brand-logo" aria-label="STRIDE Home">
+        {% include 'components/brand_logo.html' with variant='dark' height='24' %}
       </a>
 
       <!-- Desktop Nav Links -->
@@ -104,18 +94,8 @@
     <div>
       <!-- Drawer Header: Logo + Close -->
       <div class="drawer-header">
-        <a href="{% url 'core:home' %}" class="brand-logo" aria-label="UZYRA Home">
-          <svg width="20" height="24" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-drawer-silver)"/>
-            <defs>
-              <linearGradient id="uzyra-drawer-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#FFFFFF"/>
-                <stop offset="0.55" stop-color="#BFC5CF"/>
-                <stop offset="1" stop-color="#8E95A3"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <span>UZYRA</span>
+        <a href="{% url 'core:home' %}" class="brand-logo" aria-label="STRIDE Home">
+          {% include 'components/brand_logo.html' with variant='dark' height='24' %}
         </a>
         <button class="drawer-close" aria-label="Close navigation menu">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -304,21 +284,11 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <a href="{% url 'core:home' %}" class="brand-logo" style="margin-bottom: var(--space-4);" aria-label="UZYRA Home">
-            <svg width="22" height="26" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#uzyra-ftr-silver)"/>
-              <defs>
-                <linearGradient id="uzyra-ftr-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#FFFFFF"/>
-                  <stop offset="0.55" stop-color="#BFC5CF"/>
-                  <stop offset="1" stop-color="#8E95A3"/>
-                </linearGradient>
-              </defs>
-            </svg>
-            <span>UZYRA</span>
+          <a href="{% url 'core:home' %}" class="brand-logo" style="margin-bottom: var(--space-4);" aria-label="STRIDE Home">
+            {% include 'components/brand_logo.html' with variant='dark' height='26' %}
           </a>
           <p style="font-size: 0.875rem; max-width: 320px; margin-bottom: var(--space-4); color: var(--text-secondary); line-height: 1.6;">
-            YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH. Smart NFC cards, digital identity and modern business web platforms.
+            Modern Identity. Seamless Connection. Smart NFC cards, digital identity and modern business web platforms.
           </p>
           <div class="d-flex gap-2">
             <span class="badge badge-silver">NFC + QR</span>
@@ -340,7 +310,7 @@
           <h2 class="footer-title">Company</h2>
           <ul class="footer-links">
             <li><a href="{% url 'core:how_it_works' %}">How It Works</a></li>
-            <li><a href="{% url 'core:about' %}">About UZYRA</a></li>
+            <li><a href="{% url 'core:about' %}">About STRIDE</a></li>
             <li><a href="{% url 'core:faq' %}">Frequently Asked</a></li>
             <li><a href="{% url 'core:contact' %}">Contact & Support</a></li>
           </ul>

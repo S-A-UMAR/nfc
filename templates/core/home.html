@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}UZYRA — YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH.{% endblock %}
-{% block meta_description %}Create your free digital profile in minutes. Share your contact details, social links, and portfolio with a tap of your UZYRA NFC smart card or custom link. Zero apps required.{% endblock %}
+{% block title %}STRIDE — Modern Identity. Seamless Connection.{% endblock %}
+{% block meta_description %}Create your free digital profile in minutes. Share your contact details, social links, and portfolio with a tap of your STRIDE NFC smart card or custom link. Zero apps required.{% endblock %}
 
 {% block content %}
 <!-- ==========================================================================
@@ -27,7 +27,7 @@
         </h1>
 
         <p class="hero-desc">
-          UZYRA lets you share your contact details, professional portfolio, and social links through a custom digital profile, with an NFC smart card that makes in-person sharing instant. Create your profile free in minutes.
+          STRIDE lets you share your contact details, professional portfolio, and social links through a custom digital profile, with an NFC smart card that makes in-person sharing instant. Create your profile free in minutes.
         </p>
 
         <div class="hero-actions">
@@ -79,7 +79,7 @@
         <div class="hero-dual-glow" aria-hidden="true"></div>
         <div class="hero-interactive-scene">
           <!-- Physical NFC Smart Card -->
-          <div class="hero-card-floating" aria-label="UZYRA Smart NFC Card Preview">
+          <div class="hero-card-floating" aria-label="STRIDE Smart NFC Card Preview">
             <div class="card-sheen-beam"></div>
             <!-- Card Top: Chip and NFC Indicator -->
             <div class="d-flex justify-between items-center">
@@ -93,19 +93,9 @@
               </svg>
             </div>
 
-            <!-- Card Center: UZYRA Shield Emblem -->
-            <div class="text-center" style="margin: 0.35rem 0;">
-              <svg width="28" height="32" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 4px;" aria-hidden="true">
-                <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#hero-stage-silver)"/>
-                <defs>
-                  <linearGradient id="hero-stage-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#FFFFFF"/>
-                    <stop offset="0.55" stop-color="#BFC5CF"/>
-                    <stop offset="1" stop-color="#8E95A3"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.2em; color: var(--text-primary);">UZYRA</div>
+            <!-- Card Center: STRIDE Brand Logo -->
+            <div class="text-center" style="margin: 0.85rem 0; display: flex; justify-content: center;">
+              {% include 'components/brand_logo.html' with variant='dark' height='24' %}
             </div>
 
             <!-- Card Bottom: Type & Chip Spec -->
@@ -126,7 +116,7 @@
             <picture>
               <source srcset="{% static 'img/iphonemockup.webp' %}" type="image/webp">
               <img src="{% static 'img/iphonemockup.png' %}"
-                   alt="UZYRA Verified Live Digital Profile on Titanium iPhone"
+                   alt="STRIDE Verified Live Digital Profile on Titanium iPhone"
                    class="hero-iphone-img"
                    width="340"
                    height="620"
@@ -161,12 +151,12 @@
 </section>
 
 <!-- ==========================================================================
-     SECTION 2: 5-SECOND CLARITY STRIP (The 3 Pillars of UZYRA)
+     SECTION 2: 5-SECOND CLARITY STRIP (The 3 Pillars of STRIDE)
      ========================================================================== -->
-<section class="clarity-strip-section" aria-label="Why UZYRA">
+<section class="clarity-strip-section" aria-label="Why STRIDE">
   <div class="container">
     <div class="text-center max-w-md mx-auto mb-10">
-      <div class="badge-pill mb-3">The UZYRA Advantage</div>
+      <div class="badge-pill mb-3">The STRIDE Advantage</div>
       <h2 class="section-title">The Three Pillars of Modern Networking</h2>
       <p class="text-secondary mt-2">Everything you need to introduce yourself effortlessly in person or online.</p>
     </div>
@@ -244,7 +234,7 @@
       <div class="step-card">
         <div class="step-number">03</div>
         <h3 class="step-title">Share Anywhere — Tap or Link</h3>
-        <p class="step-desc">Share your link digitally on social media and email signatures, or tap your physical UZYRA NFC card on any smartphone to connect instantly.</p>
+        <p class="step-desc">Share your link digitally on social media and email signatures, or tap your physical STRIDE NFC card on any smartphone to connect instantly.</p>
       </div>
     </div>
   </div>
@@ -421,7 +411,7 @@
           <picture>
             <source srcset="{% static 'img/iphonemockup_right.webp' %}" type="image/webp">
             <img src="{% static 'img/iphonemockup_right.png' %}"
-                 alt="UZYRA Verified Live Digital Profile on Titanium iPhone"
+                 alt="STRIDE Verified Live Digital Profile on Titanium iPhone"
                  class="showcase-iphone-img"
                  width="350"
                  height="638"
@@ -589,7 +579,7 @@
     <div class="text-center max-w-md mx-auto mb-12">
       <div class="badge-pill mb-3">Common Questions</div>
       <h2>Frequently Asked Questions</h2>
-      <p class="text-secondary mt-2">Everything you need to know about UZYRA smart cards and digital profiles.</p>
+      <p class="text-secondary mt-2">Everything you need to know about STRIDE smart cards and digital profiles.</p>
     </div>
 
     <div class="faq-container">
@@ -648,7 +638,7 @@
         </button>
         <div id="faq-ans-4" class="accordion-panel">
           <div class="accordion-content">
-            Yes, unlimited times. Log in to your UZYRA dashboard to update your phone number, email, title, social media handles, or company links. All updates reflect in real time with zero reprinting.
+            Yes, unlimited times. Log in to your STRIDE dashboard to update your phone number, email, title, social media handles, or company links. All updates reflect in real time with zero reprinting.
           </div>
         </div>
       </div>

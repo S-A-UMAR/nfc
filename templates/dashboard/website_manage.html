@@ -1,6 +1,6 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
-{% block title %}Website Builder — UZYRA{% endblock %}
+{% block title %}Website Builder — {{ BRAND_NAME }}{% endblock %}
 
 {% block dashboard_content %}
 
@@ -57,7 +57,7 @@
     </div>
     <h2 class="font-heading font-bold text-primary mb-2" style="font-size: 1.5rem;">Launch Your Custom Website</h2>
     <p class="text-secondary mb-6" style="font-size: 0.95rem; line-height: 1.6; max-width: 440px; margin-left: auto; margin-right: auto;">
-      Create a high-converting, mobile-optimized standalone website directly connected to your UZYRA smart identity.
+      Create a high-converting, mobile-optimized standalone website directly connected to your {{ BRAND_NAME }} smart identity.
     </p>
     <form method="post" class="d-flex justify-center gap-3 flex-wrap">
       {% csrf_token %}
@@ -573,7 +573,7 @@
         <div style="padding: 1rem 1.25rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-primary); margin-top: 1rem;">
           <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.25rem;">🔗 Social Channels Sync</div>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-            Your website automatically displays the social media links configured in your UZYRA Profile.
+            Your website automatically displays the social media links configured in your {{ BRAND_NAME }} Profile.
           </p>
           <a href="{% url 'dashboard:links_manage' %}" class="btn btn-ghost btn-sm" style="color: var(--silver-steel);">Manage Social Links &rarr;</a>
         </div>

@@ -36,7 +36,7 @@ class Website(models.Model):
     template_choice = models.CharField(max_length=50, choices=TEMPLATE_CHOICES, default='modern_business')
     title = models.CharField(max_length=150)
     slug = models.SlugField(max_length=150, unique=True, blank=True, null=True)
-    domain = models.CharField(max_length=150, blank=True, help_text="e.g. www.ahmedphones.com or ahmed.ulva.io")
+    domain = models.CharField(max_length=150, blank=True, help_text="e.g. www.ahmedphones.com or ahmed.stride.id")
     live_url = models.URLField(blank=True, help_text="Full external live link")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
     

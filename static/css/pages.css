@@ -1933,7 +1933,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.pricing-comp-card--uzyra {
+.pricing-comp-card--uzyra,
+.pricing-comp-card--stride {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
   border-color: rgba(16, 185, 129, 0.35);
   box-shadow: 0 0 35px rgba(16, 185, 129, 0.08);
@@ -3015,7 +3016,8 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-.comparison-table th.col-uzyra {
+.comparison-table th.col-uzyra,
+.comparison-table th.col-stride {
   color: #FFFFFF;
   width: 31%;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
@@ -3041,7 +3043,8 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-.comparison-table td.cell-uzyra {
+.comparison-table td.cell-uzyra,
+.comparison-table td.cell-stride {
   color: #FFFFFF;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.06);

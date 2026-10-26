@@ -418,7 +418,7 @@ class Phase2OnboardingRedesignTests(TestCase):
         self.client.login(email=self.user.email, password=self.password)
         response = self.client.get(reverse('dashboard:onboarding'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Welcome to UZYRA")
+        self.assertContains(response, "Welcome to STRIDE")
         self.assertContains(response, "Choose Your Profile Type")
         self.assertContains(response, "Personal Profile")
         self.assertContains(response, "Business Profile")

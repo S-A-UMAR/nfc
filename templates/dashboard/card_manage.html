@@ -1,6 +1,6 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
-{% block title %}Smart Card Management — UZYRA{% endblock %}
+{% block title %}Smart Card Management — {{ BRAND_NAME }}{% endblock %}
 
 {% block dashboard_content %}
 <!-- ==========================================================================
@@ -41,19 +41,9 @@
           </svg>
         </div>
 
-        <!-- Center: UZYRA Shield Emblem -->
-        <div class="text-center" style="margin: var(--space-3) 0;">
-          <svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto var(--space-2);" aria-hidden="true">
-            <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#card-manage-silver)"/>
-            <defs>
-              <linearGradient id="card-manage-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#FFFFFF"/>
-                <stop offset="0.55" stop-color="#BFC5CF"/>
-                <stop offset="1" stop-color="#8E95A3"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; letter-spacing: 0.2em; color: var(--text-primary);">UZYRA</div>
+        <!-- Center: STRIDE Brand Logo -->
+        <div class="text-center" style="margin: var(--space-4) 0; display: flex; justify-content: center;">
+          {% include 'components/brand_logo.html' with variant='dark' height='26' %}
         </div>
 
         <!-- Bottom: Card Code & Owner Info -->

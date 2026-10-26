@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Set Up Your Digital Profile — UZYRA{% endblock %}
-{% block meta_description %}Quick guided setup for your UZYRA digital profile and NFC smart card presence.{% endblock %}
+{% block title %}Set Up Your Digital Profile — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Quick guided setup for your {{ BRAND_NAME }} digital profile and NFC smart card presence.{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
@@ -50,7 +50,7 @@
               <span class="dot dot-active"></span>
               <span>First-Time Setup</span>
             </span>
-            <h1 class="auth-title" style="font-size: 1.75rem;">Welcome to UZYRA, {{ user.first_name|default:user.display_name }}!</h1>
+            <h1 class="auth-title" style="font-size: 1.75rem;">Welcome to {{ BRAND_NAME }}, {{ user.first_name|default:user.display_name }}!</h1>
             <p class="auth-subtitle" style="max-width: 480px;">
               Let's set up your custom digital profile in less than 2 minutes. This is the profile contacts will see when they tap your card or open your link.
             </p>
@@ -283,7 +283,7 @@
             <div class="d-flex justify-between items-center mb-4 pb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
               <span id="rev_profile_type_badge" class="badge badge-active">Personal Identity</span>
               <span class="text-caption text-silver" style="font-family: var(--font-mono);">
-                uzyra.com/u/{{ profile.slug|default:user.email|slugify }}/
+                stride.id/u/{{ profile.slug|default:user.email|slugify }}/
               </span>
             </div>
 

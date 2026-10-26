@@ -122,13 +122,13 @@ def register_view(request):
             login(request, user)
             request.session['pending_verification_email'] = user.email
             if email_res.get('success') and email_res.get('mode') == 'live':
-                messages.success(request, f"Welcome to UZYRA, {user.first_name or 'there'}! A 6-digit verification code has been sent to your email.")
+                messages.success(request, f"Welcome to STRIDE, {user.first_name or 'there'}! A 6-digit verification code has been sent to your email.")
             elif email_res.get('mode') == 'simulated':
-                messages.info(request, f"Welcome to UZYRA! (Staging note: Brevo API key not set in environment). Your verification code is: {plain_code}")
+                messages.info(request, f"Welcome to STRIDE! (Staging note: Brevo API key not set in environment). Your verification code is: {plain_code}")
             elif plain_code:
-                messages.warning(request, f"Welcome to UZYRA! Brevo email notice: {email_res.get('error', 'Check sender verification')}. Staging code: {plain_code}")
+                messages.warning(request, f"Welcome to STRIDE! Brevo email notice: {email_res.get('error', 'Check sender verification')}. Staging code: {plain_code}")
             else:
-                messages.success(request, f"Welcome to UZYRA! Please verify your email.")
+                messages.success(request, f"Welcome to STRIDE! Please verify your email.")
             return redirect('accounts:verify_otp')
     else:
         form = UserRegisterForm()

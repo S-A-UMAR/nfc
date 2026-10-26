@@ -1,6 +1,6 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
-{% block title %}Create Website — UZYRA{% endblock %}
+{% block title %}Create Website — {{ BRAND_NAME }}{% endblock %}
 
 {% block dashboard_content %}
 
@@ -37,7 +37,7 @@
   </div>
   <h2 class="font-heading font-bold text-primary mb-2">No Website Created Yet</h2>
   <p class="text-secondary max-w-sm mb-6" style="font-size: 0.9375rem; line-height: 1.6;">
-    Deploy a professional website connected to your UZYRA digital profile.
+    Deploy a professional website connected to your {{ BRAND_NAME }} digital profile.
   </p>
   <form method="post" action="{% url 'dashboard:website_manage' %}" class="d-flex justify-center gap-3 flex-wrap">
     {% csrf_token %}

@@ -1,0 +1,15 @@
+{% load static %}
+{% comment %}
+  STRIDE Reusable Brand Wordmark Component
+  Params:
+    - variant: 'dark' (default for dark obsidian surfaces) or 'light' (for light cards/surfaces)
+    - height: height in pixels (default: '24')
+    - extra_class: additional CSS classes (default: 'brand-logo-img')
+{% endcomment %}
+{% with logo_variant=variant|default:'dark' logo_height=height|default:'24' logo_class=extra_class|default:'brand-logo-img' %}
+  {% if logo_variant == 'light' %}
+    <img src="{% static 'img/brand/stride-logo-light.svg' %}" alt="STRIDE" class="{{ logo_class }}" height="{{ logo_height }}" style="height: {{ logo_height }}px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" loading="eager">
+  {% else %}
+    <img src="{% static 'img/brand/stride-logo-dark.svg' %}" alt="STRIDE" class="{{ logo_class }}" height="{{ logo_height }}" style="height: {{ logo_height }}px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" loading="eager">
+  {% endif %}
+{% endwith %}

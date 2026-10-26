@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %} | UZYRA</title>
+  <title>{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %} | STRIDE</title>
   {% if not profile.is_search_indexed %}<meta name="robots" content="noindex, nofollow">{% endif %}
   <meta name="description" content="{{ profile.bio|default:profile.full_name|truncatechars:155 }}">
   <meta name="theme-color" content="#09090B">
@@ -13,15 +13,15 @@
   <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
   <!-- Open Graph / Meta for Social Sharing -->
-  <meta property="og:site_name" content="UZYRA">
+  <meta property="og:site_name" content="STRIDE">
   <meta property="og:type" content="profile">
   <meta property="og:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
-  <meta property="og:description" content="{{ profile.bio|default:'Connect with me on UZYRA Smart Digital Identity.'|truncatechars:155 }}">
+  <meta property="og:description" content="{{ profile.bio|default:'Connect with me on STRIDE Smart Digital Identity.'|truncatechars:155 }}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   {% if profile.profile_image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
   {% else %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/uzyra-og-default.png' %}">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/stride-og-default.png' %}">
   {% endif %}
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +29,7 @@
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
-  <meta name="twitter:description" content="{{ profile.bio|default:'Connect with me on UZYRA.'|truncatechars:155 }}">
+  <meta name="twitter:description" content="{{ profile.bio|default:'Connect with me on STRIDE.'|truncatechars:155 }}">
   {% if profile.profile_image %}
     <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
   {% endif %}
@@ -105,18 +105,8 @@
 
     <!-- Top Header Bar: Brand + Quick Actions -->
     <header class="prf-app-topbar">
-      <a href="{% url 'core:home' %}" class="prf-app-brand" aria-label="UZYRA Home">
-        <svg width="14" height="17" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#prf-top-silver)"/>
-          <defs>
-            <linearGradient id="prf-top-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFFFFF"/>
-              <stop offset="0.6" stop-color="#A0A0A0"/>
-              <stop offset="1" stop-color="#6B6B6B"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>UZYRA</span>
+      <a href="{% url 'core:home' %}" class="prf-app-brand" aria-label="STRIDE Home">
+        {% include 'components/brand_logo.html' with variant='dark' height='18' %}
       </a>
 
       <div class="prf-app-top-actions">
@@ -149,7 +139,7 @@
             {% endif %}
           </div>
         </div>
-        <div class="prf-status-dot" title="Active on UZYRA"></div>
+        <div class="prf-status-dot" title="Active on STRIDE"></div>
       </div>
 
       <div class="prf-name-row">
@@ -319,7 +309,7 @@
     <div class="prf-tab-panel active" id="tab-about">
       <h2 class="prf-section-heading">About Me</h2>
       <div class="prf-about-text">
-        {{ profile.bio|default:"Welcome to my verified digital profile on UZYRA. Connect with me and explore my services and portfolio."|linebreaksbr }}
+        {{ profile.bio|default:"Welcome to my verified digital profile on STRIDE. Connect with me and explore my services and portfolio."|linebreaksbr }}
       </div>
 
       <!-- Two-Way Contact Exchange Callout Card — shelved for v2 -->
@@ -524,7 +514,7 @@
               {% elif item.image_url %}
                 <img src="{{ item.image_url }}" alt="{{ item.title|default:'Work Item' }}" loading="lazy">
               {% else %}
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); color: #71717A;">UZYRA</div>
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); color: #71717A;">STRIDE</div>
               {% endif %}
               {% if item.title %}
                 <div class="prf-gallery-caption">{{ item.title }}</div>
@@ -611,19 +601,9 @@
 
     <!-- Subtle Footer Branding -->
     <footer class="profile-footer">
-      <a href="{% url 'core:home' %}" class="profile-powered-link">
+      <a href="{% url 'core:home' %}" class="profile-powered-link" aria-label="Powered by STRIDE">
         <span>Powered by</span>
-        <svg width="12" height="14" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 3C6 14 8 24 16 29C24 24 26 14 26 3H31C31 16 27 31 16 36C5 31 1 16 1 3H6Z" fill="url(#prf-ft-silver)"/>
-          <defs>
-            <linearGradient id="prf-ft-silver" x1="1" y1="3" x2="31" y2="36" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFFFFF"/>
-              <stop offset="0.6" stop-color="#A0A0A0"/>
-              <stop offset="1" stop-color="#6B6B6B"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <strong>UZYRA</strong>
+        {% include 'components/brand_logo.html' with variant='dark' height='14' %}
       </a>
     </footer>
 
@@ -749,7 +729,7 @@
 
     <!-- QR Code Scan Box -->
     <div class="prf-qr-box">
-      <img src="{{ qr_url }}" alt="UZYRA Profile QR Code for {{ profile.full_name }}" width="170" height="170">
+      <img src="{{ qr_url }}" alt="STRIDE Profile QR Code for {{ profile.full_name }}" width="170" height="170">
     </div>
     <div class="prf-qr-subtext">Scan with any phone camera to view profile</div>
 
@@ -852,7 +832,7 @@
       </div>
     </div>
     <div style="font-size: 0.85rem; color: #A1A1AA; line-height: 1.5; text-align: center;">
-      Verified digital credentials backed by UZYRA Smart NFC Infrastructure.
+      Verified digital credentials backed by STRIDE Smart NFC Infrastructure.
     </div>
   </div>
 </div>
@@ -889,10 +869,10 @@
       <button type="button" class="prf-sheet-close" data-sheet-close>&times;</button>
     </div>
     <p style="font-size: 0.85rem; color: #D4D4D8; line-height: 1.5; margin-bottom: 1.25rem;">
-      UZYRA maintains strict standards against spam, impersonation, or copyright violations. If you believe this profile violates terms or impersonates an individual, report it directly to our Trust & Safety team.
+      STRIDE maintains strict standards against spam, impersonation, or copyright violations. If you believe this profile violates terms or impersonates an individual, report it directly to our Trust & Safety team.
     </p>
-    <a href="mailto:support@uzyra.com?subject=Report%20Profile%20{{ profile.slug }}" class="prf-btn-dock-save" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #FCA5A5;">
-      <span>Report this Profile to UZYRA</span>
+    <a href="mailto:{{ BRAND_SUPPORT_EMAIL|default:'contact@uzyra.com' }}?subject=Report%20Profile%20{{ profile.slug }}" class="prf-btn-dock-save" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #FCA5A5;">
+      <span>Report this Profile to STRIDE</span>
     </a>
   </div>
 </div>
@@ -921,7 +901,7 @@
     </svg>
     <div class="prf-tap-text">
       <span class="prf-tap-title">Smart Card Connected</span>
-      <span class="prf-tap-sub">UZYRA Verified Contact</span>
+      <span class="prf-tap-sub">STRIDE Verified Contact</span>
     </div>
   </div>
 </div>
@@ -1125,7 +1105,7 @@
     const btnShareWa = document.getElementById('btn-share-wa');
     if (btnShareWa) {
       btnShareWa.addEventListener('click', () => {
-        const text = encodeURIComponent('Connect with {{ profile.full_name|escapejs }} on UZYRA: ' + window.location.href);
+        const text = encodeURIComponent('Connect with {{ profile.full_name|escapejs }} on STRIDE: ' + window.location.href);
         window.open('https://api.whatsapp.com/send?text=' + text, '_blank');
       });
     }
@@ -1134,7 +1114,7 @@
     if (btnShareTg) {
       btnShareTg.addEventListener('click', () => {
         const url = encodeURIComponent(window.location.href);
-        const text = encodeURIComponent('Connect with {{ profile.full_name|escapejs }} on UZYRA');
+        const text = encodeURIComponent('Connect with {{ profile.full_name|escapejs }} on STRIDE');
         window.open('https://t.me/share/url?url=' + url + '&text=' + text, '_blank');
       });
     }
@@ -1144,7 +1124,7 @@
       btnShareNative.addEventListener('click', async () => {
         const shareData = {
           title: '{{ profile.full_name|escapejs }}',
-          text: 'Connect with {{ profile.full_name|escapejs }}{% if profile.title %} ({{ profile.title|escapejs }}){% endif %} on UZYRA',
+          text: 'Connect with {{ profile.full_name|escapejs }}{% if profile.title %} ({{ profile.title|escapejs }}){% endif %} on STRIDE',
           url: window.location.href
         };
         if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {

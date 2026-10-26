@@ -18,8 +18,8 @@ SITEMAPS = {
 }
 
 # Custom Branded Admin Site Headers
-admin.site.site_header = "UZYRA Command Center"
-admin.site.site_title = "UZYRA Admin HQ"
+admin.site.site_header = "STRIDE Command Center"
+admin.site.site_title = "STRIDE Admin HQ"
 admin.site.index_title = "Platform Management & Operations"
 
 urlpatterns = [

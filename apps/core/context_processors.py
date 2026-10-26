@@ -14,9 +14,9 @@ def brand_context(request):
                 unread_contacts_count = 0
 
     return {
-        'BRAND_NAME': getattr(settings, 'BRAND_NAME', 'ULVA'),
-        'BRAND_TAGLINE': getattr(settings, 'BRAND_TAGLINE', 'The Smart Identity & Digital Business Platform'),
-        'BRAND_SUPPORT_EMAIL': getattr(settings, 'BRAND_SUPPORT_EMAIL', 'support@ulva.io'),
+        'BRAND_NAME': getattr(settings, 'BRAND_NAME', 'STRIDE'),
+        'BRAND_TAGLINE': getattr(settings, 'BRAND_TAGLINE', 'Modern Identity. Seamless Connection.'),
+        'BRAND_SUPPORT_EMAIL': getattr(settings, 'BRAND_SUPPORT_EMAIL', 'contact@uzyra.com'),
         'BRAND_SUPPORT_PHONE': getattr(settings, 'BRAND_SUPPORT_PHONE', '+234 800 000 0000'),
         'PAYSTACK_PUBLIC_KEY': getattr(settings, 'PAYSTACK_PUBLIC_KEY', ''),
         'user_profile': user_profile,
