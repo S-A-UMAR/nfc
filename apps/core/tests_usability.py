@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from apps.profiles.models import Profile, SocialLink
+from apps.profiles.models import Profile, SocialLink, ContactExchange
 from apps.cards.models import Card
 from apps.orders.models import Order, ProductPackage
 from apps.analytics.models import AnalyticsEvent
@@ -575,5 +575,112 @@ class Phase2OnboardingRedesignTests(TestCase):
         self.assertEqual(self.profile.profile_type, 'personal')
         # Business name is retained in DB
         self.assertEqual(self.profile.business_name, 'Analytical Dynamics')
+
+
+class Phase4CNavigationAndMobileUsabilityTests(TestCase):
+    """
+    Tests for STRIDE Phase 4C:
+    - Responsive desktop sidebar & mobile navigation parity
+    - Contacts & Referrals restored in navigation
+    - Unread contacts badge display
+    - Leads Received tile link
+    - Appearance save bar desktop positioning & mobile stacking rules
+    - Removal of legacy purple accents in Contacts
+    """
+
+    def setUp(self):
+        cache.clear()
+        self.client = Client()
+        self.password = "StridePass123!"
+        self.user = User.objects.create_user(
+            email="phase4c_tester@example.com",
+            password=self.password,
+            first_name="Stride",
+            last_name="Tester",
+            is_email_verified=True,
+        )
+        self.profile, _ = Profile.objects.get_or_create(user=self.user)
+        self.profile.full_name = "Stride Tester"
+        self.profile.slug = "stride-tester"
+        self.profile.save()
+        self.client.login(email=self.user.email, password=self.password)
+
+    def test_contacts_and_referrals_in_sidebar_and_mobile_sheet(self):
+        """Contacts and Referrals are available in both desktop sidebar and mobile More sheet."""
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+
+        contacts_url = reverse('dashboard:contacts_list')
+        referrals_url = reverse('dashboard:referrals')
+
+        # Check Contacts link
+        self.assertContains(response, contacts_url)
+        self.assertContains(response, "Contacts")
+
+        # Check Referrals link
+        self.assertContains(response, referrals_url)
+        self.assertContains(response, "Referral Program")
+
+    def test_unread_contacts_badge_in_sidebar_and_sheet(self):
+        """Unread contacts count renders properly in the navigation badges."""
+        # Create unread contact lead
+        ContactExchange.objects.create(
+            profile=self.profile,
+            full_name="Alex Lead",
+            email="alex@example.com",
+            is_read=False,
+        )
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+        # unread count of 1 is rendered
+        self.assertEqual(response.context['unread_contacts_count'], 1)
+        self.assertContains(response, contacts_list := reverse('dashboard:contacts_list'))
+
+    def test_leads_received_stat_tile_links_to_contacts(self):
+        """Overview 'Leads Received' metric tile links directly to Contacts list."""
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+        contacts_url = reverse('dashboard:contacts_list')
+        self.assertContains(response, f'href="{contacts_url}" class="dash-stat-tile"')
+
+    def test_more_nav_button_active_on_secondary_pages(self):
+        """The mobile bottom bar 'More' button is marked active on secondary pages."""
+        # On appearance page
+        response = self.client.get(reverse('dashboard:appearance'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "bottom-nav-more active")
+
+        # On contacts list page
+        response_contacts = self.client.get(reverse('dashboard:contacts_list'))
+        self.assertEqual(response_contacts.status_code, 200)
+        self.assertContains(response_contacts, "bottom-nav-more active")
+
+    def test_appearance_save_bar_z_index_and_mobile_bottom(self):
+        """Appearance save bar styles include z-index: 990 and mobile safe area bottom padding."""
+        response = self.client.get(reverse('dashboard:appearance'))
+        self.assertEqual(response.status_code, 200)
+        # z-index 990 allows the mobile sheet (999) to stack on top
+        self.assertContains(response, "z-index: 990;")
+        # Centering inside desktop content column
+        self.assertContains(response, "left: calc(260px + (100% - 260px) / 2);")
+        # Mobile bottom padding on appearance page
+        self.assertContains(response, "padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));")
+
+    def test_contacts_view_clean_of_purple_tokens(self):
+        """Contacts view uses STRIDE tokens and contains no obsolete purple hexes."""
+        ContactExchange.objects.create(
+            profile=self.profile,
+            full_name="Morgan Client",
+            email="morgan@example.com",
+            notes="Interested in graphite cards",
+            is_read=False,
+        )
+        response = self.client.get(reverse('dashboard:contacts_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "#A855F7")
+        self.assertNotContains(response, "#C084FC")
+        self.assertNotContains(response, "rgba(168, 85, 247")
+        self.assertNotContains(response, "rgba(168,85,247")
+
 
 

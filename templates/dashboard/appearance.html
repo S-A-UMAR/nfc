@@ -637,17 +637,18 @@
 .appearance-save-bar {
   position: fixed;
   bottom: 1.5rem;
-  left: 50%;
+  /* Centre within the content column (viewport minus 260px desktop sidebar) */
+  left: calc(260px + (100% - 260px) / 2);
   transform: translateX(-50%);
-  width: calc(100% - 3rem);
-  max-width: 900px;
+  width: min(900px, calc(100% - 260px - 3rem));
   border-radius: 9999px;
   padding: 0.85rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  z-index: 1005;
+  /* Lower than mobile sheet (999) so the More drawer can sit on top */
+  z-index: 990;
   background: rgba(14, 15, 22, 0.94);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
   backdrop-filter: blur(24px) saturate(200%);
@@ -671,6 +672,7 @@
 }
 
 @media (max-width: 900px) {
+  .appearance-page { padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
   .appearance-save-bar {
     bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
     left: 1rem !important;

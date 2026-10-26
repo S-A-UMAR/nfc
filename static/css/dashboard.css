@@ -540,7 +540,7 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 900px) {
   .dashboard-shell {
     grid-template-columns: 1fr;
     min-width: 0;
@@ -887,7 +887,7 @@
   padding: 0.5rem 1rem;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 900px) {
   .dashboard-mobile-nav {
     display: block;
   }

@@ -185,14 +185,14 @@
     <div class="dash-stat-sub">NFC &amp; QR scans</div>
   </div>
 
-  <div class="dash-stat-tile">
+  <a href="{% url 'dashboard:contacts_list' %}" class="dash-stat-tile" style="text-decoration: none; display: block; color: inherit;">
     <div class="dash-stat-top">
       <span class="dash-stat-label">Leads Received</span>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
     </div>
     <div class="dash-stat-num">{{ received_contacts_count }}</div>
     <div class="dash-stat-sub">Exchanged contacts</div>
-  </div>
+  </a>
 </div>
 
 <!-- ==========================================================================
