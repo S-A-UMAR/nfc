@@ -476,6 +476,50 @@ class Phase2OnboardingRedesignTests(TestCase):
         self.assertEqual(self.profile.business_category, 'Technology & Computing')
         self.assertTrue(bool(self.profile.slug))
 
+    def test_onboarding_wizard_renders_business_logo_and_preview_elements(self):
+        """Onboarding wizard includes business logo upload and review preview elements."""
+        self.client.login(email=self.user.email, password=self.password)
+        response = self.client.get(reverse('dashboard:onboarding'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id_onboard_business_logo')
+        self.assertContains(response, 'rev_logo_img')
+        self.assertContains(response, 'stride_onboard_draft_')
+
+    def test_onboarding_completes_business_profile_with_logo(self):
+        """Saving business profile with logo persists business attributes and logo file."""
+        import io
+        from PIL import Image
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        self.client.login(email=self.user.email, password=self.password)
+        
+        img_io = io.BytesIO()
+        image = Image.new('RGB', (100, 100), color=(120, 120, 120))
+        image.save(img_io, format='PNG')
+        img_io.seek(0)
+        logo_file = SimpleUploadedFile("biz_logo.png", img_io.read(), content_type="image/png")
+
+        post_data = {
+            'profile_type': 'business',
+            'full_name': 'Ada Lovelace',
+            'business_name': 'Analytical Engines Ltd',
+            'business_category': 'Technology & Computing',
+            'business_description': 'Pioneering general-purpose computational architectures.',
+            'business_logo': logo_file,
+            'phone': '+2348099998888',
+            'whatsapp': '+2348099998888',
+            'email': 'biz@example.com',
+            'website_url': 'https://analyticalengines.com',
+            'location': 'Lagos, Nigeria',
+        }
+        response = self.client.post(reverse('dashboard:onboarding'), post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('dashboard:overview'))
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.profile_type, 'business')
+        self.assertEqual(self.profile.business_name, 'Analytical Engines Ltd')
+        self.assertTrue(bool(self.profile.business_logo))
+
     def test_dashboard_overview_displays_onboarding_callout_for_incomplete_profile(self):
         """Incomplete profile displays prominent banner linking to onboarding."""
         self.profile.title = ""
@@ -495,10 +539,11 @@ class Phase2OnboardingRedesignTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Profile Type")
         self.assertContains(response, "Personal Profile")
-        # Business Profile mode selector shelved for v2 — not rendered in switcher
-        self.assertNotContains(response, "edit-mode-business")
+        # Both personal and business modes are rendered in the switcher
+        self.assertContains(response, "edit-mode-personal")
+        self.assertContains(response, "edit-mode-business")
 
-        # Submit change to business profile (backend still accepts it)
+        # Submit change to business profile
         edit_data = {
             'profile_type': 'business',
             'full_name': 'Ada Lovelace',
@@ -512,6 +557,23 @@ class Phase2OnboardingRedesignTests(TestCase):
 
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.profile_type, 'business')
+        self.assertEqual(self.profile.business_name, 'Analytical Dynamics')
+
+        # Switch back to personal without clearing business data
+        edit_data_personal = {
+            'profile_type': 'personal',
+            'full_name': 'Ada Lovelace',
+            'title': 'Managing Director',
+            'business_name': 'Analytical Dynamics',
+            'business_category': 'Technology',
+            'email': 'ada@example.com',
+        }
+        post_resp2 = self.client.post(reverse('dashboard:profile_edit'), edit_data_personal)
+        self.assertEqual(post_resp2.status_code, 302)
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.profile_type, 'personal')
+        # Business name is retained in DB
         self.assertEqual(self.profile.business_name, 'Analytical Dynamics')
 
 

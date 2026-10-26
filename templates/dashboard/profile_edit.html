@@ -118,7 +118,19 @@
           </div>
         </label>
 
-        {# Business Profile Mode — shelved for v2 #}
+        <label class="profile-mode-option {% if form.instance.profile_type == 'business' %}selected{% endif %}" id="edit-mode-business">
+          <input type="radio" name="profile_type" value="business" {% if form.instance.profile_type == 'business' %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
+          <div class="mode-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div class="mode-title">Business Profile</div>
+            <div class="mode-desc">For companies, agencies, corporate brands, and sales teams.</div>
+          </div>
+          <div class="mode-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </label>
       </div>
       {% if form.profile_type.errors %}
         <div class="form-error mt-2" role="alert">
@@ -859,29 +871,48 @@
      ========================================================================== -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // ── 1. Profile Type Switcher UI — Business Profile shelved for v2 ──────────
+  // ── 1. Profile Type Switcher UI ───────────────────────────────────────────
   const personalOpt = document.getElementById('edit-mode-personal');
+  const businessOpt = document.getElementById('edit-mode-business');
   const bizBadge = document.getElementById('biz-mode-badge');
   const personalHint = document.getElementById('personal-biz-hint');
   const businessSection = document.getElementById('sec-business');
 
-  function updateProfileTypeUI() {
-    // Business profile mode selector is shelved for v2; always show personal mode active
-    if (personalOpt) personalOpt.classList.add('selected');
-    if (bizBadge) bizBadge.style.display = 'none';
-    if (personalHint) personalHint.style.display = 'inline-flex';
-    if (businessSection) businessSection.style.borderColor = '';
+  function updateProfileTypeUI(mode) {
+    const isBiz = (mode === 'business');
+    if (personalOpt) {
+      personalOpt.classList.toggle('selected', !isBiz);
+      const radioP = personalOpt.querySelector('input[type="radio"]');
+      if (radioP) radioP.checked = !isBiz;
+    }
+    if (businessOpt) {
+      businessOpt.classList.toggle('selected', isBiz);
+      const radioB = businessOpt.querySelector('input[type="radio"]');
+      if (radioB) radioB.checked = isBiz;
+    }
+    if (bizBadge) bizBadge.style.display = isBiz ? 'inline-flex' : 'none';
+    if (personalHint) personalHint.style.display = isBiz ? 'none' : 'inline-flex';
+    if (businessSection) {
+      businessSection.style.borderColor = isBiz ? 'rgba(255, 255, 255, 0.28)' : '';
+    }
   }
 
   if (personalOpt) {
     personalOpt.addEventListener('click', function() {
-      const radio = personalOpt.querySelector('input');
-      if (radio) { radio.checked = true; markFormDirty(); }
-      updateProfileTypeUI();
+      updateProfileTypeUI('personal');
+      markFormDirty();
     });
   }
-  // Business mode listener — shelved for v2
-  updateProfileTypeUI();
+
+  if (businessOpt) {
+    businessOpt.addEventListener('click', function() {
+      updateProfileTypeUI('business');
+      markFormDirty();
+    });
+  }
+
+  const initialMode = '{{ form.instance.profile_type|default:"personal" }}';
+  updateProfileTypeUI(initialMode);
 
   // ── 2. Live Image Upload Previews ──────────────────────────────────────────
   function setupImagePreview(inputId, previewImgId, placeholderId) {

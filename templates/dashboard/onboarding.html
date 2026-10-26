@@ -105,9 +105,9 @@
             <p class="auth-subtitle">Select the format that best fits how you present yourself.</p>
           </div>
 
-          <div class="profile-type-grid" style="grid-template-columns: 1fr; max-width: 540px; margin: 0 auto;">
+          <div class="profile-type-grid" style="max-width: 680px; margin: 0 auto;">
             <!-- Option 1: Personal -->
-            <div id="card-type-personal" class="profile-type-card selected" onclick="selectProfileType('personal')" role="radio" aria-checked="true" tabindex="0">
+            <div id="card-type-personal" class="profile-type-card {% if profile.profile_type != 'business' %}selected{% endif %}" onclick="selectProfileType('personal')" role="radio" aria-checked="{% if profile.profile_type != 'business' %}true{% else %}false{% endif %}" tabindex="0">
               <div>
                 <div class="profile-type-icon" aria-hidden="true">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -116,11 +116,11 @@
                 <p class="profile-type-desc">For individuals, consultants, creators, and freelancers sharing their personal contact details, bio, and social links.</p>
               </div>
               <div class="profile-type-check-badge">
-                <span id="badge-check-personal">✓ Selected</span>
+                <span id="badge-check-personal">{% if profile.profile_type != 'business' %}✓ Selected{% else %}Select Option{% endif %}</span>
               </div>
             </div>
 
-            {% comment %} Option 2: Business Profile — shelved for v2
+            <!-- Option 2: Business Profile -->
             <div id="card-type-business" class="profile-type-card {% if profile.profile_type == 'business' %}selected{% endif %}" onclick="selectProfileType('business')" role="radio" aria-checked="{% if profile.profile_type == 'business' %}true{% else %}false{% endif %}" tabindex="0">
               <div>
                 <div class="profile-type-icon" aria-hidden="true">
@@ -133,7 +133,6 @@
                 <span id="badge-check-business">{% if profile.profile_type == 'business' %}✓ Selected{% else %}Select Option{% endif %}</span>
               </div>
             </div>
-            {% endcomment %}
           </div>
 
           <div class="onboarding-nav-row">
@@ -198,6 +197,14 @@
                   Business Overview <span class="form-label-hint">(Optional)</span>
                 </label>
                 <textarea id="id_onboard_business_description" name="business_description" class="form-textarea" rows="2" placeholder="Briefly describe what your business offers...">{{ profile.business_description }}</textarea>
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="id_onboard_business_logo" class="form-label">
+                  Business / Brand Logo <span class="form-label-hint">(Optional)</span>
+                </label>
+                <input type="file" id="id_onboard_business_logo" name="business_logo" accept="image/png,image/jpeg,image/webp" class="form-control">
+                <div class="form-hint">PNG, JPG or WebP (max 5MB). Displayed prominently in header &amp; review.</div>
               </div>
             </div>
 
@@ -288,8 +295,9 @@
             </div>
 
             <div class="d-flex items-center gap-3 mb-4">
-              <div class="hero-phone-avatar-circle" style="width: 52px; height: 52px; font-size: 1.25rem; margin: 0;">
-                <span id="rev_avatar_initial">{{ user.first_name|default:user.display_name|make_list|first|upper }}</span>
+              <div class="hero-phone-avatar-circle" style="width: 52px; height: 52px; font-size: 1.25rem; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);">
+                <img id="rev_logo_img" src="{% if profile.business_logo %}{{ profile.business_logo.url }}{% endif %}" alt="Business Logo" style="{% if not profile.business_logo or profile.profile_type != 'business' %}display: none;{% endif %} width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+                <span id="rev_avatar_initial" style="{% if profile.business_logo and profile.profile_type == 'business' %}display: none;{% endif %}">{{ user.first_name|default:user.display_name|make_list|first|upper }}</span>
               </div>
               <div>
                 <div id="rev_name" style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">
@@ -349,19 +357,59 @@
 <script>
 var currentStep = 1;
 var selectedType = '{{ profile.profile_type|default:"personal" }}';
+var STORAGE_KEY = 'stride_onboard_draft_{{ user.id }}';
+var uploadedLogoDataUrl = null;
+var existingLogoUrl = '{% if profile.business_logo %}{{ profile.business_logo.url }}{% endif %}';
+
+function saveDraft() {
+  try {
+    var data = {
+      step: currentStep,
+      profile_type: selectedType,
+      full_name: document.getElementById('id_onboard_full_name') ? document.getElementById('id_onboard_full_name').value : '',
+      title: document.getElementById('id_onboard_title') ? document.getElementById('id_onboard_title').value : '',
+      bio: document.getElementById('id_onboard_bio') ? document.getElementById('id_onboard_bio').value : '',
+      phone: document.getElementById('id_onboard_phone') ? document.getElementById('id_onboard_phone').value : '',
+      whatsapp: document.getElementById('id_onboard_whatsapp') ? document.getElementById('id_onboard_whatsapp').value : '',
+      email: document.getElementById('id_onboard_email') ? document.getElementById('id_onboard_email').value : '',
+      location: document.getElementById('id_onboard_location') ? document.getElementById('id_onboard_location').value : '',
+      website_url: document.getElementById('id_onboard_website') ? document.getElementById('id_onboard_website').value : '',
+      social_instagram: document.getElementById('id_onboard_instagram') ? document.getElementById('id_onboard_instagram').value : '',
+      social_linkedin: document.getElementById('id_onboard_linkedin') ? document.getElementById('id_onboard_linkedin').value : '',
+      business_name: document.getElementById('id_onboard_business_name') ? document.getElementById('id_onboard_business_name').value : '',
+      business_category: document.getElementById('id_onboard_business_category') ? document.getElementById('id_onboard_business_category').value : '',
+      business_description: document.getElementById('id_onboard_business_description') ? document.getElementById('id_onboard_business_description').value : ''
+    };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    // SessionStorage unavailable or restricted; fail gracefully
+  }
+}
+
+function clearDraft() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch (e) {}
+}
 
 function selectProfileType(type) {
-  selectedType = type;
-  document.getElementById('input_profile_type').value = type;
+  selectedType = (type === 'business') ? 'business' : 'personal';
+  var typeInput = document.getElementById('input_profile_type');
+  if (typeInput) typeInput.value = selectedType;
 
   var cardPersonal = document.getElementById('card-type-personal');
   var cardBusiness = document.getElementById('card-type-business');
   var badgePersonal = document.getElementById('badge-check-personal');
   var badgeBusiness = document.getElementById('badge-check-business');
+  var wrapBiz = document.getElementById('wrap_business_fields');
+  var s3Title = document.getElementById('step-3-title');
+  var s3Sub = document.getElementById('step-3-subtitle');
 
-  if (type === 'business' && cardBusiness) {
-    cardBusiness.classList.add('selected');
-    cardBusiness.setAttribute('aria-checked', 'true');
+  if (selectedType === 'business') {
+    if (cardBusiness) {
+      cardBusiness.classList.add('selected');
+      cardBusiness.setAttribute('aria-checked', 'true');
+    }
     if (cardPersonal) {
       cardPersonal.classList.remove('selected');
       cardPersonal.setAttribute('aria-checked', 'false');
@@ -370,11 +418,8 @@ function selectProfileType(type) {
     if (badgePersonal) badgePersonal.textContent = 'Select Option';
 
     // Show business fields in Step 3
-    var wrapBiz = document.getElementById('wrap_business_fields');
     if (wrapBiz) wrapBiz.style.display = 'block';
-    var s3Title = document.getElementById('step-3-title');
     if (s3Title) s3Title.textContent = 'Enter Business Details';
-    var s3Sub = document.getElementById('step-3-subtitle');
     if (s3Sub) s3Sub.textContent = 'Provide your business information and primary contact channels.';
   } else {
     if (cardPersonal) {
@@ -389,21 +434,27 @@ function selectProfileType(type) {
     if (badgeBusiness) badgeBusiness.textContent = 'Select Option';
 
     // Hide business fields in Step 3
-    document.getElementById('wrap_business_fields').style.display = 'none';
-    document.getElementById('step-3-title').textContent = 'Enter Personal Details';
-    document.getElementById('step-3-subtitle').textContent = 'Add your headline, contact numbers, and social channels.';
+    if (wrapBiz) wrapBiz.style.display = 'none';
+    if (s3Title) s3Title.textContent = 'Enter Personal Details';
+    if (s3Sub) s3Sub.textContent = 'Add your headline, contact numbers, and social channels.';
   }
+
+  saveDraft();
 }
 
 function goToStep(step) {
-  // Hide all panels
+  var s = parseInt(step, 10);
+  if (isNaN(s) || s < 1) s = 1;
+  if (s > 4) s = 4;
+
+  // Hide all panels and update pill states
   for (var i = 1; i <= 4; i++) {
     var panel = document.getElementById('step-panel-' + i);
     var pill = document.getElementById('step-pill-' + i);
     if (panel) panel.style.display = 'none';
     if (pill) {
       pill.classList.remove('active');
-      if (i < step) {
+      if (i < s) {
         pill.classList.add('completed');
       } else {
         pill.classList.remove('completed');
@@ -412,18 +463,19 @@ function goToStep(step) {
   }
 
   // Show active panel
-  var activePanel = document.getElementById('step-panel-' + step);
-  var activePill = document.getElementById('step-pill-' + step);
+  var activePanel = document.getElementById('step-panel-' + s);
+  var activePill = document.getElementById('step-pill-' + s);
   if (activePanel) activePanel.style.display = 'block';
   if (activePill) activePill.classList.add('active');
 
   // Update progress bar
   var progressBar = document.getElementById('onboarding-progress-bar');
   if (progressBar) {
-    progressBar.style.width = (step * 25) + '%';
+    progressBar.style.width = (s * 25) + '%';
   }
 
-  currentStep = step;
+  currentStep = s;
+  saveDraft();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -436,7 +488,7 @@ function validateAndGoToStep4() {
   var isValid = true;
 
   if (fullNameInput && !fullNameInput.value.trim()) {
-    errFullName.style.display = 'block';
+    if (errFullName) errFullName.style.display = 'block';
     fullNameInput.focus();
     isValid = false;
   } else if (errFullName) {
@@ -444,7 +496,7 @@ function validateAndGoToStep4() {
   }
 
   if (selectedType === 'business' && bizNameInput && !bizNameInput.value.trim()) {
-    errBizName.style.display = 'block';
+    if (errBizName) errBizName.style.display = 'block';
     if (isValid) bizNameInput.focus();
     isValid = false;
   } else if (errBizName) {
@@ -459,61 +511,237 @@ function validateAndGoToStep4() {
 }
 
 function updateReviewSummary() {
-  var fullName = document.getElementById('id_onboard_full_name').value.trim() || 'Your Name';
-  var title = document.getElementById('id_onboard_title').value.trim();
-  var bio = document.getElementById('id_onboard_bio').value.trim();
-  var phone = document.getElementById('id_onboard_phone').value.trim();
-  var whatsapp = document.getElementById('id_onboard_whatsapp').value.trim();
-  var email = document.getElementById('id_onboard_email').value.trim();
-  var bizName = document.getElementById('id_onboard_business_name').value.trim();
-  var bizCat = document.getElementById('id_onboard_business_category').value.trim();
+  var fullNameEl = document.getElementById('id_onboard_full_name');
+  var fullName = (fullNameEl && fullNameEl.value.trim()) || 'Your Name';
+  var titleEl = document.getElementById('id_onboard_title');
+  var title = titleEl ? titleEl.value.trim() : '';
+  var bioEl = document.getElementById('id_onboard_bio');
+  var bio = bioEl ? bioEl.value.trim() : '';
+  var phoneEl = document.getElementById('id_onboard_phone');
+  var phone = phoneEl ? phoneEl.value.trim() : '';
+  var whatsappEl = document.getElementById('id_onboard_whatsapp');
+  var whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
+  var emailEl = document.getElementById('id_onboard_email');
+  var email = emailEl ? emailEl.value.trim() : '';
+  var bizNameEl = document.getElementById('id_onboard_business_name');
+  var bizName = bizNameEl ? bizNameEl.value.trim() : '';
+  var bizCatEl = document.getElementById('id_onboard_business_category');
+  var bizCat = bizCatEl ? bizCatEl.value.trim() : '';
 
-  document.getElementById('rev_avatar_initial').textContent = fullName.charAt(0).toUpperCase();
-  document.getElementById('rev_name').textContent = selectedType === 'business' && bizName ? bizName : fullName;
-  
+  var revLogoImg = document.getElementById('rev_logo_img');
+  var revAvatarInitial = document.getElementById('rev_avatar_initial');
+
+  // Business logo vs personal avatar initial logic
   if (selectedType === 'business') {
-    document.getElementById('rev_profile_type_badge').textContent = 'Business Profile';
-    document.getElementById('rev_title').textContent = bizCat || 'Business';
-    if (bizName) {
-      document.getElementById('rev_business').style.display = 'block';
-      document.getElementById('rev_business').textContent = 'Represented by ' + fullName;
+    var logoSource = uploadedLogoDataUrl || existingLogoUrl;
+    if (logoSource) {
+      if (revLogoImg) {
+        revLogoImg.src = logoSource;
+        revLogoImg.style.display = 'block';
+      }
+      if (revAvatarInitial) revAvatarInitial.style.display = 'none';
+    } else {
+      if (revLogoImg) revLogoImg.style.display = 'none';
+      if (revAvatarInitial) {
+        revAvatarInitial.style.display = 'inline-block';
+        revAvatarInitial.textContent = (bizName || fullName).charAt(0).toUpperCase();
+      }
     }
   } else {
-    document.getElementById('rev_profile_type_badge').textContent = 'Personal Identity';
-    document.getElementById('rev_title').textContent = title || 'Professional';
-    document.getElementById('rev_business').style.display = 'none';
+    if (revLogoImg) revLogoImg.style.display = 'none';
+    if (revAvatarInitial) {
+      revAvatarInitial.style.display = 'inline-block';
+      revAvatarInitial.textContent = fullName.charAt(0).toUpperCase();
+    }
   }
 
-  if (bio) {
-    document.getElementById('rev_bio_box').style.display = 'block';
-    document.getElementById('rev_bio_text').textContent = bio;
+  var revName = document.getElementById('rev_name');
+  if (revName) {
+    revName.textContent = (selectedType === 'business' && bizName) ? bizName : fullName;
+  }
+  
+  var revBadge = document.getElementById('rev_profile_type_badge');
+  var revTitle = document.getElementById('rev_title');
+  var revBiz = document.getElementById('rev_business');
+
+  if (selectedType === 'business') {
+    if (revBadge) revBadge.textContent = 'Business Profile';
+    if (revTitle) revTitle.textContent = bizCat || 'Business';
+    if (revBiz) {
+      if (bizName) {
+        revBiz.style.display = 'block';
+        revBiz.textContent = 'Represented by ' + fullName;
+      } else {
+        revBiz.style.display = 'none';
+      }
+    }
   } else {
-    document.getElementById('rev_bio_box').style.display = 'none';
+    if (revBadge) revBadge.textContent = 'Personal Identity';
+    if (revTitle) revTitle.textContent = title || 'Professional';
+    if (revBiz) revBiz.style.display = 'none';
+  }
+
+  var revBioBox = document.getElementById('rev_bio_box');
+  var revBioText = document.getElementById('rev_bio_text');
+  if (bio) {
+    if (revBioBox) revBioBox.style.display = 'block';
+    if (revBioText) revBioText.textContent = bio;
+  } else {
+    if (revBioBox) revBioBox.style.display = 'none';
   }
 
   // Badges
-  document.getElementById('rev_badge_call').style.display = phone ? 'inline-flex' : 'none';
-  document.getElementById('rev_badge_whatsapp').style.display = whatsapp ? 'inline-flex' : 'none';
-  document.getElementById('rev_badge_email').style.display = email ? 'inline-flex' : 'none';
+  var bCall = document.getElementById('rev_badge_call');
+  var bWa = document.getElementById('rev_badge_whatsapp');
+  var bMail = document.getElementById('rev_badge_email');
+  if (bCall) bCall.style.display = phone ? 'inline-flex' : 'none';
+  if (bWa) bWa.style.display = whatsapp ? 'inline-flex' : 'none';
+  if (bMail) bMail.style.display = email ? 'inline-flex' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Sync initial type selection
+  // 1. Safe Draft Restoration from sessionStorage
+  var draft = null;
+  try {
+    var rawDraft = sessionStorage.getItem(STORAGE_KEY);
+    if (rawDraft) {
+      draft = JSON.parse(rawDraft);
+      if (typeof draft !== 'object' || draft === null) {
+        draft = null;
+      }
+    }
+  } catch (e) {
+    draft = null;
+  }
+
+  if (draft) {
+    function restoreVal(id, val) {
+      if (typeof val === 'string' && val.length > 0) {
+        var el = document.getElementById(id);
+        if (el) el.value = val;
+      }
+    }
+    restoreVal('id_onboard_full_name', draft.full_name);
+    restoreVal('id_onboard_title', draft.title);
+    restoreVal('id_onboard_bio', draft.bio);
+    restoreVal('id_onboard_phone', draft.phone);
+    restoreVal('id_onboard_whatsapp', draft.whatsapp);
+    restoreVal('id_onboard_email', draft.email);
+    restoreVal('id_onboard_location', draft.location);
+    restoreVal('id_onboard_website', draft.website_url);
+    restoreVal('id_onboard_instagram', draft.social_instagram);
+    restoreVal('id_onboard_linkedin', draft.social_linkedin);
+    restoreVal('id_onboard_business_name', draft.business_name);
+    restoreVal('id_onboard_business_category', draft.business_category);
+    restoreVal('id_onboard_business_description', draft.business_description);
+
+    if (draft.profile_type === 'business' || draft.profile_type === 'personal') {
+      selectedType = draft.profile_type;
+    }
+  }
+
+  // 2. Initial Type Selection
   selectProfileType(selectedType);
 
-  // Double submit protection
-  var form = document.getElementById('onboarding-form');
-  var submitBtn = document.getElementById('btn-submit-onboard');
-  var submitText = document.getElementById('btn-submit-onboard-text');
+  // 3. Logo file picker listener with live review preview
+  var logoInput = document.getElementById('id_onboard_business_logo');
+  if (logoInput) {
+    logoInput.addEventListener('change', function() {
+      var file = this.files && this.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Please select an image file under 5MB.');
+          this.value = '';
+          uploadedLogoDataUrl = null;
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedLogoDataUrl = e.target.result;
+          if (currentStep === 4) {
+            updateReviewSummary();
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        uploadedLogoDataUrl = null;
+      }
+    });
+  }
 
-  if (form && submitBtn) {
+  // 4. Determine initial step (URL query param -> draft -> default 1)
+  var targetStep = 1;
+  var urlParams = new URLSearchParams(window.location.search);
+  var qStep = parseInt(urlParams.get('step'), 10);
+  if (qStep && qStep >= 1 && qStep <= 4) {
+    targetStep = qStep;
+  } else if (draft && draft.step && draft.step >= 1 && draft.step <= 4) {
+    targetStep = draft.step;
+  }
+
+  // Validate step prerequisites so user cannot get stuck on Step 4 with missing data
+  if (targetStep >= 4) {
+    var fName = document.getElementById('id_onboard_full_name');
+    var bName = document.getElementById('id_onboard_business_name');
+    var hasName = fName && fName.value.trim().length > 0;
+    var hasBiz = (selectedType !== 'business') || (bName && bName.value.trim().length > 0);
+    if (!hasName || !hasBiz) {
+      targetStep = 3;
+    }
+  }
+
+  if (targetStep === 4) {
+    updateReviewSummary();
+  }
+  goToStep(targetStep);
+
+  // 5. Auto-save draft on user inputs
+  var form = document.getElementById('onboarding-form');
+  if (form) {
+    form.addEventListener('input', saveDraft);
+    form.addEventListener('change', saveDraft);
+
+    // Double-submit protection & clean up draft on successful submission
+    var submitBtn = document.getElementById('btn-submit-onboard');
+    var submitText = document.getElementById('btn-submit-onboard-text');
     form.addEventListener('submit', function() {
+      clearDraft();
       setTimeout(function() {
-        submitBtn.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
         if (submitText) submitText.textContent = 'Launching Profile...';
       }, 50);
     });
   }
+
+  // 6. Pill click navigation for completed steps
+  for (var p = 1; p <= 4; p++) {
+    (function(stepNum) {
+      var pill = document.getElementById('step-pill-' + stepNum);
+      if (pill) {
+        pill.style.cursor = 'pointer';
+        pill.addEventListener('click', function() {
+          if (stepNum < currentStep) {
+            goToStep(stepNum);
+          } else if (stepNum === 4 && currentStep === 3) {
+            validateAndGoToStep4();
+          }
+        });
+      }
+    })(p);
+  }
+
+  // 7. Keyboard support for profile type cards
+  ['card-type-personal', 'card-type-business'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectProfileType(id === 'card-type-personal' ? 'personal' : 'business');
+        }
+      });
+    }
+  });
 });
 </script>
 {% endblock %}
