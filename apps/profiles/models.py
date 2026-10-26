@@ -130,8 +130,10 @@ class Profile(models.Model):
     def skills_tag_list(self):
         if not self.skills_tags:
             if self.business_category:
-                return [t.strip() for t in self.business_category.split(',') if t.strip()]
-            return ["Design", "Product", "Tech"]
+                categories = [t.strip() for t in self.business_category.split(',') if t.strip()]
+                if categories:
+                    return categories
+            return []
         return [t.strip() for t in self.skills_tags.split(',') if t.strip()]
 
     @property

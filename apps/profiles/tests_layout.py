@@ -233,3 +233,159 @@ class ProfileAppLayoutTests(TestCase):
             self.assertContains(resp, 'prf-aura-orb')
             self.assertContains(resp, 'prf-particle-dust')
 
+
+class Phase4DCredibilityFixTests(TestCase):
+    """
+    Regression tests for Phase 4D Step 1 credibility fixes:
+    - Fake/synthetic testimonials removed; neutral empty state shown instead.
+    - Misleading default skill tags removed; tag row hidden when list is empty.
+    - business_category used as fallback tags when skills_tags is blank.
+    - User-entered skills_tags still render correctly.
+    """
+
+    def _make_user(self, email):
+        return User.objects.create_user(
+            email=email,
+            password="StrongPassword123!",
+            first_name="Test",
+            last_name="User",
+            is_email_verified=True,
+        )
+
+    # ------------------------------------------------------------------ #
+    # skills_tag_list property                                             #
+    # ------------------------------------------------------------------ #
+
+    def test_skills_tag_list_empty_when_no_skills_and_no_category(self):
+        """With no skills_tags and no business_category, list must be []."""
+        user = self._make_user("nocat@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = ""
+        profile.business_category = ""
+        profile.save()
+        self.assertEqual(profile.skills_tag_list, [])
+
+    def test_skills_tag_list_uses_business_category_when_skills_blank(self):
+        """With no skills_tags but a business_category, list reflects the category."""
+        user = self._make_user("catonly@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = ""
+        profile.business_category = "Fintech, SaaS"
+        profile.save()
+        self.assertEqual(profile.skills_tag_list, ["Fintech", "SaaS"])
+
+    def test_skills_tag_list_prefers_skills_over_category(self):
+        """When skills_tags is set, it takes precedence over business_category."""
+        user = self._make_user("bothset@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = "Design, AI"
+        profile.business_category = "Fintech"
+        profile.save()
+        self.assertEqual(profile.skills_tag_list, ["Design", "AI"])
+
+    def test_skills_tag_list_no_default_placeholders(self):
+        """Ensure the old hard-coded defaults ['Design', 'Product', 'Tech'] are never returned
+        when both skills_tags and business_category are empty."""
+        user = self._make_user("nodefs@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = ""
+        profile.business_category = ""
+        profile.save()
+        tag_list = profile.skills_tag_list
+        self.assertNotIn("Design", tag_list)
+        self.assertNotIn("Product", tag_list)
+        self.assertNotIn("Tech", tag_list)
+
+    # ------------------------------------------------------------------ #
+    # Public profile — tag chip row visibility                             #
+    # ------------------------------------------------------------------ #
+
+    def test_tag_chip_row_absent_when_no_skills_and_no_category(self):
+        """prf-tag-chips-row must not appear when skills_tag_list is empty."""
+        user = self._make_user("norow@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = ""
+        profile.business_category = ""
+        profile.save()
+        url = reverse("profiles:public_profile", kwargs={"slug": profile.slug})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, "prf-tag-chips-row")
+
+    def test_tag_chip_row_present_with_user_entered_skills(self):
+        """prf-tag-chips-row must appear and contain user-entered skill tags."""
+        user = self._make_user("skillrow@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = "Blockchain, UX Research"
+        profile.business_category = ""
+        profile.save()
+        url = reverse("profiles:public_profile", kwargs={"slug": profile.slug})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "prf-tag-chips-row")
+        self.assertContains(resp, "Blockchain")
+        self.assertContains(resp, "UX Research")
+
+    def test_tag_chip_row_present_with_business_category_fallback(self):
+        """prf-tag-chips-row must appear with business_category values when skills_tags is blank."""
+        user = self._make_user("catrow@example.com")
+        profile = Profile.objects.get(user=user)
+        profile.skills_tags = ""
+        profile.business_category = "Consulting, Strategy"
+        profile.save()
+        url = reverse("profiles:public_profile", kwargs={"slug": profile.slug})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "prf-tag-chips-row")
+        self.assertContains(resp, "Consulting")
+        self.assertContains(resp, "Strategy")
+
+    # ------------------------------------------------------------------ #
+    # Public profile — testimonial empty state                             #
+    # ------------------------------------------------------------------ #
+
+    def test_no_fake_testimonials_when_profile_has_no_testimonials(self):
+        """When a profile has no testimonials, synthetic/fake ones must not appear."""
+        user = self._make_user("notest@example.com")
+        profile = Profile.objects.get(user=user)
+        url = reverse("profiles:public_profile", kwargs={"slug": profile.slug})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        # Fake names and phrases from the removed hardcoded cards must not be present
+        self.assertNotContains(resp, "Verified Partner")
+        self.assertNotContains(resp, "Enterprise Partner")
+        self.assertNotContains(resp, "Executive Client")
+        self.assertNotContains(resp, "Founder &amp; CEO")
+        self.assertNotContains(resp, "A true professional. Highly skilled")
+        self.assertNotContains(resp, "Incredible execution and strong communication")
+
+    def test_neutral_empty_state_shown_when_no_testimonials(self):
+        """A neutral empty-state message must appear when there are no testimonials."""
+        user = self._make_user("emptytest@example.com")
+        profile = Profile.objects.get(user=user)
+        url = reverse("profiles:public_profile", kwargs={"slug": profile.slug})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "No client testimonials added yet.")
+
+    def test_real_testimonials_still_render(self):
+        """Genuine user-created testimonials must still be rendered on the public profile."""
+        user = self._make_user("realtest@example.com")
+        profile = Profile.objects.get(user=user)
+        ProfileTestimonial.objects.create(
+            profile=profile,
+            client_name="Jordan Lee",
+            client_title="CTO, Apex Labs",
+            content="Outstanding work, delivered on time and on budget.",
+            rating=5,
+            order=1,
+        )
+        url = reverse("profiles:public_profile", kwargs={"slug": profile.slug})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Jordan Lee")
+        self.assertContains(resp, "CTO, Apex Labs")
+        self.assertContains(resp, "Outstanding work, delivered on time and on budget.")
+        # Neutral empty state must NOT appear when real testimonials exist
+        self.assertNotContains(resp, "No client testimonials added yet.")
+

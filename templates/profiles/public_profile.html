@@ -160,11 +160,13 @@
       {% endif %}
 
       <!-- Skills / Category Pill Tags -->
+      {% if profile.skills_tag_list %}
       <div class="prf-tag-chips-row">
         {% for tag in profile.skills_tag_list %}
           <span class="prf-tag-chip {% if forloop.first %}active{% endif %}">{{ tag }}</span>
         {% endfor %}
       </div>
+      {% endif %}
 
       <!-- 4 Quick Action Hub Buttons Row -->
       <div class="prf-action-hub-row">
@@ -782,28 +784,9 @@
         </div>
       {% endfor %}
     {% else %}
-      <!-- Graceful Verified Reviews Display -->
-      <div class="prf-testimonial-card">
-        <div class="prf-test-author-row">
-          <div class="prf-test-avatar">S</div>
-          <div>
-            <div style="font-weight: 600; color: #FFF; font-size: 0.9rem;">Verified Partner</div>
-            <div style="color: #A1A1AA; font-size: 0.775rem;">Executive Client</div>
-          </div>
-          <div class="prf-test-stars">★★★★★</div>
-        </div>
-        <div class="prf-test-quote">"A true professional. Highly skilled, reliable and an absolute pleasure to collaborate with on complex initiatives."</div>
-      </div>
-      <div class="prf-testimonial-card">
-        <div class="prf-test-author-row">
-          <div class="prf-test-avatar">D</div>
-          <div>
-            <div style="font-weight: 600; color: #FFF; font-size: 0.9rem;">Enterprise Partner</div>
-            <div style="color: #A1A1AA; font-size: 0.775rem;">Founder & CEO</div>
-          </div>
-          <div class="prf-test-stars">★★★★★</div>
-        </div>
-        <div class="prf-test-quote">"Incredible execution and strong communication. Would recommend to any team looking for high-quality work."</div>
+      <div style="text-align: center; padding: 2.5rem 1rem; color: #A1A1AA; font-size: 0.875rem; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.75rem; color: #71717A;" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <div>No client testimonials added yet.</div>
       </div>
     {% endif %}
   </div>
