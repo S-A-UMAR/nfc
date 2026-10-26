@@ -1007,6 +1007,28 @@
   box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15);
 }
 
+/* ── Keyboard Focus Indicators (WCAG 2.1 2.4.7) ──────────────────────────── */
+/*
+ * Elements inside .profile-card (overflow: hidden) use outline-offset: -3px so
+ * the ring paints inward and is never clipped by the parent container.
+ * Elements outside overflow contexts (dock, sheets) use outset offset: 3px.
+ * :focus-visible fires for keyboard navigation only — mouse/touch unaffected.
+ * No animation or transition is applied to the outline itself.
+ */
+.prf-action-hub-btn:focus-visible,
+.prf-tab-btn:focus-visible,
+.prf-link-row-card:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.80);
+  outline-offset: -3px;
+}
+
+.prf-dock-item:focus-visible,
+.prf-sheet-close:focus-visible,
+.prf-sheet-action-row:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.80);
+  outline-offset: 3px;
+}
+
 /* Inline Contact Exchange Callout Card */
 .prf-exchange-callout {
   position: relative;
@@ -1661,7 +1683,7 @@
   gap: 0.25rem;
   background: none;
   border: none;
-  color: #71717A;
+  color: var(--prf-text-secondary); /* #A1A1AA — 7.62:1 on dock bg, replaces #71717A (4.04:1 WCAG fail) */
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.7rem;
   font-weight: 600;
@@ -1715,7 +1737,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-bottom: none;
   border-radius: 24px 24px 0 0;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
   box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.85);
   box-sizing: border-box;
   max-height: 85vh;

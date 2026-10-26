@@ -2230,7 +2230,7 @@
   align-items: center;
   gap: 8px;
 }
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .profile-sticky-save-bar {
     left: 12px;
     right: 12px;
