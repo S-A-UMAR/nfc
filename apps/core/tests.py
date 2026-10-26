@@ -57,7 +57,7 @@ class PlatformCoreTests(TestCase):
     def test_homepage_renders(self):
         response = self.client.get(reverse('core:home'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'YOUR IDENTITY. YOUR BUSINESS. ONE TOUCH.')
+        self.assertContains(response, 'Modern Identity. Seamless Connection.')
 
     def test_pricing_renders_packages(self):
         response = self.client.get(reverse('core:pricing'))
