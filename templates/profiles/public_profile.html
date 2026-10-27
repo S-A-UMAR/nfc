@@ -90,17 +90,16 @@
     <div class="prf-mesh-glow"></div>
   </div>
 
-  <main class="profile-card" id="profile-card-container">
+  <main class="profile-card {% if profile.cover_image %}has-cover{% endif %}" id="profile-card-container">
 
     <!-- Ambient Glow / Cover Header -->
+    <div class="profile-ambient-glow"></div>
 
     {% if profile.cover_image %}
       <div class="profile-cover">
-        <img src="{{ profile.cover_image.url }}" alt="Cover background" class="profile-cover-img" width="480" height="180" fetchpriority="high" decoding="async">
+        <img src="{{ profile.cover_image.url }}" alt="" class="profile-cover-img" width="480" height="180" fetchpriority="high" decoding="async" onerror="this.style.display='none'; var c=this.closest('.profile-cover'); var m=this.closest('.profile-card'); if(c) c.classList.add('cover-failed'); if(m) m.classList.remove('has-cover');">
         <div class="profile-cover-gradient"></div>
       </div>
-    {% else %}
-      <div class="profile-ambient-glow"></div>
     {% endif %}
 
     <!-- Top Header Bar: Brand + Quick Actions -->
@@ -133,9 +132,10 @@
         <div class="prf-avatar-ring">
           <div class="prf-avatar-inner">
             {% if profile.profile_image %}
-              <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="96" height="96" fetchpriority="high" decoding="async">
+              <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="96" height="96" fetchpriority="high" decoding="async" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';">
+              <span class="prf-avatar-fallback" style="display: none;">{{ profile.full_name|make_list|first|upper }}</span>
             {% else %}
-              {{ profile.full_name|make_list|first|upper }}
+              <span class="prf-avatar-fallback">{{ profile.full_name|make_list|first|upper }}</span>
             {% endif %}
           </div>
         </div>

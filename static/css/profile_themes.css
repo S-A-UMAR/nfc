@@ -35,11 +35,16 @@
 [data-layout="minimal_layout"] .prf-cover-wrap,
 [data-layout="minimal_layout"] .prf-ambient-glow { display: none !important; }
 [data-layout="minimal_layout"] .profile-avatar,
-[data-layout="minimal_layout"] .prf-avatar-wrap { 
+[data-layout="minimal_layout"] .prf-avatar-wrap,
+[data-layout="minimal_layout"] .has-cover .prf-avatar-wrap {
   width: 68px !important; 
   height: 68px !important; 
   font-size: 1.25rem; 
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 !important;
+}
+[data-layout="minimal_layout"] .has-cover .prf-app-topbar {
+  position: relative !important;
+  background: transparent !important;
 }
 [data-layout="minimal_layout"] .profile-card,
 [data-layout="minimal_layout"] .prf-card-viewport {
