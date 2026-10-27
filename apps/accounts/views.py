@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash, get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -20,6 +21,8 @@ from .models import OTPCode
 from apps.profiles.models import Profile
 from apps.core.security import check_rate_limit, get_client_ip
 from apps.core.services.email_service import BrevoEmailService
+
+logger = logging.getLogger('uzyra.auth')
 
 User = get_user_model()
 
@@ -114,21 +117,16 @@ def register_view(request):
                     user_agent=request.META.get('HTTP_USER_AGENT', '')
                 )
                 email_res = BrevoEmailService.send_welcome_email(user, verification_otp=plain_code)
-                print(f"\n[UZYRA OTP] Email: {user.email} | Code: {plain_code} | Brevo Result: {email_res}\n", flush=True)
             except Exception as e:
-                import logging
-                logging.getLogger('uzyra.auth').error(f"Failed to dispatch welcome email: {e}")
+                logger.error("Failed to dispatch welcome email: %s", e)
 
             login(request, user)
             request.session['pending_verification_email'] = user.email
-            if email_res.get('success') and email_res.get('mode') == 'live':
+            if email_res.get('success'):
                 messages.success(request, f"Welcome to STRIDE, {user.first_name or 'there'}! A 6-digit verification code has been sent to your email.")
-            elif email_res.get('mode') == 'simulated':
-                messages.info(request, f"Welcome to STRIDE! (Staging note: Brevo API key not set in environment). Your verification code is: {plain_code}")
-            elif plain_code:
-                messages.warning(request, f"Welcome to STRIDE! Brevo email notice: {email_res.get('error', 'Check sender verification')}. Staging code: {plain_code}")
             else:
-                messages.success(request, f"Welcome to STRIDE! Please verify your email.")
+                logger.warning("Welcome verification email could not be delivered to %s", user.email)
+                messages.warning(request, f"Welcome to STRIDE, {user.first_name or 'there'}! We could not deliver your verification code email. Please check your email address or request a new code.")
             return redirect('accounts:verify_otp')
     else:
         form = UserRegisterForm()
@@ -288,16 +286,14 @@ def resend_otp_view(request):
             user_agent=request.META.get('HTTP_USER_AGENT', '')
         )
         email_res = BrevoEmailService.send_email_verification_otp(target_email, plain_code, user.display_name if user else None)
-        print(f"\n[UZYRA OTP RESEND] Email: {target_email} | Code: {plain_code} | Brevo Result: {email_res}\n", flush=True)
         if email_res.get('success'):
-            if email_res.get('mode') == 'simulated':
-                messages.info(request, f"Staging Note: Brevo in simulated mode. Your verification code is: {plain_code}")
-            else:
-                messages.success(request, "A fresh verification code has been dispatched to your email.")
+            messages.success(request, "A fresh verification code has been dispatched to your email.")
         else:
-            messages.warning(request, f"Brevo delivery issue ({email_res.get('error')}). Staging code: {plain_code}")
+            logger.warning("Verification OTP email could not be delivered to %s", target_email)
+            messages.warning(request, "We could not deliver your verification email. Please check your email address or try resending in a moment.")
     except Exception as e:
-        messages.error(request, f"Could not send verification email at this time: {e}")
+        logger.error("Could not send verification email: %s", e)
+        messages.error(request, "We could not send your verification code at this time. Please try again shortly.")
 
     return redirect('accounts:verify_otp')
 

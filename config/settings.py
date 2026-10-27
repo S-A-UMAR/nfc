@@ -1,5 +1,7 @@
 import os
+import sys
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # TiDB / MySQL compatibility layer via pure-Python PyMySQL
 try:
@@ -21,9 +23,22 @@ if env_file.is_file():
                 key, _, value = line.partition('=')
                 os.environ.setdefault(key.strip(), value.strip().strip("'\""))
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-nfc-smart-card-platform-luxury-graphite-2026')
+# Secret Key Configuration:
+# In development (DEBUG=True) or test runs, falls back safely to default development key.
+# In production (DEBUG=False), fails closed if DJANGO_SECRET_KEY is missing or the known dev default.
+_raw_secret_key = os.environ.get('DJANGO_SECRET_KEY')
+_dev_insecure_key = 'django-insecure-nfc-smart-card-platform-luxury-graphite-2026'
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+
+_is_running_tests = 'test' in sys.argv
+
+if _raw_secret_key and _raw_secret_key != _dev_insecure_key:
+    SECRET_KEY = _raw_secret_key
+elif DEBUG or _is_running_tests:
+    SECRET_KEY = _raw_secret_key or _dev_insecure_key
+else:
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production when DEBUG=False.")
 
 # ALLOWED_HOSTS — always read from environment in production
 # In DEBUG mode, fallback to wildcard for convenience
@@ -63,13 +78,19 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 
 # Production SSL toggles (configurable via environment variables)
+# In development (DEBUG=True), defaults safely to False for local HTTP development.
+# In production (DEBUG=False), secure cookies and SSL redirect are controlled via environment.
 SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'False').lower() in ('true', '1')
 SESSION_COOKIE_SECURE = os.environ.get('DJANGO_SESSION_COOKIE_SECURE', 'False').lower() in ('true', '1')
 CSRF_COOKIE_SECURE = os.environ.get('DJANGO_CSRF_COOKIE_SECURE', 'False').lower() in ('true', '1')
+
+# HSTS Configuration:
+# Only active when SECURE_HSTS_SECONDS > 0.
+# Subdomain and preload directives are disabled by default unless explicitly confirmed.
 SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
 if SECURE_HSTS_SECONDS > 0:
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', 'True').lower() in ('true', '1')
-    SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', 'True').lower() in ('true', '1')
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', 'False').lower() in ('true', '1')
+    SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', 'False').lower() in ('true', '1')
 else:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False

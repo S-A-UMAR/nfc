@@ -1,6 +1,7 @@
 import hmac
 import hashlib
 import json
+from unittest.mock import patch
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -291,3 +292,131 @@ class Phase3PaymentAndWebhookTests(TestCase):
         self.assertEqual(self.order_a.order_status, Order.STATUS_CANCELLED)
         self.assertEqual(self.order_a.payment_status, Order.PAYMENT_CANCELLED)
         self.assertEqual(self.payment.status, Payment.STATUS_CANCELLED)
+
+
+class Phase5PaymentSecurityAndReliabilityTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email='shopper@example.com',
+            password='Password123!',
+            first_name='Shopper',
+            last_name='One'
+        )
+        self.package = ProductPackage.objects.create(
+            code='security-card',
+            name='Security NFC Card',
+            package_type='card_only',
+            price_ngn=20000,
+            is_active=True
+        )
+        self.order = Order.objects.create(
+            user=self.user,
+            package=self.package,
+            amount=20000,
+            payment_status=Order.PAYMENT_PENDING,
+            order_status=Order.STATUS_RECEIVED,
+            shipping_name='Shopper One',
+            shipping_phone='08011112222',
+            shipping_address='456 Security Ave, Lagos'
+        )
+        self.payment = Payment.objects.create(
+            order=self.order,
+            reference=f"ULV-{self.order.order_number}-SEC01",
+            amount=20000,
+            provider='paystack',
+            status=Payment.STATUS_PENDING
+        )
+
+    def test_simulation_rejected_in_production_environment(self):
+        """Simulated payment request (?simulated=true) is rejected when not permitted."""
+        self.client.force_login(self.user)
+        url = reverse('payments:verify')
+
+        with self.settings(DEBUG=False, PAYSTACK_TEST_MODE=True, PAYSTACK_ALLOW_SIMULATION_IN_TESTS=False):
+            response = self.client.post(url, {
+                'reference': self.payment.reference,
+                'simulated': 'true'
+            }, follow=True)
+
+            self.payment.refresh_from_db()
+            self.order.refresh_from_db()
+
+            self.assertEqual(self.payment.status, Payment.STATUS_PENDING)
+            self.assertEqual(self.order.payment_status, Order.PAYMENT_PENDING)
+
+            messages = list(response.context['messages'])
+            self.assertTrue(any("simulation is disabled" in m.message.lower() for m in messages))
+
+    def test_simulation_permitted_in_authorized_test_environment(self):
+        """Simulated payment succeeds when explicitly enabled in authorized test environment."""
+        self.client.force_login(self.user)
+        url = reverse('payments:verify')
+
+        with self.settings(PAYSTACK_TEST_MODE=True, PAYSTACK_ALLOW_SIMULATION_IN_TESTS=True):
+            response = self.client.post(url, {
+                'reference': self.payment.reference,
+                'simulated': 'true'
+            }, follow=True)
+
+            self.payment.refresh_from_db()
+            self.order.refresh_from_db()
+
+            self.assertEqual(self.payment.status, Payment.STATUS_SUCCESS)
+            self.assertEqual(self.order.payment_status, Order.PAYMENT_PAID)
+            self.assertEqual(self.order.order_status, Order.STATUS_PAID)
+
+    def test_webhook_missing_secret_fails_safely(self):
+        """Webhook request fails safely (500) if PAYSTACK_SECRET_KEY is empty/unconfigured."""
+        url = reverse('payments:webhook')
+        payload = json.dumps({"event": "charge.success", "data": {"reference": self.payment.reference}})
+
+        with self.settings(PAYSTACK_SECRET_KEY=''):
+            response = self.client.post(
+                url,
+                data=payload,
+                content_type='application/json',
+                HTTP_X_PAYSTACK_SIGNATURE='any_signature'
+            )
+            self.assertEqual(response.status_code, 500)
+
+            self.payment.refresh_from_db()
+            self.order.refresh_from_db()
+            self.assertEqual(self.payment.status, Payment.STATUS_PENDING)
+            self.assertEqual(self.order.payment_status, Order.PAYMENT_PENDING)
+
+    @patch('apps.payments.views.requests.get')
+    def test_payment_verification_network_error_shows_safe_message(self, mock_get):
+        """Network exception during verification displays a safe customer-facing message without leaking details."""
+        import requests
+        mock_get.side_effect = requests.RequestException("Connection timeout to api.paystack.co")
+
+        self.client.force_login(self.user)
+        url = reverse('payments:verify')
+
+        with self.settings(PAYSTACK_SECRET_KEY='sk_live_mock_secret'):
+            response = self.client.get(f"{url}?reference={self.payment.reference}", follow=True)
+
+            messages = list(response.context['messages'])
+            for m in messages:
+                self.assertNotIn("Connection timeout to api.paystack.co", m.message)
+            self.assertTrue(any("unable to reach the payment verification server" in m.message.lower() for m in messages))
+
+    def test_duplicate_verification_cannot_regress_paid_order(self):
+        """A payment/order that is already marked paid cannot be regressed by duplicate verification calls."""
+        self.payment.status = Payment.STATUS_SUCCESS
+        self.payment.save()
+        self.order.payment_status = Order.PAYMENT_PAID
+        self.order.save()
+
+        self.client.force_login(self.user)
+        url = reverse('payments:verify')
+        response = self.client.get(f"{url}?reference={self.payment.reference}", follow=True)
+
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+
+        self.assertEqual(self.payment.status, Payment.STATUS_SUCCESS)
+        self.assertEqual(self.order.payment_status, Order.PAYMENT_PAID)
+        messages = list(response.context['messages'])
+        self.assertTrue(any("already been verified" in m.message.lower() for m in messages))

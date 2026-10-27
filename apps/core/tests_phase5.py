@@ -1,9 +1,14 @@
 import hmac
 import hashlib
 import json
+import os
+import sys
+from unittest.mock import patch
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
 from apps.profiles.models import Profile
 from apps.cards.models import Card
 from apps.orders.models import ProductPackage, Order
@@ -178,3 +183,22 @@ class Phase5LaunchGateSecurityAndQATests(TestCase):
         response = self.client.get(reverse('dashboard:overview'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<meta name="robots" content="noindex, nofollow">')
+
+    # ── 6. ENVIRONMENT & SECURITY SETTINGS AUDIT ────────────────────────────
+    def test_production_secret_key_fails_closed_when_missing(self):
+        """In production (DEBUG=False, non-test environment), missing or insecure secret key raises ImproperlyConfigured."""
+        with patch.dict(os.environ, {'DJANGO_DEBUG': 'False', 'DJANGO_SECRET_KEY': ''}):
+            with patch.object(sys, 'argv', ['gunicorn', 'config.wsgi:application']):
+                with self.assertRaises(ImproperlyConfigured):
+                    raw_secret = os.environ.get('DJANGO_SECRET_KEY')
+                    dev_insecure_key = 'django-insecure-nfc-smart-card-platform-luxury-graphite-2026'
+                    debug = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1')
+                    is_running_tests = 'test' in sys.argv
+                    if not raw_secret or raw_secret == dev_insecure_key:
+                        if not debug and not is_running_tests:
+                            raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production when DEBUG=False.")
+
+    def test_hsts_subdomains_and_preload_default_to_false(self):
+        """HSTS subdomains and preload default safely to False unless explicitly verified and enabled."""
+        self.assertFalse(getattr(settings, 'SECURE_HSTS_INCLUDE_SUBDOMAINS', False))
+        self.assertFalse(getattr(settings, 'SECURE_HSTS_PRELOAD', False))

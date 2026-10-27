@@ -1,10 +1,12 @@
 import json
 import hmac
 import hashlib
+import logging
 import requests
 import uuid
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
+from django.db import transaction
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -14,6 +16,22 @@ from django.utils import timezone
 from .models import Payment
 from apps.orders.models import Order
 from apps.core.services.email_service import BrevoEmailService
+
+logger = logging.getLogger('uzyra.payments')
+
+
+def _is_payment_simulation_permitted() -> bool:
+    """
+    Authorizes simulated payment bypass ONLY in a non-production development or test environment.
+    Strict fail-closed:
+    - In production (DEBUG=False), simulation is NEVER permitted unless running within
+      an authorized automated test environment with PAYSTACK_ALLOW_SIMULATION_IN_TESTS=True.
+    - When permitted, PAYSTACK_TEST_MODE must also evaluate to True.
+    """
+    allow_in_tests = getattr(settings, 'PAYSTACK_ALLOW_SIMULATION_IN_TESTS', False)
+    if not settings.DEBUG and not allow_in_tests:
+        return False
+    return bool(getattr(settings, 'PAYSTACK_TEST_MODE', False))
 
 
 def _process_referral_qualification(order):
@@ -62,12 +80,15 @@ def initialize_payment_view(request, order_number):
     else:
         reference = payment.reference
 
+    simulation_permitted = _is_payment_simulation_permitted()
+
     return render(request, 'payments/checkout_gateway.html', {
         'order': order,
         'payment': payment,
         'reference': reference,
         'paystack_public_key': getattr(settings, 'PAYSTACK_PUBLIC_KEY', 'pk_test_sample_key'),
-        'test_mode': getattr(settings, 'PAYSTACK_TEST_MODE', True),
+        'test_mode': getattr(settings, 'PAYSTACK_TEST_MODE', False),
+        'simulation_permitted': simulation_permitted,
     })
 
 
@@ -77,10 +98,13 @@ def verify_payment_view(request):
     Server-Side Authoritative Paystack Payment Verification (/payments/verify/).
     Validates:
     1. User ownership of the underlying order.
-    2. Replay attack prevention (cannot re-verify already successful payment).
-    3. Authoritative server-to-server query to Paystack API.
-    4. Exact currency ('NGN') and price matching (amount in kobo == order.amount * 100).
-    5. Brevo payment receipt dispatch.
+    2. Replay attack and regression prevention (cannot re-verify or regress already successful payment).
+    3. Fail-closed simulation protection (simulation strictly blocked in production).
+    4. Authoritative server-to-server query to Paystack API.
+    5. Exact currency ('NGN') and price matching (amount in kobo == order.amount * 100).
+    6. Atomic status transition for Payment and Order.
+    7. Safe customer-facing messaging and server diagnostic logging.
+    8. Brevo payment receipt dispatch.
     """
     reference = request.GET.get('reference') or request.GET.get('trxref') or request.POST.get('reference')
     if not reference:
@@ -95,40 +119,53 @@ def verify_payment_view(request):
         messages.error(request, "Access denied. You do not own this order.")
         return redirect('dashboard:orders_list')
 
-    # Replay defense: If already successfully confirmed, do not re-process
-    if payment.status == Payment.STATUS_SUCCESS and order.payment_status == Order.PAYMENT_PAID:
+    # Replay defense / Idempotency: If already confirmed, do not re-process or regress
+    if payment.status == Payment.STATUS_SUCCESS or order.payment_status == Order.PAYMENT_PAID:
         messages.info(request, "This payment has already been verified and processed.")
         return redirect('dashboard:order_detail', order_number=order.order_number)
 
-    # Check if this is test mode simulator action
+    # Check if this is a simulation request
     is_test_sim = request.GET.get('simulated') == 'true' or request.POST.get('simulated') == 'true'
 
-    if is_test_sim and getattr(settings, 'PAYSTACK_TEST_MODE', True):
-        # Successful verified test simulation
-        payment.status = Payment.STATUS_SUCCESS
-        payment.paid_at = timezone.now()
-        payment.gateway_response = "Successful (Simulated Sandbox)"
-        payment.save()
+    if is_test_sim:
+        if not _is_payment_simulation_permitted():
+            logger.warning(
+                "Rejected payment simulation in production/unauthorized environment for order %s (ref %s) by %s",
+                order.order_number, reference, request.user.email
+            )
+            messages.error(request, "Payment simulation is disabled in this environment.")
+            return redirect('dashboard:order_detail', order_number=order.order_number)
 
-        order.payment_status = Order.PAYMENT_PAID
-        order.order_status = Order.STATUS_PAID
-        order.save()
+        # Authorized non-production simulation
+        with transaction.atomic():
+            payment.status = Payment.STATUS_SUCCESS
+            payment.paid_at = timezone.now()
+            payment.gateway_response = "Successful (Simulated Sandbox)"
+            payment.save()
 
-        # Qualify referral if applicable
-        _process_referral_qualification(order)
+            order.payment_status = Order.PAYMENT_PAID
+            order.order_status = Order.STATUS_PAID
+            order.save()
+
+            # Qualify referral if applicable
+            _process_referral_qualification(order)
 
         # Dispatch confirmation email via Brevo
         try:
             BrevoEmailService.send_payment_confirmation_email(payment)
         except Exception as e:
-            import logging
-            logging.getLogger('uzyra.payments').error(f"Failed to dispatch payment confirmation email: {e}")
+            logger.error("Failed to dispatch payment confirmation email for ref %s: %s", reference, e)
 
         messages.success(request, f"Payment of ₦{order.amount:,.0f} verified successfully!")
         return redirect('dashboard:order_submit_info', order_number=order.order_number)
 
     # Live / Authoritative Paystack API Verification
     secret_key = getattr(settings, 'PAYSTACK_SECRET_KEY', '')
+    if not secret_key:
+        logger.error("Paystack verification attempted for ref %s but PAYSTACK_SECRET_KEY is unconfigured.", reference)
+        messages.error(request, "Payment verification service is currently unavailable. Please contact support.")
+        return redirect('dashboard:order_detail', order_number=order.order_number)
+
     url = f"https://api.paystack.co/transaction/verify/{reference}"
     headers = {"Authorization": f"Bearer {secret_key}"}
 
@@ -144,47 +181,58 @@ def verify_payment_view(request):
 
             # Strict Price & Currency Verification
             if actual_amount_kobo != expected_amount_kobo or actual_currency != 'NGN':
-                payment.status = Payment.STATUS_FAILED
-                payment.gateway_response = f"Amount mismatch: Expected {expected_amount_kobo} kobo NGN, got {actual_amount_kobo} kobo {actual_currency}"
-                payment.raw_response = data
-                payment.save()
+                with transaction.atomic():
+                    payment.status = Payment.STATUS_FAILED
+                    payment.gateway_response = f"Amount mismatch: Expected {expected_amount_kobo} kobo NGN, got {actual_amount_kobo} kobo {actual_currency}"
+                    payment.raw_response = data
+                    payment.save()
 
+                logger.warning(
+                    "Paystack amount mismatch for ref %s: expected %s NGN kobo, got %s %s",
+                    reference, expected_amount_kobo, actual_amount_kobo, actual_currency
+                )
                 messages.error(request, "Payment verification failed: Amount or currency mismatch detected.")
                 return redirect('dashboard:order_detail', order_number=order.order_number)
 
-            payment.status = Payment.STATUS_SUCCESS
-            payment.paid_at = timezone.now()
-            payment.channel = paystack_data.get('channel', '')
-            payment.currency = actual_currency
-            payment.gateway_response = paystack_data.get('gateway_response', 'Successful')
-            payment.raw_response = data
-            payment.save()
+            with transaction.atomic():
+                payment.status = Payment.STATUS_SUCCESS
+                payment.paid_at = timezone.now()
+                payment.channel = paystack_data.get('channel', '')
+                payment.currency = actual_currency
+                payment.gateway_response = paystack_data.get('gateway_response', 'Successful')
+                payment.raw_response = data
+                payment.save()
 
-            order.payment_status = Order.PAYMENT_PAID
-            order.order_status = Order.STATUS_PAID
-            order.save()
+                order.payment_status = Order.PAYMENT_PAID
+                order.order_status = Order.STATUS_PAID
+                order.save()
 
-            # Qualify referral if applicable
-            _process_referral_qualification(order)
+                # Qualify referral if applicable
+                _process_referral_qualification(order)
 
             # Dispatch confirmation email via Brevo
             try:
                 BrevoEmailService.send_payment_confirmation_email(payment)
             except Exception as e:
-                import logging
-                logging.getLogger('uzyra.payments').error(f"Failed to dispatch payment email: {e}")
+                logger.error("Failed to dispatch payment email for ref %s: %s", reference, e)
 
             messages.success(request, f"Payment of ₦{order.amount:,.0f} confirmed! Please complete your design requirements.")
             return redirect('dashboard:order_submit_info', order_number=order.order_number)
         else:
-            payment.status = Payment.STATUS_FAILED
-            payment.gateway_response = data.get('message', 'Payment failed')
-            payment.save()
+            with transaction.atomic():
+                payment.status = Payment.STATUS_FAILED
+                payment.gateway_response = data.get('message', 'Payment failed')
+                payment.save()
             messages.error(request, "Payment verification failed or was declined.")
             return redirect('dashboard:order_detail', order_number=order.order_number)
-            
+
+    except requests.RequestException as e:
+        logger.error("Network or timeout error contacting Paystack API for ref %s: %s", reference, e)
+        messages.error(request, "Unable to reach the payment verification server. Please try again or contact support.")
+        return redirect('dashboard:order_detail', order_number=order.order_number)
     except Exception as e:
-        messages.error(request, f"Could not verify transaction: {str(e)}")
+        logger.exception("Unexpected error during Paystack payment verification for ref %s", reference)
+        messages.error(request, "An unexpected error occurred while verifying your payment. Please try again or contact support.")
         return redirect('dashboard:order_detail', order_number=order.order_number)
 
 
@@ -194,9 +242,14 @@ def paystack_webhook_view(request):
     """
     Secure Paystack Webhook Handler.
     Verifies HMAC SHA512 signature against PAYSTACK_SECRET_KEY.
-    Ensures idempotent execution and amount validation.
+    Ensures fail-closed secret validation, idempotent execution, and amount validation.
     """
-    secret = getattr(settings, 'PAYSTACK_SECRET_KEY', '').encode('utf-8')
+    raw_secret = getattr(settings, 'PAYSTACK_SECRET_KEY', '')
+    if not raw_secret:
+        logger.error("Paystack webhook received but PAYSTACK_SECRET_KEY is not configured on the server.")
+        return HttpResponse("Webhook secret unconfigured", status=500)
+
+    secret = raw_secret.encode('utf-8')
     paystack_signature = request.META.get('HTTP_X_PAYSTACK_SIGNATURE')
 
     if not paystack_signature:
@@ -219,10 +272,10 @@ def paystack_webhook_view(request):
         reference = data.get('reference')
         if reference:
             try:
-                payment = Payment.objects.get(reference=reference)
+                payment = Payment.objects.select_related('order').get(reference=reference)
                 
-                # Idempotency check: Ignore duplicate webhook delivery
-                if payment.status == Payment.STATUS_SUCCESS:
+                # Idempotency / regression defense: Ignore duplicate webhook delivery or already paid order
+                if payment.status == Payment.STATUS_SUCCESS or payment.order.payment_status == Order.PAYMENT_PAID:
                     return HttpResponse("Event already processed", status=200)
 
                 expected_kobo = payment.order.amount * 100
@@ -230,36 +283,37 @@ def paystack_webhook_view(request):
                 currency = data.get('currency', '').upper()
 
                 if webhook_kobo == expected_kobo and currency == 'NGN':
-                    payment.status = Payment.STATUS_SUCCESS
-                    payment.paid_at = timezone.now()
-                    payment.currency = currency
-                    payment.channel = data.get('channel', '')
-                    payment.gateway_response = data.get('gateway_response', 'Successful')
-                    payment.raw_response = payload
-                    payment.save()
+                    with transaction.atomic():
+                        payment.status = Payment.STATUS_SUCCESS
+                        payment.paid_at = timezone.now()
+                        payment.currency = currency
+                        payment.channel = data.get('channel', '')
+                        payment.gateway_response = data.get('gateway_response', 'Successful')
+                        payment.raw_response = payload
+                        payment.save()
 
-                    order = payment.order
-                    order.payment_status = Order.PAYMENT_PAID
-                    order.order_status = Order.STATUS_PAID
-                    order.save()
+                        order = payment.order
+                        order.payment_status = Order.PAYMENT_PAID
+                        order.order_status = Order.STATUS_PAID
+                        order.save()
 
-                    # Qualify referral if applicable
-                    _process_referral_qualification(order)
+                        # Qualify referral if applicable
+                        _process_referral_qualification(order)
 
                     # Dispatch Brevo receipt
                     try:
                         BrevoEmailService.send_payment_confirmation_email(payment)
                     except Exception as e:
-                        import logging
-                        logging.getLogger('uzyra.payments').error(f"Webhook payment email failed: {e}")
+                        logger.error("Webhook payment email failed for ref %s: %s", reference, e)
                 else:
-                    payment.status = Payment.STATUS_FAILED
-                    payment.gateway_response = f"Webhook amount mismatch: got {webhook_kobo} {currency}, expected {expected_kobo} NGN"
-                    payment.raw_response = payload
-                    payment.save()
+                    with transaction.atomic():
+                        payment.status = Payment.STATUS_FAILED
+                        payment.gateway_response = f"Webhook amount mismatch: got {webhook_kobo} {currency}, expected {expected_kobo} NGN"
+                        payment.raw_response = payload
+                        payment.save()
 
             except Payment.DoesNotExist:
-                pass
+                logger.warning("Webhook received for unknown reference: %s", reference)
 
     return HttpResponse(status=200)
 

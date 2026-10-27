@@ -3,6 +3,7 @@ import json
 import hmac
 import hashlib
 from datetime import timedelta
+from unittest.mock import patch
 from PIL import Image
 
 from django.test import TestCase, Client
@@ -610,3 +611,101 @@ class PaymentSecurityTests(TestCase):
         # Payment must NOT be marked success, order must NOT be marked paid
         self.assertNotEqual(self.payment.status, Payment.STATUS_SUCCESS)
         self.assertNotEqual(self.order.payment_status, Order.PAYMENT_PAID)
+
+
+class OTPNonDisclosureAndPrivacyTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.client = Client()
+
+    def test_registration_does_not_disclose_otp_in_messages_or_stdout(self):
+        """User registration dispatches OTP via email but never leaks the code in flash messages or stdout."""
+        import io
+        import re
+        from contextlib import redirect_stdout
+
+        f = io.StringIO()
+        with redirect_stdout(f):
+            response = self.client.post(reverse('accounts:register'), {
+                'first_name': 'Privacy',
+                'last_name': 'Champion',
+                'email': 'privacy.user@example.com',
+                'password': 'StrongPassword123!',
+                'password_confirm': 'StrongPassword123!',
+                'agree_terms': True,
+            }, follow=True)
+
+        stdout_content = f.getvalue()
+        # Ensure debug print statements like "[UZYRA OTP]" are completely absent
+        self.assertNotIn("[UZYRA OTP]", stdout_content)
+        self.assertNotIn("[UZYRA OTP RESEND]", stdout_content)
+
+        # Check OTP record created
+        otp_record = OTPCode.objects.filter(email='privacy.user@example.com').first()
+        self.assertIsNotNone(otp_record)
+
+        # Flash messages must not contain any 6-digit numeric pattern or staging codes
+        messages = list(response.context['messages'])
+        self.assertTrue(len(messages) > 0)
+        for m in messages:
+            self.assertIsNone(
+                re.search(r'\b\d{6}\b', m.message),
+                f"Flash message disclosed an OTP code: {m.message}"
+            )
+            self.assertNotIn("Staging note", m.message)
+            self.assertNotIn("Staging code", m.message)
+
+    def test_resend_otp_does_not_disclose_otp_in_messages_or_stdout(self):
+        """Resending verification code dispatches OTP without disclosing it in flash messages or stdout."""
+        import io
+        import re
+        from contextlib import redirect_stdout
+
+        user = User.objects.create_user(
+            email='resend.user@example.com',
+            password='StrongPassword123!',
+            first_name='Resend',
+            last_name='User'
+        )
+        self.client.force_login(user)
+
+        session = self.client.session
+        session['pending_verification_email'] = user.email
+        session.save()
+
+        f = io.StringIO()
+        with redirect_stdout(f):
+            response = self.client.post(reverse('accounts:resend_otp'), follow=True)
+
+        stdout_content = f.getvalue()
+        self.assertNotIn("[UZYRA OTP]", stdout_content)
+        self.assertNotIn("[UZYRA OTP RESEND]", stdout_content)
+
+        messages = list(response.context['messages'])
+        self.assertTrue(len(messages) > 0)
+        for m in messages:
+            self.assertIsNone(
+                re.search(r'\b\d{6}\b', m.message),
+                f"Flash message disclosed an OTP code: {m.message}"
+            )
+            self.assertNotIn("Staging note", m.message)
+            self.assertNotIn("Staging code", m.message)
+
+    @patch('apps.accounts.views.BrevoEmailService.send_welcome_email')
+    def test_registration_delivery_failure_shows_safe_message(self, mock_send):
+        """When Brevo email delivery fails, user receives a safe warning and is not misled."""
+        mock_send.return_value = {"success": False, "mode": "live", "error": "API 500: Delivery failure"}
+
+        response = self.client.post(reverse('accounts:register'), {
+            'first_name': 'Failing',
+            'last_name': 'Email',
+            'email': 'failing.email@example.com',
+            'password': 'StrongPassword123!',
+            'password_confirm': 'StrongPassword123!',
+            'agree_terms': True,
+        }, follow=True)
+
+        messages = list(response.context['messages'])
+        self.assertFalse(any("has been sent to your email" in m.message.lower() for m in messages))
+        self.assertTrue(any("could not deliver" in m.message.lower() for m in messages))
+        self.assertFalse(any("API 500" in m.message for m in messages))

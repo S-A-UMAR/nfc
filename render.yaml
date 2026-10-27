@@ -1,13 +1,13 @@
-# render.yaml — UZYRA Platform Render deployment configuration
+# render.yaml — STRIDE Platform Render deployment configuration
 # Persistent TiDB Serverless Database + Cloudinary Persistent Media Storage
 
 services:
   - type: web
     name: uzyra
     runtime: python
-    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     preDeployCommand: python manage.py migrate --noinput
-    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings
@@ -21,10 +21,18 @@ services:
         sync: false   # e.g. https://uzyra.onrender.com
       - key: SITE_URL
         sync: false   # e.g. https://uzyra.onrender.com
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "True"
       - key: DJANGO_SESSION_COOKIE_SECURE
         value: "True"
       - key: DJANGO_CSRF_COOKIE_SECURE
         value: "True"
+      - key: DJANGO_SECURE_HSTS_SECONDS
+        value: "2592000"
+      - key: DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS
+        value: "False"
+      - key: DJANGO_SECURE_HSTS_PRELOAD
+        value: "False"
       - key: TIDB_HOST
         sync: false
       - key: TIDB_PORT
@@ -46,13 +54,13 @@ services:
       - key: BREVO_SENDER_EMAIL
         sync: false
       - key: BREVO_SENDER_NAME
-        value: UZYRA
+        value: STRIDE
       - key: PAYSTACK_PUBLIC_KEY
-        sync: false   # Use TEST key: pk_test_...
+        sync: false   # Use pk_live_... or pk_test_...
       - key: PAYSTACK_SECRET_KEY
-        sync: false   # Use TEST key: sk_test_...
+        sync: false   # Use sk_live_... or sk_test_...
       - key: PAYSTACK_TEST_MODE
-        value: "True"
+        value: "False"
       - key: BRAND_NAME
-        value: UZYRA
+        value: STRIDE
 
