@@ -348,7 +348,7 @@
   </div>
 
   <!-- ── Floating Bottom Save Bar (Responsive Glass) ───────────────────── -->
-  <div class="appearance-save-bar glass">
+  <div class="appearance-save-bar">
     <div class="appearance-save-summary">
       <div class="d-flex items-center gap-2">
         <span class="appearance-save-dot" id="save-status-dot"></span>
@@ -639,7 +639,7 @@
   bottom: 1.5rem;
   /* Centre within the content column (viewport minus 260px desktop sidebar) */
   left: calc(260px + (100% - 260px) / 2);
-  transform: translateX(-50%);
+  transform: translateX(-50%) !important;
   width: min(900px, calc(100% - 260px - 3rem));
   border-radius: 9999px;
   padding: 0.85rem 1.5rem;
@@ -654,6 +654,12 @@
   backdrop-filter: blur(24px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+.appearance-save-bar:hover {
+  transform: translateX(-50%) !important;
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 .appearance-save-summary { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; font-size: 0.8125rem; color: var(--text-muted); }
 .appearance-save-summary strong { color: var(--text-primary); }
@@ -681,6 +687,9 @@
     transform: none !important;
     padding: 0.75rem 1.15rem !important;
     border-radius: 14px !important;
+  }
+  .appearance-save-bar:hover {
+    transform: none !important;
   }
 }
 @media (max-width: 540px) {

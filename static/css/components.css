@@ -869,10 +869,21 @@
   flex-shrink: 0;
 }
 
+.navbar .brand-logo {
+  height: 100%;
+  margin-left: calc(-1 * var(--space-5));
+  padding-left: var(--space-5);
+  padding-right: var(--space-2);
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+
+.brand-logo img,
 .brand-logo svg {
+  pointer-events: none;
   transition: transform var(--transition-fast);
 }
 
+.brand-logo:hover img,
 .brand-logo:hover svg {
   transform: scale(1.05);
 }
@@ -1547,6 +1558,10 @@
     height: 48px;
     padding: 0 var(--space-2) 0 var(--space-4);
   }
+  .navbar .brand-logo {
+    margin-left: calc(-1 * var(--space-4));
+    padding-left: var(--space-4);
+  }
   .drawer-links .nav-link {
     min-height: 44px;
     display: flex;
@@ -1570,6 +1585,10 @@
   .navbar {
     height: 46px;
     padding: 0 6px 0 12px;
+  }
+  .navbar .brand-logo {
+    margin-left: -12px;
+    padding-left: 12px;
   }
   .nav-btn-pill {
     padding: 0.32rem 0.65rem;
