@@ -630,7 +630,7 @@
    -------------------------------------------------------------------------- */
 .profile-footer {
   text-align: center;
-  padding: 2rem 1.25rem 1rem;
+  padding: 2rem 1.25rem calc(5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .profile-powered-link {
@@ -1279,15 +1279,15 @@
   box-shadow: var(--prf-theme-tab-glow, 0 0 10px rgba(255, 255, 255, 0.5));
 }
 
-/* Tab Panels */
+/* Continuous Profile Flow (formerly separate tabs) */
 .prf-tab-panel {
-  display: none;
-  padding: 1.25rem;
-  animation: prfFadeIn 0.25s ease-out;
+  display: block !important;
+  padding: 1.15rem 1.25rem 0.5rem;
+  position: relative;
 }
 
-.prf-tab-panel.active {
-  display: block;
+.prf-tab-panel:not(:first-of-type) {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 @keyframes prfFadeIn {
@@ -1578,6 +1578,39 @@
 /* ==========================================================================
    TAB 3: GALLERY (MY WORK)
    ========================================================================== */
+/* Gallery Carousel (Horizontal Swipe) */
+.prf-gallery-carousel {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.35rem 0 0.85rem;
+  margin: 0 -0.25rem 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.prf-gallery-carousel::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prf-gallery-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prf-gallery-carousel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+.prf-gallery-carousel-item {
+  flex: 0 0 160px;
+  width: 160px;
+  height: 160px;
+  scroll-snap-align: start;
+}
+
 .prf-gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1621,6 +1654,43 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   TESTIMONIALS CAROUSEL (Horizontal Swipe)
+   ========================================================================== */
+.prf-testimonials-carousel {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0 0.85rem;
+  margin: 0 -0.25rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.prf-testimonials-carousel::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prf-testimonials-carousel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+.prf-testimonial-snap-card {
+  flex: 0 0 260px;
+  width: 260px;
+  scroll-snap-align: start;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* ==========================================================================
@@ -1709,7 +1779,7 @@
 }
 
 /* ==========================================================================
-   MOBILE BOTTOM APP DOCK BAR
+   MOBILE BOTTOM FLOATING ACTION DOCK
    ========================================================================== */
 .prf-app-dock {
   position: fixed;
@@ -1725,18 +1795,20 @@
   border-top: 1px solid rgba(255, 255, 255, 0.10);
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .prf-dock-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.2rem;
   background: none;
   border: none;
-  color: var(--prf-text-secondary); /* #A1A1AA — 7.62:1 on dock bg, replaces #71717A (4.04:1 WCAG fail) */
+  color: var(--prf-text-secondary, #A1A1AA);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.7rem;
   font-weight: 600;
@@ -1744,6 +1816,7 @@
   padding: 0.35rem 0.65rem;
   border-radius: 10px;
   transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .prf-dock-item:hover {
@@ -1756,6 +1829,60 @@
 
 .prf-dock-item.active svg {
   stroke: var(--prf-theme-dock-active-color, #FFFFFF);
+}
+
+/* Floating Action Dock Specialized Buttons */
+.prf-dock-action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #E4E4E7;
+  font-size: 0.725rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 12px;
+  min-width: 60px;
+}
+
+.prf-dock-action-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: #FFFFFF;
+}
+
+.prf-dock-fab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.15rem;
+  background: var(--prf-theme-cta-bg, linear-gradient(180deg, #FFFFFF 0%, #E8ECF2 42%, #C2C8D2 100%));
+  color: var(--prf-theme-cta-color, #09090B);
+  border: var(--prf-theme-cta-border, none);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--prf-theme-cta-glow, 0 4px 18px rgba(255, 255, 255, 0.25));
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.prf-dock-fab:hover {
+  background: var(--prf-theme-cta-hover-bg, linear-gradient(180deg, #FFFFFF 0%, #F4F6F8 50%, #D4D9E2 100%));
+  transform: translateY(-1px);
+  box-shadow: var(--prf-theme-cta-hover-glow, 0 6px 22px rgba(255, 255, 255, 0.35));
+}
+
+.prf-dock-fab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prf-dock-fab-text {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /* ==========================================================================

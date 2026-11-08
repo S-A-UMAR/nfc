@@ -351,19 +351,27 @@
   <!-- ── Single Clear Save Mechanism: Docked Floating Glass Save Bar ──────── -->
   <aside class="appearance-save-bar" id="save-dock" aria-label="Appearance actions">
     <div class="appearance-save-summary">
-      <div class="d-flex items-center gap-2">
+      <div class="appearance-save-status">
         <span class="appearance-save-dot" id="save-status-dot" aria-hidden="true"></span>
-        <span id="save-status-text">Saved &amp; Live</span>
+        <span class="appearance-save-status-text" id="save-status-text">Saved &amp; Live</span>
       </div>
-      <span class="appearance-save-sep">&middot;</span>
-      <span>Theme: <strong id="summary-theme-name">{{ profile.get_theme_display }}</strong></span>
-      <span class="appearance-save-sep">&middot;</span>
-      <span>Layout: <strong id="summary-layout-name">{{ profile.get_profile_layout_display }}</strong></span>
+      <div class="appearance-save-details">
+        <span class="appearance-save-sep">&middot;</span>
+        <span>Theme: <strong id="summary-theme-name">{{ profile.get_theme_display }}</strong></span>
+        <span class="appearance-save-sep">&middot;</span>
+        <span>Layout: <strong id="summary-layout-name">{{ profile.get_profile_layout_display }}</strong></span>
+      </div>
     </div>
 
     <div class="appearance-save-action-group">
+      {% if profile.slug %}
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm appearance-live-btn" title="View live card">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>Live Card</span>
+        </a>
+      {% endif %}
       <button type="submit" form="appearance-form" class="btn btn-primary appearance-submit-btn" id="btn-save-appearance">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         <span>Save Appearance</span>
       </button>
     </div>
@@ -791,22 +799,29 @@
 /* ── Floating Save Dock ── */
 .appearance-save-bar {
   position: fixed;
-  bottom: 1.5rem;
+  bottom: 24px;
   left: calc(260px + (100% - 260px) / 2);
   transform: translateX(-50%) !important;
   width: min(920px, calc(100% - 260px - 3rem));
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
   border-radius: 9999px;
-  padding: 0.85rem 1.6rem;
+  padding: 6px 10px 6px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: 12px;
   z-index: 990;
   background: rgba(14, 15, 22, 0.94);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
   backdrop-filter: blur(24px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  overflow: hidden;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -819,12 +834,38 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   font-size: 0.8125rem;
   color: var(--text-muted, #71717A);
+  min-width: 0;
+  overflow: hidden;
 }
 
-.appearance-save-summary strong {
+.appearance-save-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.appearance-save-status-text {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #E2E8F0);
+  white-space: nowrap;
+}
+
+.appearance-save-details {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appearance-save-details strong {
   color: var(--text-primary, #FFFFFF);
 }
 
@@ -838,12 +879,62 @@
   border-radius: 50%;
   background: #10B981;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
 .appearance-save-dot.dirty {
   background: #F59E0B;
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
+}
+
+.appearance-save-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.appearance-live-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  height: 36px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.appearance-live-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.appearance-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #000000;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.appearance-submit-btn:hover {
+  background: #F1F5F9;
+  transform: translateY(-1px);
 }
 
 .spin-icon {
@@ -867,10 +958,14 @@
     max-width: 440px !important;
     margin: 0 auto !important;
     width: auto !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
     transform: none !important;
-    padding: 8px 14px !important;
+    padding: 6px 10px 6px 14px !important;
     border-radius: 9999px !important;
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+    overflow: hidden !important;
   }
 }
 
@@ -878,12 +973,20 @@
   .themes-grid { grid-template-columns: repeat(2, 1fr); }
   .layout-grid { grid-template-columns: repeat(2, 1fr); }
   .appearance-section { padding: 1.25rem 1rem; }
-  .appearance-save-summary { font-size: 0.72rem; }
+  .appearance-save-details {
+    display: none !important;
+  }
+  .appearance-save-status-text {
+    font-size: 0.78rem !important;
+  }
 }
 
 @media (max-width: 380px) {
   .themes-grid { grid-template-columns: 1fr; }
   .layout-grid { grid-template-columns: 1fr; }
+  .appearance-live-btn {
+    display: none !important;
+  }
 }
 </style>
 
@@ -969,7 +1072,7 @@
     if (isDirty) {
       if (saveDock) saveDock.classList.add('dirty');
       if (saveStatusDot) saveStatusDot.classList.add('dirty');
-      if (saveStatusText) saveStatusText.textContent = 'Unsaved visual changes';
+      if (saveStatusText) saveStatusText.textContent = window.innerWidth <= 600 ? 'Unsaved Changes' : 'Unsaved visual changes';
     } else {
       if (saveDock) saveDock.classList.remove('dirty');
       if (saveStatusDot) saveStatusDot.classList.remove('dirty');

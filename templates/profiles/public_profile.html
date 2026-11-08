@@ -554,15 +554,7 @@
       {% endif %}
     </section>
 
-    <!-- Horizontal Segmented App Tab Bar -->
-    <div class="prf-tab-bar-container">
-      <nav class="prf-tab-bar" aria-label="Profile Sections">
-        <button type="button" class="prf-tab-btn active" data-tab="tab-about">About</button>
-        <button type="button" class="prf-tab-btn" data-tab="tab-links">Links</button>
-        <button type="button" class="prf-tab-btn" data-tab="tab-gallery">Gallery</button>
-        <button type="button" class="prf-tab-btn" data-tab="tab-more">More</button>
-      </nav>
-    </div>
+    <!-- Continuous flowing sections (clean, compact mobile experience without tab barriers) -->
 
     <!-- ======================================================================
          TAB PANEL 1: ABOUT ME & WHAT I DO
@@ -739,21 +731,21 @@
     </div>
 
     <!-- ======================================================================
-         TAB PANEL 3: GALLERY (MY WORK)
+         SECTION: GALLERY / PORTFOLIO
          ====================================================================== -->
     <div class="prf-tab-panel" id="tab-gallery">
       <div class="prf-section-heading">
-        <span>My Work</span>
-        <span style="font-size: 0.8rem; color: #A1A1AA; font-weight: normal;">{{ gallery_items.count }} items</span>
+        <span>Portfolio & Work</span>
+        {% if gallery_items %}<span style="font-size: 0.8rem; color: #A1A1AA; font-weight: normal;">{{ gallery_items.count }} items</span>{% endif %}
       </div>
 
       {% if gallery_items %}
-        <div class="prf-gallery-grid">
+        <div class="prf-gallery-carousel" tabindex="0" role="region" aria-label="Portfolio Showcase">
           {% for item in gallery_items %}
             {% if item.link_url %}
-              <a href="{{ item.link_url }}" target="_blank" rel="noopener noreferrer" class="prf-gallery-card">
+              <a href="{{ item.link_url }}" target="_blank" rel="noopener noreferrer" class="prf-gallery-carousel-item prf-gallery-card">
             {% else %}
-              <div class="prf-gallery-card">
+              <div class="prf-gallery-carousel-item prf-gallery-card">
             {% endif %}
               {% if item.image %}
                 <img src="{{ item.image.url }}" alt="{{ item.title|default:'Work Item' }}" loading="lazy">
@@ -769,21 +761,53 @@
           {% endfor %}
         </div>
       {% else %}
-        <div style="text-align: center; padding: 3rem 1rem; color: #A1A1AA; font-size: 0.875rem; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.75rem; color: #71717A;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div style="text-align: center; padding: 2rem 1rem; color: #A1A1AA; font-size: 0.875rem; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; color: #71717A;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           <div>No gallery portfolio items added yet.</div>
         </div>
       {% endif %}
     </div>
 
     <!-- ======================================================================
-         TAB PANEL 4: MORE MENU
+         SECTION: REVIEWS & MORE
          ====================================================================== -->
     <div class="prf-tab-panel" id="tab-more">
+      {% if testimonials %}
+        <div class="prf-section-heading">
+          <span>Client Reviews</span>
+          <span style="font-size: 0.8rem; color: #A1A1AA; font-weight: normal;">{{ testimonials.count }} reviews</span>
+        </div>
+        <div class="prf-testimonials-carousel" tabindex="0" role="region" aria-label="Client Reviews">
+          {% for test in testimonials %}
+            <div class="prf-testimonial-snap-card">
+              <div class="prf-test-author-row">
+                <div class="prf-test-avatar">
+                  {% if test.client_avatar %}
+                    <img src="{{ test.client_avatar.url }}" alt="{{ test.client_name }}">
+                  {% else %}
+                    {{ test.client_name|make_list|first|upper }}
+                  {% endif %}
+                </div>
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-weight: 600; color: #FFF; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ test.client_name }}</div>
+                  {% if test.client_title %}
+                    <div style="color: #A1A1AA; font-size: 0.725rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ test.client_title }}</div>
+                  {% endif %}
+                </div>
+                <div class="prf-test-stars" style="color: #F59E0B; font-size: 0.75rem; letter-spacing: 1px;">
+                  ★★★★★
+                </div>
+              </div>
+              <div class="prf-test-quote">
+                "{{ test.content }}"
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       <div class="prf-more-menu-list">
-        <!-- Business Details menu item — shelved for v2 -->
-
-
+        {% if not testimonials %}
         <button type="button" class="prf-more-menu-item" id="btn-open-sheet-testimonials">
           <div class="prf-more-item-left">
             <div class="prf-more-icon-box">
@@ -796,6 +820,7 @@
           </div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+        {% endif %}
 
         <button type="button" class="prf-more-menu-item" id="btn-open-sheet-social-proof">
           <div class="prf-more-item-left">
@@ -837,7 +862,7 @@
         </button>
       </div>
 
-      <!-- Dock Save Contact Button -->
+      <!-- Bottom Save Contact fallback -->
       <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-btn-dock-save"
          data-track-event="vcard_download" data-profile-slug="{{ profile.slug }}" data-track-label="Save Contact">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -855,24 +880,40 @@
 
   </main>
 
-  <!-- Mobile Bottom App Dock Navigation — fixed outside card so overflow:hidden doesn't clip it -->
-  <nav class="prf-app-dock" aria-label="Bottom Navigation">
-    <button type="button" class="prf-dock-item active" data-dock-tab="tab-about">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>About</span>
-    </button>
-    <button type="button" class="prf-dock-item" data-dock-tab="tab-links">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+  <!-- Mobile Bottom Floating Action Dock -->
+  <nav class="prf-app-dock prf-action-dock" aria-label="Profile Action Dock">
+    <button type="button" class="prf-dock-item prf-dock-action-btn" id="dock-btn-links" data-scroll-to="tab-links" aria-label="Jump to Links & Socials">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       <span>Links</span>
     </button>
-    <button type="button" class="prf-dock-item" data-dock-tab="tab-gallery">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <span>Gallery</span>
-    </button>
-    <button type="button" class="prf-dock-item" data-dock-tab="tab-more">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-      <span>More</span>
-    </button>
+
+    <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-dock-fab" id="dock-btn-save"
+       data-track-event="vcard_download" data-profile-slug="{{ profile.slug }}" data-track-label="Save Contact"
+       aria-label="Save Contact">
+      <div class="prf-dock-fab-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+      </div>
+      <span class="prf-dock-fab-text">Save Contact</span>
+    </a>
+
+    {% if profile.whatsapp %}
+      <a href="https://wa.me/{{ profile.clean_whatsapp }}" target="_blank" rel="noopener noreferrer"
+         class="prf-dock-item prf-dock-action-btn" id="dock-btn-inquire"
+         data-track-event="whatsapp_click" data-profile-slug="{{ profile.slug }}" aria-label="Message on WhatsApp">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="#25D366"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.78 14.07c-.24.68-1.4 1.26-1.92 1.34-.51.08-1.18.11-1.91-.12-.44-.14-1.01-.33-1.74-.65-3.09-1.34-5.11-4.47-5.26-4.68-.16-.21-1.26-1.68-1.26-3.2 0-1.53.8-2.28 1.09-2.59.29-.31.63-.39.84-.39.21 0 .42.002.6.012.2.01.46-.07.72.55.27.64.91 2.22.99 2.38.08.16.13.35.03.56-.11.21-.16.35-.32.53-.16.19-.34.42-.48.56-.16.16-.33.33-.14.66.19.33.84 1.39 1.8 2.25 1.24 1.1 2.29 1.44 2.62 1.6.33.16.53.14.72-.08.2-.22.84-.98 1.07-1.32.22-.34.45-.29.75-.17.31.11 1.96.93 2.3 1.1.34.17.56.25.64.39.09.14.09.82-.15 1.5z"/></svg>
+        <span>Inquire</span>
+      </a>
+    {% else %}
+      <button type="button" class="prf-dock-item prf-dock-action-btn" id="dock-btn-inquire"
+              onclick="openSheet('sheet-contact')" aria-label="Contact Options">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Inquire</span>
+      </button>
+    {% endif %}
   </nav>
 
 </div>
@@ -1208,38 +1249,24 @@
       }, 2500);
     }
 
-    // 2. Tab Navigation Synchronization (Top Tabs + Bottom Dock)
-    const topTabBtns = document.querySelectorAll('.prf-tab-btn');
-    const dockTabBtns = document.querySelectorAll('.prf-dock-item');
-    const tabPanels = document.querySelectorAll('.prf-tab-panel');
-
-    function switchTab(targetId) {
-      // Deactivate all
-      topTabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === targetId));
-      dockTabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-dock-tab') === targetId));
-      tabPanels.forEach(p => p.classList.toggle('active', p.id === targetId));
-
-      // Scroll smoothly to tab bar on mobile if viewing lower down
-      const tabBar = document.querySelector('.prf-tab-bar-container');
-      if (tabBar) {
-        const rect = tabBar.getBoundingClientRect();
-        if (rect.top < 0) {
-          tabBar.scrollIntoView({ behavior: 'smooth' });
-        }
+    // 2. Navigation Smooth Scrolling (Action Dock & Jump Links)
+    function scrollToSection(targetId) {
+      const targetElem = document.getElementById(targetId);
+      if (targetElem) {
+        targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
-    topTabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetId = btn.getAttribute('data-tab');
-        switchTab(targetId);
-      });
-    });
+    // Retain switchTab for backward compatibility / tests if invoked
+    function switchTab(targetId) {
+      scrollToSection(targetId);
+    }
 
-    dockTabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetId = btn.getAttribute('data-dock-tab');
-        switchTab(targetId);
+    document.querySelectorAll('[data-scroll-to]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = btn.getAttribute('data-scroll-to');
+        scrollToSection(targetId);
       });
     });
 
