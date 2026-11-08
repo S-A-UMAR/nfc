@@ -1789,17 +1789,19 @@
   z-index: 200;
   max-width: 460px;
   margin: 0 auto;
-  background: rgba(12, 12, 16, 0.96);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(10, 10, 14, 0.97);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
 }
 
+/* Side ghost buttons */
 .prf-dock-item {
   display: flex;
   flex-direction: column;
@@ -1831,58 +1833,106 @@
   stroke: var(--prf-theme-dock-active-color, #FFFFFF);
 }
 
-/* Floating Action Dock Specialized Buttons */
+/* Floating Action Dock — Side Ghost Buttons */
 .prf-dock-action-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #E4E4E7;
-  font-size: 0.725rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 12px;
-  min-width: 60px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.22rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #D4D4D8;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0.9rem 0.45rem;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  min-width: 64px;
+  line-height: 1;
+  /* align to bottom of dock like a shelf */
+  align-self: flex-end;
 }
 
 .prf-dock-action-btn:hover {
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.11);
   color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
+/* ---- CENTER FAB — Pops above the dock bar ---- */
 .prf-dock-fab {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.65rem 1.15rem;
-  background: var(--prf-theme-cta-bg, linear-gradient(180deg, #FFFFFF 0%, #E8ECF2 42%, #C2C8D2 100%));
+  gap: 0.5rem;
+  /* Rise above dock top edge */
+  margin-top: -20px;
+  align-self: flex-end;
+  padding: 0.78rem 1.35rem;
+  background: var(--prf-theme-cta-bg, linear-gradient(160deg, #FFFFFF 0%, #E8ECF2 55%, #BEC6D2 100%));
   color: var(--prf-theme-cta-color, #09090B);
-  border: var(--prf-theme-cta-border, none);
+  border: var(--prf-theme-cta-border, 2px solid rgba(255, 255, 255, 0.35));
   border-radius: 999px;
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: 800;
+  font-size: 0.875rem;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: var(--prf-theme-cta-glow, 0 4px 18px rgba(255, 255, 255, 0.25));
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:
+    var(--prf-theme-cta-glow, 0 0 0 4px rgba(255, 255, 255, 0.10)),
+    0 8px 28px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  letter-spacing: -0.01em;
+  position: relative;
+}
+
+/* Animated pulse ring */
+.prf-dock-fab::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.20);
+  animation: prfFabPulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes prfFabPulse {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%       { opacity: 0;    transform: scale(1.09); }
 }
 
 .prf-dock-fab:hover {
-  background: var(--prf-theme-cta-hover-bg, linear-gradient(180deg, #FFFFFF 0%, #F4F6F8 50%, #D4D9E2 100%));
-  transform: translateY(-1px);
-  box-shadow: var(--prf-theme-cta-hover-glow, 0 6px 22px rgba(255, 255, 255, 0.35));
+  background: var(--prf-theme-cta-hover-bg, linear-gradient(160deg, #FFFFFF 0%, #F4F6F8 55%, #D0D7E2 100%));
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    var(--prf-theme-cta-hover-glow, 0 0 0 5px rgba(255, 255, 255, 0.14)),
+    0 12px 32px rgba(255, 255, 255, 0.38),
+    0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.prf-dock-fab:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .prf-dock-fab-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .prf-dock-fab-text {
   font-family: var(--font-heading, 'Sora', sans-serif);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 /* ==========================================================================
