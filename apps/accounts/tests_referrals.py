@@ -76,8 +76,9 @@ class ReferralProgrammeTests(TestCase):
         # Verify payment in sandbox mode as new_user
         self.client.force_login(new_user)
         verify_url = f"{reverse('payments:verify')}?reference={payment.reference}&simulated=true"
-        v_res = self.client.get(verify_url)
-        self.assertIn(v_res.status_code, [200, 302])
+        with self.settings(PAYSTACK_ALLOW_SIMULATION_IN_TESTS=True, PAYSTACK_TEST_MODE=True):
+            v_res = self.client.get(verify_url)
+            self.assertIn(v_res.status_code, [200, 302])
 
         # Verify referral moves to QUALIFIED
         referral.refresh_from_db()

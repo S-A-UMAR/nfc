@@ -258,6 +258,9 @@ def profile_edit_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Your digital profile has been updated successfully.")
+            open_modal = request.GET.get('open') or request.POST.get('open')
+            if open_modal in ('service', 'gallery', 'testimonial'):
+                return redirect(f"{reverse('dashboard:profile_edit')}?open={open_modal}")
             return redirect('dashboard:profile_edit')
         else:
             messages.error(request, "Please check the form below. Some required fields or formats need attention.")
@@ -368,6 +371,7 @@ def links_manage_view(request):
     profile = request.user.profile
     social_links = profile.social_links.all()
     custom_links = profile.custom_links.all()
+    configured_platforms = list(social_links.values_list('platform', flat=True))
     social_form = SocialLinkForm()
     custom_form = CustomLinkForm()
 
@@ -375,6 +379,7 @@ def links_manage_view(request):
         'profile': profile,
         'social_links': social_links,
         'custom_links': custom_links,
+        'configured_platforms': configured_platforms,
         'social_form': social_form,
         'custom_form': custom_form,
     })
@@ -420,10 +425,18 @@ def toggle_direct_link_view(request):
 @login_required
 @require_POST
 def add_social_link_view(request):
-    """Add a new social link."""
+    """Add a new social link with duplicate prevention."""
     profile = request.user.profile
     form = SocialLinkForm(request.POST)
     if form.is_valid():
+        platform = form.cleaned_data.get('platform')
+        if platform != 'other' and profile.social_links.filter(platform=platform).exists():
+            messages.warning(
+                request,
+                f"You already have a {dict(SocialLink.PLATFORM_CHOICES).get(platform, 'social')} link configured. You can edit it below."
+            )
+            return redirect('dashboard:links_manage')
+
         link = form.save(commit=False)
         link.profile = profile
         link.order = profile.social_links.count() + 1
@@ -533,56 +546,67 @@ def toggle_custom_link_view(request, link_id):
 
 # Theme metadata used by the appearance template to render visual cards.
 PERSONAL_THEMES = [
-    {'key': 'graphite',  'label': 'STRIDE Default', 'desc': 'Dark obsidian · Platinum silver · Glass',
+    {'key': 'graphite',  'label': 'Graphite Minimal', 'desc': 'Dark obsidian · Platinum silver · Precision glass',
      'bg': '#09090B', 'accent': '#BFC5CF', 'text': '#F5F5F7'},
-    {'key': 'midnight',  'label': 'Midnight',       'desc': 'Deep dark · Electric cobalt pulses',
-     'bg': '#080D1A', 'accent': '#3B82F6', 'text': '#E2E8F0'},
-    {'key': 'ocean',     'label': 'Ocean',          'desc': 'Marine abyss · Bioluminescent cyan',
+    {'key': 'midnight',  'label': 'Midnight Purple',  'desc': 'Deep dark indigo · Electric cobalt & purple pulses',
+     'bg': '#080D1A', 'accent': '#8B5CF6', 'text': '#E2E8F0'},
+    {'key': 'ocean',     'label': 'Ocean',            'desc': 'Marine abyss · Bioluminescent cyan',
      'bg': '#020E1A', 'accent': '#06B6D4', 'text': '#E0F7FA'},
-    {'key': 'emerald',   'label': 'Emerald',        'desc': 'Obsidian forest · Neon cyber jade',
+    {'key': 'emerald',   'label': 'Deep Emerald',     'desc': 'Obsidian forest · Neon cyber jade accents',
      'bg': '#04160C', 'accent': '#10B981', 'text': '#D1FAE5'},
-    {'key': 'rose',      'label': 'Rose',           'desc': 'Midnight noir · Vivid ruby petals',
+    {'key': 'rose',      'label': 'Rose',             'desc': 'Midnight noir · Vivid ruby petals',
      'bg': '#14070D', 'accent': '#F43F5E', 'text': '#FFE4E6'},
-    {'key': 'arctic',    'label': 'Arctic',         'desc': 'Crystalline obsidian · Polar aurora',
+    {'key': 'arctic',    'label': 'Arctic',           'desc': 'Crystalline obsidian · Polar aurora',
      'bg': '#06121D', 'accent': '#38BDF8', 'text': '#F0F9FF'},
-    {'key': 'sand',      'label': 'Sand',           'desc': 'Desert twilight · Molten amber gold',
+    {'key': 'sand',      'label': 'Sand',             'desc': 'Desert twilight · Molten amber gold',
      'bg': '#140E06', 'accent': '#F59E0B', 'text': '#FEF3C7'},
 ]
 
 BUSINESS_THEMES = [
-    {'key': 'executive', 'label': 'Executive',       'desc': 'Charcoal · Warm gold authority',
+    {'key': 'executive',        'label': 'Executive',        'desc': 'Charcoal · Warm gold authority',
      'bg': '#0f0f0f', 'accent': '#C9A84C', 'text': '#F5F0E8'},
-    {'key': 'navy',      'label': 'Navy',            'desc': 'Deep navy · Crisp white',
+    {'key': 'navy',             'label': 'Royal Navy',       'desc': 'Deep navy · Crisp silver-white clarity',
      'bg': '#020918', 'accent': '#FFFFFF', 'text': '#F1F5F9'},
-    {'key': 'emerald_business', 'label': 'Emerald Business', 'desc': 'Corporate green · Light',
+    {'key': 'emerald_business', 'label': 'Emerald Business', 'desc': 'Corporate green · Clean enterprise accents',
      'bg': '#051a0d', 'accent': '#34D399', 'text': '#ECFDF5'},
-    {'key': 'royal',     'label': 'Royal',           'desc': 'Midnight navy · Royal gold',
+    {'key': 'royal',            'label': 'Royal',            'desc': 'Midnight navy · Imperial gold',
      'bg': '#05091f', 'accent': '#F59E0B', 'text': '#FFF8E1'},
-    {'key': 'burgundy',  'label': 'Burgundy',        'desc': 'Deep wine · Silver',
+    {'key': 'burgundy',         'label': 'Burgundy',         'desc': 'Deep wine · Platinum silver',
      'bg': '#12040a', 'accent': '#D1D5DB', 'text': '#FDF2F8'},
-    {'key': 'luxury',    'label': 'Luxury',          'desc': 'Black marble · Rose gold',
+    {'key': 'luxury',           'label': 'Luxury Gold',      'desc': 'Black marble · Rose gold & warm champagne luster',
      'bg': '#090909', 'accent': '#E8B4B8', 'text': '#FFF5F5'},
-    {'key': 'platinum',  'label': 'Platinum',        'desc': 'Ultra dark · Platinum sheen',
+    {'key': 'platinum',         'label': 'Platinum',         'desc': 'Ultra dark obsidian · High-polish platinum sheen',
      'bg': '#0a0a0a', 'accent': '#E2E8F0', 'text': '#F8FAFC'},
 ]
 
-PERSONAL_LAYOUTS = [
-    {'key': 'classic',       'label': 'Classic',       'desc': 'Current STRIDE default layout',          'icon': '◼◼'},
-    # Hashed out for upcoming version:
-    # {'key': 'centered',      'label': 'Centered',      'desc': 'Centered symmetrical identity',          'icon': '◈◈'},
-    # {'key': 'minimal_layout','label': 'Minimal',       'desc': 'Ultra-clean typographic focus',          'icon': '▬▬'},
-    # {'key': 'social',        'label': 'Social',        'desc': 'Social-first with large link grid',      'icon': '⊞⊞'},
-    # {'key': 'card',          'label': 'Card',          'desc': 'Compact card with contact strip',        'icon': '▣▣'},
+# Five recommended themes prominently featured on Appearance workspace
+RECOMMENDED_THEMES = [
+    {'key': 'graphite', 'label': 'Graphite Minimal', 'desc': 'Dark obsidian · Platinum silver · Precision glass',
+     'bg': '#09090B', 'accent': '#BFC5CF', 'text': '#F5F5F7', 'badge': 'Default'},
+    {'key': 'midnight', 'label': 'Midnight Purple',  'desc': 'Deep dark indigo · Electric cobalt & purple pulses',
+     'bg': '#080D1A', 'accent': '#8B5CF6', 'text': '#E2E8F0', 'badge': 'Popular'},
+    {'key': 'emerald',  'label': 'Deep Emerald',     'desc': 'Obsidian forest · Neon cyber jade accents',
+     'bg': '#04160C', 'accent': '#10B981', 'text': '#D1FAE5', 'badge': 'Vibrant'},
+    {'key': 'navy',     'label': 'Royal Navy',       'desc': 'Deep nocturnal navy · Crisp silver-white clarity',
+     'bg': '#020918', 'accent': '#FFFFFF', 'text': '#F1F5F9', 'badge': 'Executive'},
+    {'key': 'luxury',   'label': 'Luxury Gold',      'desc': 'Black marble · Rose gold & warm champagne luster',
+     'bg': '#090909', 'accent': '#E8B4B8', 'text': '#FFF5F5', 'badge': 'Prestige'},
 ]
 
-# Hashed out for upcoming feature:
-# BUSINESS_LAYOUTS = [
-#     {'key': 'executive_layout',   'label': 'Executive',       'desc': 'Structured authority layout',           'icon': '▤▤'},
-#     {'key': 'brand_header',       'label': 'Brand Header',    'desc': 'Logo-first brand statement',            'icon': '◧◧'},
-#     {'key': 'business_card',      'label': 'Business Card',   'desc': 'Traditional card inspired',             'icon': '▥▥'},
-#     {'key': 'business_catalog',   'label': 'Business Catalog','desc': 'Products & services prominence',        'icon': '▦▦'},
-# ]
-BUSINESS_LAYOUTS = []
+PERSONAL_LAYOUTS = [
+    {'key': 'classic',        'label': 'Classic',        'desc': 'Balanced layout with avatar, bio, actions & links', 'icon': 'classic'},
+    {'key': 'centered',       'label': 'Centered',       'desc': 'Symmetrical focus on avatar and name',             'icon': 'centered'},
+    {'key': 'minimal_layout', 'label': 'Minimal',        'desc': 'Typographic focus without ambient glow',           'icon': 'minimal_layout'},
+    {'key': 'social',         'label': 'Social',         'desc': 'Prominent grid of your channels',                  'icon': 'social'},
+    {'key': 'card',           'label': 'Compact Card',   'desc': 'Condensed card with quick contact strip',           'icon': 'card'},
+]
+
+BUSINESS_LAYOUTS = [
+    {'key': 'executive_layout', 'label': 'Executive',        'desc': 'Corporate layout with vertical accent bar',    'icon': 'executive_layout'},
+    {'key': 'brand_header',     'label': 'Brand Header',     'desc': 'Prominent company logo and category',         'icon': 'brand_header'},
+    {'key': 'business_card',    'label': 'Business Card',    'desc': 'Horizontal digital business card',            'icon': 'business_card'},
+    {'key': 'business_catalog', 'label': 'Business Catalog', 'desc': 'Focus on company offerings & services',        'icon': 'business_catalog'},
+]
 
 
 @login_required
@@ -617,13 +641,37 @@ def profile_appearance_view(request):
 
     form = ProfileAppearanceForm(instance=profile)
 
+    # Active links for live preview
+    social_links = profile.social_links.filter(is_active=True).order_by('order', 'id')
+    custom_links = profile.custom_links.filter(is_active=True).order_by('position', 'id')
+
+    # Prepare "More Themes" depending on profile identity
+    featured_keys = {t['key'] for t in RECOMMENDED_THEMES}
+    all_available = []
+    seen = set(featured_keys)
+
+    # Add remaining personal themes
+    for t in PERSONAL_THEMES:
+        if t['key'] not in seen:
+            all_available.append(t)
+            seen.add(t['key'])
+    # Add remaining business themes
+    for t in BUSINESS_THEMES:
+        if t['key'] not in seen:
+            all_available.append(t)
+            seen.add(t['key'])
+
     return render(request, 'dashboard/appearance.html', {
         'profile': profile,
         'form': form,
+        'recommended_themes': RECOMMENDED_THEMES,
+        'more_themes': all_available,
         'personal_themes': PERSONAL_THEMES,
         'business_themes': BUSINESS_THEMES,
         'personal_layouts': PERSONAL_LAYOUTS,
         'business_layouts': BUSINESS_LAYOUTS,
+        'social_links': social_links,
+        'custom_links': custom_links,
     })
 
 

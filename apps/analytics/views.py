@@ -46,11 +46,12 @@ def track_event_api(request):
         if not profile:
             return JsonResponse({'status': 'error', 'message': 'Profile not found'}, status=404)
 
-        # Filter out owner actions (authenticated user == profile.user OR owner cookie present OR data['is_owner'] is True)
-        is_owner = (
+        # Filter out owner actions strictly using server-side identity or legitimate owner cookie.
+        # NEVER trust client-supplied ownership assertions (e.g. data['is_owner']).
+        is_owner = bool(
             (request.user.is_authenticated and profile.user and request.user == profile.user)
+            or (request.COOKIES.get(f'stride_owner_{profile.slug}') == '1')
             or (request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1')
-            or data.get('is_owner') is True
         )
         if is_owner:
             return JsonResponse({'status': 'ignored_owner', 'message': 'Owner actions are excluded from analytics'})
@@ -237,35 +238,55 @@ def analytics_dashboard_view(request):
     ]
     max_daily = max((item['count'] for item in daily_chart), default=1) or 1
 
-    # --- Per-card breakdown ---
+    # --- Per-card breakdown (Optimized: single grouped aggregation query, eliminates N+1) ---
     from apps.cards.models import Card
-    user_cards = Card.objects.filter(user=request.user)
-    card_breakdown = []
-    for card in user_cards:
-        card_qs = base_qs.filter(card=card)
-        tap_count = card_qs.filter(
-            event_type__in=[AnalyticsEvent.TYPE_CARD_TAP, AnalyticsEvent.TYPE_QR_SCAN]
-        ).count()
-        card_breakdown.append({
-            'card': card,
-            'tap_count': tap_count,
-        })
+    user_cards = list(Card.objects.filter(user=request.user))
+    if user_cards:
+        card_counts_qs = (
+            base_qs.filter(
+                card__in=user_cards,
+                event_type__in=[AnalyticsEvent.TYPE_CARD_TAP, AnalyticsEvent.TYPE_QR_SCAN],
+            )
+            .values('card_id')
+            .annotate(tap_count=Count('id'))
+        )
+        card_counts_map = {row['card_id']: row['tap_count'] for row in card_counts_qs}
+        card_breakdown = [
+            {
+                'card': card,
+                'tap_count': card_counts_map.get(card.id, 0),
+            }
+            for card in user_cards
+        ]
+    else:
+        card_breakdown = []
 
-    # --- Per-website breakdown ---
+    # --- Per-website breakdown (Optimized: single grouped aggregation query, eliminates N+1) ---
     from apps.websites.models import Website
-    user_websites = Website.objects.filter(user=request.user)
-    website_breakdown = []
-    for website in user_websites:
-        # website_page_view events reference website FK, but profile FK is also set
-        site_view_count = AnalyticsEvent.objects.filter(
-            website=website,
-            event_type=AnalyticsEvent.TYPE_WEBSITE_PAGE_VIEW,
-            **(({'timestamp__gte': since} if since else {}))
-        ).count()
-        website_breakdown.append({
-            'website': website,
-            'view_count': site_view_count,
-        })
+    user_websites = list(Website.objects.filter(user=request.user))
+    if user_websites:
+        site_filter_kwargs = {
+            'website__in': user_websites,
+            'event_type': AnalyticsEvent.TYPE_WEBSITE_PAGE_VIEW,
+        }
+        if since:
+            site_filter_kwargs['timestamp__gte'] = since
+
+        site_counts_qs = (
+            AnalyticsEvent.objects.filter(**site_filter_kwargs)
+            .values('website_id')
+            .annotate(view_count=Count('id'))
+        )
+        site_counts_map = {row['website_id']: row['view_count'] for row in site_counts_qs}
+        website_breakdown = [
+            {
+                'website': website,
+                'view_count': site_counts_map.get(website.id, 0),
+            }
+            for website in user_websites
+        ]
+    else:
+        website_breakdown = []
 
     # --- Range labels ---
     range_labels = {

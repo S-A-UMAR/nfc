@@ -137,11 +137,12 @@ class PlatformCoreTests(TestCase):
             reference=f"REF-{order.order_number}",
             amount=order.amount
         )
-        verify_response = self.client.post(reverse('payments:verify'), {
-            'reference': payment.reference,
-            'simulated': 'true'
-        }, follow=True)
-        self.assertEqual(verify_response.status_code, 200)
+        with self.settings(PAYSTACK_ALLOW_SIMULATION_IN_TESTS=True, PAYSTACK_TEST_MODE=True):
+            verify_response = self.client.post(reverse('payments:verify'), {
+                'reference': payment.reference,
+                'simulated': 'true'
+            }, follow=True)
+            self.assertEqual(verify_response.status_code, 200)
 
         order.refresh_from_db()
         self.assertEqual(order.payment_status, Order.PAYMENT_PAID)

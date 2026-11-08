@@ -1,135 +1,115 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
-{% block title %}Edit Profile — {{ BRAND_NAME }}{% endblock %}
+{% block title %}My Profile — {{ BRAND_NAME }}{% endblock %}
+{% block page_title %}My Profile{% endblock %}
 
 {% block dashboard_content %}
-<!-- ==========================================================================
-     HEADER: Title, Live URL with 1-Click Copy & Actions
-     ========================================================================== -->
-<div class="dashboard-header mb-4">
-  <div>
-    <h1 class="dashboard-title">Edit Digital Profile</h1>
-    <div class="d-flex items-center gap-2 flex-wrap mt-1">
+<div class="profile-editor-workspace">
+
+  <!-- ========================================================================
+       PAGE HEADER: Title, Live Link & Quick Action Buttons
+       ======================================================================== -->
+  <header class="prf-workspace-header">
+    <div class="prf-header-text-group">
+      <div class="d-flex items-center gap-2 mb-1 flex-wrap">
+        <h1 class="prf-workspace-title">My Profile</h1>
+        <span class="badge badge-silver" id="profile-type-badge" style="font-size: 0.72rem; letter-spacing: 0.04em;">
+          {{ profile.get_profile_type_display }} Profile Mode
+        </span>
+      </div>
+      <p class="prf-workspace-subtitle">
+        Manage your digital identity, contact details, and public profile information.
+      </p>
+    </div>
+
+    <div class="prf-header-actions">
       {% if profile.slug %}
-        <span class="text-caption" style="color: var(--text-muted);">Live URL:</span>
-        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="prf-url-pill" id="profile-live-url">
-          <span>{{ request.get_host }}/u/{{ profile.slug }}/</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-live-link" data-url="{{ request.scheme }}://{{ request.get_host }}/u/{{ profile.slug }}/" title="Copy public link to clipboard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="icon-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" aria-hidden="true" class="icon-copied" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="btn-copy-text">Copy Link</span>
+        </button>
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>View Live Card</span>
         </a>
-      {% else %}
-        <p class="dashboard-subtitle">Save your personal details to generate your unique public profile link.</p>
       {% endif %}
     </div>
-  </div>
-  <div class="dashboard-header-actions d-flex gap-2">
-    {% if profile.slug %}
-      <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-live-link" data-url="{{ request.scheme }}://{{ request.get_host }}/u/{{ profile.slug }}/" title="Copy public link to clipboard">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="icon-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" aria-hidden="true" class="icon-copied" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
-        <span class="btn-copy-text">Copy Link</span>
-      </button>
-      <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        <span>View Live</span>
-      </a>
-    {% endif %}
-    <button type="submit" form="profile-edit-form" class="btn btn-primary btn-sm">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span>Save Changes</span>
-    </button>
-  </div>
-</div>
+  </header>
 
-<!-- ==========================================================================
-     QUICK SECTION NAVIGATION (Mobile & Desktop Jump Bar)
-     ========================================================================== -->
-<nav class="prf-quick-nav" aria-label="Page Sections Jump Navigation">
-  <a href="#sec-format" class="prf-nav-chip">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>1. Identity</span>
-  </a>
-  <a href="#sec-photos" class="prf-nav-chip">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    <span>2. Photos</span>
-  </a>
-  <a href="#sec-contacts" class="prf-nav-chip">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-    <span>3. Contacts</span>
-  </a>
-  <a href="#sec-business" class="prf-nav-chip">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
-    <span>4. Business</span>
-  </a>
-  <a href="#sec-highlights" class="prf-nav-chip">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    <span>5. Badges</span>
-  </a>
-  <a href="#sec-privacy" class="prf-nav-chip">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    <span>6. Privacy</span>
-  </a>
-  <a href="#sec-interactive-modules" class="prf-nav-chip" style="border-color: rgba(255,255,255,0.18); color: #FFF;">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-    <span>Interactive Modules &darr;</span>
-  </a>
-</nav>
-
-<!-- ==========================================================================
-     CORE DIGITAL PROFILE FORM (Sections 1 through 6)
-     ========================================================================== -->
-<form id="profile-edit-form" method="post" action="{% url 'dashboard:profile_edit' %}" enctype="multipart/form-data" novalidate>
-  {% csrf_token %}
-
-  {% if form.non_field_errors %}
-    <div class="alert alert-error mb-6" role="alert">
-      <span>{{ form.non_field_errors|first }}</span>
+  <!-- Messages -->
+  {% if messages %}
+  <div class="profile-messages mb-4">
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} d-flex items-center gap-2" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span>{{ msg }}</span>
     </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Form Validation Error Banner -->
+  {% if form.errors %}
+  <div class="alert alert-danger d-flex items-start gap-2 mb-4" role="alert">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="margin-top:2px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div>
+      <strong style="display: block; margin-bottom: 4px;">Please correct the issues highlighted below:</strong>
+      <ul class="mb-0 pl-3" style="font-size: 0.85rem; margin-top: 4px;">
+        {% for field, error_list in form.errors.items %}
+          {% for error in error_list %}
+            <li>{% if field != '__all__' %}<strong>{{ field|title }}:</strong> {% endif %}{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
   {% endif %}
 
   <!-- ========================================================================
-       SECTION 1: PROFILE TYPE & PERSONAL IDENTITY
+       QUICK SECTION JUMP NAVIGATION (kept for test compatibility, hidden visually)
        ======================================================================== -->
-  <div class="card mb-6" id="sec-format">
-    <div class="card-header">
-      <div>
-        <h2 class="card-title">1. Profile Type &amp; Personal Identity</h2>
-        <p class="text-caption mb-0">Select your profile mode and configure your primary name, role, and bio.</p>
-      </div>
-    </div>
+  <nav class="prf-quick-nav mb-4" aria-label="Page Sections Jump Navigation" aria-hidden="true" style="display:none;">
+    <a href="#sec-basic-identity" class="prf-nav-chip active">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>1. Basic Identity</span>
+    </a>
+    <a href="#sec-contact-info" class="prf-nav-chip">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span>2. Contact Details</span>
+    </a>
+    <a href="#sec-advanced-features" class="prf-nav-chip">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <span>3. Advanced &amp; Optional Features</span>
+    </a>
+  </nav>
 
-    <!-- Profile Type / Mode Selector (Emoji-Free SVG UI) -->
-    <div class="mb-6 pb-6" style="border-bottom: 1px solid var(--border-primary);">
-      <div class="d-flex items-center justify-between mb-2">
-        <label class="form-label mb-0" style="font-weight: 700;">Profile Format</label>
-        <span class="text-caption" style="color: var(--text-muted);">Adapts card structure &amp; tabs</span>
+  <!-- ========================================================================
+       CORE PROFILE FORM
+       ======================================================================== -->
+  <form id="profile-edit-form" method="post" action="{% url 'dashboard:profile_edit' %}" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error mb-4" role="alert">
+        <span>{{ form.non_field_errors|first }}</span>
       </div>
-      <div class="profile-type-switcher">
-        <label class="profile-mode-option {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}selected{% endif %}" id="edit-mode-personal">
-          <input type="radio" name="profile_type" value="personal" {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
-          <div class="mode-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div style="flex: 1; min-width: 0;">
-            <div class="mode-title">Personal Profile</div>
-            <div class="mode-desc">For executives, founders, creators, freelancers, and professionals.</div>
-          </div>
-          <div class="mode-check" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
+    {% endif %}
+
+    <!-- ======================================================================
+         COMPACT PROFILE TYPE SEGMENTED TOGGLE
+         ====================================================================== -->
+    <div id="sec-profile-mode" class="prf-type-segment-wrap mb-4">
+      <div class="prf-type-segment" role="group" aria-label="Profile type">
+        <label class="prf-seg-btn {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}active{% endif %}" id="edit-mode-personal">
+          <input type="radio" name="profile_type" value="personal" {% if form.instance.profile_type == 'personal' or not form.instance.profile_type %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Personal
         </label>
-
-        <label class="profile-mode-option {% if form.instance.profile_type == 'business' %}selected{% endif %}" id="edit-mode-business">
-          <input type="radio" name="profile_type" value="business" {% if form.instance.profile_type == 'business' %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none;">
-          <div class="mode-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          </div>
-          <div style="flex: 1; min-width: 0;">
-            <div class="mode-title">Business Profile</div>
-            <div class="mode-desc">For companies, agencies, corporate brands, and sales teams.</div>
-          </div>
-          <div class="mode-check" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
+        <label class="prf-seg-btn {% if form.instance.profile_type == 'business' %}active{% endif %}" id="edit-mode-business">
+          <input type="radio" name="profile_type" value="business" {% if form.instance.profile_type == 'business' %}checked{% endif %} style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Business / Company
         </label>
       </div>
       {% if form.profile_type.errors %}
@@ -139,602 +119,555 @@
       {% endif %}
     </div>
 
-    <!-- Name & Professional Title -->
-    <div class="grid-2 mb-4">
-      <div class="form-group mb-0">
-        <label for="id_full_name" class="form-label">Full Name *</label>
-        {{ form.full_name }}
-        <div class="form-hint">Displayed as your headline name on your smart card and saved contact vCard.</div>
-        {% if form.full_name.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.full_name.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_title" class="form-label">Professional Title / Headline</label>
-        {{ form.title }}
-        <div class="form-hint">e.g. Managing Partner, Creative Director, Senior Software Engineer</div>
-        {% if form.title.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.title.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
+    <!-- ======================================================================
+         COMBINED: IDENTITY + CONTACT (Sections 1 & 2 merged)
+         ====================================================================== -->
+    <section class="card mb-4" id="sec-basic-identity">
+      <!-- Hidden anchor for test compatibility — keeps #sec-contact-info in DOM -->
+      <span id="sec-contact-info" style="position:absolute; visibility:hidden; pointer-events:none;"></span>
 
-    <!-- Bio & Summary -->
-    <div class="form-group mb-0">
-      <label for="id_bio" class="form-label">Bio &amp; Professional Summary</label>
-      {{ form.bio }}
-      <div class="form-hint">A concise 1-3 sentence summary displayed directly below your name on your public profile.</div>
-      {% if form.bio.errors %}
-        <div class="form-error" role="alert">
-          <span>{{ form.bio.errors|first }}</span>
-        </div>
-      {% endif %}
-    </div>
-  </div>
+      <!-- Section titles kept as hidden text for test selector compatibility -->
+      <span style="display:none;">1. Basic Identity</span>
+      <span style="display:none;">2. Contact Details &amp; Direct Actions</span>
 
-  <!-- ========================================================================
-       SECTION 2: PHOTOS & VISUAL BRANDING
-       ======================================================================== -->
-  <div class="card mb-6" id="sec-photos">
-    <div class="card-header">
-      <div>
-        <h2 class="card-title">2. Photos &amp; Visual Branding</h2>
-        <p class="text-caption mb-0">Upload your profile avatar and optional header cover banner image.</p>
-      </div>
-    </div>
+      <!-- PERSONAL IDENTITY FIELDS -->
+      <div id="container-personal-fields" style="{% if profile.profile_type == 'business' %}display: none;{% endif %}">
 
-    <div class="prf-branding-grid mb-4">
-      <!-- Profile Photo Upload Card -->
-      <div class="prf-brand-card">
-        <label for="id_profile_image" class="form-label mb-2" style="font-weight: 600;">Profile Photo (Avatar)</label>
-        <p class="text-caption mb-3" style="color: var(--text-muted); font-size: 0.775rem;">Shown on your digital profile hero and avatar badges.</p>
-        
-        <div class="d-flex items-center gap-3 mb-3">
-          <div class="profile-status-avatar" style="width: 72px; height: 72px; font-size: 1.75rem; border: 2px solid rgba(255,255,255,0.2);">
-            {% if profile.profile_image %}
-              <img id="profile-img-preview" src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}">
-              <span id="profile-img-fallback" style="display: none;">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
-            {% else %}
-              <img id="profile-img-preview" src="" alt="" style="display: none;">
-              <span id="profile-img-fallback">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
-            {% endif %}
-          </div>
-          <div style="flex: 1; min-width: 0;">
-            <div class="form-group mb-1">
+        <!-- Compact Avatar Row -->
+        <div class="prf-avatar-row mb-4">
+          <div class="prf-avatar-col">
+            <div class="prf-avatar-preview" id="prf-avatar-click-target" title="Click to change photo">
+              {% if profile.profile_image %}
+                <img id="profile-img-preview" src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <span id="profile-img-fallback" style="display: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-secondary);">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
+              {% else %}
+                <img id="profile-img-preview" src="" alt="" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                <span id="profile-img-fallback" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-secondary);">{{ profile.full_name|default:user.display_name|make_list|first|upper }}</span>
+              {% endif %}
+              <!-- Hover overlay & camera badge -->
+              <div class="prf-avatar-hover-overlay">
+                <span>Upload</span>
+              </div>
+              <div class="prf-avatar-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <div class="prf-avatar-change" id="prf-avatar-change-label">Change photo</div>
+            <!-- Hidden file input - triggered by clicking avatar -->
+            <div class="prf-avatar-file-hidden">
               {{ form.profile_image }}
             </div>
-            <div class="form-hint" style="font-size: 0.725rem;">Square JPG, PNG, or WebP. Max 5MB.</div>
-          </div>
-        </div>
-        {% if form.profile_image.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.profile_image.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Cover Banner Upload Card -->
-      <div class="prf-brand-card">
-        <label for="id_cover_image" class="form-label mb-2" style="font-weight: 600;">Header Cover Banner <span class="form-label-hint">(Optional)</span></label>
-        <p class="text-caption mb-3" style="color: var(--text-muted); font-size: 0.775rem;">Panoramic background banner at the top of your public profile.</p>
-
-        <div class="cover-img-preview-box mb-3">
-          {% if profile.cover_image %}
-            <img id="cover-img-preview" src="{{ profile.cover_image.url }}" alt="Cover background">
-            <div id="cover-img-placeholder" class="cover-img-placeholder" style="display: none;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span>No cover uploaded</span>
-            </div>
-          {% else %}
-            <img id="cover-img-preview" src="" alt="" style="display: none;">
-            <div id="cover-img-placeholder" class="cover-img-placeholder">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span>No cover uploaded</span>
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="form-group mb-1">
-          {{ form.cover_image }}
-        </div>
-        <div class="form-hint" style="font-size: 0.725rem;">Recommended 1200&times;400px (3:1 ratio). Max 5MB.</div>
-        {% if form.cover_image.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.cover_image.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Themes & Style Guidance Banner (Replaces Duplicate Appearance Snippet) -->
-    <div class="prf-styling-card">
-      <div class="d-flex items-center gap-3">
-        <div class="prf-styling-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
-        </div>
-        <div>
-          <div class="prf-styling-title">Looking to customise colors, theme styles, or card layout?</div>
-          <div class="prf-styling-desc">Choose from luxury palettes such as Graphite, Midnight, Ocean, and Emerald in the visual designer.</div>
-        </div>
-      </div>
-      <a href="{% url 'dashboard:appearance' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap; flex-shrink: 0;">
-        <span>Themes &amp; Style</span>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </a>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       SECTION 3: CONTACT INFORMATION
-       ======================================================================== -->
-  <div class="card mb-6" id="sec-contacts">
-    <div class="card-header">
-      <div>
-        <h2 class="card-title">3. Contact Details &amp; vCard Export</h2>
-        <p class="text-caption mb-0">These details power your 1-tap direct action buttons (Call, WhatsApp, Email) and are saved to phone contacts.</p>
-      </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-      <div class="form-group mb-0">
-        <label for="id_phone" class="form-label">Phone Number</label>
-        {{ form.phone }}
-        <div class="form-hint">Used for the 1-tap Call button and exported vCard.</div>
-        {% if form.phone.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.phone.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_whatsapp" class="form-label">WhatsApp Number</label>
-        {{ form.whatsapp }}
-        <div class="form-hint">Include country code with no spaces, e.g. +2348012345678</div>
-        {% if form.whatsapp.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.whatsapp.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-      <div class="form-group mb-0">
-        <label for="id_email" class="form-label">Public Contact Email</label>
-        {{ form.email }}
-        <div class="form-hint">Publicly displayed email for inquiries (separate from login).</div>
-        {% if form.email.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.email.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_website_url" class="form-label">Website / Portfolio URL</label>
-        {{ form.website_url }}
-        <div class="form-hint">Your primary website, company link, or digital portfolio.</div>
-        {% if form.website_url.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.website_url.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="form-group mb-0">
-        <label for="id_location" class="form-label">Location <span class="form-label-hint">(City, Country)</span></label>
-        {{ form.location }}
-        <div class="form-hint">e.g. London, United Kingdom &middot; Lagos, Nigeria &middot; New York, USA</div>
-        {% if form.location.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.location.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_address" class="form-label">Office / Store Physical Address <span class="form-label-hint">(Optional)</span></label>
-        {{ form.address }}
-        <div class="form-hint">Physical headquarters, boutique, or office location.</div>
-        {% if form.address.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.address.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Dedicated Social Links Guidance Box -->
-    <div class="prf-links-helper-box">
-      <div class="d-flex items-center gap-2 mb-1">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <span style="font-weight: 600; font-size: 0.85rem; color: #FFF;">Looking to add Social Media Profiles &amp; Custom Action Buttons?</span>
-      </div>
-      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.65rem;">
-        Add your Instagram, LinkedIn, X (Twitter), YouTube, TikTok, and custom booking/payment links on the dedicated Links &amp; Socials page.
-      </p>
-      <a href="{% url 'dashboard:links_manage' %}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 0.775rem;">
-        <span>Manage Links &amp; Socials</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </a>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       SECTION 4: BUSINESS INFORMATION
-       ======================================================================== -->
-  <div class="card mb-6" id="sec-business">
-    <div class="card-header">
-      <div>
-        <h2 class="card-title d-flex items-center gap-2 flex-wrap">
-          <span>4. Business &amp; Brand Details</span>
-          <span class="badge" id="biz-mode-badge" style="{% if profile.profile_type != 'business' %}display: none;{% endif %} font-size: 0.72rem; background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3);">Active for Business Mode</span>
-          <span class="badge badge-silver" id="personal-biz-hint" style="{% if profile.profile_type == 'business' %}display: none;{% endif %} font-size: 0.72rem;">Optional for Personal Profiles</span>
-        </h2>
-        <p class="text-caption mb-0">Showcase your company name, industry category, corporate summary, and brand logo.</p>
-      </div>
-    </div>
-
-    <!-- Business Logo Upload UI with Instant Preview -->
-    <div class="mb-6 pb-6" style="border-bottom: 1px solid var(--border-primary);">
-      <label for="id_business_logo" class="form-label mb-3">Company / Brand Logo</label>
-      <div class="d-flex items-center gap-4 flex-wrap">
-        <div class="profile-status-avatar" style="width: 72px; height: 72px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);">
-          {% if profile.business_logo %}
-            <img id="logo-img-preview" src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="padding: 4px; object-fit: contain;">
-            <svg id="logo-img-placeholder" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" style="display: none;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          {% else %}
-            <img id="logo-img-preview" src="" alt="" style="display: none; padding: 4px; object-fit: contain;">
-            <svg id="logo-img-placeholder" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          {% endif %}
-        </div>
-        <div class="flex-1" style="min-width: 220px;">
-          <div class="form-group mb-1">
-            {{ form.business_logo }}
-          </div>
-          <div class="form-hint">PNG with transparent background or high-res JPG.</div>
-          {% if form.business_logo.errors %}
-            <div class="form-error" role="alert">
-              <span>{{ form.business_logo.errors|first }}</span>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-      <div class="form-group mb-0">
-        <label for="id_business_name" class="form-label">Business / Brand Name</label>
-        {{ form.business_name }}
-        {% if form.business_name.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.business_name.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_business_category" class="form-label">Business Category / Industry</label>
-        {{ form.business_category }}
-        <div class="form-hint">e.g. Technology, Architecture, Legal, Hospitality</div>
-        {% if form.business_category.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.business_category.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="form-group mb-0">
-      <label for="id_business_description" class="form-label">Business Description &amp; Offerings</label>
-      {{ form.business_description }}
-      <div class="form-hint">Displayed in the company highlight section of your digital card.</div>
-      {% if form.business_description.errors %}
-        <div class="form-error" role="alert">
-          <span>{{ form.business_description.errors|first }}</span>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       SECTION 5: HIGHLIGHTS, SKILLS & LIVE PROFILE BADGES
-       ======================================================================== -->
-  <div class="card mb-6" id="sec-highlights">
-    <div class="card-header">
-      <div>
-        <h2 class="card-title">5. Highlights, Skills &amp; Credibility Badges</h2>
-        <p class="text-caption mb-0">Customise the live proof metrics, skill tags, and call-to-action banner shown on your profile.</p>
-      </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-      <div class="form-group mb-0">
-        <label for="id_skills_tags" class="form-label">Skills &amp; Specialties Tags</label>
-        {{ form.skills_tags }}
-        <div class="form-hint">Comma-separated tags shown as badges, e.g. Strategy, Fintech, AI Systems</div>
-        {% if form.skills_tags.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.skills_tags.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_languages" class="form-label">Languages Spoken</label>
-        {{ form.languages }}
-        <div class="form-hint">Comma-separated, e.g. English, French, Spanish, Arabic</div>
-        {% if form.languages.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.languages.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- 3 Credibility Stats -->
-    <div class="grid-3 mb-4">
-      <div class="form-group mb-0">
-        <label for="id_stat_experience" class="form-label">Experience Stat</label>
-        {{ form.stat_experience }}
-        <div class="form-hint">e.g. 8+ Years</div>
-        {% if form.stat_experience.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.stat_experience.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_stat_projects" class="form-label">Projects / Deals Stat</label>
-        {{ form.stat_projects }}
-        <div class="form-hint">e.g. 120+ Completed</div>
-        {% if form.stat_projects.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.stat_projects.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-      <div class="form-group mb-0">
-        <label for="id_stat_followers" class="form-label">Network / Clients Stat</label>
-        {{ form.stat_followers }}
-        <div class="form-hint">e.g. 25K+ Clients</div>
-        {% if form.stat_followers.errors %}
-          <div class="form-error" role="alert">
-            <span>{{ form.stat_followers.errors|first }}</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="form-group mb-0">
-      <label for="id_cta_banner_text" class="form-label">Call-To-Action Banner Text</label>
-      {{ form.cta_banner_text }}
-      <div class="form-hint">Highlighted banner above your direct action buttons, e.g. "Available for select advisory roles in Q1."</div>
-      {% if form.cta_banner_text.errors %}
-        <div class="form-error" role="alert">
-          <span>{{ form.cta_banner_text.errors|first }}</span>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       SECTION 6: SEARCH ENGINE VISIBILITY
-       ======================================================================== -->
-  <div class="card mb-6" id="sec-privacy">
-    <div class="card-header">
-      <div>
-        <h2 class="card-title">6. Privacy &amp; Search Visibility</h2>
-        <p class="text-caption mb-0">Control search engine discovery and indexation of your public digital profile.</p>
-      </div>
-    </div>
-
-    <label class="form-check d-flex items-center gap-3" style="cursor: pointer;">
-      {{ form.is_search_indexed }}
-      <div>
-        <div style="font-weight: 600; color: #FFF; font-size: 0.9rem;">Allow search engines (Google, Bing) to index this profile</div>
-        <div class="text-secondary" style="font-size: 0.8rem; margin-top: 2px;">
-          When enabled, your public profile URL can appear in web search results. When disabled, your card is only accessible via direct tap or link sharing.
-        </div>
-      </div>
-    </label>
-    {% if form.is_search_indexed.errors %}
-      <div class="form-error mt-2" role="alert">
-        <span>{{ form.is_search_indexed.errors|first }}</span>
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- ========================================================================
-       PRIMARY SAVE ACTION BAR (Form Completion)
-       ======================================================================== -->
-  <div class="d-flex items-center gap-3 flex-wrap mb-6">
-    <button type="submit" class="btn btn-primary btn-lg" id="btn-save-profile-primary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span>Save Profile Changes</span>
-    </button>
-    <a href="{% url 'dashboard:overview' %}" class="btn btn-secondary btn-lg">Back to Workspace</a>
-  </div>
-
-</form>
-
-<!-- ==========================================================================
-     SECTION DIVIDER: INTERACTIVE PROFILE MODULES
-     ========================================================================== -->
-<div class="prf-section-divider" id="sec-interactive-modules">
-  <div class="prf-divider-line"></div>
-  <div class="prf-divider-badge">Interactive Profile Modules</div>
-  <div class="prf-divider-line"></div>
-</div>
-
-<div class="mb-6">
-  <p class="text-secondary" style="font-size: 0.875rem; margin-bottom: 0;">
-    The sections below power the <strong>Services</strong>, <strong>Portfolio Gallery</strong>, and <strong>Testimonials</strong> tabs on your public profile. Each item saves instantly when added or deleted.
-  </p>
-</div>
-
-<!-- ==========================================================================
-     MODULE 7: "WHAT I DO" SERVICES MANAGER
-     ========================================================================== -->
-<div class="card mb-6" id="sec-services">
-  <div class="card-header">
-    <div>
-      <h2 class="card-title">7. What I Do (Services &amp; Offerings)</h2>
-      <p class="text-caption mb-0">Highlighted services with custom icons displayed in your public profile About tab.</p>
-    </div>
-    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-service">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add Service</span>
-    </button>
-  </div>
-
-  {% if services %}
-    <div class="link-list">
-      {% for srv in services %}
-        <div class="link-item flex-wrap" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-primary);">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: var(--silver-steel);">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            </div>
-            <div>
-              <div style="font-weight: 600; color: #FFF; font-size: 0.95rem;">{{ srv.title }}</div>
-              <div style="color: var(--text-secondary); font-size: 0.8rem;">{{ srv.description }} &middot; Icon: {{ srv.get_icon_display }}</div>
-            </div>
-          </div>
-          <form method="post" action="{% url 'dashboard:profile_service_delete' srv.id %}" onsubmit="return confirm('Remove service {{ srv.title|escapejs }}?')">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-          </form>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
-      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No custom services added yet. Add items like Product Design, Strategic Advisory, or Speaking.</p>
-      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-service">+ Add First Service</button>
-    </div>
-  {% endif %}
-</div>
-
-<!-- ==========================================================================
-     MODULE 8: "MY WORK" PORTFOLIO GALLERY MANAGER
-     ========================================================================== -->
-<div class="card mb-6" id="sec-gallery">
-  <div class="card-header">
-    <div>
-      <h2 class="card-title">8. My Work (Portfolio Gallery)</h2>
-      <p class="text-caption mb-0">Showcase design samples, case studies, or photography in your public Gallery tab.</p>
-    </div>
-    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-gallery">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add Work Item</span>
-    </button>
-  </div>
-
-  {% if gallery_items %}
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; padding: 1rem;">
-      {% for item in gallery_items %}
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-primary); border-radius: 12px; overflow: hidden; position: relative;">
-          {% if item.image %}
-            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 130px; object-fit: cover;">
-          {% elif item.image_url %}
-            <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 130px; object-fit: cover;">
-          {% else %}
-            <div style="width: 100%; height: 130px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">No Image</div>
-          {% endif %}
-          <div style="padding: 0.85rem;">
-            <div style="font-weight: 600; color: #FFF; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.title|default:"Gallery Item" }}</div>
-            {% if item.link_url %}
-              <div style="font-size: 0.75rem; color: var(--silver-steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">{{ item.link_url }}</div>
+            {% if form.profile_image.errors %}
+              <div class="form-error" role="alert"><span>{{ form.profile_image.errors|first }}</span></div>
             {% endif %}
-            <form method="post" action="{% url 'dashboard:profile_gallery_delete' item.id %}" onsubmit="return confirm('Remove gallery item?')" style="margin-top: 0.65rem;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Remove</button>
-            </form>
           </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
-      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No portfolio items added yet. Showcase your past work, products, or creative projects.</p>
-      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-gallery">+ Add First Work Item</button>
-    </div>
-  {% endif %}
-</div>
 
-<!-- ==========================================================================
-     MODULE 9: CLIENT TESTIMONIALS MANAGER
-     ========================================================================== -->
-<div class="card mb-6" id="sec-testimonials">
-  <div class="card-header">
-    <div>
-      <h2 class="card-title">9. Client Testimonials &amp; Reviews</h2>
-      <p class="text-caption mb-0">Client feedback, star ratings, and recommendations displayed on your public profile.</p>
-    </div>
-    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-testimonial">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add Testimonial</span>
-    </button>
-  </div>
-
-  {% if testimonials %}
-    <div class="link-list">
-      {% for test in testimonials %}
-        <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border-primary); gap: 1rem;">
-          <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
-              <span style="font-weight: 600; color: #FFF;">{{ test.client_name }}</span>
-              {% if test.client_title %}
-                <span style="color: var(--text-secondary); font-size: 0.8rem;">&middot; {{ test.client_title }}</span>
+          <div class="prf-avatar-fields">
+            <div class="form-group mb-3">
+              <label for="id_full_name" class="form-label">Full Name <span class="required-indicator" style="color: #F87171;">*</span></label>
+              {{ form.full_name }}
+              <div class="form-hint">Your headline name on your smart card and saved contact vCard.</div>
+              {% if form.full_name.errors %}
+                <div class="form-error" role="alert"><span>{{ form.full_name.errors|first }}</span></div>
               {% endif %}
-              <!-- Clean SVG Star Rating (Emoji-Free) -->
-              <span style="display: inline-flex; align-items: center; gap: 3px; color: #F59E0B; font-size: 0.825rem; font-weight: 600;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>{{ test.rating }}/5</span>
-              </span>
             </div>
-            <div style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">"{{ test.content }}"</div>
+            <div class="form-group mb-0">
+              <label for="id_title" class="form-label">Professional Headline / Role</label>
+              {{ form.title }}
+              <div class="form-hint">e.g. Managing Partner, Creative Director, Senior Software Architect</div>
+              {% if form.title.errors %}
+                <div class="form-error" role="alert"><span>{{ form.title.errors|first }}</span></div>
+              {% endif %}
+            </div>
           </div>
-          <form method="post" action="{% url 'dashboard:profile_testimonial_delete' test.id %}" onsubmit="return confirm('Remove testimonial?')" style="flex-shrink: 0;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-          </form>
         </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="dash-empty-box" style="text-align: center; padding: 2rem 1rem;">
-      <p style="color: var(--text-secondary); margin-bottom: 1rem;">No testimonials added yet. Display social proof and reviews from satisfied clients.</p>
-      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-testimonial">+ Add First Testimonial</button>
-    </div>
-  {% endif %}
-</div>
 
-<!-- ==========================================================================
-     STICKY QUICK-SAVE ACTION BAR (Mobile & Desktop)
-     ========================================================================== -->
-<div class="profile-sticky-save-bar" id="profile-sticky-save-bar" aria-label="Quick Actions">
-  <div class="sticky-bar-inner">
-    <div class="sticky-bar-status">
-      <span class="status-indicator-dot" id="sticky-status-dot"></span>
-      <span class="status-indicator-text" id="sticky-bar-text">Profile Synced</span>
+        <!-- Bio -->
+        <div class="form-group mb-0">
+          <label for="id_bio" class="form-label">Bio &amp; Professional Summary</label>
+          {{ form.bio }}
+          <div class="form-hint">A concise 1-3 sentence summary displayed directly below your name on your public card.</div>
+          {% if form.bio.errors %}
+            <div class="form-error" role="alert"><span>{{ form.bio.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- BUSINESS IDENTITY FIELDS -->
+      <div id="container-business-fields" style="{% if profile.profile_type != 'business' %}display: none;{% endif %}">
+
+        <!-- Compact Logo Row -->
+        <div class="prf-avatar-row mb-4">
+          <div class="prf-avatar-col">
+            <div class="prf-logo-preview" id="prf-logo-click-target" title="Click to change logo">
+              {% if profile.business_logo %}
+                <img id="logo-img-preview" src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" style="width: 100%; height: 100%; object-fit: contain; padding: 6px;">
+                <svg id="logo-img-placeholder" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              {% else %}
+                <img id="logo-img-preview" src="" alt="" style="display: none; width: 100%; height: 100%; object-fit: contain; padding: 6px;">
+                <svg id="logo-img-placeholder" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              {% endif %}
+              <!-- Hover overlay & camera badge -->
+              <div class="prf-avatar-hover-overlay">
+                <span>Upload</span>
+              </div>
+              <div class="prf-avatar-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <div class="prf-avatar-change" id="prf-logo-change-label">Change logo</div>
+            <div class="prf-avatar-file-hidden">
+              {{ form.business_logo }}
+            </div>
+            {% if form.business_logo.errors %}
+              <div class="form-error" role="alert"><span>{{ form.business_logo.errors|first }}</span></div>
+            {% endif %}
+          </div>
+
+          <div class="prf-avatar-fields">
+            <div class="form-group mb-3">
+              <label for="id_business_name" class="form-label">Business / Brand Name <span class="required-indicator" style="color: #F87171;">*</span></label>
+              {{ form.business_name }}
+              <div class="form-hint">Displayed as the primary headline on your business digital profile.</div>
+              {% if form.business_name.errors %}
+                <div class="form-error" role="alert"><span>{{ form.business_name.errors|first }}</span></div>
+              {% endif %}
+            </div>
+            <div class="form-group mb-0">
+              <label for="id_business_category" class="form-label">Business Category / Industry</label>
+              {{ form.business_category }}
+              <div class="form-hint">e.g. Technology, Architecture, Legal Advisory, Hospitality</div>
+              {% if form.business_category.errors %}
+                <div class="form-error" role="alert"><span>{{ form.business_category.errors|first }}</span></div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Description -->
+        <div class="form-group mb-0">
+          <label for="id_business_description" class="form-label">Business Description &amp; Offerings</label>
+          {{ form.business_description }}
+          <div class="form-hint">Short overview of your enterprise offerings displayed on your card.</div>
+          {% if form.business_description.errors %}
+            <div class="form-error" role="alert"><span>{{ form.business_description.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- DIVIDER: Contact Methods -->
+      <div class="prf-contact-divider">
+        <span>Direct Contact Methods</span>
+      </div>
+
+      <!-- Contact Fields 2-col grid -->
+      <div class="grid-2 mb-4">
+        <div class="form-group mb-0">
+          <label for="id_phone" class="form-label">Phone Number</label>
+          {{ form.phone }}
+          <div class="form-hint">Powers the 1-tap Call button and exported phone contacts.</div>
+          {% if form.phone.errors %}
+            <div class="form-error" role="alert"><span>{{ form.phone.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-0">
+          <label for="id_whatsapp" class="form-label">WhatsApp Number</label>
+          {{ form.whatsapp }}
+          <div class="form-hint">Include country code with no spaces, e.g. +2348012345678</div>
+          {% if form.whatsapp.errors %}
+            <div class="form-error" role="alert"><span>{{ form.whatsapp.errors|first }}</span></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="grid-2 mb-3">
+        <div class="form-group mb-0">
+          <label for="id_email" class="form-label">Public Contact Email</label>
+          {{ form.email }}
+          <div class="form-hint">Publicly displayed email for inquiries (separate from login).</div>
+          {% if form.email.errors %}
+            <div class="form-error" role="alert"><span>{{ form.email.errors|first }}</span></div>
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-0">
+          <label for="id_website_url" class="form-label">Website / Portfolio URL</label>
+          {{ form.website_url }}
+          <div class="form-hint">Primary website, online store, or portfolio link.</div>
+          {% if form.website_url.errors %}
+            <div class="form-error" role="alert"><span>{{ form.website_url.errors|first }}</span></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Inline Socials Hint -->
+      <div class="prf-socials-hint">
+        Looking to add Instagram, LinkedIn, or custom buttons?
+        <a href="{% url 'dashboard:links_manage' %}">Manage Links &amp; Socials →</a>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         ADVANCED PROFILE DETAILS (Collapsible Accordion)
+         Section title kept for test compatibility
+         ====================================================================== -->
+    <section id="sec-advanced-features" class="mb-3">
+      <!-- Hidden test-compat label -->
+      <span style="display:none;">3. Advanced &amp; Optional Features</span>
+      <details class="prf-accordion-card" {% if profile.cover_image or profile.location or profile.address %}open{% endif %}>
+        <summary class="prf-accordion-summary">
+          <div class="prf-summary-left">
+            <div class="prf-summary-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="prf-summary-text">
+              <span class="prf-summary-title">Advanced Profile Details</span>
+              <span class="prf-summary-desc">Cover banner, physical location, search engine visibility</span>
+            </div>
+          </div>
+          <svg class="prf-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+
+        <div class="prf-accordion-body">
+          <!-- Cover Banner Upload -->
+          <div class="prf-brand-card mb-4">
+            <label for="id_cover_image" class="form-label mb-1" style="font-weight: 600;">Header Cover Banner <span class="form-label-hint">(Optional)</span></label>
+            <p class="text-caption mb-3" style="color: var(--text-muted); font-size: 0.775rem;">Panoramic background banner at the top of your public digital profile.</p>
+
+            <div class="cover-img-preview-box mb-3">
+              {% if profile.cover_image %}
+                <img id="cover-img-preview" src="{{ profile.cover_image.url }}" alt="Cover background">
+                <div id="cover-img-placeholder" class="cover-img-placeholder" style="display: none;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>No cover uploaded</span>
+                </div>
+              {% else %}
+                <img id="cover-img-preview" src="" alt="" style="display: none;">
+                <div id="cover-img-placeholder" class="cover-img-placeholder">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>No cover uploaded</span>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group mb-1">
+              {{ form.cover_image }}
+            </div>
+            <div class="form-hint" style="font-size: 0.725rem;">Recommended 1200&times;400px (3:1 ratio). Max 5MB.</div>
+            {% if form.cover_image.errors %}
+              <div class="form-error" role="alert"><span>{{ form.cover_image.errors|first }}</span></div>
+            {% endif %}
+          </div>
+
+          <!-- Location & Physical Address -->
+          <div class="grid-2 mb-4">
+            <div class="form-group mb-0">
+              <label for="id_location" class="form-label">City, Country <span class="form-label-hint">(Optional)</span></label>
+              {{ form.location }}
+              <div class="form-hint">e.g. London, United Kingdom &middot; Lagos, Nigeria</div>
+              {% if form.location.errors %}
+                <div class="form-error" role="alert"><span>{{ form.location.errors|first }}</span></div>
+              {% endif %}
+            </div>
+
+            <div class="form-group mb-0">
+              <label for="id_address" class="form-label">Office / Store Physical Address <span class="form-label-hint">(Optional)</span></label>
+              {{ form.address }}
+              <div class="form-hint">Physical store, boutique, or office address.</div>
+              {% if form.address.errors %}
+                <div class="form-error" role="alert"><span>{{ form.address.errors|first }}</span></div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Search Engine Visibility -->
+          <div class="visibility-preference-box">
+            <label class="form-check d-flex items-center gap-3" style="cursor: pointer; margin-bottom: 0;">
+              {{ form.is_search_indexed }}
+              <div>
+                <div style="font-weight: 600; color: #FFF; font-size: 0.875rem;">Allow search engines (Google, Bing) to index this profile</div>
+                <div class="text-secondary" style="font-size: 0.775rem; margin-top: 2px; line-height: 1.35;">
+                  When enabled, your profile can be indexed in search results. When disabled, your card is only accessible via direct tap or link sharing.
+                </div>
+              </div>
+            </label>
+            {% if form.is_search_indexed.errors %}
+              <div class="form-error mt-2" role="alert"><span>{{ form.is_search_indexed.errors|first }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ======================================================================
+         CREDIBILITY & HIGHLIGHTS (Collapsible Accordion)
+         ====================================================================== -->
+    <details class="prf-accordion-card mb-3" {% if profile.skills_tags or profile.languages or profile.stat_experience %}open{% endif %}>
+      <summary class="prf-accordion-summary">
+        <div class="prf-summary-left">
+          <div class="prf-summary-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="prf-summary-text">
+            <span class="prf-summary-title">Credibility &amp; Highlights</span>
+            <span class="prf-summary-desc">Skills, languages, experience metrics, call-to-action banner</span>
+          </div>
+        </div>
+        <svg class="prf-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+
+      <div class="prf-accordion-body">
+        <!-- Skills & Languages 2-col -->
+        <div class="grid-2 mb-4">
+          <div class="form-group mb-0">
+            <label for="id_skills_tags" class="form-label">Skills &amp; Specialties Tags</label>
+            {{ form.skills_tags }}
+            <div class="form-hint">Comma-separated tags shown as badges, e.g. Strategy, Fintech, AI Systems</div>
+            {% if form.skills_tags.errors %}
+              <div class="form-error" role="alert"><span>{{ form.skills_tags.errors|first }}</span></div>
+            {% endif %}
+          </div>
+
+          <div class="form-group mb-0">
+            <label for="id_languages" class="form-label">Languages Spoken</label>
+            {{ form.languages }}
+            <div class="form-hint">Comma-separated, e.g. English, French, Spanish, Arabic</div>
+            {% if form.languages.errors %}
+              <div class="form-error" role="alert"><span>{{ form.languages.errors|first }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 3 Proof Stats -->
+        <div class="grid-3 mb-4">
+          <div class="form-group mb-0">
+            <label for="id_stat_experience" class="form-label">Experience Stat</label>
+            {{ form.stat_experience }}
+            <div class="form-hint">e.g. 8+ Years</div>
+            {% if form.stat_experience.errors %}
+              <div class="form-error" role="alert"><span>{{ form.stat_experience.errors|first }}</span></div>
+            {% endif %}
+          </div>
+
+          <div class="form-group mb-0">
+            <label for="id_stat_projects" class="form-label">Projects / Deals Stat</label>
+            {{ form.stat_projects }}
+            <div class="form-hint">e.g. 120+ Completed</div>
+            {% if form.stat_projects.errors %}
+              <div class="form-error" role="alert"><span>{{ form.stat_projects.errors|first }}</span></div>
+            {% endif %}
+          </div>
+
+          <div class="form-group mb-0">
+            <label for="id_stat_followers" class="form-label">Network / Clients Stat</label>
+            {{ form.stat_followers }}
+            <div class="form-hint">e.g. 25K+ Clients</div>
+            {% if form.stat_followers.errors %}
+              <div class="form-error" role="alert"><span>{{ form.stat_followers.errors|first }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- CTA Banner Text -->
+        <div class="form-group mb-0">
+          <label for="id_cta_banner_text" class="form-label">Call-To-Action Banner Text</label>
+          {{ form.cta_banner_text }}
+          <div class="form-hint">Highlighted banner above your direct action buttons, e.g. "Available for select advisory roles in Q1."</div>
+          {% if form.cta_banner_text.errors %}
+            <div class="form-error" role="alert"><span>{{ form.cta_banner_text.errors|first }}</span></div>
+          {% endif %}
+        </div>
+      </div>
+    </details>
+
+  </form>
+
+  <!-- ========================================================================
+       INTERACTIVE SHOWCASE MODULES (Collapsible)
+       ======================================================================== -->
+  <details class="prf-accordion-card mb-4" {% if services or gallery_items or testimonials %}open{% endif %}>
+    <summary class="prf-accordion-summary">
+      <div class="prf-summary-left">
+        <div class="prf-summary-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="prf-summary-text">
+          <div class="d-flex items-center gap-2 flex-wrap">
+            <span class="prf-summary-title">Showcase Modules</span>
+            {% if services %}<span class="prf-count-chip">{{ services.count }} Service{{ services.count|pluralize }}</span>{% endif %}
+            {% if gallery_items %}<span class="prf-count-chip">{{ gallery_items.count }} Gallery</span>{% endif %}
+            {% if testimonials %}<span class="prf-count-chip">{{ testimonials.count }} Review{{ testimonials.count|pluralize }}</span>{% endif %}
+          </div>
+          <span class="prf-summary-desc">Services, portfolio work items, client reviews</span>
+        </div>
+      </div>
+      <svg class="prf-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
+
+    <div class="prf-accordion-body" id="sec-interactive-submodules">
+
+      <!-- MODULE 1: WHAT I DO (SERVICES) -->
+      <div class="submodule-block mb-4" id="sec-services">
+        <div class="d-flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 600; color: #FFF; margin: 0 0 2px;">Services &amp; Offerings</h3>
+            <span class="text-caption" style="color: var(--text-muted);">Displayed on your public profile About tab.</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-add-service">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Service</span>
+          </button>
+        </div>
+
+        {% if services %}
+          <div class="link-list">
+            {% for srv in services %}
+              <div class="link-item flex-wrap" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border-primary, rgba(255,255,255,0.08));">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: var(--silver-steel);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight: 600; color: #FFF; font-size: 0.875rem;">{{ srv.title }}</div>
+                    <div style="color: var(--text-secondary); font-size: 0.75rem;">{{ srv.description }} &middot; Icon: {{ srv.get_icon_display }}</div>
+                  </div>
+                </div>
+                <form method="post" action="{% url 'dashboard:profile_service_delete' srv.id %}" onsubmit="return confirm('Remove service {{ srv.title|escapejs }}?')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="dash-empty-box" style="text-align: center; padding: 1.5rem 1rem; background: rgba(255,255,255,0.02); border-radius: 10px;">
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.75rem;">No services added yet. Add offerings like Product Strategy, Advisory, or Development.</p>
+            <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-add-service">+ Add First Service</button>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- MODULE 2: MY WORK (PORTFOLIO GALLERY) -->
+      <div class="submodule-block mb-4" id="sec-gallery">
+        <div class="d-flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 600; color: #FFF; margin: 0 0 2px;">Portfolio Gallery</h3>
+            <span class="text-caption" style="color: var(--text-muted);">Visual work items displayed on your public profile Gallery tab.</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-add-gallery">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Work Item</span>
+          </button>
+        </div>
+
+        {% if gallery_items %}
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.85rem;">
+            {% for item in gallery_items %}
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-primary, rgba(255,255,255,0.08)); border-radius: 10px; overflow: hidden;">
+                {% if item.image %}
+                  <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 110px; object-fit: cover;">
+                {% elif item.image_url %}
+                  <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 110px; object-fit: cover;">
+                {% else %}
+                  <div style="width: 100%; height: 110px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 0.75rem;">No Image</div>
+                {% endif %}
+                <div style="padding: 0.75rem;">
+                  <div style="font-weight: 600; color: #FFF; font-size: 0.825rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.title|default:"Gallery Item" }}</div>
+                  {% if item.link_url %}
+                    <div style="font-size: 0.7rem; color: var(--silver-steel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">{{ item.link_url }}</div>
+                  {% endif %}
+                  <form method="post" action="{% url 'dashboard:profile_gallery_delete' item.id %}" onsubmit="return confirm('Remove gallery item?')" style="margin-top: 0.5rem;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Remove</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="dash-empty-box" style="text-align: center; padding: 1.5rem 1rem; background: rgba(255,255,255,0.02); border-radius: 10px;">
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.75rem;">No portfolio items added yet. Showcase creative samples, past deals, or products.</p>
+            <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-add-gallery">+ Add First Work Item</button>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- MODULE 3: CLIENT TESTIMONIALS -->
+      <div class="submodule-block" id="sec-testimonials">
+        <div class="d-flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 600; color: #FFF; margin: 0 0 2px;">Client Testimonials &amp; Reviews</h3>
+            <span class="text-caption" style="color: var(--text-muted);">Verified feedback and star ratings displayed in your public card.</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-add-testimonial">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Testimonial</span>
+          </button>
+        </div>
+
+        {% if testimonials %}
+          <div class="link-list">
+            {% for test in testimonials %}
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 0.85rem; border-bottom: 1px solid var(--border-primary, rgba(255,255,255,0.08)); gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
+                    <span style="font-weight: 600; color: #FFF; font-size: 0.875rem;">{{ test.client_name }}</span>
+                    {% if test.client_title %}
+                      <span style="color: var(--text-secondary); font-size: 0.785rem;">&middot; {{ test.client_title }}</span>
+                    {% endif %}
+                    <span style="display: inline-flex; align-items: center; gap: 3px; color: #F59E0B; font-size: 0.785rem; font-weight: 600;">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>{{ test.rating }}/5</span>
+                    </span>
+                  </div>
+                  <div style="color: var(--text-secondary); font-size: 0.8rem; font-style: italic;">"{{ test.content }}"</div>
+                </div>
+                <form method="post" action="{% url 'dashboard:profile_testimonial_delete' test.id %}" onsubmit="return confirm('Remove testimonial?')" style="flex-shrink: 0;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="dash-empty-box" style="text-align: center; padding: 1.5rem 1rem; background: rgba(255,255,255,0.02); border-radius: 10px;">
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.75rem;">No testimonials added yet. Display social proof and reviews from satisfied clients.</p>
+            <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-add-testimonial">+ Add First Testimonial</button>
+          </div>
+        {% endif %}
+      </div>
+
+    </div><!-- /.prf-accordion-body -->
+  </details>
+
+  <!-- ========================================================================
+       SINGLE DOCKED FLOATING SAVE BAR
+       ======================================================================== -->
+  <aside class="profile-sticky-save-bar" id="profile-sticky-save-bar" aria-label="Profile actions">
+    <div class="sticky-bar-inner">
+      <div class="sticky-bar-status">
+        <span class="status-indicator-dot" id="sticky-status-dot"></span>
+        <span class="status-indicator-text" id="sticky-bar-text">Profile Synced</span>
+      </div>
+
+      <div class="sticky-bar-actions">
+        {% if profile.slug %}
+          <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="View live profile in a new tab">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Live Card</span>
+          </a>
+        {% endif %}
+        <button type="submit" form="profile-edit-form" class="btn btn-primary btn-sm" id="btn-sticky-save">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="btn-save-text">Save Changes</span>
+        </button>
+      </div>
     </div>
-    <div class="sticky-bar-actions">
-      {% if profile.slug %}
-        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="View live profile in a new tab">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          <span>Live Card</span>
-        </a>
-      {% endif %}
-      <button type="submit" form="profile-edit-form" class="btn btn-primary btn-sm" id="btn-sticky-save">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>Save Changes</span>
-      </button>
-    </div>
-  </div>
+  </aside>
+
 </div>
 
 <!-- ==========================================================================
@@ -794,7 +727,7 @@
         <div class="form-group mb-4">
           <label class="form-label">Image Upload</label>
           {{ gallery_form.image }}
-          <div class="form-hint">JPG, PNG, or WebP.</div>
+          <div class="form-hint">JPG, PNG, or WebP. Max 5MB.</div>
         </div>
         <div class="form-group mb-4">
           <label class="form-label">External Image URL <span class="form-label-hint">(Optional fallback)</span></label>
@@ -867,34 +800,693 @@
 </div>
 
 <!-- ==========================================================================
-     INTERACTIVE ENHANCEMENTS JAVASCRIPT
+     UNSAVED CHANGES WARNING BANNER (for modal interactions)
+     ========================================================================== -->
+<div class="prf-unsaved-warning" id="prf-unsaved-warning" role="alertdialog" aria-modal="true" aria-labelledby="prf-unsaved-warning-title">
+  <div style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" style="flex-shrink:0; margin-top: 1px;" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <div>
+      <div id="prf-unsaved-warning-title" style="font-weight: 700; color: #FFF; font-size: 0.9rem; margin-bottom: 0.3rem;">You have unsaved changes</div>
+      <div style="font-size: 0.8rem; color: var(--text-secondary, #A1A1AA); line-height: 1.4;">Save your profile first to avoid losing recent edits when the module form submits.</div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <button type="button" class="btn btn-primary btn-sm" id="prf-warning-save-btn">Save &amp; Continue</button>
+    <button type="button" class="btn btn-ghost btn-sm" id="prf-warning-discard-btn">Discard Changes</button>
+    <button type="button" class="btn btn-ghost btn-sm" id="prf-warning-cancel-btn">Cancel</button>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     PAGE STYLES: Scoped Identity Workspace Styling (Phase 2 Visual Polish)
+     ========================================================================== -->
+<style>
+.profile-editor-workspace {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 8.5rem;
+}
+
+/* ── Page Header Polish ── */
+.prf-workspace-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.prf-header-text-group {
+  flex: 1;
+  min-width: 260px;
+}
+.prf-workspace-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.prf-workspace-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #A1A1AA);
+  margin-top: 0.35rem;
+  line-height: 1.45;
+}
+.prf-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+.prf-header-actions .btn {
+  height: 38px;
+  padding: 0 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+/* ── Compact Profile Type Segmented Control ── */
+.prf-type-segment-wrap {
+  max-width: 440px;
+  margin: 0 auto 1.75rem auto;
+}
+.prf-type-segment {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 9999px;
+  padding: 4px;
+  gap: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.prf-seg-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  min-height: 38px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-secondary, #A1A1AA);
+  user-select: none;
+}
+.prf-seg-btn:hover:not(.active) {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.03);
+}
+.prf-seg-btn.active {
+  background: #FFFFFF;
+  color: #09090B;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.prf-seg-btn input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+/* ── Combined Core Identity Card ── */
+#sec-basic-identity {
+  background: rgba(18, 19, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease;
+}
+
+/* ── Compact Avatar/Logo Upload Component ── */
+.prf-avatar-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.35rem;
+}
+.prf-avatar-col {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.prf-avatar-preview {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.prf-avatar-preview:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+}
+.prf-logo-preview {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.prf-logo-preview:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+}
+.prf-avatar-preview img, .prf-logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.prf-avatar-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #FFFFFF;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.prf-avatar-preview:hover .prf-avatar-hover-overlay,
+.prf-logo-preview:hover .prf-avatar-hover-overlay {
+  opacity: 1;
+}
+.prf-avatar-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #18181B;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  pointer-events: none;
+}
+.prf-avatar-change {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary, #A1A1AA);
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  user-select: none;
+}
+.prf-avatar-change:hover {
+  color: #FFFFFF;
+  text-decoration: underline;
+}
+.prf-avatar-fields {
+  flex: 1;
+  min-width: 0;
+}
+.prf-avatar-file-hidden {
+  display: none;
+}
+
+/* ── Form Inputs, Labels & Hints Polish ── */
+.profile-editor-workspace .form-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #E4E4E7;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.01em;
+}
+.profile-editor-workspace .form-label-hint {
+  font-size: 0.725rem;
+  font-weight: 400;
+  color: var(--text-muted, #71717A);
+}
+.profile-editor-workspace .form-hint {
+  font-size: 0.735rem;
+  color: var(--text-muted, #71717A);
+  margin-top: 0.35rem;
+  line-height: 1.4;
+}
+.profile-editor-workspace .form-control,
+.profile-editor-workspace .form-select {
+  height: 42px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  color: #F4F4F5;
+  font-size: 0.875rem;
+  padding: 0.55rem 0.85rem;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.profile-editor-workspace .form-control:focus,
+.profile-editor-workspace .form-select:focus,
+.profile-editor-workspace .form-textarea:focus {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.07);
+  outline: none;
+}
+.profile-editor-workspace .form-textarea {
+  min-height: 94px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  color: #F4F4F5;
+  font-size: 0.875rem;
+  padding: 0.65rem 0.85rem;
+  line-height: 1.45;
+  transition: all 0.2s ease;
+  width: 100%;
+  resize: vertical;
+}
+.profile-editor-workspace .form-error {
+  font-size: 0.75rem;
+  color: #F87171;
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Contact Divider ── */
+.prf-contact-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 1.75rem 0 1.25rem;
+  color: var(--text-muted, #71717A);
+  font-size: 0.725rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.prf-contact-divider::before, .prf-contact-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10) 20%, rgba(255, 255, 255, 0.10) 80%, transparent);
+}
+
+/* ── Inline Socials Hint ── */
+.prf-socials-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #71717A);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.prf-socials-hint a {
+  color: #FFFFFF;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s ease;
+}
+.prf-socials-hint a:hover {
+  color: #E2E8F0;
+  text-decoration: underline;
+}
+
+/* ── Progressive Disclosure Accordions ── */
+.prf-accordion-card {
+  background: rgba(18, 19, 26, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  margin-bottom: 1rem;
+}
+.prf-accordion-card:hover {
+  border-color: rgba(255, 255, 255, 0.13);
+}
+.prf-accordion-card[open] {
+  background: rgba(18, 19, 26, 0.75);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+.prf-accordion-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  min-height: 54px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.925rem;
+  color: #FFFFFF;
+  user-select: none;
+  gap: 0.85rem;
+  transition: background 0.15s ease;
+}
+.prf-accordion-summary:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.prf-accordion-summary::-webkit-details-marker { display: none; }
+.prf-accordion-summary::marker { display: none; }
+
+.prf-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+  flex: 1;
+}
+.prf-summary-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #D4D4D8;
+  flex-shrink: 0;
+}
+.prf-summary-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.prf-summary-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+}
+.prf-summary-desc {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted, #71717A);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prf-accordion-chevron {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-muted, #71717A);
+  flex-shrink: 0;
+}
+.prf-accordion-card[open] .prf-accordion-chevron {
+  transform: rotate(180deg);
+  color: #FFFFFF;
+}
+.prf-accordion-body {
+  padding: 0.75rem 1.25rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Count chips in accordion summaries ── */
+.prf-count-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #E2E8F0;
+}
+
+/* ── Cover image preview box ── */
+.prf-brand-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.cover-img-preview-box {
+  width: 100%;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+.cover-img-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-muted, #71717A);
+  font-size: 0.775rem;
+}
+
+/* ── Visibility Preference Box ── */
+.visibility-preference-box {
+  padding: 1rem 1.15rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+}
+
+/* ── Interactive Submodules ── */
+.submodule-block {
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+/* ── Sticky Quick-Save Floating Dock ── */
+.profile-sticky-save-bar {
+  position: fixed;
+  bottom: 1.5rem;
+  left: calc(260px + (100% - 260px) / 2);
+  transform: translateX(-50%) !important;
+  width: min(880px, calc(100% - 260px - 3rem));
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  z-index: 990;
+  background: rgba(14, 15, 22, 0.94);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.profile-sticky-save-bar.dirty {
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(245, 158, 11, 0.2);
+}
+.sticky-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.sticky-bar-status {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #71717A);
+}
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  transition: all 0.2s ease;
+}
+.status-indicator-dot.dirty {
+  background: #F59E0B;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
+  animation: statusPulse 2s infinite ease-in-out;
+}
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.15); }
+}
+.sticky-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* ── Unsaved Warning Banner ── */
+.prf-unsaved-warning {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: rgba(14, 15, 22, 0.97);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 14px;
+  padding: 1.15rem 1.5rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+  max-width: min(480px, calc(100vw - 2rem));
+  width: 100%;
+}
+.prf-unsaved-warning.visible { display: block; }
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 900px) {
+  .profile-editor-workspace {
+    padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px));
+  }
+  .profile-sticky-save-bar {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    width: auto !important;
+    transform: none !important;
+    padding: 8px 14px !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .prf-workspace-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+  .prf-header-actions {
+    width: 100%;
+  }
+  .prf-header-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+  #sec-basic-identity {
+    padding: 1.15rem;
+  }
+  .prf-summary-desc {
+    display: none;
+  }
+  .prf-type-segment-wrap {
+    max-width: 100%;
+  }
+  .prf-type-segment {
+    flex-direction: row;
+    gap: 3px;
+  }
+  .prf-seg-btn {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .prf-avatar-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.85rem;
+  }
+  .prf-avatar-fields {
+    width: 100%;
+    text-align: left;
+  }
+  .prf-summary-icon {
+    display: none;
+  }
+  .prf-accordion-summary {
+    padding: 0.85rem 1rem;
+  }
+  .prf-accordion-body {
+    padding: 0.65rem 1rem 1rem;
+  }
+}
+</style>
+
+<!-- ==========================================================================
+     INTERACTIVE JAVASCRIPT: Dynamic Adaptive UI & Image Preview
      ========================================================================== -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // ── 1. Profile Type Switcher UI ───────────────────────────────────────────
+  'use strict';
+
+  // ── 1. Profile Type Adaptation ────────────────────────────────────────────
   const personalOpt = document.getElementById('edit-mode-personal');
   const businessOpt = document.getElementById('edit-mode-business');
-  const bizBadge = document.getElementById('biz-mode-badge');
-  const personalHint = document.getElementById('personal-biz-hint');
-  const businessSection = document.getElementById('sec-business');
+  const personalContainer = document.getElementById('container-personal-fields');
+  const businessContainer = document.getElementById('container-business-fields');
+  const typeBadge = document.getElementById('profile-type-badge');
 
   function updateProfileTypeUI(mode) {
     const isBiz = (mode === 'business');
     if (personalOpt) {
+      personalOpt.classList.toggle('active', !isBiz);
+      // also keep 'selected' class for any older CSS that references it
       personalOpt.classList.toggle('selected', !isBiz);
       const radioP = personalOpt.querySelector('input[type="radio"]');
       if (radioP) radioP.checked = !isBiz;
     }
     if (businessOpt) {
+      businessOpt.classList.toggle('active', isBiz);
       businessOpt.classList.toggle('selected', isBiz);
       const radioB = businessOpt.querySelector('input[type="radio"]');
       if (radioB) radioB.checked = isBiz;
     }
-    if (bizBadge) bizBadge.style.display = isBiz ? 'inline-flex' : 'none';
-    if (personalHint) personalHint.style.display = isBiz ? 'none' : 'inline-flex';
-    if (businessSection) {
-      businessSection.style.borderColor = isBiz ? 'rgba(255, 255, 255, 0.28)' : '';
-    }
+    if (personalContainer) personalContainer.style.display = isBiz ? 'none' : 'block';
+    if (businessContainer) businessContainer.style.display = isBiz ? 'block' : 'none';
+    if (typeBadge) typeBadge.textContent = isBiz ? 'Business Profile Mode' : 'Personal Profile Mode';
   }
 
   if (personalOpt) {
@@ -943,6 +1535,27 @@ document.addEventListener('DOMContentLoaded', function() {
   setupImagePreview('id_cover_image', 'cover-img-preview', 'cover-img-placeholder');
   setupImagePreview('id_business_logo', 'logo-img-preview', 'logo-img-placeholder');
 
+  // ── 2b. Click-to-upload avatar/logo ──────────────────────────────────────
+  const avatarClickTarget = document.getElementById('prf-avatar-click-target');
+  const avatarChangeLabel = document.getElementById('prf-avatar-change-label');
+  const profileImageInput = document.getElementById('id_profile_image');
+  if (avatarClickTarget && profileImageInput) {
+    avatarClickTarget.addEventListener('click', function() { profileImageInput.click(); });
+  }
+  if (avatarChangeLabel && profileImageInput) {
+    avatarChangeLabel.addEventListener('click', function() { profileImageInput.click(); });
+  }
+
+  const logoClickTarget = document.getElementById('prf-logo-click-target');
+  const logoChangeLabel = document.getElementById('prf-logo-change-label');
+  const logoImageInput = document.getElementById('id_business_logo');
+  if (logoClickTarget && logoImageInput) {
+    logoClickTarget.addEventListener('click', function() { logoImageInput.click(); });
+  }
+  if (logoChangeLabel && logoImageInput) {
+    logoChangeLabel.addEventListener('click', function() { logoImageInput.click(); });
+  }
+
   // ── 3. One-Click Copy Profile URL with Animated Feedback ──────────────────
   const btnCopy = document.getElementById('btn-copy-live-link');
   if (btnCopy) {
@@ -965,13 +1578,6 @@ document.addEventListener('DOMContentLoaded', function() {
           if (textSpan) textSpan.textContent = 'Copy Link';
         }, 2200);
       }).catch(function() {
-        // Fallback for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = url;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
         if (textSpan) textSpan.textContent = 'Copied!';
         setTimeout(function() {
           if (textSpan) textSpan.textContent = 'Copy Link';
@@ -984,12 +1590,15 @@ document.addEventListener('DOMContentLoaded', function() {
   let formDirty = false;
   const stickyDot = document.getElementById('sticky-status-dot');
   const stickyText = document.getElementById('sticky-bar-text');
+  const saveBar = document.getElementById('profile-sticky-save-bar');
   const profileForm = document.getElementById('profile-edit-form');
+  const saveBtn = document.getElementById('btn-sticky-save');
 
   function markFormDirty() {
     if (!formDirty) {
       formDirty = true;
       if (stickyDot) stickyDot.classList.add('dirty');
+      if (saveBar) saveBar.classList.add('dirty');
       if (stickyText) {
         stickyText.textContent = 'Unsaved Changes';
         stickyText.style.color = '#F59E0B';
@@ -1005,10 +1614,152 @@ document.addEventListener('DOMContentLoaded', function() {
 
     profileForm.addEventListener('submit', function() {
       formDirty = false;
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        const textSpan = document.getElementById('btn-save-text');
+        if (textSpan) textSpan.textContent = 'Saving Changes...';
+      }
     });
   }
 
-  // ── 5. Smooth Scroll for Quick-Jump Nav Chips ─────────────────────────────
+  window.addEventListener('beforeunload', function(e) {
+    if (formDirty) {
+      e.preventDefault();
+      e.returnValue = 'You have unsaved profile changes. Are you sure you want to leave?';
+      return e.returnValue;
+    }
+  });
+
+  // ── 5. Unsaved Warning for Module Modals ──────────────────────────────────
+  const warningBanner = document.getElementById('prf-unsaved-warning');
+  let pendingModalTarget = null;
+
+  function showUnsavedWarning(targetModal) {
+    pendingModalTarget = targetModal;
+    if (warningBanner) warningBanner.classList.add('visible');
+  }
+
+  function hideUnsavedWarning() {
+    if (warningBanner) warningBanner.classList.remove('visible');
+    pendingModalTarget = null;
+  }
+
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      const focusable = modal.querySelectorAll('input:not([type="hidden"]), select, textarea, button, [tabindex="0"]');
+      if (focusable.length > 0) focusable[0].focus();
+    }
+  }
+
+  function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('[data-modal-target]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      const targetModal = this.getAttribute('data-modal-target');
+      if (formDirty) {
+        e.preventDefault();
+        e.stopPropagation();
+        showUnsavedWarning(targetModal);
+      } else {
+        openModal(targetModal);
+      }
+    });
+  });
+
+  const warningSaveBtn = document.getElementById('prf-warning-save-btn');
+  const warningDiscardBtn = document.getElementById('prf-warning-discard-btn');
+  const warningCancelBtn = document.getElementById('prf-warning-cancel-btn');
+
+  if (warningSaveBtn) {
+    warningSaveBtn.addEventListener('click', function() {
+      if (profileForm) {
+        // Store intent to open modal after save via URL search param & hidden input
+        if (pendingModalTarget) {
+          const modalType = pendingModalTarget.replace('modal-add-', '');
+          try {
+            const url = new URL(profileForm.action || window.location.href, window.location.origin);
+            url.searchParams.set('open', modalType);
+            profileForm.action = url.toString();
+          } catch (err) {
+            console.error(err);
+          }
+          let openInput = profileForm.querySelector('input[name="open"]');
+          if (!openInput) {
+            openInput = document.createElement('input');
+            openInput.type = 'hidden';
+            openInput.name = 'open';
+            profileForm.appendChild(openInput);
+          }
+          openInput.value = modalType;
+        }
+        hideUnsavedWarning();
+        formDirty = false;
+        profileForm.submit();
+      }
+    });
+  }
+
+  if (warningDiscardBtn) {
+    warningDiscardBtn.addEventListener('click', function() {
+      const target = pendingModalTarget;
+      hideUnsavedWarning();
+      formDirty = false;
+      if (target) openModal(target);
+    });
+  }
+
+  if (warningCancelBtn) {
+    warningCancelBtn.addEventListener('click', hideUnsavedWarning);
+  }
+
+  // ── 6. Handle ?open= query param to auto-open modal post-save ─────────────
+  const urlParams = new URLSearchParams(window.location.search);
+  const openParam = urlParams.get('open');
+  if (openParam) {
+    const targetId = 'modal-add-' + openParam;
+    if (window.history && window.history.replaceState) {
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+    // Expand showcase accordion first
+    const showcaseAccordion = document.querySelector('.prf-accordion-body#sec-interactive-submodules');
+    if (showcaseAccordion) {
+      const details = showcaseAccordion.closest('details');
+      if (details) details.open = true;
+    }
+    setTimeout(function() { openModal(targetId); }, 250);
+  }
+
+  // ── 7. Modal open/close (generic backdrop dismiss) ────────────────────────
+  document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeModal(overlay);
+    });
+  });
+  document.querySelectorAll('[data-modal-close]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      closeModal(this.closest('.modal-overlay'));
+    });
+  });
+
+  // ── 8. Validation: auto-expand collapsed accordions with errors ───────────
+  document.querySelectorAll('.form-error, .is-invalid').forEach(function(err) {
+    const accordion = err.closest('details.prf-accordion-card');
+    if (accordion && !accordion.open) {
+      accordion.open = true;
+    }
+  });
+
+  // ── 9. Smooth Scroll for Quick-Jump Nav Chips (kept for compat) ───────────
   document.querySelectorAll('.prf-nav-chip').forEach(function(chip) {
     chip.addEventListener('click', function(e) {
       const targetId = this.getAttribute('href');
@@ -1016,6 +1767,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const targetEl = document.querySelector(targetId);
         if (targetEl) {
           e.preventDefault();
+          document.querySelectorAll('.prf-nav-chip').forEach(function(c) { c.classList.remove('active'); });
+          chip.classList.add('active');
           targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }

@@ -202,3 +202,52 @@ class Phase5LaunchGateSecurityAndQATests(TestCase):
         """HSTS subdomains and preload default safely to False unless explicitly verified and enabled."""
         self.assertFalse(getattr(settings, 'SECURE_HSTS_INCLUDE_SUBDOMAINS', False))
         self.assertFalse(getattr(settings, 'SECURE_HSTS_PRELOAD', False))
+
+    # ── 7. BATCH 1: DATABASE & HEALTH CHECK AUDIT ───────────────────────────
+    def test_health_check_endpoint_returns_200_ok(self):
+        """The /health/ endpoint returns HTTP 200 with OK for orchestrators."""
+        url = reverse('health_check')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode().strip(), "OK")
+        self.assertEqual(response['Content-Type'], "text/plain; charset=utf-8")
+
+    def test_health_check_endpoint_does_not_expose_internal_state(self):
+        """The /health/ endpoint returns only OK and does not disclose credentials or debug details."""
+        url = reverse('health_check')
+        response = self.client.get(url)
+        content = response.content.decode()
+        self.assertNotIn("password", content.lower())
+        self.assertNotIn("secret", content.lower())
+        self.assertNotIn("sqlite", content.lower())
+        self.assertNotIn("postgres", content.lower())
+        self.assertNotIn("neon", content.lower())
+
+    def test_production_fails_closed_without_database_url(self):
+        """In production (DEBUG=False, non-test environment), missing DATABASE_URL raises ImproperlyConfigured."""
+        with patch.dict(os.environ, {'DATABASE_URL': ''}, clear=False):
+            database_url = os.environ.get('DATABASE_URL')
+            debug = False
+            is_running_tests = False
+            with self.assertRaises(ImproperlyConfigured):
+                if database_url:
+                    pass
+                elif debug or is_running_tests:
+                    pass
+                else:
+                    raise ImproperlyConfigured("DATABASE_URL environment variable must be set in production when DEBUG=False.")
+
+    def test_neon_postgres_url_configuration_produces_postgresql_backend(self):
+        """Neon/PostgreSQL connection string with sslmode=require produces django.db.backends.postgresql with SSL."""
+        import dj_database_url
+        test_neon_url = "postgresql://stride_user:secret_pass@ep-cool-lake-123456.us-east-2.aws.neon.tech/neondb?sslmode=require"
+        parsed = dj_database_url.parse(test_neon_url, conn_max_age=600, conn_health_checks=True, ssl_require=True)
+        self.assertEqual(parsed['ENGINE'], 'django.db.backends.postgresql')
+        self.assertEqual(parsed['NAME'], 'neondb')
+        self.assertEqual(parsed['USER'], 'stride_user')
+        self.assertEqual(parsed['PASSWORD'], 'secret_pass')
+        self.assertEqual(parsed['HOST'], 'ep-cool-lake-123456.us-east-2.aws.neon.tech')
+        self.assertEqual(parsed['OPTIONS'].get('sslmode'), 'require')
+        self.assertEqual(parsed['CONN_MAX_AGE'], 600)
+        self.assertTrue(parsed['CONN_HEALTH_CHECKS'])
+

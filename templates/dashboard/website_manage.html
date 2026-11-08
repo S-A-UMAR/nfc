@@ -989,9 +989,21 @@
     color: #ffffff;
   }
 
+  @media (max-width: 900px) {
+    .sticky-save-bar {
+      bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+      border-radius: 9999px;
+      padding: 0.75rem 1.25rem;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+  }
+
   @media (max-width: 640px) {
     .hide-mobile { display: none !important; }
-    .sticky-save-bar { bottom: 0.5rem; padding: 0.75rem 1rem; }
+    .sticky-save-bar {
+      bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+      padding: 0.75rem 1rem;
+    }
     .sticky-save-bar .btn { flex-grow: 1; justify-content: center; }
   }
 </style>

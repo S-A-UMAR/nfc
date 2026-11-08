@@ -1,0 +1,319 @@
+/* ==========================================================================
+   STRIDE LANDING PAGE — PHASE 1 ENHANCEMENTS
+   Features Grid · UX Polish · Mobile Refinement
+   ========================================================================== */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FEATURES SECTION
+   ───────────────────────────────────────────────────────────────────────── */
+.features-section {
+  padding: var(--space-20) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background:
+    radial-gradient(800px 400px at 50% 100%, rgba(255, 255, 255, 0.025) 0%, transparent 70%),
+    var(--bg-primary);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.feature-card {
+  padding: var(--space-6);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.feature-card:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: var(--border-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--silver-accent);
+  margin-bottom: var(--space-4);
+  flex-shrink: 0;
+  transition: all 0.22s ease;
+}
+
+.feature-card:hover .feature-icon {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.20);
+  color: var(--silver-highlight);
+}
+
+.feature-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  line-height: 1.3;
+}
+
+.feature-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HERO REFINEMENTS
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Improve hero layout balance on laptop screens */
+@media (min-width: 1024px) {
+  .hero-layout {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: var(--space-12);
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    max-width: 480px;
+  }
+}
+
+/* Tighter hero on tablets */
+@media (max-width: 900px) {
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    text-align: center;
+  }
+
+  .hero-copy-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-desc {
+    max-width: 560px;
+    text-align: center;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-trust-strip {
+    justify-content: center;
+  }
+
+  .hero-stage-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STEP CARDS — ICON REFINEMENTS
+   ───────────────────────────────────────────────────────────────────────── */
+.step-card {
+  position: relative;
+}
+
+.step-number {
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.06);
+  line-height: 1;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.04em;
+  transition: color 0.3s ease;
+}
+
+.step-card:hover .step-number {
+  color: rgba(255, 255, 255, 0.12);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FEATURES SECTION RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .features-section {
+    padding: var(--space-14) 0;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .feature-card {
+    padding: var(--space-5);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HERO MOBILE (360–480px)
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .hero-trust-strip {
+    gap: var(--space-2);
+  }
+
+  .hero-trust-dot {
+    display: none;
+  }
+
+  .hero-trust-item {
+    font-size: 0.75rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--space-3);
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FAQ ACCORDION REFINEMENTS
+   ───────────────────────────────────────────────────────────────────────── */
+.accordion-trigger {
+  width: 100%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  transition: color 0.2s ease;
+}
+
+.accordion-trigger:hover {
+  color: #FFFFFF;
+}
+
+.accordion-trigger:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.accordion-icon {
+  flex-shrink: 0;
+  color: var(--silver-steel);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.accordion-item.active .accordion-icon {
+  transform: rotate(180deg);
+  color: var(--silver-accent);
+}
+
+.accordion-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-content {
+  padding: 0 var(--space-5) var(--space-5);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION SPACING CONSISTENCY (360px → 1440px)
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .how-section,
+  .persona-section,
+  .product-section,
+  .showcase-section,
+  .pc-section,
+  .faq-section,
+  .cta-section,
+  .clarity-strip-section {
+    padding-top: var(--space-14);
+    padding-bottom: var(--space-14);
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .persona-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .specs-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 768px) {
+  .showcase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .showcase-mockup-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .showcase-iphone-img {
+    max-width: 260px;
+  }
+}

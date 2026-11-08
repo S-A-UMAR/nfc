@@ -17,14 +17,22 @@ from django.db.models import Count, Q
 @login_required
 def dashboard_overview_view(request):
     """
-    Main Dashboard Overview — all stats and deltas are calculated directly from DB in optimized queries.
+    Main Dashboard Overview Command Center — real database stats, card status,
+    network leads, and contextual guidance in optimized queries.
     """
     profile, _ = Profile.objects.get_or_create(
         user=request.user,
         defaults={'full_name': request.user.display_name, 'email': request.user.email}
     )
 
-    primary_card = Card.objects.filter(user=request.user).order_by('activated_at').first()
+    # Cards query - evaluate once to avoid extra count queries
+    cards = list(Card.objects.filter(user=request.user).select_related('profile').order_by('-activated_at', '-created_at'))
+    primary_card = cards[0] if cards else None
+    has_card = bool(primary_card)
+    cards_count = len(cards)
+    active_cards_count = sum(1 for c in cards if c.status == Card.STATUS_ACTIVE)
+
+    # Orders query
     orders = Order.objects.filter(user=request.user).select_related('package').order_by('-created_at')[:4]
     active_order = Order.objects.filter(user=request.user).exclude(order_status__in=['completed', 'cancelled']).order_by('-created_at').first()
     primary_website = Website.objects.filter(user=request.user).first()
@@ -32,7 +40,6 @@ def dashboard_overview_view(request):
     has_slug = bool(profile.slug)
     has_contact = bool(profile.phone or profile.whatsapp or profile.email)
     has_links = profile.social_links.exists() or profile.custom_links.exists()
-    has_card = bool(primary_card)
 
     # Real profile checklist calculations (only genuine database fields)
     has_headline = bool(profile.title or profile.business_name)
@@ -40,21 +47,114 @@ def dashboard_overview_view(request):
     has_photo = bool(profile.profile_image or profile.business_logo)
 
     checklist = [
-        {'key': 'identity', 'label': 'Full Name & Slug', 'done': bool(profile.full_name and profile.slug)},
-        {'key': 'headline', 'label': 'Headline or Business Name', 'done': has_headline},
-        {'key': 'bio', 'label': 'Professional Bio or Overview', 'done': has_bio},
-        {'key': 'contact', 'label': 'Direct Contact Info', 'done': has_contact},
-        {'key': 'photo', 'label': 'Profile Photo or Logo', 'done': has_photo},
-        {'key': 'links', 'label': 'Social or Portfolio Links', 'done': has_links},
+        {
+            'key': 'identity',
+            'label': 'Name & Public Handle',
+            'desc': 'Your full name and unique public profile link',
+            'done': bool(profile.full_name and profile.slug),
+            'url': 'dashboard:profile_edit',
+            'action': 'Edit Name & Slug',
+        },
+        {
+            'key': 'headline',
+            'label': 'Headline or Business Name',
+            'desc': 'Your professional headline, role or enterprise identity',
+            'done': has_headline,
+            'url': 'dashboard:profile_edit',
+            'action': 'Add Headline',
+        },
+        {
+            'key': 'bio',
+            'label': 'Bio or About Overview',
+            'desc': 'A concise summary of what you do, offer or create',
+            'done': has_bio,
+            'url': 'dashboard:profile_edit',
+            'action': 'Add Bio',
+        },
+        {
+            'key': 'contact',
+            'label': 'Direct Contact Info',
+            'desc': 'Phone, WhatsApp, or primary email for direct 1-tap taps',
+            'done': has_contact,
+            'url': 'dashboard:profile_edit',
+            'action': 'Add Contact',
+        },
+        {
+            'key': 'photo',
+            'label': 'Profile Photo or Logo',
+            'desc': 'A high-resolution headshot or business logo',
+            'done': has_photo,
+            'url': 'dashboard:profile_edit',
+            'action': 'Upload Photo',
+        },
+        {
+            'key': 'links',
+            'label': 'Social & Action Links',
+            'desc': 'Interactive buttons for LinkedIn, WhatsApp, website, etc.',
+            'done': has_links,
+            'url': 'dashboard:links_manage',
+            'action': 'Add Links',
+        },
     ]
     completed_checklist_count = sum(1 for item in checklist if item['done'])
     total_checklist_count = len(checklist)
     completion_percentage = round((completed_checklist_count / total_checklist_count) * 100)
+    next_step = next((item for item in checklist if not item['done']), None)
     is_profile_configured = bool(profile.slug and (profile.title or profile.business_name))
+
+    # Network activity
+    recent_contacts = profile.received_contacts.order_by('-created_at')[:5]
     received_contacts_count = profile.received_contacts.count()
+    unread_contacts_count = profile.received_contacts.filter(is_read=False).count()
+
+    # Time-based personalized greeting
+    now = timezone.now()
+    hour = now.hour
+    if hour < 12:
+        greeting_time = "Good morning"
+    elif hour < 17:
+        greeting_time = "Good afternoon"
+    else:
+        greeting_time = "Good evening"
+
+    first_name = request.user.first_name or (profile.full_name.split()[0] if profile.full_name else request.user.display_name)
+    greeting = f"{greeting_time}, {first_name}"
+
+    # Primary recommended action
+    if not is_profile_configured:
+        primary_action = {
+            'label': 'Complete Profile Setup',
+            'desc': 'Finish your digital profile to generate your live link & QR code.',
+            'url': 'dashboard:onboarding',
+            'badge': 'Action Required',
+            'badge_type': 'warning',
+        }
+    elif not has_links:
+        primary_action = {
+            'label': 'Add Social & Action Links',
+            'desc': 'Connect WhatsApp, LinkedIn, or your website so visitors can connect instantly.',
+            'url': 'dashboard:links_manage',
+            'badge': 'Recommended',
+            'badge_type': 'info',
+        }
+    elif not has_card:
+        primary_action = {
+            'label': 'Order Smart NFC Card',
+            'desc': 'Get a premium matte obsidian or brushed silver card for physical 1-tap sharing.',
+            'url': 'dashboard:card_manage',
+            'badge': 'Hardware',
+            'badge_type': 'neutral',
+        }
+    else:
+        primary_action = {
+            'label': 'Share Digital Profile',
+            'desc': 'Your profile and smart card are active. Share your card via QR code or direct link.',
+            'url': 'dashboard:share',
+            'badge': 'Ready to Share',
+            'badge_type': 'success',
+        }
 
     # Time boundaries for deltas
-    now = timezone.now()
     seven_days_ago = now - timedelta(days=7)
     fourteen_days_ago = now - timedelta(days=14)
 
@@ -62,14 +162,19 @@ def dashboard_overview_view(request):
     stats = AnalyticsEvent.objects.filter(profile=profile).aggregate(
         profile_views=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_PROFILE_VIEW)),
         card_taps=Count('id', filter=Q(event_type__in=[AnalyticsEvent.TYPE_CARD_TAP, AnalyticsEvent.TYPE_QR_SCAN])),
+        contact_saves=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_VCARD)),
         whatsapp_clicks=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_WHATSAPP)),
         website_visits=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_WEBSITE)),
+        link_clicks=Count('id', filter=Q(event_type__in=[AnalyticsEvent.TYPE_WEBSITE, AnalyticsEvent.TYPE_SOCIAL])),
         
         recent_views=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_PROFILE_VIEW, timestamp__gte=seven_days_ago)),
         prev_views=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_PROFILE_VIEW, timestamp__gte=fourteen_days_ago, timestamp__lt=seven_days_ago)),
         
         recent_taps=Count('id', filter=Q(event_type__in=[AnalyticsEvent.TYPE_CARD_TAP, AnalyticsEvent.TYPE_QR_SCAN], timestamp__gte=seven_days_ago)),
         prev_taps=Count('id', filter=Q(event_type__in=[AnalyticsEvent.TYPE_CARD_TAP, AnalyticsEvent.TYPE_QR_SCAN], timestamp__gte=fourteen_days_ago, timestamp__lt=seven_days_ago)),
+
+        recent_vcard=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_VCARD, timestamp__gte=seven_days_ago)),
+        prev_vcard=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_VCARD, timestamp__gte=fourteen_days_ago, timestamp__lt=seven_days_ago)),
         
         recent_whatsapp=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_WHATSAPP, timestamp__gte=seven_days_ago)),
         prev_whatsapp=Count('id', filter=Q(event_type=AnalyticsEvent.TYPE_WHATSAPP, timestamp__gte=fourteen_days_ago, timestamp__lt=seven_days_ago)),
@@ -83,9 +188,21 @@ def dashboard_overview_view(request):
             return round((recent / 1.0) * 100) if recent > 0 else 0
         return round(((recent - prev) / prev) * 100)
 
+    profile_views_count = stats['profile_views'] or 0
+    card_taps_count = stats['card_taps'] or 0
+    contact_saves_count = stats['contact_saves'] or 0
+    whatsapp_clicks_count = stats['whatsapp_clicks'] or 0
+    website_visits_count = stats['website_visits'] or 0
+    link_clicks_count = stats['link_clicks'] or 0
+
+    total_interactions = profile_views_count + card_taps_count + contact_saves_count + whatsapp_clicks_count + link_clicks_count
+
     return render(request, 'dashboard/overview.html', {
         'profile': profile,
+        'cards': cards,
         'primary_card': primary_card,
+        'cards_count': cards_count,
+        'active_cards_count': active_cards_count,
         'orders': orders,
         'active_order': active_order,
         'primary_website': primary_website,
@@ -100,14 +217,23 @@ def dashboard_overview_view(request):
         'completed_checklist_count': completed_checklist_count,
         'total_checklist_count': total_checklist_count,
         'completion_percentage': completion_percentage,
+        'next_step': next_step,
         'is_profile_configured': is_profile_configured,
+        'greeting': greeting,
+        'primary_action': primary_action,
+        'recent_contacts': recent_contacts,
         'received_contacts_count': received_contacts_count,
-        'profile_views': stats['profile_views'] or 0,
-        'card_taps': stats['card_taps'] or 0,
-        'whatsapp_clicks': stats['whatsapp_clicks'] or 0,
-        'website_visits': stats['website_visits'] or 0,
+        'unread_contacts_count': unread_contacts_count,
+        'profile_views': profile_views_count,
+        'card_taps': card_taps_count,
+        'contact_saves': contact_saves_count,
+        'whatsapp_clicks': whatsapp_clicks_count,
+        'website_visits': website_visits_count,
+        'link_clicks': link_clicks_count,
+        'total_interactions': total_interactions,
         'profile_views_delta': calc_delta(stats['recent_views'] or 0, stats['prev_views'] or 0),
         'card_taps_delta': calc_delta(stats['recent_taps'] or 0, stats['prev_taps'] or 0),
+        'contact_saves_delta': calc_delta(stats['recent_vcard'] or 0, stats['prev_vcard'] or 0),
         'whatsapp_delta': calc_delta(stats['recent_whatsapp'] or 0, stats['prev_whatsapp'] or 0),
         'website_delta': calc_delta(stats['recent_website'] or 0, stats['prev_website'] or 0),
     })

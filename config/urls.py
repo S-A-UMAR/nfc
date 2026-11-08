@@ -8,7 +8,7 @@ from apps.cards import views as card_views
 from apps.profiles import views as profile_views
 from apps.websites import views as web_views
 from apps.core.sitemaps import StaticViewSitemap, LegalViewSitemap, ProfileSitemap, WebsiteSitemap
-from apps.core.views import robots_txt_view
+from apps.core.views import robots_txt_view, health_check_view
 
 SITEMAPS = {
     "static": StaticViewSitemap,
@@ -23,6 +23,9 @@ admin.site.site_title = "STRIDE Admin HQ"
 admin.site.index_title = "Platform Management & Operations"
 
 urlpatterns = [
+    # Health check endpoint for container orchestrators (Render)
+    path('health/', health_check_view, name='health_check'),
+
     # Obscured Admin URL (Shielded against automated bots scanning /admin/)
     path(f'{settings.ADMIN_URL_PATH}/', admin.site.urls),
 

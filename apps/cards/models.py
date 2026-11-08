@@ -94,9 +94,12 @@ class Card(models.Model):
         """Constant-time verification of physical card activation code."""
         import hashlib
         import hmac
-        if not self.activation_code_hash:
-            return True  # If legacy card has no hash set, fall back to open activation or code not required
-        actual = hashlib.sha256(code.strip().upper().encode('utf-8')).hexdigest()
+        if not self.activation_code_hash or not code or not isinstance(code, str):
+            return False
+        cleaned = code.strip().upper()
+        if not cleaned:
+            return False
+        actual = hashlib.sha256(cleaned.encode('utf-8')).hexdigest()
         return hmac.compare_digest(self.activation_code_hash, actual)
 
     def generate_activation_code(self) -> str:

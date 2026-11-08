@@ -178,10 +178,16 @@ def card_activate_view(request):
             return redirect('dashboard:card_manage')
 
         # Guard: Activation PIN verification
-        if card.activation_code_hash:
-            if not activation_code or not card.check_activation_code(activation_code):
-                messages.error(request, "Invalid activation code. Please enter the security PIN provided with your card package.")
-                return redirect('dashboard:card_manage')
+        if not card.activation_code_hash:
+            messages.error(
+                request,
+                f"Card '{card_code}' does not have an activation PIN configured. Please contact STRIDE support to activate this card."
+            )
+            return redirect('dashboard:card_manage')
+
+        if not activation_code or not card.check_activation_code(activation_code):
+            messages.error(request, "Invalid activation code. Please enter the security PIN provided with your card package.")
+            return redirect('dashboard:card_manage')
 
         # All checks passed: Activate & bind
         card.user = request.user

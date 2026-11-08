@@ -2,13 +2,7 @@ import os
 import sys
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
-
-# TiDB / MySQL compatibility layer via pure-Python PyMySQL
-try:
-    import pymysql
-    pymysql.install_as_MySQLdb()
-except ImportError:
-    pass
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -165,33 +159,34 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database Configuration:
-# - When TIDB_HOST is provided (production / staging), connects to TiDB Serverless (MySQL protocol with SSL)
-# - Otherwise, falls back to local SQLite3 (local development & unit testing)
-TIDB_HOST = os.environ.get('TIDB_HOST')
-if TIDB_HOST:
+# - In production (DEBUG=False and not running tests), DATABASE_URL is strictly required.
+#   Django will fail closed on startup if DATABASE_URL is missing, preventing accidental SQLite usage in production.
+# - In development (DEBUG=True) or during test suite execution, DATABASE_URL is used if provided,
+#   otherwise falls back safely to local SQLite3.
+# - Connects via standard PostgreSQL driver (psycopg) to any provider (Neon, Render Postgres, etc.).
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django_tidb',
-            'NAME': os.environ.get('TIDB_DB_NAME', 'uzyra'),
-            'USER': os.environ.get('TIDB_USER', ''),
-            'PASSWORD': os.environ.get('TIDB_PASSWORD', ''),
-            'HOST': TIDB_HOST,
-            'PORT': int(os.environ.get('TIDB_PORT', 4000)),
-            'OPTIONS': {
-                'ssl': {
-                    'ssl_mode': 'REQUIRED'
-                },
-                'charset': 'utf8mb4',
-            }
-        }
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=not DEBUG and not _is_running_tests,
+        )
     }
-else:
+elif DEBUG or _is_running_tests:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+else:
+    raise ImproperlyConfigured(
+        "DATABASE_URL environment variable must be set in production when DEBUG=False. "
+        "Production environments must not run on SQLite."
+    )
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'

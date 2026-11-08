@@ -123,3 +123,12 @@ def robots_txt_view(request):
         f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def health_check_view(request):
+    """
+    Lightweight health check endpoint for container orchestrators (e.g. Render).
+    Returns HTTP 200 without exposing internal state, database status, or credentials.
+    """
+    return HttpResponse("OK", content_type="text/plain; charset=utf-8")
+

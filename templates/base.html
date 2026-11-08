@@ -49,6 +49,7 @@
   <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
   <!-- MASTER NAVBAR (Floating Glassmorphism Pill) -->
+  {% block master_navbar %}
   <div class="navbar-wrapper">
     <header class="navbar" role="banner">
       <!-- STRIDE Brand Logo -->
@@ -236,6 +237,7 @@
       {% endif %}
     </div>
   </aside>
+  {% endblock master_navbar %}
 
   <!-- GLOBAL LUXURY TOAST NOTIFICATION CONTAINER -->
   <div id="uzyra-toast-container" class="toast-container" role="region" aria-live="polite" aria-label="System Notifications">

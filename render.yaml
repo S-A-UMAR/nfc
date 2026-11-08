@@ -1,13 +1,14 @@
 # render.yaml — STRIDE Platform Render deployment configuration
-# Persistent TiDB Serverless Database + Cloudinary Persistent Media Storage
+# Standard PostgreSQL Database (Neon) + Cloudinary Persistent Media Storage
 
 services:
   - type: web
-    name: uzyra
+    name: stride
     runtime: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     preDeployCommand: python manage.py migrate --noinput
     startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    healthCheckPath: /health/
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings
@@ -16,11 +17,11 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
-        sync: false   # e.g. uzyra.onrender.com
+        sync: false   # e.g. stride.onrender.com
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        sync: false   # e.g. https://uzyra.onrender.com
+        sync: false   # e.g. https://stride.onrender.com
       - key: SITE_URL
-        sync: false   # e.g. https://uzyra.onrender.com
+        sync: false   # e.g. https://stride.onrender.com
       - key: DJANGO_SECURE_SSL_REDIRECT
         value: "True"
       - key: DJANGO_SESSION_COOKIE_SECURE
@@ -33,16 +34,8 @@ services:
         value: "False"
       - key: DJANGO_SECURE_HSTS_PRELOAD
         value: "False"
-      - key: TIDB_HOST
-        sync: false
-      - key: TIDB_PORT
-        value: "4000"
-      - key: TIDB_USER
-        sync: false
-      - key: TIDB_PASSWORD
-        sync: false
-      - key: TIDB_DB_NAME
-        value: "uzyra"
+      - key: DATABASE_URL
+        sync: false   # Neon PostgreSQL connection string (postgresql://user:password@host/neondb?sslmode=require)
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
@@ -56,11 +49,10 @@ services:
       - key: BREVO_SENDER_NAME
         value: STRIDE
       - key: PAYSTACK_PUBLIC_KEY
-        sync: false   # Use pk_live_... or pk_test_...
+        sync: false   # Use pk_test_...
       - key: PAYSTACK_SECRET_KEY
-        sync: false   # Use sk_live_... or sk_test_...
+        sync: false   # Use sk_test_...
       - key: PAYSTACK_TEST_MODE
-        value: "False"
+        value: "True"
       - key: BRAND_NAME
         value: STRIDE
-

@@ -50,9 +50,9 @@
               <span class="dot dot-active"></span>
               <span>First-Time Setup</span>
             </span>
-            <h1 class="auth-title" style="font-size: 1.75rem;">Welcome to {{ BRAND_NAME }}, {{ user.first_name|default:user.display_name }}!</h1>
-            <p class="auth-subtitle" style="max-width: 480px;">
-              Let's set up your custom digital profile in less than 2 minutes. This is the profile contacts will see when they tap your card or open your link.
+            <h1 class="auth-title" style="font-size: 1.75rem;">Let's create your digital identity.</h1>
+            <p class="auth-subtitle" style="max-width: 520px;">
+              Welcome to STRIDE{% if user.first_name %}, {{ user.first_name }}{% elif user.display_name %}, {{ user.display_name }}{% endif %}! Your STRIDE profile brings your contact details, professional information and social links together in one place. Let's get everything ready in just a few simple steps.
             </p>
           </div>
 
@@ -62,8 +62,8 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
               <div>
-                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">1. Choose Your Profile Type</div>
-                <div style="font-size: 0.8125rem; color: var(--text-muted);">Personal identity for individuals or a dedicated company profile for businesses.</div>
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">Step 2: Choose Your Profile Type</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">Personal profile for individual creators and professionals, or business profile for companies.</div>
               </div>
             </div>
 
@@ -72,8 +72,8 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               </div>
               <div>
-                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">2. Add Contact & Social Channels</div>
-                <div style="font-size: 0.8125rem; color: var(--text-muted);">Enable 1-tap phonebook saving (.vcf), WhatsApp chat, and your key links.</div>
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">Step 3: Enter Your Profile Details</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">Add your contact numbers, headline, bio, photo, and social media handles.</div>
               </div>
             </div>
 
@@ -82,15 +82,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
               </div>
               <div>
-                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">3. Preview & Launch</div>
-                <div style="font-size: 0.8125rem; color: var(--text-muted);">See exactly what visitors experience and get your permanent share link.</div>
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">Step 4: Review &amp; Launch</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">Preview your public presentation and publish your verified link instantly.</div>
               </div>
             </div>
           </div>
 
           <div class="text-center mt-6">
             <button type="button" class="btn btn-primary btn-lg btn-glow" onclick="goToStep(2)">
-              <span>Get Started</span>
+              <span>Continue &rarr;</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
           </div>
@@ -135,6 +135,11 @@
             </div>
           </div>
 
+          <div class="p-3 text-center mt-4" style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: var(--radius-sm); font-size: 0.8125rem; color: var(--silver-steel); max-width: 680px; margin-left: auto; margin-right: auto;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: -2px; margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <strong>Flexible Setup:</strong> You can switch between Personal and Business modes anytime from your profile settings.
+          </div>
+
           <div class="onboarding-nav-row">
             <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
               <span>&larr; Back</span>
@@ -158,6 +163,24 @@
           <div class="card mb-4" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); padding: var(--space-5);">
             <h3 class="card-title mb-3" style="font-size: 1rem; color: var(--silver-highlight);">1. Primary Identity</h3>
             
+            <!-- Profile Picture Upload (Personal & Shared) -->
+            <div class="form-group mb-4" id="wrap_profile_image">
+              <label for="id_onboard_profile_image" class="form-label">
+                Profile Picture <span class="form-label-hint">(Recommended)</span>
+              </label>
+              <div class="d-flex items-center gap-3">
+                <div class="hero-phone-avatar-circle" style="width: 56px; height: 56px; font-size: 1.25rem; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); flex-shrink: 0;">
+                  <img id="preview_profile_image" src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% endif %}" alt="Profile Preview" style="{% if not profile.profile_image %}display: none;{% endif %} width: 100%; height: 100%; object-fit: cover;">
+                  <span id="preview_profile_initial" style="{% if profile.profile_image %}display: none;{% endif %}">{{ user.first_name|default:user.display_name|make_list|first|upper }}</span>
+                </div>
+                <div style="flex: 1;">
+                  <input type="file" id="id_onboard_profile_image" name="profile_image" accept="image/png,image/jpeg,image/webp" class="form-control" style="padding: 7px 12px; font-size: 0.85rem;">
+                  <div class="form-hint">JPG, PNG or WebP (max 5MB). Displayed on your public digital card and NFC taps.</div>
+                  <div id="feedback_profile_image" class="form-hint" style="color: #4ade80; display: none; font-weight: 500;">✓ Ready to upload: <span id="name_profile_image"></span></div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group mb-3">
               <label for="id_onboard_full_name" class="form-label">
                 Your Full Name <span class="text-danger" title="Required">*</span>
@@ -203,8 +226,25 @@
                 <label for="id_onboard_business_logo" class="form-label">
                   Business / Brand Logo <span class="form-label-hint">(Optional)</span>
                 </label>
-                <input type="file" id="id_onboard_business_logo" name="business_logo" accept="image/png,image/jpeg,image/webp" class="form-control">
-                <div class="form-hint">PNG, JPG or WebP (max 5MB). Displayed prominently in header &amp; review.</div>
+                <div class="d-flex items-center gap-3">
+                  <div class="hero-phone-avatar-circle" style="width: 56px; height: 56px; font-size: 1.25rem; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); flex-shrink: 0;">
+                    <img id="preview_business_logo" src="{% if profile.business_logo %}{{ profile.business_logo.url }}{% endif %}" alt="Logo Preview" style="{% if not profile.business_logo %}display: none;{% endif %} width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+                    <span id="preview_business_initial" style="{% if profile.business_logo %}display: none;{% endif %}">🏢</span>
+                  </div>
+                  <div style="flex: 1;">
+                    <input type="file" id="id_onboard_business_logo" name="business_logo" accept="image/png,image/jpeg,image/webp" class="form-control" style="padding: 7px 12px; font-size: 0.85rem;">
+                    <div class="form-hint">PNG, JPG or WebP (max 5MB). Displayed in header &amp; review.</div>
+                    <div id="feedback_business_logo" class="form-hint" style="color: #4ade80; display: none; font-weight: 500;">✓ Ready to upload: <span id="name_business_logo"></span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="id_onboard_address" class="form-label">
+                  Office / Business Address <span class="form-label-hint">(Optional)</span>
+                </label>
+                <input type="text" id="id_onboard_address" name="address" class="form-control" value="{{ profile.address }}" placeholder="e.g. 14 Marina Street, Lagos Island">
+                <div class="form-hint">Displays your physical office or headquarters address.</div>
               </div>
             </div>
 
@@ -254,7 +294,7 @@
               <input type="url" id="id_onboard_website" name="website_url" class="form-control" value="{{ profile.website_url }}" placeholder="https://yourwebsite.com">
             </div>
 
-            <div class="form-row-2col mb-0">
+            <div class="form-row-2col mb-3">
               <div class="form-group mb-0">
                 <label for="id_onboard_instagram" class="form-label">Instagram Handle</label>
                 <input type="text" id="id_onboard_instagram" name="social_instagram" class="form-control" placeholder="@yourhandle">
@@ -263,6 +303,11 @@
                 <label for="id_onboard_linkedin" class="form-label">LinkedIn Profile</label>
                 <input type="text" id="id_onboard_linkedin" name="social_linkedin" class="form-control" placeholder="https://linkedin.com/in/yourname">
               </div>
+            </div>
+
+            <div class="form-group mb-0">
+              <label for="id_onboard_twitter" class="form-label">X / Twitter Handle</label>
+              <input type="text" id="id_onboard_twitter" name="social_twitter" class="form-control" placeholder="@yourhandle">
             </div>
           </div>
 
@@ -281,23 +326,24 @@
              ================================================================== -->
         <div id="step-panel-4" class="onboarding-step-panel" style="display: none;">
           <div class="text-center mb-6">
-            <h2 class="auth-title">Review & Launch Profile</h2>
-            <p class="auth-subtitle">Verify your profile summary below before making it active.</p>
+            <h2 class="auth-title">Review Your Profile</h2>
+            <p class="auth-subtitle">Verify your profile summary below before publishing your digital identity.</p>
           </div>
 
           <!-- Live Preview Summary Card -->
           <div class="onboarding-review-card">
             <div class="d-flex justify-between items-center mb-4 pb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
               <span id="rev_profile_type_badge" class="badge badge-active">Personal Identity</span>
-              <span class="text-caption text-silver" style="font-family: var(--font-mono);">
-                stride.id/u/{{ profile.slug|default:user.email|slugify }}/
+              <span id="rev_profile_url_slug" class="text-caption text-silver" style="font-family: var(--font-mono);">
+                {{ request.get_host }}/u/{{ profile.slug|default:user.email|slugify }}/
               </span>
             </div>
 
             <div class="d-flex items-center gap-3 mb-4">
-              <div class="hero-phone-avatar-circle" style="width: 52px; height: 52px; font-size: 1.25rem; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);">
+              <div class="hero-phone-avatar-circle" style="width: 56px; height: 56px; font-size: 1.25rem; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); flex-shrink: 0;">
+                <img id="rev_avatar_img" src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% endif %}" alt="Profile Avatar" style="{% if not profile.profile_image %}display: none;{% endif %} width: 100%; height: 100%; object-fit: cover;">
                 <img id="rev_logo_img" src="{% if profile.business_logo %}{{ profile.business_logo.url }}{% endif %}" alt="Business Logo" style="{% if not profile.business_logo or profile.profile_type != 'business' %}display: none;{% endif %} width: 100%; height: 100%; object-fit: contain; padding: 4px;">
-                <span id="rev_avatar_initial" style="{% if profile.business_logo and profile.profile_type == 'business' %}display: none;{% endif %}">{{ user.first_name|default:user.display_name|make_list|first|upper }}</span>
+                <span id="rev_avatar_initial" style="{% if profile.profile_image or profile.business_logo %}display: none;{% endif %}">{{ user.first_name|default:user.display_name|make_list|first|upper }}</span>
               </div>
               <div>
                 <div id="rev_name" style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">
@@ -328,6 +374,10 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 <span>Email Active</span>
               </span>
+              <span id="rev_badge_social" class="badge" style="background: rgba(255, 255, 255, 0.06); display: none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
+                <span>Social Links Linked</span>
+              </span>
               <span id="rev_badge_vcard" class="badge" style="background: rgba(255, 255, 255, 0.06);">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                 <span>1-Tap vCard Download</span>
@@ -344,7 +394,7 @@
               <span>&larr; Edit Details</span>
             </button>
             <button type="submit" id="btn-submit-onboard" class="btn btn-primary btn-lg btn-glow">
-              <span id="btn-submit-onboard-text">Complete Setup & Launch Profile</span>
+              <span id="btn-submit-onboard-text">Publish My Profile</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
             </button>
           </div>
@@ -358,6 +408,8 @@
 var currentStep = 1;
 var selectedType = '{{ profile.profile_type|default:"personal" }}';
 var STORAGE_KEY = 'stride_onboard_draft_{{ user.id }}';
+var uploadedAvatarDataUrl = null;
+var existingAvatarUrl = '{% if profile.profile_image %}{{ profile.profile_image.url }}{% endif %}';
 var uploadedLogoDataUrl = null;
 var existingLogoUrl = '{% if profile.business_logo %}{{ profile.business_logo.url }}{% endif %}';
 
@@ -376,9 +428,11 @@ function saveDraft() {
       website_url: document.getElementById('id_onboard_website') ? document.getElementById('id_onboard_website').value : '',
       social_instagram: document.getElementById('id_onboard_instagram') ? document.getElementById('id_onboard_instagram').value : '',
       social_linkedin: document.getElementById('id_onboard_linkedin') ? document.getElementById('id_onboard_linkedin').value : '',
+      social_twitter: document.getElementById('id_onboard_twitter') ? document.getElementById('id_onboard_twitter').value : '',
       business_name: document.getElementById('id_onboard_business_name') ? document.getElementById('id_onboard_business_name').value : '',
       business_category: document.getElementById('id_onboard_business_category') ? document.getElementById('id_onboard_business_category').value : '',
-      business_description: document.getElementById('id_onboard_business_description') ? document.getElementById('id_onboard_business_description').value : ''
+      business_description: document.getElementById('id_onboard_business_description') ? document.getElementById('id_onboard_business_description').value : '',
+      address: document.getElementById('id_onboard_address') ? document.getElementById('id_onboard_address').value : ''
     };
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -389,6 +443,12 @@ function saveDraft() {
 function clearDraft() {
   try {
     sessionStorage.removeItem(STORAGE_KEY);
+    for (var i = sessionStorage.length - 1; i >= 0; i--) {
+      var k = sessionStorage.key(i);
+      if (k && k.indexOf('stride_onboard_draft_') === 0) {
+        sessionStorage.removeItem(k);
+      }
+    }
   } catch (e) {}
 }
 
@@ -402,6 +462,7 @@ function selectProfileType(type) {
   var badgePersonal = document.getElementById('badge-check-personal');
   var badgeBusiness = document.getElementById('badge-check-business');
   var wrapBiz = document.getElementById('wrap_business_fields');
+  var wrapPersHeadline = document.getElementById('wrap_personal_headline');
   var s3Title = document.getElementById('step-3-title');
   var s3Sub = document.getElementById('step-3-subtitle');
 
@@ -419,6 +480,7 @@ function selectProfileType(type) {
 
     // Show business fields in Step 3
     if (wrapBiz) wrapBiz.style.display = 'block';
+    if (wrapPersHeadline) wrapPersHeadline.style.display = 'none';
     if (s3Title) s3Title.textContent = 'Enter Business Details';
     if (s3Sub) s3Sub.textContent = 'Provide your business information and primary contact channels.';
   } else {
@@ -433,8 +495,9 @@ function selectProfileType(type) {
     if (badgePersonal) badgePersonal.textContent = '✓ Selected';
     if (badgeBusiness) badgeBusiness.textContent = 'Select Option';
 
-    // Hide business fields in Step 3
+    // Hide business fields in Step 3, show personal headline
     if (wrapBiz) wrapBiz.style.display = 'none';
+    if (wrapPersHeadline) wrapPersHeadline.style.display = 'block';
     if (s3Title) s3Title.textContent = 'Enter Personal Details';
     if (s3Sub) s3Sub.textContent = 'Add your headline, contact numbers, and social channels.';
   }
@@ -527,31 +590,61 @@ function updateReviewSummary() {
   var bizName = bizNameEl ? bizNameEl.value.trim() : '';
   var bizCatEl = document.getElementById('id_onboard_business_category');
   var bizCat = bizCatEl ? bizCatEl.value.trim() : '';
+  var webEl = document.getElementById('id_onboard_website');
+  var web = webEl ? webEl.value.trim() : '';
+  var igEl = document.getElementById('id_onboard_instagram');
+  var ig = igEl ? igEl.value.trim() : '';
+  var liEl = document.getElementById('id_onboard_linkedin');
+  var li = liEl ? liEl.value.trim() : '';
+  var twEl = document.getElementById('id_onboard_twitter');
+  var tw = twEl ? twEl.value.trim() : '';
 
+  var revAvatarImg = document.getElementById('rev_avatar_img');
   var revLogoImg = document.getElementById('rev_logo_img');
   var revAvatarInitial = document.getElementById('rev_avatar_initial');
 
-  // Business logo vs personal avatar initial logic
+  // Avatar / Logo preview logic
+  var avatarSource = uploadedAvatarDataUrl || existingAvatarUrl;
+  var logoSource = uploadedLogoDataUrl || existingLogoUrl;
+
   if (selectedType === 'business') {
-    var logoSource = uploadedLogoDataUrl || existingLogoUrl;
     if (logoSource) {
       if (revLogoImg) {
         revLogoImg.src = logoSource;
         revLogoImg.style.display = 'block';
       }
+      if (revAvatarImg) revAvatarImg.style.display = 'none';
+      if (revAvatarInitial) revAvatarInitial.style.display = 'none';
+    } else if (avatarSource) {
+      if (revAvatarImg) {
+        revAvatarImg.src = avatarSource;
+        revAvatarImg.style.display = 'block';
+      }
+      if (revLogoImg) revLogoImg.style.display = 'none';
       if (revAvatarInitial) revAvatarInitial.style.display = 'none';
     } else {
       if (revLogoImg) revLogoImg.style.display = 'none';
+      if (revAvatarImg) revAvatarImg.style.display = 'none';
       if (revAvatarInitial) {
         revAvatarInitial.style.display = 'inline-block';
         revAvatarInitial.textContent = (bizName || fullName).charAt(0).toUpperCase();
       }
     }
   } else {
-    if (revLogoImg) revLogoImg.style.display = 'none';
-    if (revAvatarInitial) {
-      revAvatarInitial.style.display = 'inline-block';
-      revAvatarInitial.textContent = fullName.charAt(0).toUpperCase();
+    if (avatarSource) {
+      if (revAvatarImg) {
+        revAvatarImg.src = avatarSource;
+        revAvatarImg.style.display = 'block';
+      }
+      if (revLogoImg) revLogoImg.style.display = 'none';
+      if (revAvatarInitial) revAvatarInitial.style.display = 'none';
+    } else {
+      if (revAvatarImg) revAvatarImg.style.display = 'none';
+      if (revLogoImg) revLogoImg.style.display = 'none';
+      if (revAvatarInitial) {
+        revAvatarInitial.style.display = 'inline-block';
+        revAvatarInitial.textContent = fullName.charAt(0).toUpperCase();
+      }
     }
   }
 
@@ -594,9 +687,11 @@ function updateReviewSummary() {
   var bCall = document.getElementById('rev_badge_call');
   var bWa = document.getElementById('rev_badge_whatsapp');
   var bMail = document.getElementById('rev_badge_email');
+  var bSoc = document.getElementById('rev_badge_social');
   if (bCall) bCall.style.display = phone ? 'inline-flex' : 'none';
   if (bWa) bWa.style.display = whatsapp ? 'inline-flex' : 'none';
   if (bMail) bMail.style.display = email ? 'inline-flex' : 'none';
+  if (bSoc) bSoc.style.display = (web || ig || li || tw) ? 'inline-flex' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -631,9 +726,11 @@ document.addEventListener('DOMContentLoaded', function() {
     restoreVal('id_onboard_website', draft.website_url);
     restoreVal('id_onboard_instagram', draft.social_instagram);
     restoreVal('id_onboard_linkedin', draft.social_linkedin);
+    restoreVal('id_onboard_twitter', draft.social_twitter);
     restoreVal('id_onboard_business_name', draft.business_name);
     restoreVal('id_onboard_business_category', draft.business_category);
     restoreVal('id_onboard_business_description', draft.business_description);
+    restoreVal('id_onboard_address', draft.address);
 
     if (draft.profile_type === 'business' || draft.profile_type === 'personal') {
       selectedType = draft.profile_type;
@@ -643,8 +740,51 @@ document.addEventListener('DOMContentLoaded', function() {
   // 2. Initial Type Selection
   selectProfileType(selectedType);
 
-  // 3. Logo file picker listener with live review preview
+  // 3. Profile picture file picker listener
+  var avatarInput = document.getElementById('id_onboard_profile_image');
+  var prevAvatarImg = document.getElementById('preview_profile_image');
+  var prevAvatarInit = document.getElementById('preview_profile_initial');
+  var nameAvatarSpan = document.getElementById('name_profile_image');
+  var fbAvatarDiv = document.getElementById('feedback_profile_image');
+  if (avatarInput) {
+    avatarInput.addEventListener('change', function() {
+      var file = this.files && this.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Please select an image file under 5MB.');
+          this.value = '';
+          uploadedAvatarDataUrl = null;
+          if (fbAvatarDiv) fbAvatarDiv.style.display = 'none';
+          return;
+        }
+        if (nameAvatarSpan) nameAvatarSpan.textContent = file.name;
+        if (fbAvatarDiv) fbAvatarDiv.style.display = 'block';
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedAvatarDataUrl = e.target.result;
+          if (prevAvatarImg) {
+            prevAvatarImg.src = uploadedAvatarDataUrl;
+            prevAvatarImg.style.display = 'block';
+          }
+          if (prevAvatarInit) prevAvatarInit.style.display = 'none';
+          if (currentStep === 4) {
+            updateReviewSummary();
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        uploadedAvatarDataUrl = null;
+        if (fbAvatarDiv) fbAvatarDiv.style.display = 'none';
+      }
+    });
+  }
+
+  // 4. Business Logo file picker listener
   var logoInput = document.getElementById('id_onboard_business_logo');
+  var prevLogoImg = document.getElementById('preview_business_logo');
+  var prevLogoInit = document.getElementById('preview_business_initial');
+  var nameLogoSpan = document.getElementById('name_business_logo');
+  var fbLogoDiv = document.getElementById('feedback_business_logo');
   if (logoInput) {
     logoInput.addEventListener('change', function() {
       var file = this.files && this.files[0];
@@ -653,11 +793,19 @@ document.addEventListener('DOMContentLoaded', function() {
           alert('Please select an image file under 5MB.');
           this.value = '';
           uploadedLogoDataUrl = null;
+          if (fbLogoDiv) fbLogoDiv.style.display = 'none';
           return;
         }
+        if (nameLogoSpan) nameLogoSpan.textContent = file.name;
+        if (fbLogoDiv) fbLogoDiv.style.display = 'block';
         var reader = new FileReader();
         reader.onload = function(e) {
           uploadedLogoDataUrl = e.target.result;
+          if (prevLogoImg) {
+            prevLogoImg.src = uploadedLogoDataUrl;
+            prevLogoImg.style.display = 'block';
+          }
+          if (prevLogoInit) prevLogoInit.style.display = 'none';
           if (currentStep === 4) {
             updateReviewSummary();
           }
@@ -665,11 +813,12 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsDataURL(file);
       } else {
         uploadedLogoDataUrl = null;
+        if (fbLogoDiv) fbLogoDiv.style.display = 'none';
       }
     });
   }
 
-  // 4. Determine initial step (URL query param -> draft -> default 1)
+  // 5. Determine initial step (URL query param -> draft -> default 1)
   var targetStep = 1;
   var urlParams = new URLSearchParams(window.location.search);
   var qStep = parseInt(urlParams.get('step'), 10);
@@ -695,7 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   goToStep(targetStep);
 
-  // 5. Auto-save draft on user inputs
+  // 6. Auto-save draft on user inputs
   var form = document.getElementById('onboarding-form');
   if (form) {
     form.addEventListener('input', saveDraft);
@@ -708,12 +857,12 @@ document.addEventListener('DOMContentLoaded', function() {
       clearDraft();
       setTimeout(function() {
         if (submitBtn) submitBtn.disabled = true;
-        if (submitText) submitText.textContent = 'Launching Profile...';
+        if (submitText) submitText.textContent = 'Publishing Profile...';
       }, 50);
     });
   }
 
-  // 6. Pill click navigation for completed steps
+  // 7. Pill click navigation for completed steps
   for (var p = 1; p <= 4; p++) {
     (function(stepNum) {
       var pill = document.getElementById('step-pill-' + stepNum);
@@ -730,7 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })(p);
   }
 
-  // 7. Keyboard support for profile type cards
+  // 8. Keyboard support for profile type cards
   ['card-type-personal', 'card-type-business'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) {

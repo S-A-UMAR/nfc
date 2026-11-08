@@ -162,3 +162,166 @@ class Phase7CardAdminWorkflowTests(TestCase):
         resp_lost = self.client.get(f'/c/{card.card_code}/', follow=False)
         self.assertEqual(resp_lost.status_code, 200)
         self.assertContains(resp_lost, 'This card has been reported lost')
+
+
+class Phase3BCardSecurityTests(TestCase):
+    """
+    Security regression test suite for Phase 3B:
+    1. check_activation_code rejection on missing hash, empty PIN, wrong PIN.
+    2. check_activation_code constant-time matching on valid PIN.
+    3. card_activate_view rejection when card lacks activation_code_hash.
+    4. card_activate_view rejection on wrong PIN.
+    5. card_activate_view success on valid PIN.
+    6. Preservation of legitimate active cards and prohibition of re-activation.
+    7. No leakage of secret PIN in messages or responses.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email='security_user@example.com',
+            password='Password123!',
+            first_name='Sec',
+            last_name='User'
+        )
+        self.profile = self.user.profile
+        self.profile.slug = 'sec-user'
+        self.profile.save()
+
+    def test_check_activation_code_missing_hash_rejected(self):
+        """Cards with no activation_code_hash must NEVER validate as true."""
+        card = Card.objects.create(card_code='SEC-NOHASH-01', status=Card.STATUS_UNASSIGNED)
+        self.assertIsNone(card.activation_code_hash)
+        self.assertFalse(card.check_activation_code(''))
+        self.assertFalse(card.check_activation_code('TEST-1234'))
+        self.assertFalse(card.check_activation_code('ANYTHING'))
+        self.assertFalse(card.check_activation_code(None))
+
+    def test_check_activation_code_empty_code_rejected(self):
+        """Empty or whitespace PINs must fail verification."""
+        card = Card.objects.create(card_code='SEC-EMPTY-01', status=Card.STATUS_UNASSIGNED)
+        card.set_activation_code('VALID-PIN-12')
+        card.save()
+
+        self.assertFalse(card.check_activation_code(''))
+        self.assertFalse(card.check_activation_code('   '))
+        self.assertFalse(card.check_activation_code(None))
+
+    def test_check_activation_code_wrong_code_rejected(self):
+        """Mismatched PINs must fail constant-time verification."""
+        card = Card.objects.create(card_code='SEC-WRONG-01', status=Card.STATUS_UNASSIGNED)
+        card.set_activation_code('SECRET-PIN-99')
+        card.save()
+
+        self.assertFalse(card.check_activation_code('SECRET-PIN-00'))
+        self.assertFalse(card.check_activation_code('WRONG-PIN'))
+
+    def test_check_activation_code_valid_code_accepted(self):
+        """Matching PINs must pass constant-time verification with case and whitespace trimming."""
+        card = Card.objects.create(card_code='SEC-VALID-01', status=Card.STATUS_UNASSIGNED)
+        card.set_activation_code('ABCD-1234')
+        card.save()
+
+        self.assertTrue(card.check_activation_code('ABCD-1234'))
+        self.assertTrue(card.check_activation_code('abcd-1234'))
+        self.assertTrue(card.check_activation_code('  AbCd-1234  '))
+
+    def test_card_activate_view_missing_hash_requires_support(self):
+        """Unassigned cards with no activation hash cannot be activated online and instruct to contact support."""
+        card = Card.objects.create(card_code='SEC-LEGACY-01', status=Card.STATUS_UNASSIGNED)
+        self.client.force_login(self.user)
+
+        resp = self.client.post(reverse('cards:card_activate'), {
+            'card_code': 'SEC-LEGACY-01',
+            'activation_code': 'ANY-PIN',
+        }, follow=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "does not have an activation PIN configured. Please contact STRIDE support")
+        card.refresh_from_db()
+        self.assertEqual(card.status, Card.STATUS_UNASSIGNED)
+        self.assertIsNone(card.user)
+
+    def test_card_activate_view_invalid_pin_rejected(self):
+        """Invalid PIN rejects activation and preserves unassigned state."""
+        card = Card.objects.create(card_code='SEC-CARD-02', status=Card.STATUS_UNASSIGNED)
+        card.set_activation_code('CORRECT-PIN')
+        card.save()
+
+        self.client.force_login(self.user)
+        resp = self.client.post(reverse('cards:card_activate'), {
+            'card_code': 'SEC-CARD-02',
+            'activation_code': 'WRONG-PIN-XYZ',
+        }, follow=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Invalid activation code")
+        card.refresh_from_db()
+        self.assertEqual(card.status, Card.STATUS_UNASSIGNED)
+        self.assertIsNone(card.user)
+
+    def test_card_activate_view_valid_pin_succeeds(self):
+        """Valid PIN successfully binds card to user and marks it active."""
+        card = Card.objects.create(card_code='SEC-CARD-03', status=Card.STATUS_UNASSIGNED)
+        card.set_activation_code('CORRECT-PIN')
+        card.save()
+
+        self.client.force_login(self.user)
+        resp = self.client.post(reverse('cards:card_activate'), {
+            'card_code': 'SEC-CARD-03',
+            'activation_code': 'CORRECT-PIN',
+        }, follow=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "is now activated")
+        card.refresh_from_db()
+        self.assertEqual(card.status, Card.STATUS_ACTIVE)
+        self.assertEqual(card.user, self.user)
+        self.assertEqual(card.profile, self.profile)
+        self.assertIsNotNone(card.activated_at)
+
+    def test_card_activate_view_already_active_rejected(self):
+        """Already active card cannot be re-activated by customer."""
+        other_user = User.objects.create_user(
+            email='other_owner@example.com',
+            password='Password123!',
+            first_name='Other',
+            last_name='User'
+        )
+        card = Card.objects.create(
+            card_code='SEC-ACTIVE-01',
+            user=other_user,
+            profile=other_user.profile,
+            status=Card.STATUS_ACTIVE
+        )
+        card.set_activation_code('PIN-1234')
+        card.save()
+
+        self.client.force_login(self.user)
+        resp = self.client.post(reverse('cards:card_activate'), {
+            'card_code': 'SEC-ACTIVE-01',
+            'activation_code': 'PIN-1234',
+        }, follow=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "already active and in use")
+        card.refresh_from_db()
+        self.assertEqual(card.user, other_user)
+
+    def test_card_activate_view_pin_not_leaked_in_response(self):
+        """Neither submitted PIN nor PIN hash appears anywhere in response messages or HTML."""
+        secret_pin = "SUPER-SECRET-PIN-999"
+        card = Card.objects.create(card_code='SEC-LEAK-01', status=Card.STATUS_UNASSIGNED)
+        card.set_activation_code(secret_pin)
+        card.save()
+
+        self.client.force_login(self.user)
+        resp = self.client.post(reverse('cards:card_activate'), {
+            'card_code': 'SEC-LEAK-01',
+            'activation_code': 'WRONG-PIN',
+        }, follow=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, secret_pin)
+        self.assertNotContains(resp, card.activation_code_hash)
+

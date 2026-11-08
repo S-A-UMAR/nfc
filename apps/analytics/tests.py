@@ -645,3 +645,220 @@ class ProfileOwnerFilterAndSensoryTests(TestCase):
         response_public = self.client.get(reverse('core:home') + '?public=1')
         self.assertEqual(response_public.status_code, 200)
 
+
+
+class Phase3BAnalyticsSecurityTests(TestCase):
+    """
+    Phase 3B security regression tests for analytics:
+    1. Ownership spoofing via data['is_owner'] must NOT suppress event recording.
+    2. Authenticated owner is correctly excluded by server-side identity.
+    3. Authenticated non-owner is treated as a visitor and event IS recorded.
+    4. Anonymous visitor with is_owner=true in body is still treated as visitor.
+    5. Owner cookie (uzyra_owner_*) continues to correctly identify owner.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.owner, self.profile = _make_user('p3b_owner@example.com', 'P3B Owner')
+        self.visitor, _ = _make_user('p3b_visitor@example.com', 'P3B Visitor')
+
+    def _post_track(self, payload, cookies=None):
+        if cookies:
+            for key, val in cookies.items():
+                self.client.cookies[key] = val
+        return self.client.post(
+            reverse('analytics:track_event'),
+            data=json.dumps(payload),
+            content_type='application/json',
+        )
+
+    def test_anonymous_with_is_owner_true_event_is_recorded(self):
+        """
+        CRITICAL: Anonymous POST with {"is_owner": true} MUST NOT suppress event.
+        The server must ignore the client-supplied is_owner field entirely.
+        """
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        resp = self._post_track({
+            'profile_slug': self.profile.slug,
+            'event_type': AnalyticsEvent.TYPE_VCARD,
+            'target_label': 'Save Contact',
+            'is_owner': True,  # Attempted spoofing
+        })
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        # Must NOT return 'ignored_owner'; must record the event
+        self.assertEqual(data.get('status'), 'success',
+            "Anonymous visitor should not be able to suppress analytics via is_owner spoofing")
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial + 1)
+
+    def test_authenticated_owner_beacon_is_ignored(self):
+        """Authenticated owner's beacon is correctly excluded server-side."""
+        self.client.login(email='p3b_owner@example.com', password='TestPass123!')
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        resp = self._post_track({
+            'profile_slug': self.profile.slug,
+            'event_type': AnalyticsEvent.TYPE_VCARD,
+            'target_label': 'Save Contact',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json().get('status'), 'ignored_owner')
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial)
+
+    def test_authenticated_non_owner_beacon_is_recorded(self):
+        """Authenticated non-owner's beacon is treated as a normal visitor event."""
+        self.client.login(email='p3b_visitor@example.com', password='TestPass123!')
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        resp = self._post_track({
+            'profile_slug': self.profile.slug,
+            'event_type': AnalyticsEvent.TYPE_SOCIAL,
+            'target_label': 'LinkedIn Click',
+            'is_owner': True,  # Non-owner attempting to spoof ownership
+        })
+        self.assertEqual(resp.status_code, 200)
+        # Non-owner must have event recorded, not suppressed
+        self.assertEqual(resp.json().get('status'), 'success',
+            "Non-owner should not be able to suppress analytics for another user's profile")
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial + 1)
+
+    def test_owner_cookie_suppresses_event(self):
+        """The legitimate server-set uzyra_owner_* cookie still suppresses events for identified owners."""
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        self.client.cookies[f'uzyra_owner_{self.profile.slug}'] = '1'
+        resp = self._post_track({
+            'profile_slug': self.profile.slug,
+            'event_type': AnalyticsEvent.TYPE_VCARD,
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json().get('status'), 'ignored_owner')
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial)
+
+    def test_anonymous_without_is_owner_event_is_recorded(self):
+        """Baseline: anonymous visitor without is_owner has event recorded normally."""
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        resp = self._post_track({
+            'profile_slug': self.profile.slug,
+            'event_type': AnalyticsEvent.TYPE_WHATSAPP,
+            'target_label': 'WhatsApp Click',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json().get('status'), 'success')
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial + 1)
+
+
+class Phase3BAnalyticsQueryOptimizationTests(TestCase):
+    """
+    Phase 3B regression tests for analytics query optimization.
+    Verifies per-card and per-website breakdown counts remain accurate after
+    replacing N+1 query loops with grouped annotations.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user, self.profile = _make_user('p3b_query@example.com', 'P3B Query')
+        self.url = reverse('dashboard:analytics_view')
+        self.client.force_login(self.user)
+
+        from apps.cards.models import Card
+        from apps.websites.models import Website
+
+        self.card_a = Card.objects.create(
+            card_code='P3B-CARD-001',
+            user=self.user,
+            profile=self.profile,
+            status=Card.STATUS_ACTIVE,
+        )
+        self.card_b = Card.objects.create(
+            card_code='P3B-CARD-002',
+            user=self.user,
+            profile=self.profile,
+            status=Card.STATUS_ACTIVE,
+        )
+        self.website = Website.objects.create(
+            user=self.user,
+            title='P3B Test Site',
+            slug='p3b-test-site',
+            status=Website.STATUS_PUBLISHED,
+        )
+
+    def test_card_breakdown_multi_card_accurate(self):
+        """Two cards with different tap counts each report correctly."""
+        # 3 taps on card_a
+        for _ in range(3):
+            AnalyticsEvent.objects.create(
+                profile=self.profile, card=self.card_a,
+                event_type=AnalyticsEvent.TYPE_CARD_TAP,
+            )
+        # 1 QR scan on card_b
+        AnalyticsEvent.objects.create(
+            profile=self.profile, card=self.card_b,
+            event_type=AnalyticsEvent.TYPE_QR_SCAN,
+        )
+        # 1 profile view on card_a — must NOT count
+        AnalyticsEvent.objects.create(
+            profile=self.profile, card=self.card_a,
+            event_type=AnalyticsEvent.TYPE_PROFILE_VIEW,
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        breakdown = {row['card'].id: row['tap_count'] for row in response.context['card_breakdown']}
+        self.assertEqual(breakdown.get(self.card_a.id), 3)
+        self.assertEqual(breakdown.get(self.card_b.id), 1)
+
+    def test_website_breakdown_accurate(self):
+        """Website page view events count correctly; CTA clicks don't inflate view count."""
+        from apps.websites.models import Website
+        AnalyticsEvent.objects.create(
+            profile=self.profile, website=self.website,
+            event_type=AnalyticsEvent.TYPE_WEBSITE_PAGE_VIEW,
+        )
+        AnalyticsEvent.objects.create(
+            profile=self.profile, website=self.website,
+            event_type=AnalyticsEvent.TYPE_WEBSITE_PAGE_VIEW,
+        )
+        # CTA click must NOT count as a page view
+        AnalyticsEvent.objects.create(
+            profile=self.profile, website=self.website,
+            event_type=AnalyticsEvent.TYPE_WEBSITE_CTA_CLICK,
+        )
+
+        response = self.client.get(self.url)
+        breakdown = {row['website'].id: row['view_count'] for row in response.context['website_breakdown']}
+        self.assertEqual(breakdown.get(self.website.id), 2)
+
+    def test_card_with_no_events_shows_zero(self):
+        """A card with no tap events shows 0 in the breakdown (not missing from list)."""
+        response = self.client.get(self.url)
+        card_ids = [row['card'].id for row in response.context['card_breakdown']]
+        self.assertIn(self.card_a.id, card_ids)
+        self.assertIn(self.card_b.id, card_ids)
+        for row in response.context['card_breakdown']:
+            self.assertEqual(row['tap_count'], 0)
+
+    def test_date_range_filters_card_breakdown(self):
+        """Date range filter (7-day) correctly scopes card breakdown counts."""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        from apps.cards.models import Card
+        old_event = AnalyticsEvent.objects.create(
+            profile=self.profile, card=self.card_a,
+            event_type=AnalyticsEvent.TYPE_CARD_TAP,
+        )
+        AnalyticsEvent.objects.filter(pk=old_event.pk).update(
+            timestamp=timezone.now() - timedelta(days=30)
+        )
+        # Recent event within 7-day range
+        AnalyticsEvent.objects.create(
+            profile=self.profile, card=self.card_a,
+            event_type=AnalyticsEvent.TYPE_CARD_TAP,
+        )
+
+        resp_7 = self.client.get(self.url, {'range': '7'})
+        breakdown_7 = {row['card'].id: row['tap_count'] for row in resp_7.context['card_breakdown']}
+        self.assertEqual(breakdown_7.get(self.card_a.id), 1)
+
+        resp_all = self.client.get(self.url, {'range': 'all'})
+        breakdown_all = {row['card'].id: row['tap_count'] for row in resp_all.context['card_breakdown']}
+        self.assertEqual(breakdown_all.get(self.card_a.id), 2)

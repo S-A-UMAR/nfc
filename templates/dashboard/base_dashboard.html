@@ -2,127 +2,211 @@
 {% load static %}
 
 {% block robots_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block master_navbar %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=1.5">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=3.2">
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-shell">
 
-  <!-- =====================================================================
-       DESKTOP SIDEBAR (Sleek Obsidian Glass)
-       ===================================================================== -->
-  <aside class="dashboard-sidebar" aria-label="Dashboard Navigation">
-    <div>
-      <!-- User Profile Badge -->
+  <!-- =======================================================================
+       DESKTOP SIDEBAR
+       ======================================================================= -->
+  <aside class="dashboard-sidebar" id="dashboard-sidebar" aria-label="Dashboard Navigation">
+    <div class="sidebar-inner">
+
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <a href="{% url 'core:home' %}?public=1" class="sidebar-brand-logo" aria-label="STRIDE Home">
+          {% include 'components/brand_logo.html' with variant='dark' height='22' %}
+        </a>
+      </div>
+
+      <!-- User Badge -->
       <div class="sidebar-user">
-        <div class="sidebar-user-avatar">
+        <div class="sidebar-user-avatar" aria-hidden="true">
           {% if user_profile and user_profile.profile_image %}
-            <img src="{{ user_profile.profile_image.url }}" alt="{{ user.display_name }}" width="36" height="36" loading="lazy" decoding="async">
+            <img src="{{ user_profile.profile_image.url }}" alt="" width="36" height="36" loading="lazy" decoding="async">
           {% else %}
             <span>{{ user.first_name|default:user.email|make_list|first|upper }}</span>
           {% endif %}
+          <span class="sidebar-online-dot" aria-hidden="true"></span>
         </div>
-        <div style="min-width: 0; flex: 1;">
-          <div class="sidebar-user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ user.first_name|default:user.display_name }}</div>
-          <div class="sidebar-user-role" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            {{ user.email }}
-          </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">{{ user.first_name|default:user.display_name }}</div>
+          <div class="sidebar-user-role">{{ user.email }}</div>
         </div>
       </div>
 
-      <!-- Sidebar Navigation Links -->
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Core Essentials</div>
-        <a href="{% url 'dashboard:overview' %}" class="sidebar-link {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>Workspace</span>
-        </a>
-        <a href="{% url 'dashboard:profile_edit' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Edit Profile</span>
-        </a>
-        <a href="{% url 'dashboard:links_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          <span>Links &amp; Socials</span>
-        </a>
-        <a href="{% url 'dashboard:card_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          <span>Smart NFC Card</span>
-        </a>
-        <a href="{% url 'dashboard:share' %}" class="sidebar-link {% if request.resolver_match.url_name == 'share' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span>Share &amp; QR</span>
-        </a>
+      <!-- Navigation -->
+      <nav class="sidebar-nav" aria-label="Main navigation">
 
-        <div class="sidebar-section-label">Growth &amp; Network</div>
-        <a href="{% url 'dashboard:contacts_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Contacts</span>
-          {% if unread_contacts_count > 0 %}
-          <span style="margin-left: auto; background: var(--silver-highlight); color: var(--deep-graphite); font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 999px; line-height: 1.4;">{{ unread_contacts_count }}</span>
+        <!-- OVERVIEW -->
+        <div class="sidebar-group">
+          <p class="sidebar-section-label">Overview</p>
+          <a href="{% url 'dashboard:overview' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'overview' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'overview' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Overview</span>
+          </a>
+        </div>
+
+        <!-- MY IDENTITY -->
+        <div class="sidebar-group">
+          <p class="sidebar-section-label">My Identity</p>
+          <a href="{% url 'dashboard:profile_edit' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'profile_edit' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>My Profile</span>
+          </a>
+          <a href="{% url 'dashboard:links_manage' %}"
+             class="sidebar-link sidebar-link--sub {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'links_manage' %}aria-current="page"{% endif %}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Links &amp; Socials</span>
+          </a>
+          <a href="{% url 'dashboard:share' %}"
+             class="sidebar-link sidebar-link--sub {% if request.resolver_match.url_name == 'share' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'share' %}aria-current="page"{% endif %}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Share &amp; QR</span>
+          </a>
+          <a href="{% url 'dashboard:card_manage' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'card_manage' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>Smart Cards</span>
+          </a>
+        </div>
+
+        <!-- GROWTH & NETWORK -->
+        <div class="sidebar-group">
+          <p class="sidebar-section-label">Growth &amp; Network</p>
+          {% comment %}
+          <a href="{% url 'dashboard:contacts_list' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'contacts_list' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Contacts</span>
+            {% if unread_contacts_count > 0 %}
+            <span class="sidebar-badge" aria-label="{{ unread_contacts_count }} new">{{ unread_contacts_count }}</span>
+            {% endif %}
+          </a>
+          {% endcomment %}
+          <a href="{% url 'dashboard:analytics_view' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'analytics_view' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Analytics</span>
+          </a>
+        </div>
+
+        <!-- ACCOUNT & SYSTEM -->
+        <div class="sidebar-group">
+          <p class="sidebar-section-label">Account &amp; System</p>
+          <a href="{% url 'dashboard:appearance' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'appearance' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
+            <span>Customization</span>
+          </a>
+          <a href="{% url 'dashboard:orders_list' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'orders_list' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'orders_list' or request.resolver_match.url_name == 'order_detail' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span>Orders</span>
+          </a>
+          <a href="{% url 'dashboard:referrals' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'referrals' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
+            <span>Referral Program</span>
+          </a>
+          <a href="{% url 'dashboard:settings_view' %}"
+             class="sidebar-link {% if request.resolver_match.url_name == 'settings_view' or request.resolver_match.url_name == 'delete_account' %}active{% endif %}"
+             {% if request.resolver_match.url_name == 'settings_view' or request.resolver_match.url_name == 'delete_account' %}aria-current="page"{% endif %}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+          {% if request.user.is_staff %}
+          <a href="{% url 'operations:overview' %}" class="sidebar-link sidebar-link--staff">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Operations</span>
+          </a>
           {% endif %}
-        </a>
-        <a href="{% url 'dashboard:appearance' %}" class="sidebar-link {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
-          <span>Themes &amp; Style</span>
-        </a>
-        <a href="{% url 'dashboard:analytics_view' %}" class="sidebar-link {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          <span>Live Analytics</span>
-        </a>
-        <a href="{% url 'dashboard:referrals' %}" class="sidebar-link {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
-          <span>Referral Program</span>
-        </a>
+        </div>
 
-        <div class="sidebar-section-label">Hardware &amp; Account</div>
-        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'orders_list' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          <span>Orders</span>
-        </a>
-        <!-- Website Builder nav — shelved for v2 -->
-        <a href="{% url 'dashboard:settings_view' %}" class="sidebar-link {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span>Settings</span>
-        </a>
-        {% if request.user.is_staff %}
-        <a href="{% url 'operations:overview' %}" class="sidebar-link" style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 0.5rem; padding-top: 0.75rem; color: #a3e635;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          <span>Operations</span>
-        </a>
-        {% endif %}
       </nav>
-    </div>
+    </div><!-- /.sidebar-inner -->
 
-    <!-- Sidebar Bottom Actions -->
-    <div class="sidebar-bottom-actions">
-      {% if user_profile and user_profile.slug %}
-        <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" class="sidebar-link sidebar-view-profile">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          <span>View Public Card</span>
-        </a>
-      {% endif %}
-      <a href="{% url 'core:home' %}?public=1" class="sidebar-link">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Homepage</span>
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <a href="{% url 'core:home' %}?public=1" class="sidebar-footer-link" title="Visit the public STRIDE homepage">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>Public Website</span>
       </a>
-      <a href="{% url 'accounts:logout' %}" class="sidebar-logout">
+      {% if user_profile and user_profile.slug %}
+      <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" rel="noopener noreferrer" class="sidebar-footer-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span>View Public Card</span>
+      </a>
+      {% endif %}
+      <a href="{% url 'accounts:logout' %}" class="sidebar-footer-link sidebar-footer-link--logout">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>Log Out</span>
       </a>
     </div>
   </aside>
 
-  <!-- =====================================================================
-       MAIN DASHBOARD WORKSPACE AREA
-       ===================================================================== -->
-  <div class="d-flex flex-column flex-1" style="min-width: 0;">
+  <!-- =======================================================================
+       MAIN CONTENT AREA
+       ======================================================================= -->
+  <div class="dashboard-main" id="dash-workspace" tabindex="-1">
+
+    <!-- In-page sticky header bar -->
+    <header class="dash-page-header">
+      <div class="dash-page-header-left">
+        <a href="{% url 'core:home' %}?public=1" class="dash-header-mobile-brand" aria-label="STRIDE Public Home" title="Back to STRIDE Home">
+          {% include 'components/brand_logo.html' with variant='dark' height='20' %}
+        </a>
+        <span class="dash-header-divider" aria-hidden="true">/</span>
+        <h1 class="dash-page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+      </div>
+      <div class="dash-page-header-right">
+        <!-- Direct Website Link -->
+        <a href="{% url 'core:home' %}?public=1" class="dash-header-website-btn" title="View Public Website" aria-label="View Public Website">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="dash-header-website-label">Website</span>
+        </a>
+
+        {% if user_profile and user_profile.slug %}
+        <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" rel="noopener noreferrer"
+           class="dash-header-profile-link" title="View your public card">
+          <span class="dash-header-avatar">
+            {% if user_profile.profile_image %}
+              <img src="{{ user_profile.profile_image.url }}" alt="" width="26" height="26" style="width: 26px; height: 26px; object-fit: cover; border-radius: 50%;">
+            {% else %}
+              {{ user.first_name|default:user.email|make_list|first|upper }}
+            {% endif %}
+            <span class="dash-header-avatar-dot dot-{% if is_profile_configured %}live{% else %}preview{% endif %}" aria-hidden="true"></span>
+          </span>
+          <span class="dash-header-profile-label">{% if is_profile_configured %}Live{% else %}Preview{% endif %}</span>
+        </a>
+        {% endif %}
+        <a href="{% url 'dashboard:settings_view' %}" class="dash-header-icon-btn" aria-label="Settings"
+           title="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </a>
+      </div>
+    </header>
 
     <div class="dashboard-content" role="region" aria-label="Dashboard Workspace">
 
-      <!-- Slim, Luxury Email Verification Alert (Non-Intrusive) -->
+      <!-- Email verification alert -->
       {% if not request.user.is_email_verified %}
       <div class="dash-alert-email" role="alert">
         <div class="dash-alert-content">
@@ -145,59 +229,154 @@
     </div>
   </div>
 
-  <!-- =====================================================================
-       MOBILE BOTTOM NAVIGATION BAR (Thumb-Friendly Native Experience)
-       ===================================================================== -->
+  <!-- =======================================================================
+       MOBILE BOTTOM NAVIGATION BAR: Modern Floating Glass Island with Center FAB
+       ======================================================================= -->
+  {% with page_name=request.resolver_match.url_name %}
   <nav class="dashboard-bottom-bar" aria-label="Mobile Navigation">
-    <a href="{% url 'dashboard:overview' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span>Home</span>
+    <a href="{% url 'dashboard:overview' %}"
+       class="bottom-nav-item {% if page_name == 'overview' %}active{% endif %}"
+       {% if page_name == 'overview' %}aria-current="page"{% endif %}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Overview</span>
     </a>
-    <a href="{% url 'dashboard:profile_edit' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <a href="{% url 'dashboard:profile_edit' %}"
+       class="bottom-nav-item {% if page_name == 'profile_edit' %}active{% endif %}"
+       {% if page_name == 'profile_edit' %}aria-current="page"{% endif %}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Profile</span>
     </a>
-    <a href="{% url 'dashboard:links_manage' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      <span>Links</span>
-    </a>
-    <a href="{% url 'dashboard:card_manage' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'card_manage' %}active{% endif %}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      <span>Card</span>
-    </a>
-    <a href="{% url 'dashboard:share' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'share' %}active{% endif %}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <button type="button"
+            class="bottom-nav-item bottom-nav-fab"
+            id="btn-instant-share"
+            aria-label="Instant Share & QR Code"
+            aria-haspopup="dialog"
+            aria-controls="instant-share-sheet">
+      <div class="bottom-nav-fab-btn">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM14 20h3M20 14v3M20 20h.01"/></svg>
+      </div>
       <span>Share</span>
+    </button>
+    <a href="{% url 'dashboard:card_manage' %}"
+       class="bottom-nav-item {% if page_name == 'card_manage' %}active{% endif %}"
+       {% if page_name == 'card_manage' %}aria-current="page"{% endif %}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span>Cards</span>
     </a>
-    {% with page_name=request.resolver_match.url_name %}
-    <button type="button" class="bottom-nav-item bottom-nav-more {% if page_name == 'appearance' or page_name == 'analytics_view' or page_name == 'contacts_list' or page_name == 'referrals' or page_name == 'orders_list' or page_name == 'order_detail' or page_name == 'settings_view' %}active{% endif %}" id="btn-toggle-dash-sheet" aria-expanded="false" aria-controls="mobile-dash-sheet">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+    <button type="button"
+            class="bottom-nav-item bottom-nav-more {% if page_name == 'analytics_view' or page_name == 'appearance' or page_name == 'links_manage' or page_name == 'share' or page_name == 'referrals' or page_name == 'orders_list' or page_name == 'order_detail' or page_name == 'settings_view' or page_name == 'delete_account' %}active{% endif %}"
+            id="btn-toggle-dash-sheet"
+            aria-expanded="false"
+            aria-controls="mobile-dash-sheet"
+            aria-haspopup="dialog">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
       <span>More</span>
     </button>
-    {% endwith %}
   </nav>
+  {% endwith %}
 
-  <!-- Mobile Sheet for Secondary Navigation Tools -->
+  <!-- =======================================================================
+       INSTANT SHARE LIQUID-GLASS MODAL / SHEET
+       ======================================================================= -->
+  <div class="instant-share-backdrop" id="instant-share-backdrop" aria-hidden="true"></div>
+  <div class="instant-share-sheet" id="instant-share-sheet" role="dialog" aria-modal="true" aria-label="Instant Profile Share" aria-hidden="true">
+    <div class="instant-share-handle" aria-hidden="true"></div>
+    <div class="instant-share-header">
+      <div class="instant-share-user">
+        <div class="instant-share-avatar">
+          {% if user_profile and user_profile.avatar %}
+            <img src="{{ user_profile.avatar.url }}" alt="{{ user_profile.full_name|default:'User' }}">
+          {% else %}
+            <span>{{ user_profile.full_name|slice:":1"|default:request.user.email|slice:":1"|upper }}</span>
+          {% endif %}
+        </div>
+        <div>
+          <div class="instant-share-name">{{ user_profile.full_name|default:request.user.email }}</div>
+          <div class="instant-share-handle-text">{% if user_profile and user_profile.slug %}@{{ user_profile.slug }}{% endif %}</div>
+        </div>
+      </div>
+      <button type="button" class="instant-share-close" id="btn-close-instant-share" aria-label="Close share sheet">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="instant-share-body">
+      {% if user_profile and user_profile.slug %}
+        <div class="instant-share-qr-card">
+          <img src="{% url 'profiles:download_profile_qr' user_profile.slug %}" alt="Profile QR Code" width="170" height="170" loading="lazy">
+        </div>
+        <div class="instant-share-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Hold near NFC card or scan QR code</span>
+        </div>
+
+        <div class="instant-share-actions">
+          <button type="button" class="btn btn-primary" id="btn-share-copy" data-url="{{ request.scheme }}://{{ request.get_host }}{% url 'profiles:public_profile' user_profile.slug %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="btn-share-copy-text">Copy Profile Link</span>
+          </button>
+
+          <button type="button" class="btn btn-secondary" id="btn-share-native" data-title="{{ user_profile.full_name|default:'My STRIDE Profile' }}" data-url="{{ request.scheme }}://{{ request.get_host }}{% url 'profiles:public_profile' user_profile.slug %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Share via...</span>
+          </button>
+        </div>
+
+        <div class="instant-share-footer-links">
+          <a href="{% url 'profiles:download_profile_qr' user_profile.slug %}?download=true" download>
+            Download QR (.PNG)
+          </a>
+          <span style="color: rgba(255,255,255,0.2);">&bull;</span>
+          <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" rel="noopener noreferrer">
+            Open Live Card &nearr;
+          </a>
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin: 1.5rem 0;">
+          Complete your profile handle first to generate your shareable QR code.
+        </p>
+        <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary btn-block">Edit Profile</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Mobile Sheet Backdrop -->
   <div class="mobile-dash-sheet-backdrop" id="dash-sheet-backdrop" aria-hidden="true"></div>
-  <div class="mobile-dash-sheet" id="mobile-dash-sheet" role="dialog" aria-modal="true" aria-label="More Features">
+
+  <!-- Mobile Sheet -->
+  <div class="mobile-dash-sheet" id="mobile-dash-sheet" role="dialog" aria-modal="true" aria-label="More" aria-hidden="true">
+    <div class="mobile-sheet-handle" aria-hidden="true"></div>
     <div class="mobile-dash-sheet-header">
-      <h2 class="mobile-dash-sheet-title">More Features</h2>
-      <button type="button" class="btn btn-ghost btn-sm" id="btn-close-dash-sheet" aria-label="Close" style="font-size: 1.25rem; padding: 0.25rem 0.6rem;">&times;</button>
+      <h2 class="mobile-dash-sheet-title">More</h2>
+      <button type="button" class="sheet-close-btn" id="btn-close-dash-sheet" aria-label="Close menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="mobile-dash-sheet-body">
-      <div class="sheet-category-title">Growth &amp; Interactions</div>
+
+      <!-- My Identity -->
+      <div class="sheet-category-title">My Identity</div>
       <div class="sheet-nav-grid">
-        <a href="{% url 'dashboard:contacts_list' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'contacts_list' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Contacts{% if unread_contacts_count > 0 %} <strong style="background: var(--silver-highlight); color: var(--deep-graphite); font-size: 0.6rem; font-weight: 700; padding: 0.05rem 0.4rem; border-radius: 999px; vertical-align: middle; margin-left: 2px;">{{ unread_contacts_count }}</strong>{% endif %}</span>
+        <a href="{% url 'dashboard:links_manage' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'links_manage' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Links &amp; Socials</span>
+        </a>
+        <a href="{% url 'dashboard:share' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'share' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Share &amp; QR</span>
+        </a>
+      </div>
+
+      <!-- Growth & Network -->
+      <div class="sheet-category-title">Growth &amp; Network</div>
+      <div class="sheet-nav-grid">
+        <a href="{% url 'dashboard:analytics_view' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Analytics</span>
         </a>
         <a href="{% url 'dashboard:appearance' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.39 13.73a9 9 0 1 1-8.12-9.46"/><path d="M22 12a2 2 0 0 0-2-2"/></svg>
-          <span>Themes &amp; Style</span>
-        </a>
-        <a href="{% url 'dashboard:analytics_view' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'analytics_view' %}active{% endif %}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          <span>Live Analytics</span>
+          <span>Customization</span>
         </a>
         <a href="{% url 'dashboard:referrals' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
@@ -205,65 +384,190 @@
         </a>
       </div>
 
-      <div class="sheet-category-title">Hardware &amp; Account</div>
+      <!-- Account & System -->
+      <div class="sheet-category-title">Account &amp; System</div>
       <div class="sheet-nav-grid">
-        <a href="{% url 'dashboard:orders_list' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">
+        <a href="{% url 'dashboard:orders_list' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'orders_list' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          <span>Orders &amp; Tracking</span>
+          <span>Orders</span>
         </a>
-        <!-- Website Builder mobile nav — shelved for v2 -->
-        <a href="{% url 'dashboard:settings_view' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">
+        <a href="{% url 'dashboard:settings_view' %}" class="sheet-nav-link {% if request.resolver_match.url_name == 'settings_view' or request.resolver_match.url_name == 'delete_account' %}active{% endif %}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span>Account Settings</span>
+          <span>Settings</span>
         </a>
       </div>
 
-      <div class="d-flex flex-column gap-2 mt-4 pt-3" style="border-top: 1px solid rgba(255, 255, 255, 0.08);">
+      <!-- Sheet Footer Actions -->
+      <div class="sheet-footer-actions">
+        <a href="{% url 'core:home' %}?public=1" class="btn btn-secondary btn-block" style="margin-bottom: 0.65rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>View Public Website</span>
+        </a>
         {% if user_profile and user_profile.slug %}
-          <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" class="btn btn-secondary btn-block">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>View Public Card</span>
-          </a>
+        <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-block" style="border: 1px solid rgba(255,255,255,0.12); margin-bottom: 0.65rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>View Public Card</span>
+        </a>
         {% endif %}
         <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-block" style="color: var(--text-muted);">
           Log Out
         </a>
       </div>
+
     </div>
   </div>
 
-</div>
+</div><!-- /.dashboard-shell -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function () {
   var toggleBtn = document.getElementById('btn-toggle-dash-sheet');
-  var closeBtn = document.getElementById('btn-close-dash-sheet');
-  var backdrop = document.getElementById('dash-sheet-backdrop');
-  var sheet = document.getElementById('mobile-dash-sheet');
+  var closeBtn  = document.getElementById('btn-close-dash-sheet');
+  var backdrop  = document.getElementById('dash-sheet-backdrop');
+  var sheet     = document.getElementById('mobile-dash-sheet');
+  var lastFocus = null;
+
+  function getFocusable() {
+    if (!sheet) return [];
+    return Array.from(sheet.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    ));
+  }
 
   function openSheet() {
-    if (sheet && backdrop) {
-      sheet.classList.add('open');
-      backdrop.classList.add('open');
-      if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
+    if (!sheet || !backdrop) return;
+    lastFocus = document.activeElement;
+    sheet.classList.add('open');
+    sheet.removeAttribute('aria-hidden');
+    backdrop.classList.add('open');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    // Move focus to close button
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeSheet(returnFocus) {
+    if (!sheet || !backdrop) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    backdrop.classList.remove('open');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    if (returnFocus !== false && lastFocus) {
+      try { lastFocus.focus(); } catch(e) {}
     }
   }
 
-  function closeSheet() {
-    if (sheet && backdrop) {
-      sheet.classList.remove('open');
-      backdrop.classList.remove('open');
-      if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    }
-  }
-
+  // Open/close controls
   if (toggleBtn) toggleBtn.addEventListener('click', openSheet);
-  if (closeBtn) closeBtn.addEventListener('click', closeSheet);
-  if (backdrop) backdrop.addEventListener('click', closeSheet);
-});
+  if (closeBtn)  closeBtn.addEventListener('click', function () { closeSheet(true); });
+  if (backdrop)  backdrop.addEventListener('click', function () { closeSheet(true); });
+
+  // Escape key closes sheet
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'Escape' || e.keyCode === 27) && sheet && sheet.classList.contains('open')) {
+      closeSheet(true);
+    }
+    // Focus trap
+    if (e.key === 'Tab' && sheet && sheet.classList.contains('open')) {
+      var focusable = getFocusable();
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last  = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+      }
+    }
+  });
+
+  // Auto-close when navigating away via sheet link
+  if (sheet) {
+    sheet.querySelectorAll('a[href]').forEach(function (link) {
+      link.addEventListener('click', function () { closeSheet(false); });
+    });
+  }
+})();
 </script>
+
+<script>
+// ── Instant Share Sheet Controller ──────────────────────────────────────────
+(function () {
+  var shareBtn = document.getElementById('btn-instant-share');
+  var closeBtn = document.getElementById('btn-close-instant-share');
+  var backdrop = document.getElementById('instant-share-backdrop');
+  var sheet = document.getElementById('instant-share-sheet');
+  var copyBtn = document.getElementById('btn-share-copy');
+  var copyText = document.getElementById('btn-share-copy-text');
+  var nativeBtn = document.getElementById('btn-share-native');
+
+  function openShare() {
+    if (!sheet || !backdrop) return;
+    sheet.classList.add('open');
+    sheet.removeAttribute('aria-hidden');
+    backdrop.classList.add('open');
+    if (shareBtn) shareBtn.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeShare() {
+    if (!sheet || !backdrop) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    backdrop.classList.remove('open');
+    if (shareBtn) shareBtn.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (shareBtn) shareBtn.addEventListener('click', openShare);
+  if (closeBtn) closeBtn.addEventListener('click', closeShare);
+  if (backdrop) backdrop.addEventListener('click', closeShare);
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'Escape' || e.keyCode === 27) && sheet && sheet.classList.contains('open')) {
+      closeShare();
+    }
+  });
+
+  // Copy Profile Link with micro-interaction
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function () {
+      var url = copyBtn.getAttribute('data-url');
+      if (!url) return;
+      navigator.clipboard.writeText(url).then(function () {
+        if (copyText) copyText.textContent = 'Copied to Clipboard!';
+        copyBtn.classList.add('btn-copy-success');
+        setTimeout(function () {
+          if (copyText) copyText.textContent = 'Copy Profile Link';
+          copyBtn.classList.remove('btn-copy-success');
+        }, 2200);
+      }).catch(function () {
+        prompt('Copy your link:', url);
+      });
+    });
+  }
+
+  // Native Mobile Web Share API
+  if (nativeBtn) {
+    nativeBtn.addEventListener('click', function () {
+      var url = nativeBtn.getAttribute('data-url');
+      var title = nativeBtn.getAttribute('data-title') || 'STRIDE Digital Profile';
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          text: 'Connect with me on STRIDE:',
+          url: url
+        }).catch(function () {});
+      } else if (copyBtn) {
+        copyBtn.click();
+      }
+    });
+  }
+})();
+</script>
+
 {% if user_profile and user_profile.slug %}
 <script>
   // Tag browser as owner of this profile to filter out self-visits from analytics
@@ -276,3 +580,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endif %}
 {% endblock %}
+
+{% block footer %}{% endblock %}

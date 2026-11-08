@@ -372,8 +372,8 @@
   background: rgba(245, 158, 11, 0.12);
 }
 .profile-action-btn.btn-web .profile-action-icon-wrap {
-  color: #A78BFA;
-  background: rgba(167, 139, 250, 0.12);
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.12);
 }
 
 /* Primary Save Contact to Phone Button */
@@ -2085,3 +2085,37 @@
 }
 
 
+
+/* ============================================================
+   BUSINESS PROFILE: Distinct Avatar Ring & Category Chip
+   ============================================================ */
+
+/* Square-ish ring for business logos */
+.prf-avatar-ring--business {
+  border-radius: 18px !important;
+}
+
+.prf-avatar-ring--business .prf-avatar-inner {
+  border-radius: 14px !important;
+}
+
+/* Business category displayed as a chip below the name */
+.prf-business-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.prf-business-category svg {
+  color: #A1A1AA;
+  flex-shrink: 0;
+}

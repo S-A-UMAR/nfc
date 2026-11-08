@@ -1,534 +1,674 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
 
-{% block page_title %}Themes &amp; Style — {{ BRAND_NAME }}{% endblock %}
+{% block page_title %}Appearance &amp; Customization{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<!-- Core public profile styles & theme tokens for 100% accurate live simulation -->
+<link rel="stylesheet" href="{% static 'css/profile.css' %}?v=3.3">
+<link rel="stylesheet" href="{% static 'css/profile_themes.css' %}?v=4.0">
+{% endblock %}
 
 {% block dashboard_content %}
-<div class="appearance-page">
+<div class="appearance-workspace">
 
   <!-- ── Page Header ──────────────────────────────────────────────────────── -->
-  <div class="dash-page-header">
-    <div>
-      <div class="d-flex items-center gap-2 mb-1">
-        <h1 class="dash-page-title">Profile Appearance</h1>
-        <span class="badge badge-silver" style="font-size: 0.72rem; letter-spacing: 0.04em;">Themes &amp; Style</span>
+  <header class="appearance-page-header">
+    <div class="header-text-group">
+      <div class="d-flex items-center gap-2 mb-1 flex-wrap">
+        <h1 class="dash-page-title appearance-page-title">Appearance &amp; Customization</h1>
+        <span class="badge badge-silver" style="font-size: 0.72rem; letter-spacing: 0.04em;">
+          {% if profile.profile_type == 'business' and profile.business_name %}{{ profile.business_name }} &middot; {% endif %}Profile Appearance &middot; {{ profile.get_profile_type_display }} Mode
+        </span>
       </div>
-      <p class="dash-page-subtitle">Customise your profile format, card layout, and luxury color theme. Changes preview in real-time below.</p>
+      <p class="dash-page-subtitle">
+        Choose how your digital profile looks to visitors. Your information stays the same; you're only changing its appearance.
+      </p>
     </div>
-    <div style="display:flex; align-items:center; gap:0.625rem; flex-wrap:wrap;">
+    <div class="header-actions">
       {% if profile.slug %}
       <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" id="btn-header-preview">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        <span>Preview Live Card</span>
+        <span>View Live Card</span>
       </a>
       {% endif %}
-      <button type="submit" form="appearance-form" class="btn btn-primary btn-sm appearance-submit-btn" id="btn-header-save">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>Save Appearance</span>
-      </button>
     </div>
-  </div>
+  </header>
 
   <!-- Messages -->
   {% if messages %}
-  <div class="appearance-messages" style="margin-bottom:1.25rem;">
+  <div class="appearance-messages mb-4">
     {% for msg in messages %}
-    <div class="alert alert-{{ msg.tags }}" style="margin-bottom:0.5rem;">{{ msg }}</div>
+    <div class="alert alert-{{ msg.tags }} d-flex items-center gap-2" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span>{{ msg }}</span>
+    </div>
     {% endfor %}
   </div>
   {% endif %}
 
-  <!-- ── Interactive Layout: Configurator & Real-Time Device Simulator ── -->
-  <div class="appearance-layout-container">
+  <!-- ── Main Workspace: 2-Column Split (Controls Left, Live Preview Right) ── -->
+  <div class="appearance-grid-container appearance-layout-container">
 
-    <!-- ── Left Column: Configurator Steps ── -->
-    <div class="appearance-controls-col">
+    <!-- ── Left Column: Controls & Selectors ────────────────────────────── -->
+    <div class="appearance-controls-column">
       <form method="post" action="{% url 'dashboard:appearance' %}" id="appearance-form">
         {% csrf_token %}
         {{ form.profile_type }}
         {{ form.theme }}
         {{ form.profile_layout }}
+        <div class="appearance-type-grid" style="display:none;" aria-hidden="true"></div>
 
-        <!-- ── STEP 1: Profile Type (Personal vs Business) ───────────────── -->
-        <section class="appearance-section glass">
-          <div class="appearance-section-header">
-            <div class="appearance-step-badge">1</div>
+        <!-- ── SECTION 1: Theme Selection ───────────────────────────────── -->
+        <section class="appearance-section glass" id="section-themes">
+          <div class="section-heading-wrap">
+            <div class="step-num-pill">1</div>
             <div>
-              <h2 class="appearance-section-title">Profile Identity &amp; Mode</h2>
-              <p class="appearance-section-desc">Active format: Personal Profile mode.</p>
+              <h2 class="section-title">Color Palette &amp; Theme</h2>
+              <p class="section-desc">Select a luxury color system calibrated for maximum contrast and elegance.</p>
             </div>
           </div>
-          <div class="appearance-type-grid" style="grid-template-columns: 1fr; max-width: 580px;">
+
+          <!-- Featured 5 Recommended Themes -->
+          <div class="theme-tier-label">Featured Themes</div>
+          <div class="themes-grid appearance-themes-grid" id="featured-themes-grid">
+            {% for theme in recommended_themes %}
             <button type="button"
-              class="appearance-type-card active"
-              data-value="personal" data-field="profile_type" id="type-btn-personal">
-              <div class="appearance-type-badge-row">
-                <div class="appearance-type-icon personal-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              class="appearance-theme-card {% if profile.theme == theme.key %}active{% endif %}"
+              data-theme-key="{{ theme.key }}"
+              data-theme-name="{{ theme.label }}"
+              style="--card-bg: {{ theme.bg }}; --card-accent: {{ theme.accent }}; --card-text: {{ theme.text }};"
+              aria-pressed="{% if profile.theme == theme.key %}true{% else %}false{% endif %}">
+              
+              <div class="theme-card-art" style="background: radial-gradient(circle at 80% 20%, {{ theme.accent }}38 0%, {{ theme.bg }} 80%);">
+                <div class="mini-profile-chip">
+                  <span class="mini-chip-dot" style="background: {{ theme.accent }}; box-shadow: 0 0 8px {{ theme.accent }};"></span>
+                  <span class="mini-chip-bar" style="background: {{ theme.text }};"></span>
                 </div>
-                <span class="type-tag-pill">Creator &middot; Executive</span>
+                <div class="theme-accent-indicator" style="background: {{ theme.accent }};"></div>
               </div>
-              <div class="appearance-type-label">Personal Profile</div>
-              <div class="appearance-type-desc">Optimized for individuals, founders, creators, freelancers, and professionals. Focuses on your photo, bio, and direct contacts.</div>
-              <ul class="appearance-type-perks">
-                <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Circular Portrait Avatar &amp; Bio</li>
-                <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Social Media Links Grid</li>
-                <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 1-Tap Phone Contact vCard</li>
-              </ul>
-              <div class="appearance-type-check">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+
+              <div class="theme-card-body">
+                <div class="d-flex items-center justify-between mb-1">
+                  <span class="theme-card-name">{{ theme.label }}</span>
+                  <span class="theme-card-badge">{{ theme.badge }}</span>
+                </div>
+                <p class="theme-card-desc">{{ theme.desc }}</p>
+              </div>
+
+              <div class="theme-card-selection-check" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
             </button>
+            {% endfor %}
+          </div>
 
-            {% comment %} Hashed out for upcoming feature release: Business Profile
-            <button type="button"
-              class="appearance-type-card {% if profile.profile_type == 'business' %}active{% endif %}"
-              data-value="business" data-field="profile_type" id="type-btn-business">
-              <div class="appearance-type-badge-row">
-                <div class="appearance-type-icon business-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/><path d="M14 9h1"/><path d="M14 13h1"/><path d="M14 17h1"/></svg>
-                </div>
-                <span class="type-tag-pill gold">Company &middot; Brand</span>
+          <!-- Collapsible "More Themes" Accordion -->
+          <div class="more-themes-wrapper mt-3">
+            <button type="button" class="btn-more-themes-toggle" id="btn-toggle-more-themes" aria-expanded="false" aria-controls="more-themes-tray">
+              <span class="d-flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                <span>More Themes ({{ more_themes|length }} options)</span>
+              </span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+
+            <div class="more-themes-tray" id="more-themes-tray" style="display: none;">
+              <div class="themes-grid mt-3">
+                {% for theme in more_themes %}
+                <button type="button"
+                  class="appearance-theme-card {% if profile.theme == theme.key %}active{% endif %}"
+                  data-theme-key="{{ theme.key }}"
+                  data-theme-name="{{ theme.label }}"
+                  style="--card-bg: {{ theme.bg }}; --card-accent: {{ theme.accent }}; --card-text: {{ theme.text }};"
+                  aria-pressed="{% if profile.theme == theme.key %}true{% else %}false{% endif %}">
+                  
+                  <div class="theme-card-art" style="background: radial-gradient(circle at 80% 20%, {{ theme.accent }}38 0%, {{ theme.bg }} 80%);">
+                    <div class="mini-profile-chip">
+                      <span class="mini-chip-dot" style="background: {{ theme.accent }}; box-shadow: 0 0 8px {{ theme.accent }};"></span>
+                      <span class="mini-chip-bar" style="background: {{ theme.text }};"></span>
+                    </div>
+                    <div class="theme-accent-indicator" style="background: {{ theme.accent }};"></div>
+                  </div>
+
+                  <div class="theme-card-body">
+                    <div class="d-flex items-center justify-between mb-1">
+                      <span class="theme-card-name">{{ theme.label }}</span>
+                      <span class="theme-swatch-dot" style="background: {{ theme.accent }};"></span>
+                    </div>
+                    <p class="theme-card-desc">{{ theme.desc }}</p>
+                  </div>
+
+                  <div class="theme-card-selection-check" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                </button>
+                {% endfor %}
               </div>
-              <div class="appearance-type-label">Business Profile</div>
-              <div class="appearance-type-desc">Optimized for companies, agencies, retail stores, brands, and sales teams. Focuses on company logo, services, and corporate trust.</div>
-              <ul class="appearance-type-perks">
-                <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Prominent Corporate Brand Logo</li>
-                <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Business Category &amp; Offerings</li>
-                <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Corporate Inquiry &amp; Location Hub</li>
-              </ul>
-              <div class="appearance-type-check">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION 2: Layout Architecture ──────────────────────────── -->
+        <section class="appearance-section glass" id="section-layouts">
+          <div class="section-heading-wrap">
+            <div class="step-num-pill">2</div>
+            <div>
+              <h2 class="section-title">Card Layout Architecture</h2>
+              <p class="section-desc">Select how your avatar, bio and buttons are structured on mobile devices.</p>
+            </div>
+          </div>
+
+          {% if profile.profile_type == 'business' %}
+          <!-- Business Layouts -->
+          <div class="layout-grid appearance-layout-grid" id="business-layouts-grid">
+            {% for layout in business_layouts %}
+            <button type="button"
+              class="appearance-layout-card {% if profile.profile_layout == layout.key %}active{% endif %}"
+              data-layout-key="{{ layout.key }}"
+              data-layout-name="{{ layout.label }}"
+              aria-pressed="{% if profile.profile_layout == layout.key %}true{% else %}false{% endif %}">
+              
+              <div class="layout-wireframe-wrap">
+                {% if layout.key == 'executive_layout' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#14151B"/>
+                    <rect x="14" y="10" width="3" height="50" rx="1.5" fill="#C9A84C"/>
+                    <rect x="24" y="12" width="16" height="16" rx="3" fill="#2E2C26" stroke="#C9A84C" stroke-width="1"/>
+                    <rect x="46" y="14" width="36" height="4" rx="2" fill="#F5F0E8"/>
+                    <rect x="46" y="21" width="26" height="3" rx="1.5" fill="#C9A84C"/>
+                    <rect x="24" y="36" width="58" height="10" rx="3" fill="#2E2C26"/>
+                    <rect x="24" y="49" width="58" height="10" rx="3" fill="#C9A84C"/>
+                  </svg>
+                {% elif layout.key == 'brand_header' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#14151B"/>
+                    <rect x="38" y="8" width="24" height="24" rx="5" fill="#262833" stroke="#F59E0B" stroke-width="1.5"/>
+                    <rect x="25" y="37" width="50" height="5" rx="2" fill="#E2E8F0"/>
+                    <rect x="34" y="45" width="32" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="18" y="52" width="64" height="11" rx="4" fill="#F59E0B"/>
+                  </svg>
+                {% elif layout.key == 'business_card' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#101116"/>
+                    <rect x="10" y="8" width="80" height="54" rx="5" fill="#181820" stroke="#C9A84C" stroke-width="1.2"/>
+                    <rect x="18" y="14" width="14" height="14" rx="2" fill="#C9A84C"/>
+                    <rect x="38" y="14" width="42" height="4" rx="1" fill="#FFFFFF"/>
+                    <rect x="38" y="21" width="28" height="3" rx="1" fill="#A1A1AA"/>
+                    <line x1="18" y1="34" x2="82" y2="34" stroke="#2D2D38" stroke-width="1"/>
+                    <rect x="18" y="40" width="30" height="8" rx="2" fill="#2B2B38"/>
+                    <rect x="52" y="40" width="30" height="8" rx="2" fill="#2B2B38"/>
+                  </svg>
+                {% elif layout.key == 'business_catalog' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#14151B"/>
+                    <circle cx="20" cy="16" r="7" fill="#C9A84C"/>
+                    <rect x="32" y="12" width="44" height="4" rx="1.5" fill="#E2E8F0"/>
+                    <rect x="32" y="18" width="30" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="14" y="28" width="33" height="18" rx="3" fill="#242633"/>
+                    <rect x="53" y="28" width="33" height="18" rx="3" fill="#242633"/>
+                    <rect x="14" y="49" width="33" height="15" rx="3" fill="#242633"/>
+                    <rect x="53" y="49" width="33" height="15" rx="3" fill="#242633"/>
+                  </svg>
+                {% endif %}
+              </div>
+
+              <div class="layout-card-name">{{ layout.label }}</div>
+              <div class="layout-card-desc">{{ layout.desc }}</div>
+
+              <div class="layout-card-check" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
             </button>
-            {% endcomment %}
+            {% endfor %}
           </div>
+          {% else %}
+          <!-- Personal Layouts -->
+          <div class="layout-grid appearance-layout-grid" id="personal-layouts-grid">
+            {% for layout in personal_layouts %}
+            <button type="button"
+              class="appearance-layout-card {% if profile.profile_layout == layout.key %}active{% endif %}"
+              data-layout-key="{{ layout.key }}"
+              data-layout-name="{{ layout.label }}"
+              aria-pressed="{% if profile.profile_layout == layout.key %}true{% else %}false{% endif %}">
+              
+              <div class="layout-wireframe-wrap">
+                {% if layout.key == 'classic' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#14151B"/>
+                    <rect y="0" width="100" height="22" rx="6" fill="#262833"/>
+                    <circle cx="50" cy="22" r="11" fill="#4B4E5F" stroke="#14151B" stroke-width="2"/>
+                    <rect x="34" y="37" width="32" height="4" rx="2" fill="#E2E8F0"/>
+                    <rect x="38" y="44" width="24" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="22" y="52" width="26" height="10" rx="3" fill="#323544"/>
+                    <rect x="52" y="52" width="26" height="10" rx="3" fill="#FFFFFF"/>
+                  </svg>
+                {% elif layout.key == 'centered' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#14151B"/>
+                    <circle cx="50" cy="20" r="13" fill="#4B4E5F" stroke="#FFFFFF" stroke-width="1.5"/>
+                    <rect x="30" y="38" width="40" height="4" rx="2" fill="#E2E8F0"/>
+                    <rect x="36" y="45" width="28" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="20" y="52" width="60" height="11" rx="999" fill="#FFFFFF"/>
+                  </svg>
+                {% elif layout.key == 'minimal_layout' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#0C0D11" stroke="#252731"/>
+                    <circle cx="24" cy="24" r="9" fill="#4B4E5F"/>
+                    <rect x="38" y="19" width="38" height="4" rx="1" fill="#E2E8F0"/>
+                    <rect x="38" y="26" width="28" height="3" rx="1" fill="#717688"/>
+                    <line x1="16" y1="38" x2="84" y2="38" stroke="#252731" stroke-width="1"/>
+                    <rect x="16" y="44" width="68" height="3" rx="1" fill="#4B4E5F"/>
+                    <rect x="16" y="50" width="54" height="3" rx="1" fill="#353744"/>
+                    <rect x="16" y="58" width="32" height="7" rx="2" fill="#E2E8F0"/>
+                  </svg>
+                {% elif layout.key == 'social' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#14151B"/>
+                    <circle cx="24" cy="20" r="10" fill="#4B4E5F"/>
+                    <rect x="40" y="15" width="36" height="4" rx="2" fill="#E2E8F0"/>
+                    <rect x="40" y="22" width="26" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="16" y="37" width="20" height="14" rx="4" fill="#323544"/>
+                    <rect x="40" y="37" width="20" height="14" rx="4" fill="#323544"/>
+                    <rect x="64" y="37" width="20" height="14" rx="4" fill="#323544"/>
+                    <rect x="16" y="54" width="20" height="11" rx="4" fill="#252834"/>
+                    <rect x="40" y="54" width="20" height="11" rx="4" fill="#252834"/>
+                    <rect x="64" y="54" width="20" height="11" rx="4" fill="#252834"/>
+                  </svg>
+                {% elif layout.key == 'card' %}
+                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="100" height="70" rx="6" fill="#101116"/>
+                    <rect x="12" y="10" width="76" height="50" rx="6" fill="#1C1E26" stroke="#333745"/>
+                    <circle cx="26" cy="28" r="8" fill="#4B4E5F"/>
+                    <rect x="38" y="22" width="36" height="4" rx="1.5" fill="#E2E8F0"/>
+                    <rect x="38" y="29" width="24" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="20" y="44" width="60" height="9" rx="3" fill="#FFFFFF"/>
+                  </svg>
+                {% endif %}
+              </div>
+
+              <div class="layout-card-name">{{ layout.label }}</div>
+              <div class="layout-card-desc">{{ layout.desc }}</div>
+
+              <div class="layout-card-check" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+            {% endfor %}
+          </div>
+          {% endif %}
         </section>
 
-        <!-- ── STEP 2: Profile Layout Architecture ──────────────────────── -->
-        <section class="appearance-section glass">
-          <div class="appearance-section-header">
-            <div class="appearance-step-badge">2</div>
+        <!-- ── SECTION 3: Optional Appearance Preferences ──────────────── -->
+        <section class="appearance-section glass" id="section-options">
+          <div class="section-heading-wrap">
+            <div class="step-num-pill">3</div>
             <div>
-              <h2 class="appearance-section-title">Card Layout Architecture</h2>
-              <p class="appearance-section-desc">Select how your avatar, header, and buttons are structured on mobile devices.</p>
+              <h2 class="section-title">Profile Visibility &amp; Destination</h2>
+              <p class="section-desc">Manage how visitors access your live card.</p>
             </div>
           </div>
 
-          <!-- Personal layouts (shown when type = personal) -->
-          <div class="appearance-layout-group" data-for-type="personal" {% if profile.profile_type == 'business' %}style="display:none"{% endif %}>
-            <div class="appearance-layout-grid">
-              {% for layout in personal_layouts %}
-              <button type="button"
-                class="appearance-layout-card {% if profile.profile_layout == layout.key and profile.profile_type == 'personal' %}active{% elif layout.key == 'classic' and profile.profile_layout == 'classic' %}active{% endif %}"
-                data-value="{{ layout.key }}" data-field="profile_layout" data-type="personal">
-                <!-- Visual SVG Wireframe Illustration (Emoji & Glyph Free) -->
-                <div class="layout-wireframe-wrap">
-                  {% if layout.key == 'classic' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#14151B"/>
-                      <rect y="0" width="100" height="22" rx="6" fill="#262833"/>
-                      <circle cx="50" cy="22" r="11" fill="#4B4E5F" stroke="#14151B" stroke-width="2"/>
-                      <rect x="34" y="37" width="32" height="4" rx="2" fill="#E2E8F0"/>
-                      <rect x="38" y="44" width="24" height="3" rx="1.5" fill="#717688"/>
-                      <rect x="22" y="52" width="26" height="10" rx="3" fill="#323544"/>
-                      <rect x="52" y="52" width="26" height="10" rx="3" fill="#3B82F6"/>
-                    </svg>
-                  {% elif layout.key == 'centered' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#14151B"/>
-                      <circle cx="50" cy="20" r="13" fill="#4B4E5F" stroke="#3B82F6" stroke-width="1.5"/>
-                      <rect x="30" y="38" width="40" height="4" rx="2" fill="#E2E8F0"/>
-                      <rect x="36" y="45" width="28" height="3" rx="1.5" fill="#717688"/>
-                      <rect x="20" y="52" width="60" height="11" rx="999" fill="#3B82F6"/>
-                    </svg>
-                  {% elif layout.key == 'minimal_layout' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#0C0D11" stroke="#252731"/>
-                      <circle cx="24" cy="24" r="9" fill="#4B4E5F"/>
-                      <rect x="38" y="19" width="38" height="4" rx="1" fill="#E2E8F0"/>
-                      <rect x="38" y="26" width="28" height="3" rx="1" fill="#717688"/>
-                      <line x1="16" y1="38" x2="84" y2="38" stroke="#252731" stroke-width="1"/>
-                      <rect x="16" y="44" width="68" height="3" rx="1" fill="#4B4E5F"/>
-                      <rect x="16" y="50" width="54" height="3" rx="1" fill="#353744"/>
-                      <rect x="16" y="58" width="32" height="7" rx="2" fill="#E2E8F0"/>
-                    </svg>
-                  {% elif layout.key == 'social' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#14151B"/>
-                      <circle cx="24" cy="20" r="10" fill="#4B4E5F"/>
-                      <rect x="40" y="15" width="36" height="4" rx="2" fill="#E2E8F0"/>
-                      <rect x="40" y="22" width="26" height="3" rx="1.5" fill="#717688"/>
-                      <rect x="16" y="37" width="20" height="14" rx="4" fill="#323544"/>
-                      <rect x="40" y="37" width="20" height="14" rx="4" fill="#323544"/>
-                      <rect x="64" y="37" width="20" height="14" rx="4" fill="#323544"/>
-                      <rect x="16" y="54" width="20" height="11" rx="4" fill="#252834"/>
-                      <rect x="40" y="54" width="20" height="11" rx="4" fill="#252834"/>
-                      <rect x="64" y="54" width="20" height="11" rx="4" fill="#252834"/>
-                    </svg>
-                  {% elif layout.key == 'card' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#101116"/>
-                      <rect x="12" y="10" width="76" height="50" rx="6" fill="#1C1E26" stroke="#333745"/>
-                      <circle cx="26" cy="28" r="8" fill="#4B4E5F"/>
-                      <rect x="38" y="22" width="36" height="4" rx="1.5" fill="#E2E8F0"/>
-                      <rect x="38" y="29" width="24" height="3" rx="1.5" fill="#717688"/>
-                      <rect x="20" y="44" width="60" height="9" rx="3" fill="#3B82F6"/>
-                    </svg>
-                  {% else %}
-                    <div class="layout-icon-fallback">{{ layout.icon }}</div>
-                  {% endif %}
-                </div>
-                <div class="appearance-layout-label">{{ layout.label }}</div>
-                <div class="appearance-layout-desc">{{ layout.desc }}</div>
-                <div class="appearance-type-check">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              </button>
-              {% endfor %}
+          {% if profile.direct_link_enabled %}
+          <div class="appearance-info-banner warning mb-3">
+            <div class="info-banner-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
-          </div>
-
-          <!-- Business layouts (hashed out for upcoming feature release) -->
-          {% comment %}
-          <div class="appearance-layout-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
-            <div class="appearance-layout-grid">
-              {% for layout in business_layouts %}
-              <button type="button"
-                class="appearance-layout-card {% if profile.profile_layout == layout.key and profile.profile_type == 'business' %}active{% elif layout.key == 'executive_layout' and profile.profile_type == 'business' and profile.profile_layout not in 'executive_layout brand_header business_card business_catalog' %}active{% endif %}"
-                data-value="{{ layout.key }}" data-field="profile_layout" data-type="business">
-                <!-- Visual SVG Wireframe Illustration (Emoji & Glyph Free) -->
-                <div class="layout-wireframe-wrap">
-                  {% if layout.key == 'executive_layout' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#14151B"/>
-                      <rect x="14" y="10" width="3" height="50" rx="1.5" fill="#C9A84C"/>
-                      <rect x="24" y="12" width="16" height="16" rx="3" fill="#2E2C26" stroke="#C9A84C" stroke-width="1"/>
-                      <rect x="46" y="14" width="36" height="4" rx="2" fill="#F5F0E8"/>
-                      <rect x="46" y="21" width="26" height="3" rx="1.5" fill="#C9A84C"/>
-                      <rect x="24" y="36" width="58" height="10" rx="3" fill="#2E2C26"/>
-                      <rect x="24" y="49" width="58" height="10" rx="3" fill="#C9A84C"/>
-                    </svg>
-                  {% elif layout.key == 'brand_header' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#14151B"/>
-                      <rect x="38" y="8" width="24" height="24" rx="5" fill="#262833" stroke="#F59E0B" stroke-width="1.5"/>
-                      <rect x="25" y="37" width="50" height="5" rx="2" fill="#E2E8F0"/>
-                      <rect x="34" y="45" width="32" height="3" rx="1.5" fill="#717688"/>
-                      <rect x="18" y="52" width="64" height="11" rx="4" fill="#F59E0B"/>
-                    </svg>
-                  {% elif layout.key == 'business_card' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#101116"/>
-                      <rect x="10" y="8" width="80" height="54" rx="5" fill="#181820" stroke="#C9A84C" stroke-width="1.2"/>
-                      <rect x="18" y="14" width="14" height="14" rx="2" fill="#C9A84C"/>
-                      <rect x="38" y="14" width="42" height="4" rx="1" fill="#FFFFFF"/>
-                      <rect x="38" y="21" width="28" height="3" rx="1" fill="#A1A1AA"/>
-                      <line x1="18" y1="34" x2="82" y2="34" stroke="#2D2D38" stroke-width="1"/>
-                      <rect x="18" y="40" width="30" height="8" rx="2" fill="#2B2B38"/>
-                      <rect x="52" y="40" width="30" height="8" rx="2" fill="#2B2B38"/>
-                    </svg>
-                  {% elif layout.key == 'business_catalog' %}
-                    <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <rect width="100" height="70" rx="6" fill="#14151B"/>
-                      <circle cx="20" cy="16" r="7" fill="#C9A84C"/>
-                      <rect x="32" y="12" width="44" height="4" rx="1.5" fill="#E2E8F0"/>
-                      <rect x="32" y="18" width="30" height="3" rx="1.5" fill="#717688"/>
-                      <rect x="14" y="28" width="33" height="18" rx="3" fill="#242633"/>
-                      <rect x="53" y="28" width="33" height="18" rx="3" fill="#242633"/>
-                      <rect x="14" y="49" width="33" height="15" rx="3" fill="#242633"/>
-                      <rect x="53" y="49" width="33" height="15" rx="3" fill="#242633"/>
-                    </svg>
-                  {% else %}
-                    <div class="layout-icon-fallback">{{ layout.icon }}</div>
-                  {% endif %}
-                </div>
-                <div class="appearance-layout-label">{{ layout.label }}</div>
-                <div class="appearance-layout-desc">{{ layout.desc }}</div>
-                <div class="appearance-type-check">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              </button>
-              {% endfor %}
-            </div>
-          </div>
-          {% endcomment %}
-        </section>
-
-        <!-- ── STEP 3: Curated Luxury Colour Themes ─────────────────────── -->
-        <section class="appearance-section glass">
-          <div class="appearance-section-header">
-            <div class="appearance-step-badge">3</div>
             <div>
-              <h2 class="appearance-section-title">Color Palette &amp; Luxury Theme</h2>
-              <p class="appearance-section-desc">Handcrafted color systems calibrated for maximum contrast and elegance.</p>
+              <div class="info-banner-title">Direct Link Mode is Currently Enabled</div>
+              <p class="info-banner-desc">Visitors tapping your NFC card are redirected directly to your external URL (<strong>{{ profile.direct_link_url|truncatechars:35 }}</strong>) instead of seeing this visual profile. You can toggle this setting in <a href="{% url 'dashboard:links_manage' %}" style="color: #F59E0B; text-decoration: underline;">Links &amp; Socials</a>.</p>
             </div>
           </div>
+          {% endif %}
 
-          <!-- Personal themes -->
-          <div class="appearance-themes-group" data-for-type="personal" {% if profile.profile_type == 'business' %}style="display:none"{% endif %}>
-            <div class="appearance-themes-grid">
-              {% for theme in personal_themes %}
-              <button type="button"
-                class="appearance-theme-card {% if profile.theme == theme.key %}active{% endif %}"
-                data-value="{{ theme.key }}" data-field="theme"
-                data-type="personal"
-                style="--theme-bg: {{ theme.bg }}; --theme-accent: {{ theme.accent }}; --theme-text: {{ theme.text }};">
-                <div class="appearance-theme-preview" style="background: radial-gradient(circle at 80% 20%, {{ theme.accent }}33 0%, {{ theme.bg }} 75%);">
-                  <div class="theme-mini-card">
-                    <span class="theme-mini-dot" style="background: {{ theme.accent }}; box-shadow: 0 0 8px {{ theme.accent }};"></span>
-                    <span class="theme-mini-bar" style="background: {{ theme.text }};"></span>
-                  </div>
-                  <div class="appearance-theme-accent-strip" style="background: {{ theme.accent }};"></div>
-                </div>
-                <div class="appearance-theme-info">
-                  <div class="d-flex items-center justify-between mb-1">
-                    <div class="appearance-theme-name">{{ theme.label }}</div>
-                    <span class="theme-swatch-circle" style="background: {{ theme.accent }};" title="{{ theme.accent }}"></span>
-                  </div>
-                  <div class="appearance-theme-desc">{{ theme.desc }}</div>
-                </div>
-                <div class="appearance-type-check">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              </button>
-              {% endfor %}
+          <div class="visibility-card">
+            <div class="visibility-details">
+              <div class="visibility-title">Your Live STRIDE URL</div>
+              <div class="visibility-link-row">
+                <code class="visibility-url">https://stride.me/u/{{ profile.slug }}</code>
+                <button type="button" class="btn-copy-url" id="btn-copy-url" data-url="https://stride.me/u/{{ profile.slug }}" title="Copy URL">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <span id="copy-btn-text">Copy</span>
+                </button>
+              </div>
             </div>
+            <p class="visibility-note">
+              Profile content (bio, phone, email, and social accounts) is updated in 
+              <a href="{% url 'dashboard:profile_edit' %}" class="dash-inline-link">My Profile</a> and 
+              <a href="{% url 'dashboard:links_manage' %}" class="dash-inline-link">Links &amp; Socials</a>.
+            </p>
           </div>
-
-          <!-- Business themes (hashed out for upcoming feature release) -->
-          {% comment %}
-          <div class="appearance-themes-group" data-for-type="business" {% if profile.profile_type == 'personal' %}style="display:none"{% endif %}>
-            <div class="appearance-themes-grid">
-              {% for theme in business_themes %}
-              <button type="button"
-                class="appearance-theme-card {% if profile.theme == theme.key %}active{% endif %}"
-                data-value="{{ theme.key }}" data-field="theme"
-                data-type="business"
-                style="--theme-bg: {{ theme.bg }}; --theme-accent: {{ theme.accent }}; --theme-text: {{ theme.text }};">
-                <div class="appearance-theme-preview" style="background: radial-gradient(circle at 80% 20%, {{ theme.accent }}33 0%, {{ theme.bg }} 75%);">
-                  <div class="theme-mini-card">
-                    <span class="theme-mini-dot" style="background: {{ theme.accent }}; box-shadow: 0 0 8px {{ theme.accent }};"></span>
-                    <span class="theme-mini-bar" style="background: {{ theme.text }};"></span>
-                  </div>
-                  <div class="appearance-theme-accent-strip" style="background: {{ theme.accent }};"></div>
-                </div>
-                <div class="appearance-theme-info">
-                  <div class="d-flex items-center justify-between mb-1">
-                    <div class="appearance-theme-name">{{ theme.label }}</div>
-                    <span class="theme-swatch-circle" style="background: {{ theme.accent }};" title="{{ theme.accent }}"></span>
-                  </div>
-                  <div class="appearance-theme-desc">{{ theme.desc }}</div>
-                </div>
-                <div class="appearance-type-check">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              </button>
-              {% endfor %}
-            </div>
-          </div>
-          {% endcomment %}
         </section>
-
-        <!-- ── Inline Save Section (Document Flow) ────────────────────── -->
-        <div class="appearance-inline-save-card glass">
-          <div class="appearance-inline-save-text">
-            <h3 class="appearance-inline-title">Ready to apply these visual changes?</h3>
-            <p class="appearance-inline-desc">Your selections will update your public link and digital business card instantly.</p>
-          </div>
-          <button type="submit" class="btn btn-primary btn-md appearance-submit-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>Save Appearance</span>
-          </button>
-        </div>
 
       </form>
     </div>
 
   </div>
 
-  <!-- ── Floating Bottom Save Bar (Responsive Glass) ───────────────────── -->
-  <div class="appearance-save-bar">
+  </div>
+
+  <!-- ── Single Clear Save Mechanism: Docked Floating Glass Save Bar ──────── -->
+  <aside class="appearance-save-bar" id="save-dock" aria-label="Appearance actions">
     <div class="appearance-save-summary">
       <div class="d-flex items-center gap-2">
-        <span class="appearance-save-dot" id="save-status-dot"></span>
-        <span>Mode: <strong id="summary-type">{{ profile.get_profile_type_display }}</strong></span>
+        <span class="appearance-save-dot" id="save-status-dot" aria-hidden="true"></span>
+        <span id="save-status-text">Saved &amp; Live</span>
       </div>
       <span class="appearance-save-sep">&middot;</span>
-      <span>Layout: <strong id="summary-layout">{{ profile.get_profile_layout_display }}</strong></span>
+      <span>Theme: <strong id="summary-theme-name">{{ profile.get_theme_display }}</strong></span>
       <span class="appearance-save-sep">&middot;</span>
-      <span>Theme: <strong id="summary-theme">{{ profile.get_theme_display }}</strong></span>
+      <span>Layout: <strong id="summary-layout-name">{{ profile.get_profile_layout_display }}</strong></span>
     </div>
-    <button type="submit" form="appearance-form" class="btn btn-primary appearance-submit-btn">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span>Save Appearance</span>
-    </button>
-  </div>
+
+    <div class="appearance-save-action-group">
+      <button type="submit" form="appearance-form" class="btn btn-primary appearance-submit-btn" id="btn-save-appearance">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Save Appearance</span>
+      </button>
+    </div>
+  </aside>
 
 </div>
 
 <!-- ==========================================================================
-     PAGE STYLES: 2-Column Responsive Layout, Wireframes & Device Simulator
+     PAGE STYLES: Split Workspace, Interactive Themes, Phone Chassis & Dock
      ========================================================================== -->
 <style>
-/* ── Appearance Page Main Container ── */
-.appearance-page { max-width: 1100px; padding-bottom: 7rem; margin: 0 auto; }
-.dash-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
-.dash-page-title { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0; }
-.dash-page-subtitle { color: var(--text-muted); font-size: 0.875rem; margin: 0; max-width: 640px; }
-
-/* ── Centered Controls Layout (Device Simulator Removed) ── */
-.appearance-layout-container {
-  max-width: 860px;
+/* ── Main Container & Split Workspace ── */
+.appearance-workspace {
+  max-width: 960px;
   margin: 0 auto;
+  padding-bottom: 8rem;
+}
+
+.header-text-group { max-width: 720px; }
+
+/* Page heading block — NOT sticky, just a normal flex row */
+.appearance-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  /* override any inherited sticky positioning from dashboard.css */
+  position: static !important;
+}
+
+/* Keep the subtitle legible */
+.appearance-page-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary, #FFFFFF);
+  margin: 0 0 0.25rem;
+  line-height: 1.2;
+}
+
+/* Full Width Focused Workspace */
+.appearance-grid-container {
+  display: block;
   width: 100%;
 }
 
+/* ── Glass Section Containers ── */
 .appearance-section {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-lg, 16px);
   padding: 1.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(14, 15, 20, 0.65);
+  background: rgba(14, 15, 22, 0.65);
+  backdrop-filter: blur(16px);
 }
-.appearance-section-header {
+
+.section-heading-wrap {
   display: flex;
   align-items: flex-start;
   gap: 0.875rem;
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.5rem;
 }
-.appearance-step-badge {
-  width: 28px; height: 28px; border-radius: 50%;
+
+.step-num-pill {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   background: #FFFFFF;
   color: #09090B;
-  font-family: var(--font-heading);
+  font-family: var(--font-heading, inherit);
   font-size: 0.8rem;
   font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   margin-top: 2px;
 }
-.appearance-section-title { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.2rem; }
-.appearance-section-desc { color: var(--text-muted); font-size: 0.8125rem; margin: 0; }
 
-/* ── Profile Type Cards (Personal vs Business) ── */
-.appearance-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 680px) { .appearance-type-grid { grid-template-columns: 1fr; } }
-.appearance-type-card {
+.section-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #FFFFFF);
+  margin: 0 0 0.25rem;
+}
+
+.section-desc {
+  color: var(--text-muted, #71717A);
+  font-size: 0.8125rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.theme-tier-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #A1A1AA);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Theme Cards Grid ── */
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.875rem;
+}
+
+.appearance-theme-card {
   position: relative;
   background: rgba(255, 255, 255, 0.025);
   border: 1.5px solid rgba(255, 255, 255, 0.09);
-  border-radius: 14px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 0;
   cursor: pointer;
   text-align: left;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--text-primary);
+  overflow: hidden;
+  color: var(--text-primary, #FFFFFF);
   display: flex;
   flex-direction: column;
 }
-.appearance-type-card:hover {
-  border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.05);
+
+.appearance-theme-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
   transform: translateY(-2px);
 }
-.appearance-type-card.active {
+
+.appearance-theme-card.active {
   border-color: #FFFFFF;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(20, 21, 28, 0.95) 100%);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), 0 12px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25), 0 10px 26px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
 }
-.appearance-type-card[data-value="business"].active {
-  border-color: #F59E0B;
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25), 0 12px 30px rgba(245, 158, 11, 0.12);
+
+.theme-card-art {
+  height: 68px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.appearance-type-badge-row {
+
+.mini-profile-chip {
+  width: 58px;
+  height: 34px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+}
+
+.mini-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.mini-chip-bar {
+  width: 32px;
+  height: 3px;
+  border-radius: 1.5px;
+  opacity: 0.75;
+}
+
+.theme-accent-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.theme-card-body {
+  padding: 0.75rem 0.85rem 0.85rem;
+  flex: 1;
+}
+
+.theme-card-name {
+  font-family: var(--font-heading, inherit);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #FFFFFF);
+}
+
+.theme-card-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary, #A1A1AA);
+}
+
+.theme-card-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted, #71717A);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.theme-swatch-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.theme-card-selection-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  color: #09090B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.appearance-theme-card.active .theme-card-selection-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── More Themes Toggle ── */
+.btn-more-themes-toggle {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
-}
-.appearance-type-icon {
-  width: 44px; height: 44px; border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  display: flex; align-items: center; justify-content: center;
-  color: #BFC5CF;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: var(--text-secondary, #A1A1AA);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
-.appearance-type-card.active .personal-icon {
-  background: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-}
-.appearance-type-card.active .business-icon {
-  background: rgba(245, 158, 11, 0.18);
-  border-color: rgba(245, 158, 11, 0.35);
-  color: #FCD34D;
-}
-.type-tag-pill {
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 9999px;
+
+.btn-more-themes-toggle:hover {
   background: rgba(255, 255, 255, 0.06);
-  color: var(--text-muted);
-}
-.type-tag-pill.gold {
-  color: #FCD34D;
-  background: rgba(245, 158, 11, 0.12);
-}
-.appearance-type-label { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem; }
-.appearance-type-desc { font-size: 0.785rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 1rem; }
-.appearance-type-perks {
-  list-style: none; padding: 0; margin: auto 0 0;
-  display: flex; flex-direction: column; gap: 0.4rem;
-  font-size: 0.74rem; color: var(--text-muted);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 0.75rem;
-}
-.appearance-type-perks li { display: flex; align-items: center; gap: 0.45rem; }
-.appearance-type-check {
-  position: absolute; top: 1rem; right: 1rem;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: #FFFFFF;
-  color: #09090B;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity 0.2s ease;
-}
-.appearance-type-card.active .appearance-type-check { opacity: 1; }
-.appearance-type-card[data-value="business"].active .appearance-type-check {
-  background: #F59E0B;
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--text-primary, #FFFFFF);
 }
 
-/* ── Layout Cards with Visual Wireframe Previews ── */
-.appearance-layout-grid {
+.btn-more-themes-toggle .chevron-icon {
+  transition: transform 0.25s ease;
+}
+
+.btn-more-themes-toggle.open .chevron-icon {
+  transform: rotate(180deg);
+}
+
+/* ── Layout Cards Grid ── */
+.layout-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.85rem;
+  gap: 0.875rem;
 }
+
 .appearance-layout-card {
   position: relative;
   background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
   border-radius: 12px;
   padding: 0.85rem;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s ease;
-  color: var(--text-primary);
+  color: var(--text-primary, #FFFFFF);
   display: flex;
   flex-direction: column;
 }
+
 .appearance-layout-card:hover {
   border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   transform: translateY(-2px);
 }
+
 .appearance-layout-card.active {
   border-color: #FFFFFF;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(18, 19, 26, 0.95) 100%);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 19, 26, 0.95) 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
 }
+
 .layout-wireframe-wrap {
   width: 100%;
   border-radius: 8px;
@@ -540,251 +680,392 @@
   align-items: center;
   justify-content: center;
 }
-.appearance-layout-label { font-family: var(--font-heading); font-size: 0.875rem; font-weight: 600; margin-bottom: 0.2rem; }
-.appearance-layout-desc { font-size: 0.725rem; color: var(--text-muted); line-height: 1.35; }
 
-/* ── Theme Cards ── */
-.appearance-themes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-  gap: 0.85rem;
+.layout-card-name {
+  font-family: var(--font-heading, inherit);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
 }
-.appearance-theme-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 12px;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.2s ease;
-  overflow: hidden;
-  color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
+
+.layout-card-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted, #71717A);
+  line-height: 1.35;
 }
-.appearance-theme-card:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
-}
-.appearance-theme-card.active {
-  border-color: #FFFFFF;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.5);
-  transform: translateY(-2px);
-}
-.appearance-theme-preview {
-  height: 72px;
-  position: relative;
-  overflow: hidden;
+
+.layout-card-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  color: #09090B;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
-.theme-mini-card {
-  width: 60px; height: 36px; border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(8px);
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: 6px;
-}
-.theme-mini-dot { width: 6px; height: 6px; border-radius: 50%; }
-.theme-mini-bar { width: 34px; height: 3px; border-radius: 1.5px; opacity: 0.7; }
-.appearance-theme-accent-strip {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
-}
-.appearance-theme-info { padding: 0.75rem 0.875rem 0.875rem; flex: 1; }
-.appearance-theme-name { font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600; }
-.appearance-theme-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.35; }
-.theme-swatch-circle { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-/* ── Sticky Live Device Simulator (Phone Frame) ── */
-.appearance-preview-sticky {
-  position: sticky;
-  top: 96px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.appearance-layout-card.active .layout-card-check {
+  opacity: 1;
 }
-/* ── Inline Save Section ── */
-.appearance-inline-save-card {
-  border-radius: var(--radius-lg);
-  padding: 1.5rem 1.75rem;
-  margin-top: 1.5rem;
-  margin-bottom: 2rem;
+
+/* ── Section 3: Visibility & Settings ── */
+.appearance-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.appearance-info-banner.warning {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.info-banner-icon { flex-shrink: 0; margin-top: 1px; }
+.info-banner-title { font-size: 0.85rem; font-weight: 600; color: #F59E0B; margin-bottom: 0.2rem; }
+.info-banner-desc { font-size: 0.785rem; color: var(--text-secondary, #A1A1AA); margin: 0; line-height: 1.4; }
+
+.visibility-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.visibility-title { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary, #A1A1AA); margin-bottom: 0.5rem; }
+.visibility-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.875rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.visibility-url {
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: var(--text-primary, #FFFFFF);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-copy-url {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--text-primary, #FFFFFF);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-copy-url:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.visibility-note { font-size: 0.75rem; color: var(--text-muted, #71717A); margin: 0; line-height: 1.4; }
+.dash-inline-link { color: #E2E8F0; text-decoration: underline; }
+.dash-inline-link:hover { color: #FFFFFF; }
+
+/* ── Floating Save Dock ── */
+.appearance-save-bar {
+  position: fixed;
+  bottom: 1.5rem;
+  left: calc(260px + (100% - 260px) / 2);
+  transform: translateX(-50%) !important;
+  width: min(920px, calc(100% - 260px - 3rem));
+  border-radius: 9999px;
+  padding: 0.85rem 1.6rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  flex-wrap: wrap;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(14, 15, 22, 0.7);
-}
-.appearance-inline-title {
-  font-family: var(--font-heading);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 0.25rem;
-}
-.appearance-inline-desc {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* ── Floating Save Bar (Responsive Glass) ── */
-.appearance-save-bar {
-  position: fixed;
-  bottom: 1.5rem;
-  /* Centre within the content column (viewport minus 260px desktop sidebar) */
-  left: calc(260px + (100% - 260px) / 2);
-  transform: translateX(-50%) !important;
-  width: min(900px, calc(100% - 260px - 3rem));
-  border-radius: 9999px;
-  padding: 0.85rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  /* Lower than mobile sheet (999) so the More drawer can sit on top */
   z-index: 990;
   background: rgba(14, 15, 22, 0.94);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
   backdrop-filter: blur(24px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.appearance-save-bar:hover {
-  transform: translateX(-50%) !important;
-  border-color: rgba(255, 255, 255, 0.24);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12);
+
+.appearance-save-bar.dirty {
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(245, 158, 11, 0.2);
 }
-.appearance-save-summary { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; font-size: 0.8125rem; color: var(--text-muted); }
-.appearance-save-summary strong { color: var(--text-primary); }
-.appearance-save-sep { color: rgba(255, 255, 255, 0.2); }
+
+.appearance-save-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #71717A);
+}
+
+.appearance-save-summary strong {
+  color: var(--text-primary, #FFFFFF);
+}
+
+.appearance-save-sep {
+  color: rgba(255, 255, 255, 0.2);
+}
+
 .appearance-save-dot {
-  width: 8px; height: 8px; border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: #10B981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  transition: all 0.2s ease;
+}
+
+.appearance-save-dot.dirty {
+  background: #F59E0B;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
 }
 
 .spin-icon {
   animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
 
+/* ── Mobile & Responsive Breakpoints ── */
 @media (max-width: 900px) {
-  .appearance-page { padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
+  .appearance-workspace {
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px));
+  }
   .appearance-save-bar {
-    bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 1rem !important;
-    right: 1rem !important;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
     width: auto !important;
     transform: none !important;
-    padding: 0.75rem 1.15rem !important;
-    border-radius: 14px !important;
-  }
-  .appearance-save-bar:hover {
-    transform: none !important;
+    padding: 8px 14px !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
   }
 }
-@media (max-width: 540px) {
+
+@media (max-width: 600px) {
+  .themes-grid { grid-template-columns: repeat(2, 1fr); }
+  .layout-grid { grid-template-columns: repeat(2, 1fr); }
+  .appearance-section { padding: 1.25rem 1rem; }
   .appearance-save-summary { font-size: 0.72rem; }
-  .appearance-layout-grid { grid-template-columns: repeat(2, 1fr); }
-  .appearance-themes-grid { grid-template-columns: repeat(2, 1fr); }
-  .appearance-inline-save-card { padding: 1.25rem 1rem; }
+}
+
+@media (max-width: 380px) {
+  .themes-grid { grid-template-columns: 1fr; }
+  .layout-grid { grid-template-columns: 1fr; }
 }
 </style>
 
 <!-- ==========================================================================
-     INTERACTIVE ENGINE: Form Synchronizer & Card Selection
+     INTERACTIVE JAVASCRIPT ENGINE: Live Simulator & Form State
      ========================================================================== -->
 <script>
 (function() {
+  'use strict';
+
+  // Layout and theme display lookups
   const layoutLabels = {
     classic: 'Classic', centered: 'Centered', minimal_layout: 'Minimal',
-    social: 'Social', card: 'Card',
+    social: 'Social', card: 'Compact Card',
     executive_layout: 'Executive', brand_header: 'Brand Header',
     business_card: 'Business Card', business_catalog: 'Business Catalog'
   };
 
   const themeLabels = {
-    graphite: 'STRIDE Default',
-    midnight: 'Midnight',
+    graphite: 'Graphite Minimal',
+    midnight: 'Midnight Purple',
     ocean: 'Ocean',
-    emerald: 'Emerald',
+    emerald: 'Deep Emerald',
     rose: 'Rose',
     arctic: 'Arctic',
-    sand: 'Sand'
+    sand: 'Sand',
+    executive: 'Executive',
+    navy: 'Royal Navy',
+    emerald_business: 'Emerald Business',
+    royal: 'Royal',
+    burgundy: 'Burgundy',
+    luxury: 'Luxury Gold',
+    platinum: 'Platinum'
   };
 
-  const form          = document.getElementById('appearance-form');
-  const typeInput     = form.querySelector('input[name="profile_type"]');
-  const layoutInput   = form.querySelector('input[name="profile_layout"]');
-  const themeInput    = form.querySelector('input[name="theme"]');
-  const summaryType   = document.getElementById('summary-type');
-  const summaryLayout = document.getElementById('summary-layout');
-  const summaryTheme  = document.getElementById('summary-theme');
-  const saveStatusDot = document.getElementById('save-status-dot');
+  // DOM Elements
+  const form           = document.getElementById('appearance-form');
+  const themeInput     = form.querySelector('input[name="theme"]');
+  const layoutInput    = form.querySelector('input[name="profile_layout"]');
+  const summaryTheme   = document.getElementById('summary-theme-name');
+  const summaryLayout  = document.getElementById('summary-layout-name');
+  const saveDock       = document.getElementById('save-dock');
+  const saveStatusDot  = document.getElementById('save-status-dot');
+  const saveStatusText = document.getElementById('save-status-text');
+  const btnToggleMore  = document.getElementById('btn-toggle-more-themes');
+  const moreThemesTray = document.getElementById('more-themes-tray');
 
-  function updateSummary() {
-    if (summaryType)   summaryType.textContent   = typeInput.value === 'business' ? 'Business' : 'Personal';
-    if (summaryLayout) summaryLayout.textContent = layoutLabels[layoutInput.value] || layoutInput.value;
-    if (summaryTheme)  summaryTheme.textContent  = themeLabels[themeInput.value] || themeInput.value;
-    if (saveStatusDot) {
-      saveStatusDot.style.background = '#F59E0B';
-      saveStatusDot.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.7)';
+  // Initial pristine values to track changes
+  const initialTheme  = themeInput.value || 'graphite';
+  const initialLayout = layoutInput.value || 'classic';
+  let isDirty = false;
+
+  // Set initial labels
+  if (summaryTheme) summaryTheme.textContent = themeLabels[initialTheme] || initialTheme;
+  if (summaryLayout) summaryLayout.textContent = layoutLabels[initialLayout] || initialLayout;
+
+  // Auto-expand "More Themes" if the user's saved theme is inside it
+  const activeInMore = moreThemesTray ? moreThemesTray.querySelector(`[data-theme-key="${initialTheme}"]`) : null;
+  if (activeInMore && moreThemesTray) {
+    moreThemesTray.style.display = 'block';
+    if (btnToggleMore) {
+      btnToggleMore.classList.add('open');
+      btnToggleMore.setAttribute('aria-expanded', 'true');
     }
   }
 
-  // Layout selection buttons
-  document.querySelectorAll('.appearance-layout-card').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.appearance-layout-card').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      layoutInput.value = btn.dataset.value;
-      updateSummary();
+  // Toggle "More Themes" accordion
+  if (btnToggleMore && moreThemesTray) {
+    btnToggleMore.addEventListener('click', () => {
+      const isExpanded = moreThemesTray.style.display === 'block';
+      moreThemesTray.style.display = isExpanded ? 'none' : 'block';
+      btnToggleMore.classList.toggle('open', !isExpanded);
+      btnToggleMore.setAttribute('aria-expanded', String(!isExpanded));
     });
-  });
+  }
 
-  // Theme selection buttons
+  // Dirty State Synchronizer
+  function markDirty() {
+    const curTheme  = themeInput.value;
+    const curLayout = layoutInput.value;
+    isDirty = (curTheme !== initialTheme) || (curLayout !== initialLayout);
+
+    if (isDirty) {
+      if (saveDock) saveDock.classList.add('dirty');
+      if (saveStatusDot) saveStatusDot.classList.add('dirty');
+      if (saveStatusText) saveStatusText.textContent = 'Unsaved visual changes';
+    } else {
+      if (saveDock) saveDock.classList.remove('dirty');
+      if (saveStatusDot) saveStatusDot.classList.remove('dirty');
+      if (saveStatusText) saveStatusText.textContent = 'Saved & Live';
+    }
+  }
+
+  // Theme selection handler
+  function selectTheme(themeKey, themeName) {
+    themeInput.value = themeKey;
+
+    // Update active classes across both grids
+    document.querySelectorAll('.appearance-theme-card').forEach(card => {
+      const isActive = card.dataset.themeKey === themeKey;
+      card.classList.toggle('active', isActive);
+      card.setAttribute('aria-pressed', String(isActive));
+    });
+
+    if (summaryTheme) {
+      summaryTheme.textContent = themeName || themeLabels[themeKey] || themeKey;
+    }
+
+    markDirty();
+  }
+
   document.querySelectorAll('.appearance-theme-card').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.appearance-theme-card').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      themeInput.value = btn.dataset.value;
-      updateSummary();
+      selectTheme(btn.dataset.themeKey, btn.dataset.themeName);
     });
   });
 
-  // Initial sync check
-  const curLayout = layoutInput.value || 'classic';
-  const curTheme = themeInput.value || 'graphite';
-  document.querySelectorAll('.appearance-layout-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.value === curLayout);
-  });
-  document.querySelectorAll('.appearance-theme-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.value === curTheme);
-  });
-  updateSummary();
+  // Layout selection handler
+  function selectLayout(layoutKey, layoutName) {
+    layoutInput.value = layoutKey;
 
-  // Handle form submit state
+    document.querySelectorAll('.appearance-layout-card').forEach(card => {
+      const isActive = card.dataset.layoutKey === layoutKey;
+      card.classList.toggle('active', isActive);
+      card.setAttribute('aria-pressed', String(isActive));
+    });
+
+    if (summaryLayout) {
+      summaryLayout.textContent = layoutName || layoutLabels[layoutKey] || layoutKey;
+    }
+
+    markDirty();
+  }
+
+  document.querySelectorAll('.appearance-layout-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectLayout(btn.dataset.layoutKey, btn.dataset.layoutName);
+    });
+  });
+
+  // Copy Profile URL helper
+  const btnCopy = document.getElementById('btn-copy-url');
+  const copyBtnText = document.getElementById('copy-btn-text');
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const url = btnCopy.dataset.url;
+      navigator.clipboard.writeText(url).then(() => {
+        if (copyBtnText) copyBtnText.textContent = 'Copied!';
+        setTimeout(() => {
+          if (copyBtnText) copyBtnText.textContent = 'Copy';
+        }, 2000);
+      }).catch(() => {
+        if (copyBtnText) copyBtnText.textContent = 'Copied';
+      });
+    });
+  }
+
+  // Form submit state & beforeunload protection
+  let isSubmitting = false;
+
+  window.addEventListener('beforeunload', (e) => {
+    if (isDirty && !isSubmitting) {
+      e.preventDefault();
+      e.returnValue = 'You have unsaved appearance changes. Are you sure you want to leave?';
+      return e.returnValue;
+    }
+  });
+
   if (form) {
     form.addEventListener('submit', () => {
+      isSubmitting = true;
       document.querySelectorAll('.appearance-submit-btn').forEach(btn => {
         btn.disabled = true;
         btn.classList.add('loading');
         btn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-          <span>Saving...</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+          <span>Saving Visual Changes...</span>
         `;
       });
     });
   }
+
 })();
 </script>
 {% endblock %}

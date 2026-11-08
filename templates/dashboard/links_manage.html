@@ -1,384 +1,906 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
-{% block title %}Links & Buttons Manager — {{ BRAND_NAME }}{% endblock %}
+{% block title %}Links &amp; Socials — {{ BRAND_NAME }}{% endblock %}
+{% block page_title %}Links &amp; Socials{% endblock %}
 
 {% block dashboard_content %}
-<!-- ==========================================================================
-     HEADER: Links Management
-     ========================================================================== -->
-<div class="dashboard-header">
-  <div>
-    <h1 class="dashboard-title">Links & Action Buttons</h1>
-    <p class="dashboard-subtitle">Control the social platforms and custom action links displayed on your live digital profile.</p>
-  </div>
-  {% if profile.slug %}
-    <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-secondary btn-sm">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      <span>View Live Profile</span>
-    </a>
-  {% endif %}
-</div>
+<div class="links-page-wrap">
 
-<!-- ==========================================================================
-     DIRECT LINK MODE (ONE-TAP ROUTING)
-     ========================================================================== -->
-<div class="card mb-6" style="border: 1px solid {% if profile.direct_link_enabled %}rgba(245, 158, 11, 0.45){% else %}rgba(255, 255, 255, 0.08){% endif %}; background: {% if profile.direct_link_enabled %}linear-gradient(135deg, rgba(245, 158, 11, 0.06) 0%, rgba(18, 18, 22, 0.95) 100%){% else %}var(--card-bg, #121316){% endif %}; position: relative; overflow: hidden;">
-  <div class="card-body">
-    <div class="d-flex items-center justify-between flex-wrap gap-3 mb-4">
+  <!-- ========================================================================
+       SECTION A: PAGE INTRODUCTION & CONTACT REFERENCE
+       ======================================================================== -->
+  <header class="dash-page-header d-flex items-center justify-between mb-5 flex-wrap gap-3" style="background: none; border-bottom: none; padding: 0; position: static;">
+    <div class="header-text-group">
+      <div class="d-flex items-center gap-2 mb-1 flex-wrap">
+        <h1 class="dash-page-title dashboard-title">Links &amp; Socials</h1>
+        <span class="badge badge-silver" style="font-size: 0.72rem; letter-spacing: 0.04em;">
+          Public Channels
+        </span>
+      </div>
+      <p class="dash-page-subtitle dashboard-subtitle" style="max-width: 680px; margin-bottom: 0;">
+        Connect the places where people can find and contact you. These channels appear on your live STRIDE profile.
+      </p>
+    </div>
+    {% if profile.slug %}
+      <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="flex-shrink: 0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span>View Live Card</span>
+      </a>
+    {% endif %}
+  </header>
+
+  <!-- Helpful guidance & Contact info consistency callout -->
+  <div class="card mb-6" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: var(--radius-lg); padding: 1.15rem 1.35rem;">
+    <div class="d-flex items-start gap-3">
+      <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.14); display: flex; align-items: center; justify-content: center; color: #E2E8F0; flex-shrink: 0; margin-top: 2px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      </div>
+      <div style="flex: 1; font-size: 0.85rem; color: #D4D4D8; line-height: 1.5;">
+        <strong>How links work on STRIDE:</strong> Add your social media accounts and custom action buttons (e.g. Calendly, portfolios, menus) below.
+        <div class="mt-1" style="color: #A1A1AA; font-size: 0.8rem;">
+          Looking to update your direct <strong>Phone, WhatsApp, Email, or Website</strong>? Those are managed on your <a href="{% url 'dashboard:profile_edit' %}" style="color: #FFFFFF; text-decoration: underline; font-weight: 600;">Profile Page</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SECTION B: QUICK ADD SOCIAL CHANNELS
+       ======================================================================== -->
+  <div class="card mb-6" style="background: var(--card-bg, #121316); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-lg); padding: 1.5rem;">
+    <div class="d-flex items-center justify-between flex-wrap gap-2 mb-4">
+      <div>
+        <h2 class="card-title" style="font-size: 1.1rem; margin-bottom: 0.2rem;">Quick Add Social Channels</h2>
+        <p class="text-caption mb-0" style="color: #A1A1AA; font-size: 0.825rem;">Select a platform to connect your account in one step.</p>
+      </div>
+      <button type="button" class="btn btn-ghost btn-xs" data-modal-target="modal-add-social" style="color: var(--text-secondary); font-weight: 600;">
+        + Browse All Platforms
+      </button>
+    </div>
+
+    <!-- 6 Primary Quick Platform Pills -->
+    <div class="quick-platform-grid">
+      <!-- 1. Instagram -->
+      {% if 'instagram' in configured_platforms %}
+        <div class="quick-platform-chip configured" title="Instagram is already configured">
+          <div class="chip-icon-box ig-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <span class="chip-label">Instagram</span>
+          <span class="chip-badge-added">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Added
+          </span>
+        </div>
+      {% else %}
+        <button type="button" class="quick-platform-chip" data-quick-platform="instagram" data-label="Instagram" data-placeholder="instagram.com/username or @username">
+          <div class="chip-icon-box ig-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <span class="chip-label">Instagram</span>
+          <span class="chip-plus">+</span>
+        </button>
+      {% endif %}
+
+      <!-- 2. LinkedIn -->
+      {% if 'linkedin' in configured_platforms %}
+        <div class="quick-platform-chip configured" title="LinkedIn is already configured">
+          <div class="chip-icon-box li-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </div>
+          <span class="chip-label">LinkedIn</span>
+          <span class="chip-badge-added">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Added
+          </span>
+        </div>
+      {% else %}
+        <button type="button" class="quick-platform-chip" data-quick-platform="linkedin" data-label="LinkedIn" data-placeholder="linkedin.com/in/username">
+          <div class="chip-icon-box li-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </div>
+          <span class="chip-label">LinkedIn</span>
+          <span class="chip-plus">+</span>
+        </button>
+      {% endif %}
+
+      <!-- 3. X (Twitter) -->
+      {% if 'x_twitter' in configured_platforms %}
+        <div class="quick-platform-chip configured" title="X (Twitter) is already configured">
+          <div class="chip-icon-box x-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <span class="chip-label">X (Twitter)</span>
+          <span class="chip-badge-added">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Added
+          </span>
+        </div>
+      {% else %}
+        <button type="button" class="quick-platform-chip" data-quick-platform="x_twitter" data-label="X (Twitter)" data-placeholder="x.com/username or @username">
+          <div class="chip-icon-box x-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <span class="chip-label">X (Twitter)</span>
+          <span class="chip-plus">+</span>
+        </button>
+      {% endif %}
+
+      <!-- 4. TikTok -->
+      {% if 'tiktok' in configured_platforms %}
+        <div class="quick-platform-chip configured" title="TikTok is already configured">
+          <div class="chip-icon-box tt-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05A6.34 6.34 0 0 0 4 15.28a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.87a8.18 8.18 0 0 0 4.78 1.53V7.02a4.85 4.85 0 0 1-1.86-.33z"/></svg>
+          </div>
+          <span class="chip-label">TikTok</span>
+          <span class="chip-badge-added">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Added
+          </span>
+        </div>
+      {% else %}
+        <button type="button" class="quick-platform-chip" data-quick-platform="tiktok" data-label="TikTok" data-placeholder="tiktok.com/@username or @username">
+          <div class="chip-icon-box tt-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05A6.34 6.34 0 0 0 4 15.28a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.87a8.18 8.18 0 0 0 4.78 1.53V7.02a4.85 4.85 0 0 1-1.86-.33z"/></svg>
+          </div>
+          <span class="chip-label">TikTok</span>
+          <span class="chip-plus">+</span>
+        </button>
+      {% endif %}
+
+      <!-- 5. YouTube -->
+      {% if 'youtube' in configured_platforms %}
+        <div class="quick-platform-chip configured" title="YouTube is already configured">
+          <div class="chip-icon-box yt-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </div>
+          <span class="chip-label">YouTube</span>
+          <span class="chip-badge-added">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Added
+          </span>
+        </div>
+      {% else %}
+        <button type="button" class="quick-platform-chip" data-quick-platform="youtube" data-label="YouTube" data-placeholder="youtube.com/@channel or channel link">
+          <div class="chip-icon-box yt-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </div>
+          <span class="chip-label">YouTube</span>
+          <span class="chip-plus">+</span>
+        </button>
+      {% endif %}
+
+      <!-- 6. Facebook -->
+      {% if 'facebook' in configured_platforms %}
+        <div class="quick-platform-chip configured" title="Facebook is already configured">
+          <div class="chip-icon-box fb-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <span class="chip-label">Facebook</span>
+          <span class="chip-badge-added">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Added
+          </span>
+        </div>
+      {% else %}
+        <button type="button" class="quick-platform-chip" data-quick-platform="facebook" data-label="Facebook" data-placeholder="facebook.com/yourpage">
+          <div class="chip-icon-box fb-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <span class="chip-label">Facebook</span>
+          <span class="chip-plus">+</span>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SECTION C: ACTIVE SOCIAL LINKS
+       ======================================================================== -->
+  <div class="card mb-6" style="background: var(--card-bg, #121316); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-lg); padding: 1.5rem;">
+    <div class="d-flex items-center justify-between flex-wrap gap-2 mb-4">
+      <div>
+        <h2 class="card-title" style="font-size: 1.1rem; margin-bottom: 0.2rem;">Connected Social Accounts</h2>
+        <p class="text-caption mb-0" style="color: #A1A1AA; font-size: 0.825rem;">These channels appear with their official logos on your profile.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-social">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>+ Add Channel</span>
+      </button>
+    </div>
+
+    {% if social_links %}
+      <div class="link-list">
+        {% for link in social_links %}
+          <div class="link-item flex-wrap" id="link-item-social-{{ link.id }}">
+            <div class="link-item-left">
+              <div class="link-icon-box">
+                {% if link.platform == 'instagram' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E1306C" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                {% elif link.platform == 'linkedin' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#0A66C2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                {% elif link.platform == 'x_twitter' %}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                {% elif link.platform == 'whatsapp' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.78 14.07c-.24.68-1.4 1.26-1.92 1.34-.51.08-1.18.11-1.91-.12-.44-.14-1.01-.33-1.74-.65-3.09-1.34-5.11-4.47-5.26-4.68-.16-.21-1.26-1.68-1.26-3.2 0-1.53.8-2.28 1.09-2.59.29-.31.63-.39.84-.39.21 0 .42.002.6.012.2.01.46-.07.72.55.27.64.91 2.22.99 2.38.08.16.13.35.03.56-.11.21-.16.35-.32.53-.16.19-.34.42-.48.56-.16.16-.33.33-.14.66.19.33.84 1.39 1.8 2.25 1.24 1.1 2.29 1.44 2.62 1.6.33.16.53.14.72-.08.2-.22.84-.98 1.07-1.32.22-.34.45-.29.75-.17.31.11 1.96.93 2.3 1.1.34.17.56.25.64.39.09.14.09.82-.15 1.5z"/></svg>
+                {% elif link.platform == 'youtube' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                {% elif link.platform == 'tiktok' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#00F2FE"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05A6.34 6.34 0 0 0 4 15.28a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.87a8.18 8.18 0 0 0 4.78 1.53V7.02a4.85 4.85 0 0 1-1.86-.33z"/></svg>
+                {% elif link.platform == 'facebook' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                {% elif link.platform == 'github' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                {% elif link.platform == 'telegram' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#2AABEE"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.97 1.25-5.56 3.68-.53.36-1 .54-1.43.53-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.03-.75 4.04-1.76 6.74-2.92 8.09-3.48 3.85-1.6 4.65-1.88 5.17-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.13-.04.22z"/></svg>
+                {% else %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                {% endif %}
+              </div>
+              <div class="link-info">
+                <div class="title d-flex items-center gap-2">
+                  <span style="font-weight: 600; color: #FFF;">{{ link.get_platform_display }}</span>
+                  {% if link.display_label %}
+                    <span class="text-muted font-normal" style="font-size: 0.775rem;">({{ link.display_label }})</span>
+                  {% endif %}
+                  <span class="badge" style="background: {% if link.is_active %}rgba(16, 185, 129, 0.15){% else %}rgba(255, 255, 255, 0.05){% endif %}; border: 1px solid {% if link.is_active %}rgba(16, 185, 129, 0.35){% else %}rgba(255, 255, 255, 0.1){% endif %}; color: {% if link.is_active %}#34D399{% else %}#71717A{% endif %}; font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 999px;">
+                    {% if link.is_active %}● Active{% else %}○ Disabled{% endif %}
+                  </span>
+                </div>
+                <div class="url d-flex items-center gap-1">
+                  <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="color: #A1A1AA; text-decoration: none;" title="{{ link.url }}">
+                    {{ link.url|truncatechars:42 }}
+                  </a>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="link-actions">
+              <!-- Edit button -->
+              <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-edit-social-{{ link.id }}">
+                Edit
+              </button>
+
+              <!-- Toggle Active / Disabled -->
+              <form method="post" action="{% url 'dashboard:toggle_social_link' link.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost btn-sm" title="Toggle visibility">
+                  {% if link.is_active %}Disable{% else %}Enable{% endif %}
+                </button>
+              </form>
+
+              <!-- Delete button with confirmation -->
+              <form method="post" action="{% url 'dashboard:delete_social_link' link.id %}" onsubmit="return confirm('Remove {{ link.get_platform_display }} link?')" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" style="color: #F87171; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25);">
+                  Remove
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- EDIT SOCIAL LINK MODAL -->
+          <div class="modal-overlay" id="modal-edit-social-{{ link.id }}" role="dialog" aria-modal="true" aria-labelledby="modal-edit-social-title-{{ link.id }}">
+            <div class="modal-box">
+              <div class="modal-header">
+                <h3 class="modal-title" id="modal-edit-social-title-{{ link.id }}">Edit {{ link.get_platform_display }} Link</h3>
+                <button type="button" class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+              </div>
+              <form method="post" action="{% url 'dashboard:edit_social_link' link.id %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                  <label class="form-label">Platform</label>
+                  <select name="platform" class="form-select">
+                    <option value="instagram" {% if link.platform == 'instagram' %}selected{% endif %}>Instagram</option>
+                    <option value="linkedin" {% if link.platform == 'linkedin' %}selected{% endif %}>LinkedIn</option>
+                    <option value="x_twitter" {% if link.platform == 'x_twitter' %}selected{% endif %}>X (Twitter)</option>
+                    <option value="tiktok" {% if link.platform == 'tiktok' %}selected{% endif %}>TikTok</option>
+                    <option value="facebook" {% if link.platform == 'facebook' %}selected{% endif %}>Facebook</option>
+                    <option value="youtube" {% if link.platform == 'youtube' %}selected{% endif %}>YouTube</option>
+                    <option value="github" {% if link.platform == 'github' %}selected{% endif %}>GitHub</option>
+                    <option value="whatsapp" {% if link.platform == 'whatsapp' %}selected{% endif %}>WhatsApp Channel</option>
+                    <option value="telegram" {% if link.platform == 'telegram' %}selected{% endif %}>Telegram</option>
+                    <option value="behance" {% if link.platform == 'behance' %}selected{% endif %}>Behance</option>
+                    <option value="dribbble" {% if link.platform == 'dribbble' %}selected{% endif %}>Dribbble</option>
+                    <option value="other" {% if link.platform == 'other' %}selected{% endif %}>Other</option>
+                  </select>
+                </div>
+                <div class="form-group mb-3">
+                  <label class="form-label">Profile URL or Handle <span style="color: #F87171;">*</span></label>
+                  <input type="text" name="url" value="{{ link.url }}" class="form-control" required placeholder="https://... or @handle">
+                  <div class="form-hint" style="color: #71717A; font-size: 0.75rem; margin-top: 0.35rem;">
+                    You can enter a full web link (e.g. https://instagram.com/yourname) or your username/handle (@yourname).
+                  </div>
+                </div>
+                <div class="form-group mb-4">
+                  <label class="form-label">Custom Display Label <span class="form-label-hint" style="color: #71717A;">(Optional)</span></label>
+                  <input type="text" name="display_label" value="{{ link.display_label }}" class="form-control" placeholder="e.g. Official Page">
+                </div>
+                <div class="d-flex justify-end gap-2">
+                  <button type="button" class="btn btn-ghost btn-sm" data-modal-close>Cancel</button>
+                  <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="dash-empty-box" style="text-align: center; padding: 2.5rem 1rem; border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.01);">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="1.5" class="mb-2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <p style="color: #A1A1AA; font-size: 0.875rem; margin-bottom: 0.85rem;">
+          No social media accounts connected yet. Tap one of the quick platform buttons above to get started.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ========================================================================
+       SECTION D: CUSTOM ACTION BUTTONS (CTA)
+       ======================================================================== -->
+  <div class="card mb-6" style="background: var(--card-bg, #121316); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-lg); padding: 1.5rem;">
+    <div class="d-flex items-center justify-between flex-wrap gap-2 mb-4">
+      <div>
+        <h2 class="card-title" style="font-size: 1.1rem; margin-bottom: 0.2rem;">Custom Action Buttons</h2>
+        <p class="text-caption mb-0" style="color: #A1A1AA; font-size: 0.825rem;">Create interactive buttons for bookings, portfolios, menus, or external downloads.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" data-modal-target="modal-add-custom">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>+ Add Button</span>
+      </button>
+    </div>
+
+    {% if custom_links %}
+      <div class="link-list">
+        {% for link in custom_links %}
+          <div class="link-item flex-wrap" id="link-item-custom-{{ link.id }}">
+            <div class="link-item-left">
+              <div class="link-icon-box">
+                {% if link.icon == 'briefcase' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                {% elif link.icon == 'star' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                {% elif link.icon == 'calendar' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                {% elif link.icon == 'download' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                {% elif link.icon == 'globe' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                {% else %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                {% endif %}
+              </div>
+              <div class="link-info">
+                <div class="title d-flex items-center gap-2">
+                  <span style="font-weight: 600; color: #FFF;">{{ link.title }}</span>
+                  <span class="badge" style="background: {% if link.is_active %}rgba(16, 185, 129, 0.15){% else %}rgba(255, 255, 255, 0.05){% endif %}; border: 1px solid {% if link.is_active %}rgba(16, 185, 129, 0.35){% else %}rgba(255, 255, 255, 0.1){% endif %}; color: {% if link.is_active %}#34D399{% else %}#71717A{% endif %}; font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 999px;">
+                    {% if link.is_active %}● Active{% else %}○ Disabled{% endif %}
+                  </span>
+                </div>
+                <div class="url d-flex items-center gap-1">
+                  <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="color: #A1A1AA; text-decoration: none;" title="{{ link.url }}">
+                    {{ link.url|truncatechars:42 }}
+                  </a>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="link-actions">
+              <button type="button" class="btn btn-secondary btn-sm" data-modal-target="modal-edit-custom-{{ link.id }}">
+                Edit
+              </button>
+
+              <form method="post" action="{% url 'dashboard:toggle_custom_link' link.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost btn-sm" title="Toggle visibility">
+                  {% if link.is_active %}Disable{% else %}Enable{% endif %}
+                </button>
+              </form>
+
+              <form method="post" action="{% url 'dashboard:delete_custom_link' link.id %}" onsubmit="return confirm('Remove custom button \'{{ link.title|escapejs }}\'?')" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" style="color: #F87171; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25);">
+                  Remove
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- EDIT CUSTOM BUTTON MODAL -->
+          <div class="modal-overlay" id="modal-edit-custom-{{ link.id }}" role="dialog" aria-modal="true" aria-labelledby="modal-edit-custom-title-{{ link.id }}">
+            <div class="modal-box">
+              <div class="modal-header">
+                <h3 class="modal-title" id="modal-edit-custom-title-{{ link.id }}">Edit Button: {{ link.title }}</h3>
+                <button type="button" class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+              </div>
+              <form method="post" action="{% url 'dashboard:edit_custom_link' link.id %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                  <label class="form-label">Button Title <span style="color: #F87171;">*</span></label>
+                  <input type="text" name="title" value="{{ link.title }}" class="form-control" required placeholder="e.g. Book Consultation">
+                </div>
+                <div class="form-group mb-3">
+                  <label class="form-label">Destination URL <span style="color: #F87171;">*</span></label>
+                  <input type="text" name="url" value="{{ link.url }}" class="form-control" required placeholder="https://calendly.com/... or https://...">
+                </div>
+                <div class="form-group mb-4">
+                  <label class="form-label">Icon Identifier</label>
+                  <select name="icon" class="form-select">
+                    <option value="link" {% if link.icon == 'link' %}selected{% endif %}>Link / Chain</option>
+                    <option value="globe" {% if link.icon == 'globe' %}selected{% endif %}>Globe / Website</option>
+                    <option value="briefcase" {% if link.icon == 'briefcase' %}selected{% endif %}>Briefcase / Work</option>
+                    <option value="star" {% if link.icon == 'star' %}selected{% endif %}>Star / Feature</option>
+                    <option value="download" {% if link.icon == 'download' %}selected{% endif %}>Download / File</option>
+                    <option value="calendar" {% if link.icon == 'calendar' %}selected{% endif %}>Calendar / Booking</option>
+                  </select>
+                </div>
+                <div class="d-flex justify-end gap-2">
+                  <button type="button" class="btn btn-ghost btn-sm" data-modal-close>Cancel</button>
+                  <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="dash-empty-box" style="text-align: center; padding: 2.5rem 1rem; border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.01);">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="1.5" class="mb-2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <p style="color: #A1A1AA; font-size: 0.875rem; margin-bottom: 0.85rem;">
+          No custom action buttons created yet. Add buttons to drive meetings, portfolio views, or product purchases.
+        </p>
+        <button type="button" class="btn btn-primary btn-sm" data-modal-target="modal-add-custom">+ Create First Action Button</button>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ========================================================================
+       SECTION E: ADVANCED NFC ROUTING (DIRECT LINK MODE - COLLAPSED AT BOTTOM)
+       ======================================================================== -->
+  <div class="card mb-6 nfc-routing-card" style="background: var(--card-bg, #121316); border: 1px solid {% if profile.direct_link_enabled %}rgba(245, 158, 11, 0.4){% else %}rgba(255, 255, 255, 0.08){% endif %}; border-radius: var(--radius-lg); overflow: hidden;">
+    <div class="nfc-routing-header" id="nfc-routing-toggle" style="padding: 1.25rem 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; user-select: none;">
       <div class="d-flex items-center gap-3">
-        <div style="width: 42px; height: 42px; border-radius: 12px; background: {% if profile.direct_link_enabled %}rgba(245, 158, 11, 0.18){% else %}rgba(255, 255, 255, 0.06){% endif %}; display: flex; align-items: center; justify-content: center; color: {% if profile.direct_link_enabled %}#F59E0B{% else %}#A1A1AA{% endif %}; flex-shrink: 0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-          </svg>
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: {% if profile.direct_link_enabled %}rgba(245, 158, 11, 0.15){% else %}rgba(255, 255, 255, 0.05){% endif %}; display: flex; align-items: center; justify-content: center; color: {% if profile.direct_link_enabled %}#F59E0B{% else %}#A1A1AA{% endif %}; flex-shrink: 0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <div>
-          <div class="d-flex items-center gap-2">
-            <h2 class="card-title mb-0" style="font-size: 1.05rem;">Direct Link Mode (One-Tap Direct)</h2>
+          <div class="d-flex items-center gap-2 flex-wrap">
+            <h3 style="font-size: 1rem; font-weight: 600; color: #FFF; margin: 0;">Advanced NFC Card Routing (Direct Link Mode)</h3>
             {% if profile.direct_link_enabled %}
-              <span class="badge" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #FBBF24; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;">ACTIVE</span>
+              <span class="badge" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.45); color: #FBBF24; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;">
+                ⚡ DIRECT FORWARDING ACTIVE
+              </span>
             {% else %}
-              <span class="badge" style="background: rgba(255, 255, 255, 0.06); color: #71717A; font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px;">OFF</span>
+              <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #71717A; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px;">
+                Profile Mode (Default)
+              </span>
             {% endif %}
           </div>
-          <p class="text-caption mb-0" style="color: #A1A1AA; font-size: 0.825rem;">
-            When active, tapping your physical card or scanning your QR code instantly bypasses your digital profile and opens this single link.
+          <p style="color: #71717A; font-size: 0.8rem; margin: 0.2rem 0 0;">
+            Optional hardware override: forward NFC taps immediately to a single external link instead of opening your profile.
           </p>
         </div>
       </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="nfc-routing-btn" style="color: #A1A1AA; font-size: 0.8rem;" aria-expanded="false">
+        <span>Configure</span>
+        <svg id="nfc-routing-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
     </div>
 
-    <form method="POST" action="{% url 'dashboard:toggle_direct_link' %}" class="direct-link-form">
-      {% csrf_token %}
-      <div class="row g-3">
-        <div class="col-12 col-md-5">
-          <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #D4D4D8;">Target Destination URL *</label>
-          <input type="url" name="direct_link_url" id="direct-link-url-input" class="form-control"
-                 placeholder="https://linkedin.com/in/yourname"
-                 value="{{ profile.direct_link_url|default:'' }}"
-                 style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #FFF;" />
-        </div>
-        <div class="col-12 col-md-4">
-          <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #D4D4D8;">Custom Label (Optional)</label>
-          <input type="text" name="direct_link_label" id="direct-link-label-input" class="form-control"
-                 placeholder="e.g. My LinkedIn / Calendly"
-                 value="{{ profile.direct_link_label|default:'' }}"
-                 style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #FFF;" />
-        </div>
-        <div class="col-12 col-md-3 d-flex items-end">
-          <div class="d-flex items-center gap-2 w-100">
-            <label class="d-flex items-center gap-2 mb-0" style="cursor: pointer; user-select: none;">
-              <input type="checkbox" name="direct_link_enabled" value="true" {% if profile.direct_link_enabled %}checked{% endif %} style="width: 18px; height: 18px; accent-color: #F59E0B; cursor: pointer;" />
-              <span style="font-size: 0.85rem; font-weight: 600; color: #FFF;">Enable Mode</span>
-            </label>
-            <button type="submit" class="btn btn-primary btn-sm ms-auto" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; color: #09090B; font-weight: 700;">
-              Save
-            </button>
-          </div>
-        </div>
+    <!-- Collapsible Body -->
+    <div id="nfc-routing-body" style="display: none; padding: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.06); background: rgba(0, 0, 0, 0.18);">
+      <div class="alert mb-4" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); color: #FDE68A; font-size: 0.825rem; border-radius: 8px; padding: 0.85rem 1rem;">
+        <strong>How Direct Link Mode works:</strong> By default, tapping your physical card or scanning your QR code opens your complete STRIDE digital profile.
+        When Direct Link Mode is <strong>enabled</strong>, taps immediately forward visitors to your target URL, bypassing your profile card entirely.
       </div>
 
-      <!-- Quick presets -->
-      <div class="d-flex items-center gap-2 flex-wrap mt-3 pt-2" style="border-top: 1px solid rgba(255, 255, 255, 0.06);">
-        <span style="font-size: 0.725rem; color: #71717A; font-weight: 600;">Quick Presets:</span>
-        <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://linkedin.com/in/" data-label="LinkedIn" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">LinkedIn</button>
-        <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://instagram.com/" data-label="Instagram" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">Instagram</button>
-        {% if profile.clean_whatsapp %}
-          <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://wa.me/{{ profile.clean_whatsapp }}" data-label="WhatsApp" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">WhatsApp</button>
-        {% endif %}
-        <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://calendly.com/" data-label="Book Meeting" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">Calendly</button>
-        {% if profile.website_url %}
-          <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="{{ profile.website_url }}" data-label="Website" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">Website</button>
-        {% endif %}
-      </div>
-    </form>
+      <form method="POST" action="{% url 'dashboard:toggle_direct_link' %}" id="direct-link-form">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #D4D4D8;">Target Destination URL <span style="color: #F87171;">*</span></label>
+            <input type="text" name="direct_link_url" id="direct-link-url-input" class="form-control"
+                   placeholder="https://yoursite.com or calendly.com/yourlink"
+                   value="{{ profile.direct_link_url|default:'' }}"
+                   style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #FFF;" />
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #D4D4D8;">Custom Label (Optional)</label>
+            <input type="text" name="direct_link_label" id="direct-link-label-input" class="form-control"
+                   placeholder="e.g. Company Website / Booking"
+                   value="{{ profile.direct_link_label|default:'' }}"
+                   style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #FFF;" />
+          </div>
+        </div>
+
+        <div class="d-flex items-center justify-between flex-wrap gap-3 mt-4 pt-3" style="border-top: 1px solid rgba(255, 255, 255, 0.06);">
+          <label class="d-flex items-center gap-2 mb-0" style="cursor: pointer; user-select: none;">
+            <input type="checkbox" name="direct_link_enabled" id="direct-link-enabled-cb" value="true" {% if profile.direct_link_enabled %}checked{% endif %} style="width: 18px; height: 18px; accent-color: #F59E0B; cursor: pointer;" />
+            <span style="font-size: 0.875rem; font-weight: 600; color: #FFF;">Enable Direct Link Mode (Bypass Profile)</span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-sm" id="btn-save-direct-link" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; color: #09090B; font-weight: 700;">
+            Save NFC Settings
+          </button>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="d-flex items-center gap-2 flex-wrap mt-3 pt-2" style="border-top: 1px dashed rgba(255, 255, 255, 0.08);">
+          <span style="font-size: 0.725rem; color: #71717A; font-weight: 600;">Presets:</span>
+          {% if profile.website_url %}
+            <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="{{ profile.website_url }}" data-label="Personal Website" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">Website</button>
+          {% endif %}
+          <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://linkedin.com/in/" data-label="LinkedIn Profile" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">LinkedIn</button>
+          <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://instagram.com/" data-label="Instagram Profile" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">Instagram</button>
+          <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://calendly.com/" data-label="Book Meeting" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">Calendly</button>
+          {% if profile.clean_whatsapp %}
+            <button type="button" class="btn btn-ghost btn-xs direct-preset-btn" data-url="https://wa.me/{{ profile.clean_whatsapp }}" data-label="Direct WhatsApp" style="font-size: 0.725rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">WhatsApp</button>
+          {% endif %}
+        </div>
+      </form>
+    </div>
   </div>
+
 </div>
 
 <!-- ==========================================================================
-     SECTION 1: SOCIAL MEDIA LINKS
-     ========================================================================== -->
-<div class="card mb-6">
-  <div class="card-header">
-    <div>
-      <h2 class="card-title">Social Media Channels</h2>
-      <p class="text-caption mb-0">Connected social accounts displayed as interactive icons on your profile.</p>
-    </div>
-    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-social">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add Social Link</span>
-    </button>
-  </div>
-
-  {% if social_links %}
-    <div class="link-list">
-      {% for link in social_links %}
-        <div class="link-item flex-wrap">
-          <div class="link-item-left">
-            <div class="link-icon-box">
-              {% if link.platform == 'instagram' %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              {% elif link.platform == 'linkedin' %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-              {% elif link.platform == 'x_twitter' %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              {% elif link.platform == 'whatsapp' %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-              {% elif link.platform == 'youtube' %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
-              {% elif link.platform == 'tiktok' %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-              {% else %}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              {% endif %}
-            </div>
-            <div class="link-info">
-              <div class="title d-flex items-center gap-2">
-                <span>{{ link.get_platform_display }}</span>
-                {% if link.display_label %}
-                  <span class="text-muted font-normal" style="font-size: 0.75rem;">({{ link.display_label }})</span>
-                {% endif %}
-                <span class="badge badge-{% if link.is_active %}active{% else %}pending{% endif %}">
-                  <span class="dot dot-{% if link.is_active %}active{% else %}pending{% endif %}"></span>
-                  {% if link.is_active %}Active{% else %}Disabled{% endif %}
-                </span>
-              </div>
-              <div class="url">{{ link.url }}</div>
-            </div>
-          </div>
-
-          <div class="link-actions">
-            <!-- Edit button triggers Edit modal -->
-            <button class="btn btn-secondary btn-sm" data-modal-target="modal-edit-social-{{ link.id }}">Edit</button>
-
-            <!-- Toggle Enable / Disable -->
-            <form method="post" action="{% url 'dashboard:toggle_social_link' link.id %}" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-ghost btn-sm">
-                {% if link.is_active %}Disable{% else %}Enable{% endif %}
-              </button>
-            </form>
-
-            <!-- Delete with confirmation -->
-            <form method="post" action="{% url 'dashboard:delete_social_link' link.id %}" onsubmit="return confirm('Are you sure you want to remove this {{ link.get_platform_display }} link?')" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-            </form>
-          </div>
-        </div>
-
-        <!-- EDIT SOCIAL LINK MODAL -->
-        <div class="modal-overlay" id="modal-edit-social-{{ link.id }}">
-          <div class="modal-box">
-            <div class="modal-header">
-              <h3 class="modal-title">Edit {{ link.get_platform_display }} Link</h3>
-              <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
-            </div>
-            <form method="post" action="{% url 'dashboard:edit_social_link' link.id %}">
-              {% csrf_token %}
-              <div class="form-group">
-                <label class="form-label">Platform</label>
-                <select name="platform" class="form-select">
-                  <option value="instagram" {% if link.platform == 'instagram' %}selected{% endif %}>Instagram</option>
-                  <option value="linkedin" {% if link.platform == 'linkedin' %}selected{% endif %}>LinkedIn</option>
-                  <option value="x_twitter" {% if link.platform == 'x_twitter' %}selected{% endif %}>X (Twitter)</option>
-                  <option value="tiktok" {% if link.platform == 'tiktok' %}selected{% endif %}>TikTok</option>
-                  <option value="facebook" {% if link.platform == 'facebook' %}selected{% endif %}>Facebook</option>
-                  <option value="youtube" {% if link.platform == 'youtube' %}selected{% endif %}>YouTube</option>
-                  <option value="github" {% if link.platform == 'github' %}selected{% endif %}>GitHub</option>
-                  <option value="whatsapp" {% if link.platform == 'whatsapp' %}selected{% endif %}>WhatsApp Channel</option>
-                  <option value="telegram" {% if link.platform == 'telegram' %}selected{% endif %}>Telegram</option>
-                  <option value="behance" {% if link.platform == 'behance' %}selected{% endif %}>Behance</option>
-                  <option value="dribbble" {% if link.platform == 'dribbble' %}selected{% endif %}>Dribbble</option>
-                  <option value="other" {% if link.platform == 'other' %}selected{% endif %}>Other</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">URL or Handle</label>
-                <input type="text" name="url" value="{{ link.url }}" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Custom Display Label <span class="form-label-hint">(Optional)</span></label>
-                <input type="text" name="display_label" value="{{ link.display_label }}" class="form-control">
-              </div>
-              <div class="d-flex justify-end gap-2 mt-4">
-                <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="dash-empty-box">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" class="mb-2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <p>No social media channels added yet. Add your accounts so visitors can connect with you across platforms.</p>
-      <button class="btn btn-primary btn-sm" data-modal-target="modal-add-social">+ Add Your First Social Link</button>
-    </div>
-  {% endif %}
-</div>
-
-<!-- ==========================================================================
-     SECTION 2: CUSTOM CTA BUTTONS
-     ========================================================================== -->
-<div class="card mb-6">
-  <div class="card-header">
-    <div>
-      <h2 class="card-title">Custom CTA Buttons</h2>
-      <p class="text-caption mb-0">High-converting action buttons (e.g., 'Book a Call', 'Download Catalogue', 'View Portfolio').</p>
-    </div>
-    <button class="btn btn-primary btn-sm" data-modal-target="modal-add-custom">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add Custom Button</span>
-    </button>
-  </div>
-
-  {% if custom_links %}
-    <div class="link-list">
-      {% for link in custom_links %}
-        <div class="link-item flex-wrap">
-          <div class="link-item-left">
-            <div class="link-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div class="link-info">
-              <div class="title d-flex items-center gap-2">
-                <span>{{ link.title }}</span>
-                <span class="badge badge-{% if link.is_active %}active{% else %}pending{% endif %}">
-                  <span class="dot dot-{% if link.is_active %}active{% else %}pending{% endif %}"></span>
-                  {% if link.is_active %}Active{% else %}Disabled{% endif %}
-                </span>
-              </div>
-              <div class="url">{{ link.url }}</div>
-            </div>
-          </div>
-
-          <div class="link-actions">
-            <!-- Edit Button triggers modal -->
-            <button class="btn btn-secondary btn-sm" data-modal-target="modal-edit-custom-{{ link.id }}">Edit</button>
-
-            <!-- Toggle Enable / Disable -->
-            <form method="post" action="{% url 'dashboard:toggle_custom_link' link.id %}" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-ghost btn-sm">
-                {% if link.is_active %}Disable{% else %}Enable{% endif %}
-              </button>
-            </form>
-
-            <!-- Delete with confirmation -->
-            <form method="post" action="{% url 'dashboard:delete_custom_link' link.id %}" onsubmit="return confirm('Are you sure you want to remove the button \'{{ link.title }}\'?')" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-            </form>
-          </div>
-        </div>
-
-        <!-- EDIT CUSTOM BUTTON MODAL -->
-        <div class="modal-overlay" id="modal-edit-custom-{{ link.id }}">
-          <div class="modal-box">
-            <div class="modal-header">
-              <h3 class="modal-title">Edit Button: {{ link.title }}</h3>
-              <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
-            </div>
-            <form method="post" action="{% url 'dashboard:edit_custom_link' link.id %}">
-              {% csrf_token %}
-              <div class="form-group">
-                <label class="form-label">Button Title</label>
-                <input type="text" name="title" value="{{ link.title }}" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Destination URL</label>
-                <input type="url" name="url" value="{{ link.url }}" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Icon Tag <span class="form-label-hint">(link, globe, briefcase, star, download, calendar)</span></label>
-                <input type="text" name="icon" value="{{ link.icon }}" class="form-control">
-              </div>
-              <div class="d-flex justify-end gap-2 mt-4">
-                <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="dash-empty-box">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--silver-steel)" stroke-width="1.5" class="mb-2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      <p>No custom buttons added yet. Create interactive CTA buttons for bookings, portfolios, or catalogues.</p>
-      <button class="btn btn-primary btn-sm" data-modal-target="modal-add-custom">+ Add Your First Button</button>
-    </div>
-  {% endif %}
-</div>
-
-<!-- ==========================================================================
-     ADD SOCIAL LINK MODAL
+     MODAL: ADD SOCIAL LINK (USED FOR QUICK ADD & GENERAL ADD)
      ========================================================================== -->
 <div class="modal-overlay" id="modal-add-social" role="dialog" aria-modal="true" aria-labelledby="modal-add-social-title">
   <div class="modal-box">
     <div class="modal-header">
-      <h3 class="modal-title" id="modal-add-social-title">Add Social Media Link</h3>
-      <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+      <h3 class="modal-title" id="modal-add-social-title">Connect Social Channel</h3>
+      <button type="button" class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
     </div>
-    <form method="post" action="{% url 'dashboard:add_social_link' %}">
+    <form method="post" action="{% url 'dashboard:add_social_link' %}" id="add-social-form">
       {% csrf_token %}
-      <div class="form-group">
-        <label class="form-label" for="id_platform">Platform</label>
-        {{ social_form.platform }}
+      <div class="form-group mb-3">
+        <label class="form-label" for="id_add_platform">Platform <span style="color: #F87171;">*</span></label>
+        <select name="platform" id="id_add_platform" class="form-select" required>
+          <option value="instagram">Instagram</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="x_twitter">X (Twitter)</option>
+          <option value="tiktok">TikTok</option>
+          <option value="youtube">YouTube</option>
+          <option value="facebook">Facebook</option>
+          <option value="github">GitHub</option>
+          <option value="whatsapp">WhatsApp Channel</option>
+          <option value="telegram">Telegram</option>
+          <option value="behance">Behance</option>
+          <option value="dribbble">Dribbble</option>
+          <option value="other">Other Platform</option>
+        </select>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="id_url">URL or Handle</label>
-        {{ social_form.url }}
-        <div class="form-hint">Paste your full profile URL (e.g. https://instagram.com/username) or @handle</div>
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="id_add_url">Profile Handle or Link <span style="color: #F87171;">*</span></label>
+        <input type="text" name="url" id="id_add_url" class="form-control" required placeholder="https://instagram.com/username or @handle">
+        <div class="form-hint" id="add-social-hint" style="color: #71717A; font-size: 0.775rem; margin-top: 0.35rem;">
+          Paste your full URL (e.g. https://instagram.com/yourname) or your username/handle (@yourname).
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="id_display_label">Custom Display Label <span class="form-label-hint">(Optional)</span></label>
-        {{ social_form.display_label }}
+
+      <div class="form-group mb-4">
+        <label class="form-label" for="id_add_label">Custom Label <span class="form-label-hint" style="color: #71717A;">(Optional)</span></label>
+        <input type="text" name="display_label" id="id_add_label" class="form-control" placeholder="e.g. Personal / Company Page">
       </div>
-      <div class="d-flex justify-end gap-2 mt-4">
-        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Link</button>
+
+      <div class="d-flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Connect Channel</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- ==========================================================================
-     ADD CUSTOM BUTTON MODAL
+     MODAL: ADD CUSTOM BUTTON
      ========================================================================== -->
 <div class="modal-overlay" id="modal-add-custom" role="dialog" aria-modal="true" aria-labelledby="modal-add-custom-title">
   <div class="modal-box">
     <div class="modal-header">
-      <h3 class="modal-title" id="modal-add-custom-title">Add Custom CTA Button</h3>
-      <button class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
+      <h3 class="modal-title" id="modal-add-custom-title">Create Action Button</h3>
+      <button type="button" class="modal-close" data-modal-close aria-label="Close modal">&times;</button>
     </div>
     <form method="post" action="{% url 'dashboard:add_custom_link' %}">
       {% csrf_token %}
-      <div class="form-group">
-        <label class="form-label" for="id_title">Button Title</label>
-        {{ custom_form.title }}
+      <div class="form-group mb-3">
+        <label class="form-label" for="id_custom_title">Button Title <span style="color: #F87171;">*</span></label>
+        <input type="text" name="title" id="id_custom_title" class="form-control" required placeholder="e.g. Book Consultation, Download Menu">
       </div>
-      <div class="form-group">
-        <label class="form-label" for="id_custom_url">Destination URL</label>
-        {{ custom_form.url }}
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="id_custom_url">Destination URL <span style="color: #F87171;">*</span></label>
+        <input type="text" name="url" id="id_custom_url" class="form-control" required placeholder="https://calendly.com/... or https://...">
+        <div class="form-hint" style="color: #71717A; font-size: 0.775rem; margin-top: 0.35rem;">
+          The web link or booking page visitors will be sent to when tapping this button.
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="id_icon">Icon Tag <span class="form-label-hint">(link, globe, briefcase, star, download, calendar)</span></label>
-        {{ custom_form.icon }}
+
+      <div class="form-group mb-4">
+        <label class="form-label">Button Icon</label>
+        <div class="icon-selector-grid">
+          <label class="icon-choice-label">
+            <input type="radio" name="icon" value="link" checked />
+            <span class="icon-choice-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>Link</span>
+            </span>
+          </label>
+          <label class="icon-choice-label">
+            <input type="radio" name="icon" value="calendar" />
+            <span class="icon-choice-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Booking</span>
+            </span>
+          </label>
+          <label class="icon-choice-label">
+            <input type="radio" name="icon" value="briefcase" />
+            <span class="icon-choice-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span>Work</span>
+            </span>
+          </label>
+          <label class="icon-choice-label">
+            <input type="radio" name="icon" value="star" />
+            <span class="icon-choice-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Feature</span>
+            </span>
+          </label>
+          <label class="icon-choice-label">
+            <input type="radio" name="icon" value="download" />
+            <span class="icon-choice-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download</span>
+            </span>
+          </label>
+          <label class="icon-choice-label">
+            <input type="radio" name="icon" value="globe" />
+            <span class="icon-choice-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Website</span>
+            </span>
+          </label>
+        </div>
       </div>
-      <div class="d-flex justify-end gap-2 mt-4">
-        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Button</button>
+
+      <div class="d-flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Create Button</button>
       </div>
     </form>
   </div>
 </div>
 
+<!-- ==========================================================================
+     PAGE STYLES & INTERACTIVITY SCRIPT
+     ========================================================================== -->
+<style>
+.links-page-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 5rem;
+}
+
+/* Quick Platform Selection Grid */
+.quick-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 0.75rem;
+}
+
+.quick-platform-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  color: #FFF;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  user-select: none;
+}
+
+.quick-platform-chip:hover:not(.configured) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.quick-platform-chip.configured {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.25);
+  cursor: default;
+}
+
+.chip-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chip-icon-box.ig-icon { color: #E1306C; }
+.chip-icon-box.li-icon { color: #0A66C2; }
+.chip-icon-box.x-icon  { color: #FFFFFF; }
+.chip-icon-box.tt-icon { color: #00F2FE; }
+.chip-icon-box.yt-icon { color: #FF0000; }
+.chip-icon-box.fb-icon { color: #1877F2; }
+
+.chip-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip-plus {
+  color: #A1A1AA;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.chip-badge-added {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #34D399;
+}
+
+/* Icon Selector Grid inside Add Custom Modal */
+.icon-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.icon-choice-label {
+  cursor: pointer;
+  margin: 0;
+}
+
+.icon-choice-label input {
+  display: none;
+}
+
+.icon-choice-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  color: #D4D4D8;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.icon-choice-label input:checked + .icon-choice-box {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #FFF;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .quick-platform-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .icon-selector-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.direct-preset-btn').forEach(function(btn) {
+  // Quick Platform selection handler
+  var quickButtons = document.querySelectorAll('[data-quick-platform]');
+  var addModal = document.getElementById('modal-add-social');
+  var platformSelect = document.getElementById('id_add_platform');
+  var urlInput = document.getElementById('id_add_url');
+  var hintEl = document.getElementById('add-social-hint');
+
+  var platformHints = {
+    'instagram': 'Enter your Instagram handle (e.g. @username) or full profile link (https://instagram.com/username)',
+    'linkedin': 'Enter your LinkedIn public link (e.g. https://linkedin.com/in/username)',
+    'x_twitter': 'Enter your X handle (e.g. @username) or profile link (https://x.com/username)',
+    'tiktok': 'Enter your TikTok handle (e.g. @username) or link (https://tiktok.com/@username)',
+    'youtube': 'Enter your YouTube channel link or handle (e.g. https://youtube.com/@channel)',
+    'facebook': 'Enter your Facebook page or profile link (e.g. https://facebook.com/yourpage)',
+    'github': 'Enter your GitHub username or profile link (e.g. https://github.com/username)',
+    'whatsapp': 'Enter your WhatsApp group or channel link',
+    'telegram': 'Enter your Telegram username (@channel) or t.me link'
+  };
+
+  quickButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
+      var plat = btn.getAttribute('data-quick-platform');
+      var placeholder = btn.getAttribute('data-placeholder');
+      if (platformSelect) {
+        platformSelect.value = plat;
+      }
+      if (urlInput) {
+        urlInput.placeholder = placeholder || 'https://...';
+        urlInput.value = '';
+      }
+      if (hintEl && platformHints[plat]) {
+        hintEl.textContent = platformHints[plat];
+      }
+      if (addModal) {
+        addModal.classList.add('active');
+        setTimeout(function() {
+          if (urlInput) urlInput.focus();
+        }, 150);
+      }
+    });
+  });
+
+  if (platformSelect) {
+    platformSelect.addEventListener('change', function() {
+      var plat = platformSelect.value;
+      if (hintEl && platformHints[plat]) {
+        hintEl.textContent = platformHints[plat];
+      }
+    });
+  }
+
+  // NFC Routing Accordion Toggle
+  var nfcToggle = document.getElementById('nfc-routing-toggle');
+  var nfcBody = document.getElementById('nfc-routing-body');
+  var nfcBtn = document.getElementById('nfc-routing-btn');
+  var nfcChevron = document.getElementById('nfc-routing-chevron');
+
+  function toggleNfcRouting() {
+    var isOpen = nfcBody.style.display !== 'none';
+    if (isOpen) {
+      nfcBody.style.display = 'none';
+      if (nfcBtn) {
+        nfcBtn.querySelector('span').textContent = 'Configure';
+        nfcBtn.setAttribute('aria-expanded', 'false');
+      }
+      if (nfcChevron) nfcChevron.style.transform = 'rotate(0deg)';
+    } else {
+      nfcBody.style.display = 'block';
+      if (nfcBtn) {
+        nfcBtn.querySelector('span').textContent = 'Close';
+        nfcBtn.setAttribute('aria-expanded', 'true');
+      }
+      if (nfcChevron) nfcChevron.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  if (nfcToggle) {
+    nfcToggle.addEventListener('click', function(e) {
+      toggleNfcRouting();
+    });
+  }
+
+  // If Direct Link Mode is currently active, start expanded so user sees it
+  {% if profile.direct_link_enabled %}
+    toggleNfcRouting();
+  {% endif %}
+
+  // Presets in NFC routing
+  document.querySelectorAll('.direct-preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
       var url = btn.getAttribute('data-url');
       var label = btn.getAttribute('data-label');
       var urlInput = document.getElementById('direct-link-url-input');
@@ -392,6 +914,26 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Direct Link Mode Enable Confirmation
+  var directForm = document.getElementById('direct-link-form');
+  var directCb = document.getElementById('direct-link-enabled-cb');
+  if (directForm && directCb) {
+    directForm.addEventListener('submit', function(e) {
+      var isEnabling = directCb.checked;
+      var wasEnabled = {% if profile.direct_link_enabled %}true{% else %}false{% endif %};
+      if (isEnabling && !wasEnabled) {
+        var confirmed = confirm(
+          "⚠️ Enable Direct Link Mode?\n\n" +
+          "When enabled, tapping your physical card or scanning your QR code will forward visitors immediately to this URL, bypassing your STRIDE profile.\n\n" +
+          "Do you want to activate Direct Forwarding now?"
+        );
+        if (!confirmed) {
+          e.preventDefault();
+        }
+      }
+    });
+  }
 });
 </script>
 {% endblock %}

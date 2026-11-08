@@ -86,11 +86,33 @@ class SocialLinkForm(forms.ModelForm):
 
     def clean_url(self):
         from apps.core.validators import validate_safe_url
+        from django.core.exceptions import ValidationError
         url = self.cleaned_data.get('url', '').strip()
+        platform = self.cleaned_data.get('platform') or self.data.get('platform', '')
+
         if url:
-            # If user provided a URL scheme, enforce http/https and reject javascript/data
-            if '://' in url or url.lower().startswith(('javascript:', 'data:', 'vbscript:', 'file:')):
-                validate_safe_url(url, allow_relative=False)
+            if url.lower().startswith(('javascript:', 'data:', 'vbscript:', 'file:')):
+                raise ValidationError("Invalid URL scheme.")
+
+            # Normalize handles (e.g. @username) or domains without scheme
+            if not (url.startswith('http://') or url.startswith('https://')):
+                clean_handle = url.lstrip('@').strip()
+                prefixes = {
+                    'instagram': 'https://instagram.com/',
+                    'linkedin': 'https://linkedin.com/in/',
+                    'x_twitter': 'https://x.com/',
+                    'tiktok': 'https://tiktok.com/@',
+                    'facebook': 'https://facebook.com/',
+                    'youtube': 'https://youtube.com/@',
+                    'github': 'https://github.com/',
+                    'telegram': 'https://t.me/',
+                }
+                if platform in prefixes and ('/' not in clean_handle and '.' not in clean_handle):
+                    url = prefixes[platform] + clean_handle
+                else:
+                    url = 'https://' + url
+
+            validate_safe_url(url, allow_relative=False)
         return url
 
 
@@ -101,14 +123,19 @@ class CustomLinkForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Book Consultation, View Portfolio'}),
             'url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://calendly.com/... or https://...'}),
-            'icon': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'link, globe, briefcase, star, download'}),
+            'icon': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'link, globe, briefcase, star, download, calendar'}),
         }
 
     def clean_url(self):
         from apps.core.validators import validate_safe_url
+        from django.core.exceptions import ValidationError
         url = self.cleaned_data.get('url', '').strip()
         if url:
-            validate_safe_url(url, allow_relative=True)
+            if url.lower().startswith(('javascript:', 'data:', 'vbscript:', 'file:')):
+                raise ValidationError("Invalid URL scheme.")
+            if not (url.startswith('http://') or url.startswith('https://') or url.startswith('mailto:') or url.startswith('tel:')):
+                url = 'https://' + url
+            validate_safe_url(url, allow_relative=False)
         return url
 
 
@@ -154,7 +181,9 @@ class ProfileAppearanceForm(forms.ModelForm):
 
     def clean_profile_type(self):
         ptype = self.cleaned_data.get('profile_type', '').strip()
-        return ptype if ptype in ('personal', 'business') else 'personal'
+        if ptype in ('personal', 'business'):
+            return ptype
+        return self.instance.profile_type if self.instance else 'personal'
 
     def clean_theme(self):
         theme = self.cleaned_data.get('theme', '').strip()

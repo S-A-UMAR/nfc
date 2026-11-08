@@ -4,6 +4,10 @@
 {% block title %}STRIDE — Modern Identity. Seamless Connection.{% endblock %}
 {% block meta_description %}Create your free digital profile in minutes. Share your contact details, social links, and portfolio with a tap of your STRIDE NFC smart card or custom link. Zero apps required.{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home_phase1.css' %}?v=1.0">
+{% endblock %}
+
 {% block content %}
 <!-- ==========================================================================
      SECTION 1: HERO (Simple, Spacious, Friendly First Impression)
@@ -27,7 +31,7 @@
         </h1>
 
         <p class="hero-desc">
-          STRIDE lets you share your contact details, professional portfolio, and social links through a custom digital profile, with an NFC smart card that makes in-person sharing instant. Create your profile free in minutes.
+          Create your digital identity, share your contact details and professional links, and connect with people instantly using a STRIDE NFC smart card.
         </p>
 
         <div class="hero-actions">
@@ -36,16 +40,16 @@
               <span>Go to Your Digital Profile</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
-            <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
-              <span>Order Your Smart Card</span>
+            <a href="{% url 'core:smart_card' %}" class="btn btn-secondary btn-lg">
+              <span>Explore Smart Cards</span>
             </a>
           {% else %}
             <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
-              <span>Create Your Profile Free</span>
+              <span>Create Your Free Profile</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
-            <a href="#how-it-works" class="btn btn-secondary btn-lg">
-              <span>See How It Works</span>
+            <a href="#nfc-cards" class="btn btn-secondary btn-lg" data-target="#how-it-works">
+              <span>Explore Smart Cards</span>
             </a>
           {% endif %}
         </div>
@@ -241,6 +245,95 @@
 </section>
 
 <!-- ==========================================================================
+     SECTION 3b: FEATURES GRID (Verified Implemented Features Only)
+     ========================================================================== -->
+<section id="features" class="features-section" aria-label="Platform Features">
+  <div class="container">
+    <div class="text-center max-w-md mx-auto mb-10">
+      <div class="badge-pill mb-3">What You Get</div>
+      <h2>Everything in Your Digital Profile</h2>
+      <p class="text-secondary mt-2">Every feature below is live and available to you right now — no extra setup required.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h3 class="feature-title">Digital Business Profile</h3>
+        <p class="feature-desc">Your public profile page with bio, photo, job title, business name, and address — live and shareable instantly.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <h3 class="feature-title">Contact Information</h3>
+        <p class="feature-desc">Display your phone numbers, email address, website, and physical address so new contacts can reach you immediately.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="feature-title">WhatsApp Integration</h3>
+        <p class="feature-desc">A direct WhatsApp button on your public profile lets visitors message you instantly with a single tap — no number copying needed.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </div>
+        <h3 class="feature-title">1-Tap Contact Save (.vcf)</h3>
+        <p class="feature-desc">Visitors can save your full contact details directly into their phone's address book with one tap — works natively on iPhone and Android.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </div>
+        <h3 class="feature-title">Social Media Links</h3>
+        <p class="feature-desc">Connect Instagram, LinkedIn, Twitter/X, TikTok, YouTube and custom links — everything in one clean, tappable profile.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <h3 class="feature-title">QR Code Sharing</h3>
+        <p class="feature-desc">Every profile has a downloadable QR code. Share digitally on email signatures, presentations, and social media — zero NFC required.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <h3 class="feature-title">Profile Analytics</h3>
+        <p class="feature-desc">Track how many times your profile has been viewed, your contact saved, or your WhatsApp button tapped — straight from your dashboard.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3 class="feature-title">Contact Exchange</h3>
+        <p class="feature-desc">Collect leads from profile visitors. When someone shares their contact details on your profile, you receive and manage them from your dashboard.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/><path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/><circle cx="12" cy="12" r="1"/></svg>
+        </div>
+        <h3 class="feature-title">NFC Card Integration</h3>
+        <p class="feature-desc">Order a physical STRIDE NFC smart card and link it to your profile. Tap it to any compatible phone and your profile opens instantly — no app needed.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
      SECTION 4: PERSONAL VS BUSINESS DIFFERENTIATION
      ========================================================================== -->
 <section id="personal" class="persona-section" aria-label="Personal and Business Solutions">
@@ -321,25 +414,25 @@
               <span class="persona-feature-icon" aria-hidden="true">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Multi-user card provisioning and fleet card management</span>
+              <span>Custom NFC smart card bundles prepared and programmed for teams</span>
             </li>
             <li class="persona-feature-item">
               <span class="persona-feature-icon" aria-hidden="true">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Product catalogue, services menu, and appointment booking links</span>
+              <span>Business inquiry management and direct consultation support</span>
             </li>
             <li class="persona-feature-item">
               <span class="persona-feature-icon" aria-hidden="true">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Lead collection with downloadable CSV and analytics tracking</span>
+              <span>Two-way contact exchange to capture leads and customer contacts</span>
             </li>
             <li class="persona-feature-item">
               <span class="persona-feature-icon" aria-hidden="true">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Dedicated custom business websites and custom domain hosting</span>
+              <span>Custom volume quotes and tracked nationwide delivery</span>
             </li>
           </ul>
         </div>
@@ -358,8 +451,7 @@
 <!-- ==========================================================================
      SECTION 5: SMART CARD (Hardware Specifications & Relationship)
      ========================================================================== -->
-<section id="nfc-cards" class="product-section" aria-label="Smart Card Hardware">
-  <div class="container">
+<section id="nfc-cards" class="product-section" aria-label="Smart Card Hardware">  <div class="container">
     <div class="text-center max-w-md mx-auto mb-10">
       <div class="badge-pill mb-3">Physical Craftsmanship</div>
       <h2>The NFC Smart Card Companion</h2>
@@ -583,17 +675,18 @@
     </div>
 
     <div class="faq-container">
+
       <!-- FAQ 1 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-1">
-          <span>Can I create a profile without buying a physical card?</span>
+          <span>What is STRIDE?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-1" class="accordion-panel">
           <div class="accordion-content">
-            Yes! You can create your free digital profile right now, add your contact info, social links, and bio, and share your unique web link or QR code immediately. You can order a physical NFC smart card whenever you are ready.
+            STRIDE is a digital identity and NFC smart card platform. You create a free digital profile containing your contact details, social links, and professional information. Optionally, you order a physical NFC smart card that opens your profile on any nearby smartphone with a single tap.
           </div>
         </div>
       </div>
@@ -601,14 +694,14 @@
       <!-- FAQ 2 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-2">
-          <span>Does the person tapping my card need to install an app?</span>
+          <span>How does the NFC smart card work?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-2" class="accordion-panel">
           <div class="accordion-content">
-            No. The person who taps your card needs zero apps. Your digital profile opens instantly in their native smartphone web browser (Safari, Chrome, Samsung Internet, etc.).
+            The card contains a passive NTAG216 NFC microchip. When you hold it near any NFC-enabled phone, the chip transmits a secure link and your digital profile opens in the phone's web browser — instantly, without any app download.
           </div>
         </div>
       </div>
@@ -616,14 +709,14 @@
       <!-- FAQ 3 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-3">
-          <span>Does the card work on both iPhone and Android?</span>
+          <span>Does the recipient need to install an application?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-3" class="accordion-panel">
           <div class="accordion-content">
-            Yes. NFC sharing is natively supported on iPhone (iPhone 7 and newer with iOS 11+) and all modern NFC-enabled Android devices. For older cameras, the reverse laser QR code provides 100% universal compatibility.
+            No. Does the person tapping my card need to install an app? Absolutely not. The recipient needs zero apps installed. Your digital profile opens instantly in their native smartphone browser — Safari on iPhone, Chrome or Samsung Internet on Android.
           </div>
         </div>
       </div>
@@ -631,14 +724,14 @@
       <!-- FAQ 4 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-4">
-          <span>Can I edit my contact details after receiving the physical card?</span>
+          <span>Do all smartphones support NFC?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-4" class="accordion-panel">
           <div class="accordion-content">
-            Yes, unlimited times. Log in to your STRIDE dashboard to update your phone number, email, title, social media handles, or company links. All updates reflect in real time with zero reprinting.
+            Yes. Does the card work on both iPhone and Android? Yes, NFC is supported natively on iPhone 7 and newer (iOS 11+) and on modern Android devices. For older cameras, the reverse laser QR code provides 100% universal compatibility.
           </div>
         </div>
       </div>
@@ -646,14 +739,14 @@
       <!-- FAQ 5 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-5">
-          <span>What happens if I lose my smart card?</span>
+          <span>Can I use my digital profile without purchasing a physical card?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-5" class="accordion-panel">
           <div class="accordion-content">
-            You can immediately mark your card as 'Lost' or deactivated from your dashboard. Once reported, the physical card will no longer display your personal details, and you can re-link a new card anytime.
+            Yes. Can I create a profile without buying a physical card? Yes, creating and sharing your digital profile is completely free. You receive a shareable profile link and a downloadable QR code immediately. The physical NFC card is an optional upgrade you can order whenever you are ready.
           </div>
         </div>
       </div>
@@ -661,17 +754,33 @@
       <!-- FAQ 6 -->
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-6">
-          <span>Does the smart card require batteries or charging?</span>
+          <span>Can I update my information after creating my profile?</span>
           <span class="accordion-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
         </button>
         <div id="faq-ans-6" class="accordion-panel">
           <div class="accordion-content">
-            No. The NFC microchip is completely passive and draws power from the electromagnetic field of the smartphone reading it. It never needs charging and will last for years.
+            Yes, unlimited times. Log into your STRIDE dashboard to update your phone number, email, job title, social media handles, or any other detail. All changes reflect immediately on your live profile with zero reprinting or re-linking required.
           </div>
         </div>
       </div>
+
+      <!-- FAQ 7 -->
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-ans-7">
+          <span>How do people save my contact information?</span>
+          <span class="accordion-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </button>
+        <div id="faq-ans-7" class="accordion-panel">
+          <div class="accordion-content">
+            Your public profile includes a "Save Contact" button that downloads a standard .vcf contact file. Tapping it adds your name, number, email, company, and other details directly into the visitor's phone address book in one step — no manual typing needed.
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

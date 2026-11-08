@@ -477,13 +477,51 @@ class Phase2OnboardingRedesignTests(TestCase):
         self.assertTrue(bool(self.profile.slug))
 
     def test_onboarding_wizard_renders_business_logo_and_preview_elements(self):
-        """Onboarding wizard includes business logo upload and review preview elements."""
+        """Onboarding wizard includes profile image and business logo upload and review preview elements."""
         self.client.login(email=self.user.email, password=self.password)
         response = self.client.get(reverse('dashboard:onboarding'))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id_onboard_profile_image')
         self.assertContains(response, 'id_onboard_business_logo')
         self.assertContains(response, 'rev_logo_img')
+        self.assertContains(response, 'rev_avatar_img')
+        self.assertContains(response, 'btn-submit-onboard')
+        self.assertContains(response, 'Publish My Profile')
         self.assertContains(response, 'stride_onboard_draft_')
+
+    def test_onboarding_completes_personal_profile_with_image(self):
+        """Saving personal profile with profile image persists attributes and image file."""
+        import io
+        from PIL import Image
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        self.client.login(email=self.user.email, password=self.password)
+
+        img_io = io.BytesIO()
+        image = Image.new('RGB', (100, 100), color=(80, 120, 180))
+        image.save(img_io, format='PNG')
+        img_io.seek(0)
+        avatar_file = SimpleUploadedFile("avatar.png", img_io.read(), content_type="image/png")
+
+        post_data = {
+            'profile_type': 'personal',
+            'full_name': 'Grace Hopper',
+            'title': 'Computer Scientist',
+            'bio': 'Pioneer of computer programming and compilers.',
+            'profile_image': avatar_file,
+            'phone': '+2348011223344',
+            'whatsapp': '+2348011223344',
+            'email': 'grace@example.com',
+            'social_twitter': '@gracehopper',
+        }
+        response = self.client.post(reverse('dashboard:onboarding'), post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('dashboard:overview'))
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.profile_type, 'personal')
+        self.assertEqual(self.profile.full_name, 'Grace Hopper')
+        self.assertTrue(bool(self.profile.profile_image))
+        self.assertTrue(self.profile.social_links.filter(platform='x_twitter').exists())
 
     def test_onboarding_completes_business_profile_with_logo(self):
         """Saving business profile with logo persists business attributes and logo file."""
@@ -606,23 +644,21 @@ class Phase4CNavigationAndMobileUsabilityTests(TestCase):
         self.client.login(email=self.user.email, password=self.password)
 
     def test_contacts_and_referrals_in_sidebar_and_mobile_sheet(self):
-        """Contacts and Referrals are available in both desktop sidebar and mobile More sheet."""
+        """Referrals are available in sidebar/sheet, while Contact Exchange is safely shelved."""
         response = self.client.get(reverse('dashboard:overview'))
         self.assertEqual(response.status_code, 200)
 
-        contacts_url = reverse('dashboard:contacts_list')
         referrals_url = reverse('dashboard:referrals')
-
-        # Check Contacts link
-        self.assertContains(response, contacts_url)
-        self.assertContains(response, "Contacts")
 
         # Check Referrals link
         self.assertContains(response, referrals_url)
         self.assertContains(response, "Referral Program")
 
+        # Contact Exchange is shelved for v2 — navigation link is hidden
+        self.assertNotContains(response, '<span>Contacts</span>')
+
     def test_unread_contacts_badge_in_sidebar_and_sheet(self):
-        """Unread contacts count renders properly in the navigation badges."""
+        """Unread contacts count in context while Contact Exchange UI is safely shelved."""
         # Create unread contact lead
         ContactExchange.objects.create(
             profile=self.profile,
@@ -632,16 +668,13 @@ class Phase4CNavigationAndMobileUsabilityTests(TestCase):
         )
         response = self.client.get(reverse('dashboard:overview'))
         self.assertEqual(response.status_code, 200)
-        # unread count of 1 is rendered
         self.assertEqual(response.context['unread_contacts_count'], 1)
-        self.assertContains(response, contacts_list := reverse('dashboard:contacts_list'))
 
     def test_leads_received_stat_tile_links_to_contacts(self):
-        """Overview 'Leads Received' metric tile links directly to Contacts list."""
+        """Contacts directory is safely shelved and not linked from overview."""
         response = self.client.get(reverse('dashboard:overview'))
         self.assertEqual(response.status_code, 200)
-        contacts_url = reverse('dashboard:contacts_list')
-        self.assertContains(response, f'href="{contacts_url}" class="dash-stat-tile"')
+        self.assertNotContains(response, "Recent Connections &amp; Leads")
 
     def test_more_nav_button_active_on_secondary_pages(self):
         """The mobile bottom bar 'More' button is marked active on secondary pages."""
@@ -650,10 +683,10 @@ class Phase4CNavigationAndMobileUsabilityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "bottom-nav-more active")
 
-        # On contacts list page
-        response_contacts = self.client.get(reverse('dashboard:contacts_list'))
-        self.assertEqual(response_contacts.status_code, 200)
-        self.assertContains(response_contacts, "bottom-nav-more active")
+        # On referrals page (secondary page inside More sheet)
+        response_referrals = self.client.get(reverse('dashboard:referrals'))
+        self.assertEqual(response_referrals.status_code, 200)
+        self.assertContains(response_referrals, "bottom-nav-more active")
 
     def test_appearance_save_bar_z_index_and_mobile_bottom(self):
         """Appearance save bar styles include z-index: 990 and mobile safe area bottom padding."""
@@ -684,3 +717,204 @@ class Phase4CNavigationAndMobileUsabilityTests(TestCase):
 
 
 
+
+
+class Phase3COverviewCommandCenterTests(TestCase):
+    """
+    Tests for STRIDE Phase 3C Batch 2: Overview & Command Center Redesign.
+    - Welcome header with personalized greeting and contextual primary action
+    - Digital identity card with live link, copy & view actions
+    - Real profile completion engine (verifiable database checks, never fake 100%)
+    - Smart card hardware status & unassigned empty state
+    - Live performance analytics aggregation (views, taps, vcard saves, whatsapp)
+    - Recent network activity display & empty states
+    - Quick actions 6-grid with verified working destinations
+    - Query-count boundedness
+    """
+
+    def setUp(self):
+        cache.clear()
+        self.client = Client()
+        self.password = "StridePass123!"
+        self.user = User.objects.create_user(
+            email="command_tester@stride.id",
+            password=self.password,
+            first_name="Amina",
+            last_name="Bello",
+            is_email_verified=True,
+        )
+        self.profile, _ = Profile.objects.get_or_create(user=self.user)
+        self.profile.full_name = "Amina Bello"
+        self.profile.slug = "amina-bello"
+        self.profile.title = "Principal Identity Architect"
+        self.profile.bio = "Designing next-generation digital networking systems."
+        self.profile.phone = "+2348011223344"
+        self.profile.save()
+        self.client.login(email=self.user.email, password=self.password)
+
+    def test_overview_command_center_all_sections_render(self):
+        """All 7 command center sections render cleanly with real user data."""
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+
+        # 1. Welcome header with greeting & workspace context
+        self.assertContains(response, "Amina")
+        self.assertContains(response, "Workspace")
+
+        # 2. Digital identity card
+        self.assertContains(response, "Amina Bello")
+        self.assertContains(response, "Principal Identity Architect")
+        self.assertContains(response, "/u/amina-bello/")
+        self.assertContains(response, "Live Active")
+
+        # 3. Profile setup status
+        self.assertContains(response, "Profile Setup Status")
+        self.assertContains(response, "Name &amp; Public Handle")
+        self.assertContains(response, "Headline or Business Name")
+
+        # 4. Smart card status
+        self.assertContains(response, "NFC Smart Card")
+
+        # 5. Performance overview
+        self.assertContains(response, "Performance Overview")
+        self.assertContains(response, "Profile Views")
+        self.assertContains(response, "NFC Card Taps")
+        self.assertContains(response, "Contact Saves")
+
+        # 6. Quick actions (6 working destinations)
+        self.assertContains(response, "Quick Actions")
+        self.assertContains(response, reverse('dashboard:profile_edit'))
+        self.assertContains(response, reverse('dashboard:share'))
+        self.assertContains(response, reverse('dashboard:card_manage'))
+        self.assertContains(response, reverse('dashboard:links_manage'))
+        self.assertContains(response, reverse('dashboard:analytics_view'))
+        self.assertContains(response, reverse('dashboard:appearance'))
+
+    def test_overview_profile_completion_engine(self):
+        """Profile completion accurately checks database fields and prevents premature 100%."""
+        # Current state: has full_name, slug, title, bio, contact (phone). Missing photo and links.
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+
+        checklist = response.context['checklist']
+        done_keys = {item['key'] for item in checklist if item['done']}
+        self.assertIn('identity', done_keys)
+        self.assertIn('headline', done_keys)
+        self.assertIn('bio', done_keys)
+        self.assertIn('contact', done_keys)
+        self.assertNotIn('links', done_keys)
+        self.assertNotIn('photo', done_keys)
+
+        pct = response.context['completion_percentage']
+        self.assertLess(pct, 100)
+        self.assertEqual(pct, round((4 / 6) * 100))  # 67%
+        self.assertContains(response, "67% complete")
+
+        # Add social link and photo
+        SocialLink.objects.create(
+            profile=self.profile,
+            platform='linkedin',
+            url='https://linkedin.com/in/aminabello',
+        )
+        self.profile.profile_image = "profiles/test_photo.jpg"
+        self.profile.save()
+
+        response2 = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response2.context['completion_percentage'], 100)
+        # Once 100% complete the setup widget must not appear on the overview
+        self.assertNotContains(response2, "Profile Setup Status")
+        self.assertNotContains(response2, "Name &amp; Public Handle")
+
+    def test_overview_smart_card_states_unpaired_and_active(self):
+        """Smart card section distinguishes between unpaired accounts and active cardholders."""
+        # Unpaired state
+        response_unpaired = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response_unpaired.status_code, 200)
+        self.assertFalse(response_unpaired.context['has_card'])
+        self.assertContains(response_unpaired, "No Physical Card Assigned")
+        self.assertContains(response_unpaired, "Order Card")
+        self.assertContains(response_unpaired, "Activate Card")
+
+        # Assign card
+        card = Card.objects.create(
+            card_code="BR-990011",
+            user=self.user,
+            profile=self.profile,
+            status=Card.STATUS_ACTIVE,
+            material='matte_black',
+        )
+
+        response_paired = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response_paired.status_code, 200)
+        self.assertTrue(response_paired.context['has_card'])
+        self.assertContains(response_paired, "BR-990011")
+        self.assertContains(response_paired, "Matte Graphite Black")
+        self.assertContains(response_paired, "Manage Card Hardware")
+
+    def test_overview_live_analytics_aggregation(self):
+        """Live analytics aggregates exact event totals from real database records."""
+        # Create real events
+        AnalyticsEvent.objects.create(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW)
+        AnalyticsEvent.objects.create(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW)
+        AnalyticsEvent.objects.create(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP)
+        AnalyticsEvent.objects.create(profile=self.profile, event_type=AnalyticsEvent.TYPE_QR_SCAN)
+        AnalyticsEvent.objects.create(profile=self.profile, event_type=AnalyticsEvent.TYPE_VCARD)
+        AnalyticsEvent.objects.create(profile=self.profile, event_type=AnalyticsEvent.TYPE_WHATSAPP)
+
+        response = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(response.status_code, 200)
+
+        ctx = response.context
+        self.assertEqual(ctx['profile_views'], 2)
+        self.assertEqual(ctx['card_taps'], 2)       # card_tap + qr_scan
+        self.assertEqual(ctx['contact_saves'], 1)   # vcard_download
+        self.assertEqual(ctx['whatsapp_clicks'], 1)
+        self.assertEqual(ctx['total_interactions'], 6)
+
+    def test_overview_recent_contacts_and_empty_state(self):
+        """Recent network activity is safely shelved from overview for v2."""
+        # Initially 0 leads
+        resp_empty = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(resp_empty.status_code, 200)
+        self.assertNotContains(resp_empty, "No Captured Leads Yet")
+        self.assertNotContains(resp_empty, "Recent Connections &amp; Leads")
+
+        # Create contact exchange lead - database records remain safe for v2
+        lead = ContactExchange.objects.create(
+            profile=self.profile,
+            full_name="Kolawole Sanusi",
+            business_name="Apex Capital Partners",
+            email="kola@apexcapital.ng",
+            is_read=False,
+        )
+
+        resp_leads = self.client.get(reverse('dashboard:overview'))
+        self.assertEqual(resp_leads.status_code, 200)
+        self.assertEqual(resp_leads.context['received_contacts_count'], 1)
+        self.assertNotContains(resp_leads, "Recent Connections &amp; Leads")
+
+    def test_overview_query_count_is_bounded(self):
+        """Dashboard overview query count is constant and avoids N+1 queries."""
+        # Warmup cache / session
+        self.client.get(reverse('dashboard:overview'))
+
+        # Add extra cards and contacts to ensure queries do not scale with record count
+        Card.objects.create(card_code="BR-EXTRA-1", user=self.user, profile=self.profile, status=Card.STATUS_ACTIVE)
+        Card.objects.create(card_code="BR-EXTRA-2", user=self.user, profile=self.profile, status=Card.STATUS_ACTIVE)
+        for i in range(10):
+            ContactExchange.objects.create(
+                profile=self.profile,
+                full_name=f"Lead {i}",
+                email=f"lead{i}@example.com",
+            )
+
+        # Count queries executed
+        from django.test.utils import CaptureQueriesContext
+        from django.db import connection
+
+        with CaptureQueriesContext(connection) as ctx:
+            response = self.client.get(reverse('dashboard:overview'))
+            self.assertEqual(response.status_code, 200)
+
+        # Overview should execute under 18 queries total including auth, session, context processors
+        self.assertLess(len(ctx.captured_queries), 18)

@@ -4,9 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <title>{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %} | STRIDE</title>
+  {% if profile.profile_type == 'business' %}
+    <title>{{ profile.business_name|default:profile.full_name }}{% if profile.business_category %} — {{ profile.business_category }}{% endif %} | STRIDE</title>
+    <meta name="description" content="{{ profile.business_description|default:profile.business_name|default:profile.full_name|truncatechars:155 }}">
+  {% else %}
+    <title>{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %} | STRIDE</title>
+    <meta name="description" content="{{ profile.bio|default:profile.full_name|truncatechars:155 }}">
+  {% endif %}
   {% if not profile.is_search_indexed %}<meta name="robots" content="noindex, nofollow">{% endif %}
-  <meta name="description" content="{{ profile.bio|default:profile.full_name|truncatechars:155 }}">
   <meta name="theme-color" content="#09090B">
 
   <!-- Canonical URL -->
@@ -15,10 +20,17 @@
   <!-- Open Graph / Meta for Social Sharing -->
   <meta property="og:site_name" content="STRIDE">
   <meta property="og:type" content="profile">
-  <meta property="og:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
-  <meta property="og:description" content="{{ profile.bio|default:'Connect with me on STRIDE Smart Digital Identity.'|truncatechars:155 }}">
+  {% if profile.profile_type == 'business' %}
+    <meta property="og:title" content="{{ profile.business_name|default:profile.full_name }}{% if profile.business_category %} — {{ profile.business_category }}{% endif %}">
+    <meta property="og:description" content="{{ profile.business_description|default:'Connect with us on STRIDE Smart Digital Identity.'|truncatechars:155 }}">
+  {% else %}
+    <meta property="og:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
+    <meta property="og:description" content="{{ profile.bio|default:'Connect with me on STRIDE Smart Digital Identity.'|truncatechars:155 }}">
+  {% endif %}
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
-  {% if profile.profile_image %}
+  {% if profile.profile_type == 'business' and profile.business_logo %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
+  {% elif profile.profile_image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
   {% else %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/stride-og-default.png' %}">
@@ -129,13 +141,22 @@
     <!-- Main Hero Identity Section (Always Visible) -->
     <section class="prf-hero-section">
       <div class="prf-avatar-wrap">
-        <div class="prf-avatar-ring">
+        <div class="prf-avatar-ring {% if profile.profile_type == 'business' %}prf-avatar-ring--business{% endif %}">
           <div class="prf-avatar-inner">
-            {% if profile.profile_image %}
-              <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="96" height="96" fetchpriority="high" decoding="async" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';">
-              <span class="prf-avatar-fallback" style="display: none;">{{ profile.full_name|make_list|first|upper }}</span>
+            {% if profile.profile_type == 'business' %}
+              {% if profile.business_logo %}
+                <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" width="96" height="96" fetchpriority="high" decoding="async" style="object-fit: contain; border-radius: 14px;" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';">
+                <span class="prf-avatar-fallback" style="display: none; border-radius: 14px;">{{ profile.business_name|make_list|first|upper }}</span>
+              {% else %}
+                <span class="prf-avatar-fallback" style="border-radius: 14px;">{{ profile.business_name|default:profile.full_name|make_list|first|upper }}</span>
+              {% endif %}
             {% else %}
-              <span class="prf-avatar-fallback">{{ profile.full_name|make_list|first|upper }}</span>
+              {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="96" height="96" fetchpriority="high" decoding="async" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';">
+                <span class="prf-avatar-fallback" style="display: none;">{{ profile.full_name|make_list|first|upper }}</span>
+              {% else %}
+                <span class="prf-avatar-fallback">{{ profile.full_name|make_list|first|upper }}</span>
+              {% endif %}
             {% endif %}
           </div>
         </div>
@@ -143,7 +164,11 @@
       </div>
 
       <div class="prf-name-row">
-        <h1 class="prf-hero-name">{{ profile.full_name }}</h1>
+        {% if profile.profile_type == 'business' %}
+          <h1 class="prf-hero-name">{{ profile.business_name|default:profile.full_name }}</h1>
+        {% else %}
+          <h1 class="prf-hero-name">{{ profile.full_name }}</h1>
+        {% endif %}
         <span class="prf-badge-verified" title="Verified Digital Profile">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -151,12 +176,23 @@
         </span>
       </div>
 
-      {% if profile.title %}
-        <div class="prf-hero-title">{{ profile.title }}</div>
-      {% endif %}
-
-      {% if profile.business_name %}
-        <div class="prf-hero-company">{{ profile.business_name }}</div>
+      {% if profile.profile_type == 'business' %}
+        {% if profile.business_category %}
+          <div class="prf-hero-title prf-business-category">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            {{ profile.business_category }}
+          </div>
+        {% endif %}
+        {% if profile.full_name %}
+          <div class="prf-hero-company">{{ profile.full_name }}</div>
+        {% endif %}
+      {% else %}
+        {% if profile.title %}
+          <div class="prf-hero-title">{{ profile.title }}</div>
+        {% endif %}
+        {% if profile.business_name %}
+          <div class="prf-hero-company">{{ profile.business_name }}</div>
+        {% endif %}
       {% endif %}
 
       <!-- Skills / Category Pill Tags -->
@@ -260,38 +296,84 @@
       </div>
 
       <!-- Bio Summary Pitch -->
-      {% if profile.bio %}
-        <div class="prf-hero-bio">{{ profile.bio|linebreaksbr }}</div>
+      {% if profile.profile_type == 'business' %}
+        {% if profile.business_description %}
+          <div class="prf-hero-bio">{{ profile.business_description|linebreaksbr }}</div>
+        {% elif profile.bio %}
+          <div class="prf-hero-bio">{{ profile.bio|linebreaksbr }}</div>
+        {% endif %}
+      {% else %}
+        {% if profile.bio %}
+          <div class="prf-hero-bio">{{ profile.bio|linebreaksbr }}</div>
+        {% endif %}
       {% endif %}
 
       <!-- Direct Details Quick List -->
-      {% if profile.location or profile.email or profile.website_url %}
-      <div class="prf-details-quicklist">
-        {% if profile.location %}
-          <div class="prf-detail-item">
-            <div class="prf-detail-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      {% if profile.profile_type == 'business' %}
+        {% if profile.address or profile.email or profile.website_url %}
+        <div class="prf-details-quicklist">
+          {% if profile.address %}
+            <div class="prf-detail-item">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span>{{ profile.address }}</span>
             </div>
-            <span>{{ profile.location }}</span>
-          </div>
-        {% endif %}
-        {% if profile.email %}
-          <a href="mailto:{{ profile.email }}" class="prf-detail-item" data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
-            <div class="prf-detail-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          {% elif profile.location %}
+            <div class="prf-detail-item">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span>{{ profile.location }}</span>
             </div>
-            <span>{{ profile.email }}</span>
-          </a>
+          {% endif %}
+          {% if profile.email %}
+            <a href="mailto:{{ profile.email }}" class="prf-detail-item" data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <span>{{ profile.email }}</span>
+            </a>
+          {% endif %}
+          {% if profile.website_url %}
+            <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-detail-item" data-track-event="website_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <span>{{ profile.website_url|cut:"https://"|cut:"http://" }}</span>
+            </a>
+          {% endif %}
+        </div>
         {% endif %}
-        {% if profile.website_url %}
-          <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-detail-item" data-track-event="website_click" data-profile-slug="{{ profile.slug }}">
-            <div class="prf-detail-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      {% else %}
+        {% if profile.location or profile.email or profile.website_url %}
+        <div class="prf-details-quicklist">
+          {% if profile.location %}
+            <div class="prf-detail-item">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span>{{ profile.location }}</span>
             </div>
-            <span>{{ profile.website_url|cut:"https://"|cut:"http://" }}</span>
-          </a>
+          {% endif %}
+          {% if profile.email %}
+            <a href="mailto:{{ profile.email }}" class="prf-detail-item" data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <span>{{ profile.email }}</span>
+            </a>
+          {% endif %}
+          {% if profile.website_url %}
+            <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-detail-item" data-track-event="website_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <span>{{ profile.website_url|cut:"https://"|cut:"http://" }}</span>
+            </a>
+          {% endif %}
+        </div>
         {% endif %}
-      </div>
       {% endif %}
     </section>
 
@@ -309,18 +391,29 @@
          TAB PANEL 1: ABOUT ME & WHAT I DO
          ====================================================================== -->
     <div class="prf-tab-panel active" id="tab-about">
-      <h2 class="prf-section-heading">About Me</h2>
-      <div class="prf-about-text">
-        {{ profile.bio|default:"Welcome to my verified digital profile on STRIDE. Connect with me and explore my services and portfolio."|linebreaksbr }}
-      </div>
+      {% if profile.profile_type == 'business' %}
+        <h2 class="prf-section-heading">About {{ profile.business_name|default:"Us" }}</h2>
+        <div class="prf-about-text">
+          {{ profile.business_description|default:profile.bio|default:"Welcome to our verified business profile on STRIDE."|linebreaksbr }}
+        </div>
+      {% else %}
+        <h2 class="prf-section-heading">About Me</h2>
+        <div class="prf-about-text">
+          {{ profile.bio|default:"Welcome to my verified digital profile on STRIDE. Connect with me and explore my services and portfolio."|linebreaksbr }}
+        </div>
+      {% endif %}
 
       <!-- Two-Way Contact Exchange Callout Card — shelved for v2 -->
 
 
-      <!-- What I Do / Services List -->
-      <h2 class="prf-section-heading">What I Do</h2>
-      <div class="prf-services-list">
-        {% if services %}
+      <!-- What I Do / Services List — only shown when services exist -->
+      {% if services %}
+        {% if profile.profile_type == 'business' %}
+          <h2 class="prf-section-heading">What We Offer</h2>
+        {% else %}
+          <h2 class="prf-section-heading">What I Do</h2>
+        {% endif %}
+        <div class="prf-services-list">
           {% for srv in services %}
             <div class="prf-service-card">
               <div class="prf-service-icon-box">
@@ -346,53 +439,27 @@
               </div>
             </div>
           {% endfor %}
-        {% else %}
-          <!-- Graceful Default Services based on Title / Category -->
-          <div class="prf-service-card">
-            <div class="prf-service-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            </div>
-            <div class="prf-service-content">
-              <div class="prf-service-title">{{ profile.title|default:"Professional Services" }}</div>
-              <div class="prf-service-desc">{{ profile.business_category|default:"Strategy, execution & quality delivery" }}</div>
-            </div>
-          </div>
-          <div class="prf-service-card">
-            <div class="prf-service-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="prf-service-content">
-              <div class="prf-service-title">Consulting & Advisory</div>
-              <div class="prf-service-desc">Tailored insights and strategic partnerships</div>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Languages Section -->
-      <h2 class="prf-section-heading">Languages</h2>
-      <div class="prf-lang-pills-row">
-        {% for lang in profile.language_list %}
-          <span class="prf-lang-pill {% if forloop.first %}highlight{% endif %}">{{ lang }}</span>
-        {% endfor %}
-      </div>
-
-      <!-- Experience & Network Stats Bar -->
-      <div class="prf-stats-bar">
-        <div class="prf-stat-item">
-          <div class="prf-stat-val">{{ profile.stat_experience|default:"5+ Years" }}</div>
-          <div class="prf-stat-lbl">Experience</div>
         </div>
-        <div class="prf-stat-item">
-          <div class="prf-stat-val">{{ profile.stat_projects|default:"50+ Projects" }}</div>
-          <div class="prf-stat-lbl">Projects</div>
-        </div>
-        <div class="prf-stat-item">
-          <div class="prf-stat-val">{{ profile.stat_followers|default:"10K+ Network" }}</div>
-          <div class="prf-stat-lbl">Network</div>
-        </div>
-      </div>
+      {% endif %}
 
+      <!-- Languages Section — only shown when languages are explicitly set -->
+      {% if profile.languages %}
+        <h2 class="prf-section-heading">Languages</h2>
+        <div class="prf-lang-pills-row">
+          {% for lang in profile.language_list %}
+            <span class="prf-lang-pill {% if forloop.first %}highlight{% endif %}">{{ lang }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Experience & Network Stats Bar — only shown when user has customised beyond defaults -->
+      {% if profile.stat_experience != "5+ Years" or profile.stat_projects != "50+ Projects" or profile.stat_followers != "10K+ Network" %}
+        <div class="prf-stats-bar">
+          {% if profile.stat_experience %}<div class="prf-stat-item"><div class="prf-stat-val">{{ profile.stat_experience }}</div><div class="prf-stat-lbl">Experience</div></div>{% endif %}
+          {% if profile.stat_projects %}<div class="prf-stat-item"><div class="prf-stat-val">{{ profile.stat_projects }}</div><div class="prf-stat-lbl">Projects</div></div>{% endif %}
+          {% if profile.stat_followers %}<div class="prf-stat-item"><div class="prf-stat-val">{{ profile.stat_followers }}</div><div class="prf-stat-lbl">Network</div></div>{% endif %}
+        </div>
+      {% endif %}
       <!-- CTA Banner Card -->
       <div class="prf-cta-banner-box">
         <div class="prf-cta-banner-text">
@@ -675,7 +742,7 @@
 
       <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-sheet-action-row"
          data-track-event="vcard_download" data-profile-slug="{{ profile.slug }}">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         <span>Download vCard to Phone</span>
       </a>
 
@@ -800,20 +867,13 @@
       <h3 class="prf-sheet-title">Social Proof & Impact</h3>
       <button type="button" class="prf-sheet-close" data-sheet-close>&times;</button>
     </div>
+    {% if profile.stat_experience != "5+ Years" or profile.stat_projects != "50+ Projects" or profile.stat_followers != "10K+ Network" %}
     <div class="prf-stats-bar" style="margin-bottom: 1.25rem;">
-      <div class="prf-stat-item">
-        <div class="prf-stat-val">{{ profile.stat_experience|default:"5+ Years" }}</div>
-        <div class="prf-stat-lbl">Experience</div>
-      </div>
-      <div class="prf-stat-item">
-        <div class="prf-stat-val">{{ profile.stat_projects|default:"50+ Projects" }}</div>
-        <div class="prf-stat-lbl">Projects</div>
-      </div>
-      <div class="prf-stat-item">
-        <div class="prf-stat-val">{{ profile.stat_followers|default:"10K+ Network" }}</div>
-        <div class="prf-stat-lbl">Network</div>
-      </div>
+      {% if profile.stat_experience %}<div class="prf-stat-item"><div class="prf-stat-val">{{ profile.stat_experience }}</div><div class="prf-stat-lbl">Experience</div></div>{% endif %}
+      {% if profile.stat_projects %}<div class="prf-stat-item"><div class="prf-stat-val">{{ profile.stat_projects }}</div><div class="prf-stat-lbl">Projects</div></div>{% endif %}
+      {% if profile.stat_followers %}<div class="prf-stat-item"><div class="prf-stat-val">{{ profile.stat_followers }}</div><div class="prf-stat-lbl">Network</div></div>{% endif %}
     </div>
+    {% endif %}
     <div style="font-size: 0.85rem; color: #A1A1AA; line-height: 1.5; text-align: center;">
       Verified digital credentials backed by STRIDE Smart NFC Infrastructure.
     </div>
@@ -829,7 +889,7 @@
     </div>
     <div class="prf-contact-sheet-list">
       <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-sheet-action-row">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         <span>Download RFC 2426 vCard (.vcf)</span>
       </a>
       <a href="{{ qr_url }}?download=true" class="prf-sheet-action-row" download="{{ profile.slug }}_qr.png">

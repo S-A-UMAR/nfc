@@ -4,10 +4,12 @@ def brand_context(request):
     """Provides global brand settings and notification counts to all Django templates."""
     user_profile = None
     unread_contacts_count = 0
+    is_profile_configured = False
 
     if request.user.is_authenticated:
         user_profile = getattr(request.user, 'profile', None)
         if user_profile:
+            is_profile_configured = bool(user_profile.slug and (user_profile.title or user_profile.business_name))
             try:
                 unread_contacts_count = user_profile.received_contacts.filter(is_read=False).count()
             except Exception:
@@ -21,4 +23,5 @@ def brand_context(request):
         'PAYSTACK_PUBLIC_KEY': getattr(settings, 'PAYSTACK_PUBLIC_KEY', ''),
         'user_profile': user_profile,
         'unread_contacts_count': unread_contacts_count,
+        'is_profile_configured': is_profile_configured,
     }

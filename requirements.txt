@@ -2,15 +2,15 @@ asgiref==3.12.1
 certifi==2026.7.22
 charset-normalizer==3.5.1
 Django==5.2.16
+dj-database-url==3.1.2
 gunicorn==22.0.0
 idna==3.19
 pillow==12.3.0
+psycopg[binary]==3.3.6
 qrcode==8.2
 requests==2.34.2
 sqlparse==0.6.0
 urllib3==2.7.0
 whitenoise==6.7.0
-PyMySQL==1.1.2
 cloudinary==1.44.2
 django-cloudinary-storage==0.3.0
-django-tidb==6.0.0

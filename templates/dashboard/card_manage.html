@@ -1,6 +1,7 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% load static %}
 {% block title %}Smart Card Management — {{ BRAND_NAME }}{% endblock %}
+{% block page_title %}Smart Cards{% endblock %}
 
 {% block dashboard_content %}
 <!-- ==========================================================================
@@ -216,4 +217,19 @@
     </div>
   </div>
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('activate') === '1') {
+    var modal = document.getElementById('modal-activate-card');
+    if (modal) {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      var input = modal.querySelector('#id_card_code');
+      if (input) input.focus();
+    }
+  }
+});
+</script>
 {% endblock %}
