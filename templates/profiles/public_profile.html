@@ -140,6 +140,36 @@
 
     <!-- Main Hero Identity Section (Always Visible) -->
     <section class="prf-hero-section">
+      {% if profile.profile_type == 'business' and profile.profile_layout in 'executive_layout,business_card' %}
+      <!-- 3D Luxury Smart Card Twin for Executive & Business Card Layouts -->
+      <div class="prf-executive-card-container" id="prf-executive-card-container">
+        <div class="prf-executive-smart-card">
+          <div class="prf-esc-glow-sheen"></div>
+          <div class="prf-esc-top">
+            <div class="prf-esc-chip">
+              <div class="prf-esc-chip-lines"></div>
+            </div>
+            <div class="prf-esc-nfc-wave" aria-label="NFC Contactless">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8.5 16.5a5 5 0 0 1 0-9"/><path d="M12 19a8.5 8.5 0 0 0 0-14"/><path d="M15.5 21.5a12 12 0 0 0 0-19"/></svg>
+            </div>
+          </div>
+          <div class="prf-esc-middle">
+            <div class="prf-esc-brand">{{ profile.business_name|default:profile.full_name|upper }}</div>
+            <div class="prf-esc-category">{{ profile.business_category|default:"Verified Corporate Identity" }}</div>
+          </div>
+          <div class="prf-esc-bottom">
+            <div class="prf-esc-holder-meta">
+              <span class="prf-esc-holder-name">{{ profile.full_name|default:profile.business_name }}</span>
+              <span class="prf-esc-holder-title">{{ profile.title|default:"Executive Officer" }}</span>
+            </div>
+            <div class="prf-esc-hologram">
+              <span>STRIDE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="prf-avatar-wrap">
         <div class="prf-avatar-ring {% if profile.profile_type == 'business' %}prf-avatar-ring--business{% endif %}">
           <div class="prf-avatar-inner">
@@ -373,6 +403,153 @@
             </a>
           {% endif %}
         </div>
+        {% endif %}
+      {% endif %}
+
+      {% if profile.profile_type == 'personal' %}
+        <!-- ====================================================================
+             PERSONAL SCREEN 1: DIRECT SOCIAL & LINK HUB
+             Visible immediately above the fold for incoming taps
+             ==================================================================== -->
+        {% if social_links or custom_links %}
+        <div class="prf-screen1-social-hub" id="prf-screen1-social-hub" aria-label="Social and Direct Links">
+          <div class="prf-screen1-social-header">
+            <span class="prf-screen1-social-title">Connect &amp; Follow</span>
+            <span class="prf-screen1-social-count">{{ social_links|length|add:custom_links|length }} channels</span>
+          </div>
+          <div class="prf-screen1-social-grid">
+            {% for social in social_links %}
+              <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer"
+                 class="prf-social-tile prf-social-tile--{{ social.platform }}"
+                 data-platform="{{ social.platform }}"
+                 data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ social.get_platform_display }}"
+                 title="{{ social.get_platform_display }}">
+                <div class="prf-social-tile-icon">
+                  {% if social.platform == 'instagram' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  {% elif social.platform == 'linkedin' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                  {% elif social.platform == 'x_twitter' %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  {% elif social.platform == 'youtube' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+                  {% elif social.platform == 'tiktok' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05A6.34 6.34 0 0 0 4 15.28a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.87a8.18 8.18 0 0 0 4.78 1.53V7.02a4.85 4.85 0 0 1-1.86-.33z"/></svg>
+                  {% elif social.platform == 'facebook' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  {% elif social.platform == 'github' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                  {% elif social.platform == 'telegram' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.97 1.25-5.56 3.68-.53.36-1 .54-1.43.53-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.03-.75 4.04-1.76 6.74-2.92 8.09-3.48 3.85-1.6 4.65-1.88 5.17-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.13-.04.22z"/></svg>
+                  {% elif social.platform == 'dribbble' %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M19.13 5.09C15.22 9.14 10 10.44 2.25 10.94"/><path d="M21.75 12.84c-6.62-1.41-12.14 1-16.38 6.32"/><path d="M8.56 2.75c4.37 6 6 9.42 8 17.72"/></svg>
+                  {% else %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  {% endif %}
+                </div>
+                <div class="prf-social-tile-text">
+                  <span class="prf-social-tile-label">{{ social.get_platform_display }}</span>
+                  <span class="prf-social-tile-handle">{{ social.display_label|default:social.url|cut:"https://"|cut:"http://"|cut:"www."|cut:"instagram.com/"|cut:"twitter.com/"|cut:"x.com/"|cut:"linkedin.com/in/"|truncatechars:18 }}</span>
+                </div>
+                <svg class="prf-social-tile-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            {% endfor %}
+
+            {% for link in custom_links %}
+              <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
+                 class="prf-social-tile prf-social-tile--custom"
+                 data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ link.title }}"
+                 title="{{ link.title }}">
+                <div class="prf-social-tile-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div class="prf-social-tile-text">
+                  <span class="prf-social-tile-label">{{ link.title }}</span>
+                  <span class="prf-social-tile-handle">{{ link.url|cut:"https://"|cut:"http://"|truncatechars:18 }}</span>
+                </div>
+                <svg class="prf-social-tile-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+      {% elif profile.profile_type == 'business' %}
+        <!-- ====================================================================
+             BUSINESS SCREEN 1: EXECUTIVE CONTACT MATRIX & CATALOG
+             ==================================================================== -->
+        {% if profile.profile_layout in 'executive_layout,business_card' %}
+        <div class="prf-executive-contact-matrix" id="prf-executive-contact-matrix">
+          {% if profile.phone %}
+            <a href="tel:{{ profile.clean_phone }}" class="prf-matrix-item" data-track-event="call_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-matrix-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+              <div class="prf-matrix-info">
+                <span class="prf-matrix-label">Direct Line</span>
+                <span class="prf-matrix-val">{{ profile.phone }}</span>
+              </div>
+            </a>
+          {% endif %}
+          {% if profile.whatsapp %}
+            <a href="https://wa.me/{{ profile.clean_whatsapp }}" target="_blank" rel="noopener noreferrer" class="prf-matrix-item" data-track-event="whatsapp_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-matrix-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.78 14.07c-.24.68-1.4 1.26-1.92 1.34-.51.08-1.18.11-1.91-.12-.44-.14-1.01-.33-1.74-.65-3.09-1.34-5.11-4.47-5.26-4.68-.16-.21-1.26-1.68-1.26-3.2 0-1.53.8-2.28 1.09-2.59.29-.31.63-.39.84-.39.21 0 .42.002.6.012.2.01.46-.07.72.55.27.64.91 2.22.99 2.38.08.16.13.35.03.56-.11.21-.16.35-.32.53-.16.19-.34.42-.48.56-.16.16-.33.33-.14.66.19.33.84 1.39 1.8 2.25 1.24 1.1 2.29 1.44 2.62 1.6.33.16.53.14.72-.08.2-.22.84-.98 1.07-1.32.22-.34.45-.29.75-.17.31.11 1.96.93 2.3 1.1.34.17.56.25.64.39.09.14.09.82-.15 1.5z"/></svg></div>
+              <div class="prf-matrix-info">
+                <span class="prf-matrix-label">Corporate WhatsApp</span>
+                <span class="prf-matrix-val">{{ profile.whatsapp }}</span>
+              </div>
+            </a>
+          {% endif %}
+          {% if profile.email %}
+            <a href="mailto:{{ profile.email }}" class="prf-matrix-item" data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-matrix-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="prf-matrix-info">
+                <span class="prf-matrix-label">Corporate Inquiries</span>
+                <span class="prf-matrix-val">{{ profile.email }}</span>
+              </div>
+            </a>
+          {% endif %}
+          {% if profile.website_url %}
+            <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-matrix-item" data-track-event="website_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-matrix-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+              <div class="prf-matrix-info">
+                <span class="prf-matrix-label">Official Website</span>
+                <span class="prf-matrix-val">{{ profile.website_url|cut:"https://"|cut:"http://"|truncatechars:20 }}</span>
+              </div>
+            </a>
+          {% endif %}
+        </div>
+        {% elif profile.profile_layout == 'business_catalog' %}
+          {% if services %}
+          <div class="prf-catalog-screen1-showcase" id="prf-catalog-screen1-showcase">
+            <div class="prf-catalog-header">
+              <span class="prf-catalog-title">What We Offer</span>
+              <span class="prf-catalog-count">{{ services|length }} services</span>
+            </div>
+            <div class="prf-catalog-grid">
+              {% for srv in services %}
+                <div class="prf-catalog-card">
+                  <div class="prf-catalog-card-header">
+                    <h3 class="prf-catalog-card-title">{{ srv.title }}</h3>
+                    {% if srv.price_formatted %}
+                      <span class="prf-catalog-card-price">{{ srv.price_formatted }}</span>
+                    {% endif %}
+                  </div>
+                  {% if srv.description %}
+                    <p class="prf-catalog-card-desc">{{ srv.description }}</p>
+                  {% endif %}
+                  {% if profile.whatsapp or profile.email %}
+                    <a href="{% if profile.whatsapp %}https://wa.me/{{ profile.clean_whatsapp }}?text=Hello,%20I'm%20interested%20in%20your%20{{ srv.title|urlencode }}{% else %}mailto:{{ profile.email }}?subject=Inquiry%20regarding%20{{ srv.title|urlencode }}{% endif %}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="prf-catalog-card-btn"
+                       data-track-event="service_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ srv.title }}">
+                      <span>Inquire Now</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
         {% endif %}
       {% endif %}
     </section>
