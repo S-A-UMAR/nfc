@@ -240,7 +240,7 @@
   {% endblock master_navbar %}
 
   <!-- GLOBAL LUXURY TOAST NOTIFICATION CONTAINER -->
-  <div id="uzyra-toast-container" class="toast-container" role="region" aria-live="polite" aria-label="System Notifications">
+  <div id="stride-toast-container" class="toast-container" role="region" aria-live="polite" aria-label="System Notifications">
     {% if messages %}
       {% for message in messages %}
         <div class="toast-item toast-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert" data-auto-dismiss="5000">

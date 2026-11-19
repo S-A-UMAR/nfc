@@ -5,20 +5,22 @@ from .models import Card, CardEvent
 
 @admin.action(description="Batch Generate 20 Sequential Cards (Unassigned)")
 def batch_generate_20_cards(modeladmin, request, queryset):
-    # Find highest existing code
-    existing = Card.objects.filter(card_code__startswith='BR-').order_by('-card_code').first()
+    # Find highest existing ST- code
+    existing = Card.objects.filter(card_code__startswith='ST-').order_by('-card_code').first()
     start_num = 1
     if existing:
         try:
-            start_num = int(existing.card_code.replace('BR-', '')) + 1
+            start_num = int(existing.card_code.replace('ST-', '')) + 1
         except ValueError:
             start_num = Card.objects.count() + 1
             
     created_count = 0
     for i in range(20):
-        code = f"BR-{start_num + i:06d}"
+        code = f"ST-{start_num + i:06d}"
         if not Card.objects.filter(card_code=code).exists():
-            Card.objects.create(card_code=code, status=Card.STATUS_UNASSIGNED)
+            card = Card(card_code=code, status=Card.STATUS_UNASSIGNED)
+            card.generate_activation_code()
+            card.save()
             created_count += 1
             
     messages.success(request, f"Successfully created {created_count} new unassigned cards in batch.")

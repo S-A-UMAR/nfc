@@ -6,7 +6,7 @@ from .forms import CheckoutForm, OrderRequirementForm
 from apps.core.services.email_service import BrevoEmailService
 import logging
 
-logger = logging.getLogger('uzyra.orders')
+logger = logging.getLogger('stride.orders')
 
 @login_required
 def checkout_view(request, package_code):

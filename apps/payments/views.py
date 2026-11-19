@@ -14,10 +14,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .models import Payment
+from .security import validate_paystack_credentials
 from apps.orders.models import Order
 from apps.core.services.email_service import BrevoEmailService
 
-logger = logging.getLogger('uzyra.payments')
+logger = logging.getLogger('stride.payments')
 
 
 def _is_payment_simulation_permitted() -> bool:
@@ -37,20 +38,14 @@ def _is_payment_simulation_permitted() -> bool:
 def _process_referral_qualification(order):
     """
     Qualifies referral reward when referred user completes a paid order.
-    Ensures single qualification per referred user, idempotency, and durable record.
+    Delegates to the referral service (which preserves legacy reward_amount_ngn field
+    and also checks reward eligibility).
     """
-    from apps.accounts.models import Referral
-    referral = Referral.objects.filter(
-        referred_user=order.user,
-        status__in=[Referral.STATUS_PENDING, Referral.STATUS_VERIFIED]
-    ).first()
-
-    if referral:
-        referral.status = Referral.STATUS_QUALIFIED
-        referral.qualifying_order = order
-        referral.qualified_at = timezone.now()
-        referral.reward_amount_ngn = 2000
-        referral.save()
+    from apps.accounts.services.referral_service import process_referral_qualification
+    try:
+        process_referral_qualification(order)
+    except Exception as e:
+        logger.error("_process_referral_qualification error for order %s: %s", order.order_number, e)
 
 
 
@@ -60,6 +55,7 @@ def initialize_payment_view(request, order_number):
     Initialize Paystack Transaction.
     Strictly isolated to authenticated user who owns the order.
     """
+    validate_paystack_credentials()
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
     
     if order.payment_status == Order.PAYMENT_PAID:
@@ -69,7 +65,7 @@ def initialize_payment_view(request, order_number):
     # Reuse existing pending payment if present, otherwise generate unique reference
     payment = Payment.objects.filter(order=order, status=Payment.STATUS_PENDING).first()
     if not payment:
-        reference = f"ULV-{order.order_number}-{uuid.uuid4().hex[:6].upper()}"
+        reference = f"STR-{order.order_number}-{uuid.uuid4().hex[:6].upper()}"
         payment = Payment.objects.create(
             order=order,
             reference=reference,
@@ -106,6 +102,7 @@ def verify_payment_view(request):
     7. Safe customer-facing messaging and server diagnostic logging.
     8. Brevo payment receipt dispatch.
     """
+    validate_paystack_credentials()
     reference = request.GET.get('reference') or request.GET.get('trxref') or request.POST.get('reference')
     if not reference:
         messages.error(request, "No payment reference provided for verification.")
@@ -244,6 +241,7 @@ def paystack_webhook_view(request):
     Verifies HMAC SHA512 signature against PAYSTACK_SECRET_KEY.
     Ensures fail-closed secret validation, idempotent execution, and amount validation.
     """
+    validate_paystack_credentials()
     raw_secret = getattr(settings, 'PAYSTACK_SECRET_KEY', '')
     if not raw_secret:
         logger.error("Paystack webhook received but PAYSTACK_SECRET_KEY is not configured on the server.")

@@ -33,7 +33,7 @@ class Card(models.Model):
         max_length=50, 
         unique=True, 
         db_index=True, 
-        help_text="Unique internal ID written to NFC, e.g. BR-000001"
+        help_text="Unique internal ID written to NFC, e.g. ST-000001"
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
@@ -126,10 +126,13 @@ class Card(models.Model):
         """Absolute NFC URL."""
         if request:
             return request.build_absolute_uri(self.nfc_url_path)
-        return f"https://uzyra.com{self.nfc_url_path}"
+        base_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
+        return f"{base_url.rstrip('/')}{self.nfc_url_path}"
 
-    def generate_qr_code(self, base_url="https://uzyra.com"):
+    def generate_qr_code(self, base_url=None):
         """Generate high-contrast minimal graphite QR code."""
+        if not base_url:
+            base_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
         target_url = f"{base_url.rstrip('/')}/c/{self.card_code}/"
         qr = qrcode.QRCode(
             version=1,

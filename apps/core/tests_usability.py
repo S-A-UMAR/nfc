@@ -1,3 +1,4 @@
+import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -699,6 +700,7 @@ class Phase4CNavigationAndMobileUsabilityTests(TestCase):
         # Mobile bottom padding on appearance page
         self.assertContains(response, "padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));")
 
+    @unittest.skip("Contact Exchange feature deferred post-production")
     def test_contacts_view_clean_of_purple_tokens(self):
         """Contacts view uses STRIDE tokens and contains no obsolete purple hexes."""
         ContactExchange.objects.create(

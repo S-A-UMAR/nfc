@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from apps.profiles.models import Profile, CustomLink
 from apps.cards.models import Card
-from apps.orders.models import Order, ProductPackage
+from apps.orders.models import Order, ProductPackage, OrderRequirement
+from apps.payments.models import Payment
 from apps.core.models import ContactMessage
 from apps.core.admin import InquiryCategoryFilter, ContactMessageAdmin
 from apps.analytics.models import AnalyticsEvent
@@ -205,6 +206,102 @@ class Phase2PrivacyAndDataRightsTests(TestCase):
         self.assertIsNone(card.user)
         self.assertIsNone(card.profile)
         self.assertEqual(card.status, Card.STATUS_UNASSIGNED)
+
+    def test_account_deletion_preserves_financial_records_and_anonymizes_personal_data(self):
+        """
+        Critical financial data integrity test under NDPA Right to Erasure:
+        - Deleting account must NOT cascade/delete Order or Payment records.
+        - Order.user is set to NULL.
+        - Order reference, package, amount, and payment records remain preserved for accounting.
+        - Personal shipping and requirement details are anonymized.
+        """
+        package = ProductPackage.objects.first()
+        if not package:
+            package = ProductPackage.objects.create(code='pkg-test', name='Test Package', price_ngn=25000)
+
+        order = Order.objects.create(
+            order_number='ORD-RETENTION-001',
+            user=self.user_a,
+            package=package,
+            amount=25000,
+            payment_status=Order.PAYMENT_PAID,
+            order_status=Order.STATUS_PAID,
+            shipping_name='Alice Tester',
+            shipping_phone='+2348011223344',
+            shipping_address='123 Victoria Island, Lagos',
+            shipping_city='Lagos',
+            shipping_state='Lagos',
+            customer_notes='Special packaging please'
+        )
+        payment = Payment.objects.create(
+            order=order,
+            reference='PAY-RETENTION-REF-001',
+            amount=25000,
+            status=Payment.STATUS_SUCCESS
+        )
+        req = OrderRequirement.objects.create(
+            order=order,
+            full_name='Alice Personal Brand',
+            title='Managing Director',
+            bio='Personal confidential bio details',
+            phone='+2348011223344',
+            email='alice@example.com',
+            website_url='https://alice.example.com',
+            business_name='Alice Design Studio',
+            business_category='Creative Services',
+            business_description='Full-service creative agency',
+            pages_needed='Home, About, Services',
+            design_notes='Use brand colours from the PDF'
+        )
+
+        order_id = order.pk
+        payment_id = payment.pk
+        req_id = req.pk
+
+        # Post deletion
+        url = reverse('dashboard:delete_account')
+        response = self.client_a.post(url, {
+            'confirm_acknowledgment': 'on',
+            'confirm_password': self.password,
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # 1. Order survives deletion with user=None
+        order.refresh_from_db()
+        self.assertIsNone(order.user)
+        self.assertEqual(order.order_number, 'ORD-RETENTION-001')
+        self.assertEqual(order.amount, 25000)
+        self.assertEqual(order.package, package)
+        self.assertEqual(order.payment_status, Order.PAYMENT_PAID)
+
+        # 2. Payment survives with immutable transaction reference
+        payment.refresh_from_db()
+        self.assertEqual(payment.order, order)
+        self.assertEqual(payment.reference, 'PAY-RETENTION-REF-001')
+        self.assertEqual(payment.amount, 25000)
+        self.assertEqual(payment.status, Payment.STATUS_SUCCESS)
+
+        # 3. Personal shipping details are anonymized
+        self.assertEqual(order.shipping_name, '[Account Deleted]')
+        self.assertEqual(order.shipping_phone, '')
+        self.assertEqual(order.shipping_address, '[Deleted for Privacy]')
+        self.assertEqual(order.customer_notes, '')
+        # Macro geographic city/state preserved for financial volume reconciliation
+        self.assertEqual(order.shipping_city, 'Lagos')
+
+        # 4. Personal requirements details are stripped
+        req.refresh_from_db()
+        self.assertEqual(req.full_name, '[Account Deleted]')
+        self.assertEqual(req.bio, '')
+        self.assertEqual(req.phone, '')
+        self.assertEqual(req.email, '')
+        self.assertEqual(req.website_url, '')
+        # Business identity fields are also removed — can identify the data subject
+        self.assertEqual(req.business_name, '')
+        self.assertEqual(req.business_category, '')
+        self.assertEqual(req.business_description, '')
+        self.assertEqual(req.pages_needed, '')
+        self.assertEqual(req.design_notes, '')
 
     def test_admin_inquiry_category_filter(self):
         """Admin InquiryCategoryFilter isolates privacy requests properly."""

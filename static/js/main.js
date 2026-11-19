@@ -192,7 +192,9 @@ function initAnalyticsTracking() {
       if (!eventType || !profileSlug) return;
 
       // Suppress beacon if visitor is identified as the profile owner
-      if (window.UZYRA_IS_OWNER === true || (typeof getCookie === 'function' && getCookie('uzyra_owner_' + profileSlug) === '1')) {
+      const isOwner = window.STRIDE_IS_OWNER === true || window.UZYRA_IS_OWNER === true
+        || (typeof getCookie === 'function' && (getCookie('stride_owner_' + profileSlug) === '1' || getCookie('uzyra_owner_' + profileSlug) === '1'));
+      if (isOwner) {
         return;
       }
 
@@ -244,10 +246,10 @@ function initImagePreviews() {
 }
 
 /* --------------------------------------------------------------------------
-   5. UZYRA LIQUID-GLASS TOAST SYSTEM
+   5. STRIDE LIQUID-GLASS TOAST SYSTEM
    -------------------------------------------------------------------------- */
 function initToastNotifications() {
-  const container = document.getElementById('uzyra-toast-container');
+  const container = document.getElementById('stride-toast-container') || document.getElementById('uzyra-toast-container');
   if (!container) return;
 
   const existingToasts = container.querySelectorAll('.toast-item');
@@ -305,13 +307,13 @@ function dismissToast(toast) {
 
 /**
  * Public Client-side Toast API:
- * window.uzyraToast(message, type, title, duration)
+ * window.strideToast(message, type, title, duration) (alias: window.uzyraToast)
  */
-window.uzyraToast = function(message, type = 'success', title = null, duration = 4500) {
-  let container = document.getElementById('uzyra-toast-container');
+window.strideToast = window.uzyraToast = function(message, type = 'success', title = null, duration = 4500) {
+  let container = document.getElementById('stride-toast-container') || document.getElementById('uzyra-toast-container');
   if (!container) {
     container = document.createElement('div');
-    container.id = 'uzyra-toast-container';
+    container.id = 'stride-toast-container';
     container.className = 'toast-container';
     container.setAttribute('role', 'region');
     container.setAttribute('aria-live', 'polite');

@@ -12,58 +12,53 @@ This policy outlines the processing, fulfillment, and courier delivery procedure
 <div class="legal-prose">
 
   <div class="legal-callout">
-    <strong>Nationwide Nigeria Delivery:</strong> {{ BRAND_NAME }} ships physical smart cards to all thirty-six (36) states of Nigeria and the Federal Capital Territory (Abuja). Deliveries are coordinated via trusted commercial dispatch and courier logistics partners.
+    <strong>Free Nationwide Tracked Delivery:</strong> {{ BRAND_NAME }} provides free nationwide standard tracked delivery included in all smart card package prices across all thirty-six (36) states of Nigeria and the Federal Capital Territory (Abuja). Deliveries are coordinated via trusted commercial dispatch and courier logistics partners.
   </div>
 
   <!-- SECTION 1 -->
   <section class="legal-section" id="coverage">
-    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Geographic Coverage</h2>
-    <p>We currently fulfill and deliver physical smart card orders nationwide within Nigeria. International shipments outside Nigeria can be arranged on a bespoke basis by contacting our corporate enterprise team.</p>
+    <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Geographic Coverage &amp; Delivery Pricing</h2>
+    <p>Standard tracked courier delivery across Nigeria is completely included in your package purchase price—there are no surprise delivery fees added at checkout. International shipments outside Nigeria can be arranged on a bespoke basis by contacting our corporate enterprise team.</p>
   </section>
 
   <!-- SECTION 2 -->
   <section class="legal-section" id="timelines">
     <h2 class="legal-section-title"><span class="legal-section-number">02.</span> Order Processing & Fulfillment Timelines</h2>
-    <p>Each physical card order moves through two distinct stages:</p>
+    <p>Delivery estimates commence once payment is confirmed and any required custom engraving or profile design details are confirmed. Processing and delivery proceed through two coordinated stages:</p>
 
-    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">Stage 1: Production & Programming (1–3 Business Days)</h3>
-    <p>Every individual card is individually encoded with a secure, unique chip identifier, linked to your cloud redirection profile, electronically tested for RF induction, and packed in luxury protective packaging.</p>
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">Stage 1: Hardware Encoding &amp; Quality Inspection (1–2 Business Days)</h3>
+    <p>Every individual card is encoded with a unique NTAG216 chip identifier, linked to your cloud profile, electronically tested for RF induction, and packaged in protective sleeve packaging.</p>
 
-    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">Stage 2: Courier Transit Timelines</h3>
+    <h3 style="font-size: 1.05rem; color: var(--text-primary); margin: var(--space-4) 0 var(--space-2);">Stage 2: Estimated Doorstep Delivery Timelines</h3>
     <div class="legal-table-wrapper">
       <table class="legal-table">
         <thead>
           <tr>
             <th>Destination Region</th>
-            <th>Estimated Courier Transit</th>
-            <th>Delivery Method</th>
+            <th>Estimated Delivery Window</th>
+            <th>Fulfillment Method</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><strong>Lagos State</strong></td>
-            <td>1 – 3 Business Days</td>
-            <td>Express Local Courier / Direct Dispatch</td>
-          </tr>
-          <tr>
-            <td><strong>Abuja (FCT)</strong></td>
-            <td>2 – 4 Business Days</td>
-            <td>Domestic Air Logistics / Inter-state Courier</td>
-          </tr>
-          <tr>
-            <td><strong>Major Commercial Hubs</strong> (PH, Kano, Ibadan, Enugu, Benin)</td>
             <td>3 – 5 Business Days</td>
-            <td>Inter-state Interstate Freight Logistics</td>
+            <td>Tracked Local Dispatch / Doorstep Courier</td>
           </tr>
           <tr>
-            <td><strong>Other State Capitals &amp; Regional Towns</strong></td>
-            <td>4 – 8 Business Days</td>
+            <td><strong>Abuja (FCT) &amp; Major Cities</strong> (Port Harcourt, Ibadan, Kano, Enugu, Benin)</td>
+            <td>4 – 7 Business Days</td>
+            <td>Domestic Air Freight / Regional Logistics Courier</td>
+          </tr>
+          <tr>
+            <td><strong>Other Locations &amp; Regional Towns</strong></td>
+            <td>5 – 10 Business Days</td>
             <td>Regional Courier Terminal / Doorstep Dispatch</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size: 0.85rem; color: var(--text-muted);"><em>Note: Business days exclude weekends (Saturdays and Sundays) and statutory Nigerian public holidays. Unforeseen weather, transit checkpoints, or national fuel constraints may occasionally introduce slight delays.</em></p>
+    <p style="font-size: 0.85rem; color: var(--text-muted);"><em>Important Note: Stated timeframes are realistic delivery estimates, not legally guaranteed arrival dates. Business days exclude Saturdays, Sundays, and statutory Nigerian public holidays. Unforeseen weather, transit checkpoints, or inter-state logistics constraints may occasionally affect final arrival timing.</em></p>
   </section>
 
   <!-- SECTION 3 -->
@@ -100,7 +95,7 @@ This policy outlines the processing, fulfillment, and courier delivery procedure
   <!-- SECTION 6 -->
   <section class="legal-section" id="inquiries">
     <h2 class="legal-section-title"><span class="legal-section-number">06.</span> Delivery Inquiries & Order Tracking</h2>
-    <p>You can check your order fulfillment status at any time through your <a href="{% url 'dashboard:orders_list' %}">Customer Orders Dashboard</a>. For urgent delivery inquiries or address changes before dispatch, reach out to our logistics desk at <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> or via WhatsApp at {{ BRAND_SUPPORT_PHONE }}.</p>
+    <p>You can check your order fulfillment status at any time through your <a href="{% url 'dashboard:orders_list' %}">Customer Orders Dashboard</a>. For urgent delivery inquiries or address changes before dispatch, reach out to our logistics desk at <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a> or via WhatsApp at {{ BRAND_SUPPORT_PHONE_INTL }} ({{ BRAND_SUPPORT_PHONE }}).</p>
   </section>
 
 </div>

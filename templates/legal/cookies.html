@@ -55,6 +55,24 @@ This Cookie Policy explains how {{ BRAND_NAME }} uses cookies and similar storag
             <td>Session</td>
             <td>Temporary storage for system notifications and feedback alerts (e.g. "Your profile has been updated successfully"). Discarded once displayed.</td>
           </tr>
+          <tr>
+            <td><code>stride_owner_*</code> / <code>uzyra_owner_*</code></td>
+            <td><strong>First-Party Telemetry</strong></td>
+            <td>1 Year</td>
+            <td>Client-side suppression cookie set when you view your own public profile from an authenticated browser. Prevents your own visits and preview clicks from skewing your real-time analytics data. Contains no personal tracking data.</td>
+          </tr>
+          <tr>
+            <td><code>stride_tap</code> / <code>uzyra_tap</code></td>
+            <td><strong>First-Party Telemetry</strong></td>
+            <td>30 Seconds</td>
+            <td>Short-lived debounce cookie set when a smart card is tapped or QR code is scanned. Prevents accidental duplicate view counts if the hardware card is tapped repeatedly in rapid succession.</td>
+          </tr>
+          <tr>
+            <td><code>stride_ref</code> / <code>uzyra_ref</code></td>
+            <td><strong>Referral Attribution</strong></td>
+            <td>30 Days</td>
+            <td>Secure HTTP-only attribution cookie set when visiting a referral invite link (<code>/join/?ref=CODE</code>). Retains the referrer's unique code to award qualified commission credits upon registration. Marked <code>HttpOnly</code> and <code>SameSite=Lax</code>.</td>
+          </tr>
         </tbody>
       </table>
     </div>

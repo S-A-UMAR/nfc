@@ -62,6 +62,28 @@ class ProfileTestimonialAdmin(admin.ModelAdmin):
 
 @admin.register(ContactExchange)
 class ContactExchangeAdmin(admin.ModelAdmin):
+    """
+    Contact Exchange — Staff Deletion Request Process
+    --------------------------------------------------
+    The Contact Exchange feature is currently DISABLED on all public profiles.
+    Legacy records collected prior to disablement are stored here, restricted
+    to authorised staff only. The customer-facing dashboard does NOT surface
+    these records.
+
+    Data Subject Deletion Requests:
+        1. Requests arrive via the Complaints / Contact form with the subject
+           prefix [Data Privacy Request].
+        2. Identify the data subject: verify their name, email, and profile.
+        3. Locate relevant records using the Search box above (search by email,
+           phone, or name).
+        4. Delete only the verified data subject's records using the Django Admin
+           action "Delete selected contact exchange records".
+        5. Reply to the data subject confirming deletion. Log the action in the
+           platform's AdminAuditLog if available, or in your internal ops log.
+
+    DO NOT modify, export, or bulk-delete records without an explicit verified
+    request or a lawful authority directive.
+    """
     list_display = ('full_name', 'profile', 'email', 'phone', 'business_name', 'is_read', 'consent_given', 'created_at')
     list_filter = ('is_read', 'consent_given', 'created_at')
     search_fields = ('full_name', 'email', 'phone', 'business_name', 'profile__full_name', 'notes')
@@ -74,4 +96,4 @@ class ContactExchangeAdmin(admin.ModelAdmin):
         return False  # Contacts are only created by visitors, never manually
 
     def has_change_permission(self, request, obj=None):
-        return False  # Read-only in admin — changes happen via dashboard only
+        return False  # Read-only in admin — deletion requests handled via delete action only

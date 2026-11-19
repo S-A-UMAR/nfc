@@ -44,7 +44,8 @@ class LegalSuiteTests(TestCase):
         self.assertContains(response, 'NDPA')
         self.assertContains(response, 'Paystack')
         self.assertContains(response, 'Brevo')
-        self.assertContains(response, 'TiDB Cloud')
+        self.assertContains(response, 'Neon PostgreSQL')
+        self.assertContains(response, 'Railway')
         self.assertContains(response, 'Cloudinary')
 
     def test_terms_of_service_contains_card_and_nigerian_jurisdiction(self):
@@ -84,7 +85,9 @@ class LegalSuiteTests(TestCase):
         """Verify Shipping Policy covers all 36 states and delivery timelines."""
         response = self.client.get(reverse('legal:shipping'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Nationwide Nigeria Delivery')
+        # Heading was updated from 'Nationwide Nigeria Delivery' to
+        # 'Free Nationwide Tracked Delivery' in Batch 2B.1 cleanup.
+        self.assertContains(response, 'Nationwide Tracked Delivery')
         self.assertContains(response, 'Lagos State')
         self.assertContains(response, 'Abuja')
 
@@ -112,14 +115,15 @@ class LegalSuiteTests(TestCase):
         self.assertContains(response, 'Profile and avatar photographs')
 
     def test_third_party_disclosure_lists_verified_providers(self):
-        """Verify Third-Party Disclosure lists all 5 actual infrastructure providers."""
+        """Verify Third-Party Disclosure lists all verified infrastructure providers."""
         response = self.client.get(reverse('legal:third_party'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Paystack Payments Limited')
         self.assertContains(response, 'Brevo (Sendinblue SAS)')
-        self.assertContains(response, 'TiDB Cloud (PingCAP, Inc.)')
+        self.assertContains(response, 'Neon PostgreSQL (Neon, Inc.)')
         self.assertContains(response, 'Cloudinary Ltd')
-        self.assertContains(response, 'Render Services, Inc.')
+        self.assertContains(response, 'Railway (Railway Corp.)')
+        self.assertContains(response, 'Redis Cache')
 
     def test_complaints_page_handles_get_with_category(self):
         """Verify Complaints page pre-fills subject when category query param is passed."""

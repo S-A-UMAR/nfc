@@ -1,16 +1,17 @@
 import logging
 import os
 import requests
+from email.utils import parseaddr
 from django.conf import settings
 
-logger = logging.getLogger('uzyra.email_service')
+logger = logging.getLogger('stride.email_service')
 
 def _render_email_template(title: str, subtitle: str, body_html: str, cta_text: str = None, cta_url: str = None) -> str:
     """
     Renders high-contrast luxury graphite/silver branded HTML email template for STRIDE.
     """
     brand_name = getattr(settings, 'BRAND_NAME', 'STRIDE')
-    support_email = getattr(settings, 'BRAND_SUPPORT_EMAIL', 'contact@uzyra.com')
+    support_email = getattr(settings, 'BRAND_SUPPORT_EMAIL', 'support@strideid.com')
 
     cta_section = ""
     if cta_text and cta_url:
@@ -82,6 +83,7 @@ class BrevoEmailService:
     """
     Centralized Brevo (Sendinblue) Transactional Email Service.
     Safe, resilient, non-blocking fallback in development and testing.
+    Enforces a strict fail-closed STAGING_EMAIL_ALLOWLIST in staging.
     """
 
     @classmethod
@@ -90,26 +92,194 @@ class BrevoEmailService:
 
     @classmethod
     def get_sender(cls) -> dict:
-        sender_email = os.environ.get('BREVO_SENDER_EMAIL') or getattr(settings, 'BREVO_SENDER_EMAIL', 'contact@uzyra.com')
+        sender_email = os.environ.get('BREVO_SENDER_EMAIL') or getattr(settings, 'BREVO_SENDER_EMAIL', '') or getattr(settings, 'BRAND_SUPPORT_EMAIL', '')
         sender_name = os.environ.get('BREVO_SENDER_NAME') or getattr(settings, 'BREVO_SENDER_NAME', 'STRIDE')
         return {"name": sender_name, "email": sender_email}
 
     @classmethod
-    def send_transactional_email(cls, to_email: str, subject: str, html_content: str, to_name: str = None) -> dict:
+    def is_staging_environment(cls) -> bool:
+        """
+        Detects if the current execution environment is staging.
+        Checks settings.ENVIRONMENT or OS environment variables.
+        """
+        env = getattr(settings, 'ENVIRONMENT', '') or os.environ.get('ENVIRONMENT', '') or os.environ.get('RAILWAY_ENVIRONMENT', '')
+        return str(env).strip().lower() == 'staging'
+
+    @staticmethod
+    def normalize_email(email_str) -> str:
+        """
+        Safely normalizes an email address for comparison:
+        - Extracts pure email address if provided as 'Name <user@domain.com>'.
+        - Strips whitespace.
+        - Converts to lower-case.
+        """
+        if not email_str:
+            return ""
+        cleaned = str(email_str).strip()
+        if '<' in cleaned and '>' in cleaned:
+            _, addr = parseaddr(cleaned)
+            cleaned = addr.strip()
+        return cleaned.lower()
+
+    @classmethod
+    def get_staging_allowlist(cls) -> set:
+        """
+        Parses and normalizes the staging recipient allowlist from settings or environment.
+        Supports comma-, semicolon-, or newline-delimited email addresses or domain patterns (e.g. '@strideid.com').
+        All entries are normalized to lower-case.
+        """
+        raw = getattr(settings, 'STAGING_EMAIL_ALLOWLIST', '')
+        if raw is None:
+            raw = ''
+
+        if isinstance(raw, (list, tuple, set)):
+            items = list(raw)
+        elif isinstance(raw, str):
+            formatted = raw.replace(';', ',').replace('\n', ',')
+            items = formatted.split(',')
+        else:
+            items = []
+
+        allowed = set()
+        for item in items:
+            clean = item.strip().lower()
+            if clean:
+                if '<' in clean and '>' in clean:
+                    _, addr = parseaddr(clean)
+                    clean = addr.strip().lower()
+                allowed.add(clean)
+        return allowed
+
+    @classmethod
+    def is_email_allowlisted(cls, email: str, allowlist: set) -> bool:
+        """
+        Checks whether a normalized email address matches any rule in the allowlist.
+        Matches either:
+        1. Exact email match: 'tester@strideid.com'
+        2. Domain wildcard: '@strideid.com', '*@strideid.com', or 'strideid.com'
+        """
+        norm = cls.normalize_email(email)
+        if not norm or not allowlist:
+            return False
+
+        if norm in allowlist:
+            return True
+
+        if '@' in norm:
+            domain = norm.split('@')[-1]
+            if f"@{domain}" in allowlist or f"*@{domain}" in allowlist or domain in allowlist:
+                return True
+
+        return False
+
+    @classmethod
+    def validate_staging_recipients(cls, to_emails: list, cc_emails: list = None, bcc_emails: list = None) -> tuple:
+        """
+        Validates all recipients (to, cc, bcc) against the staging allowlist.
+        Returns: (is_allowed: bool, unapproved_list: list)
+        Fail-closed: If allowlist is empty or missing, all recipients are rejected.
+        """
+        allowlist = cls.get_staging_allowlist()
+        all_recipients = list(to_emails) + (list(cc_emails) if cc_emails else []) + (list(bcc_emails) if bcc_emails else [])
+
+        # Fail closed: Empty or missing allowlist rejects all recipients in staging
+        if not allowlist:
+            unapproved = [cls.normalize_email(e) or str(e) for e in all_recipients if e]
+            return False, unapproved
+
+        unapproved = []
+        for r in all_recipients:
+            if not r:
+                continue
+            norm = cls.normalize_email(r)
+            if not norm or not cls.is_email_allowlisted(norm, allowlist):
+                unapproved.append(norm or str(r))
+
+        return (len(unapproved) == 0), unapproved
+
+    @classmethod
+    def send_transactional_email(
+        cls,
+        to_email,
+        subject: str,
+        html_content: str,
+        to_name: str = None,
+        cc=None,
+        bcc=None
+    ) -> dict:
         """
         Dispatches email via Brevo REST API v3.
         Gracefully falls back to local logging when API key is not configured or in tests.
+        Never dispatches live emails in development or testing.
+        Enforces STAGING_EMAIL_ALLOWLIST in staging environment before any dispatch.
         """
+        # Parse and normalize recipient lists
+        if isinstance(to_email, (list, tuple, set)):
+            to_list = [cls.normalize_email(e) for e in to_email if e]
+        elif isinstance(to_email, str):
+            to_list = [cls.normalize_email(e) for e in to_email.split(',') if e.strip()]
+        else:
+            to_list = []
+
+        if isinstance(cc, (list, tuple, set)):
+            cc_list = [cls.normalize_email(e) for e in cc if e]
+        elif isinstance(cc, str):
+            cc_list = [cls.normalize_email(e) for e in cc.split(',') if e.strip()]
+        else:
+            cc_list = []
+
+        if isinstance(bcc, (list, tuple, set)):
+            bcc_list = [cls.normalize_email(e) for e in bcc if e]
+        elif isinstance(bcc, str):
+            bcc_list = [cls.normalize_email(e) for e in bcc.split(',') if e.strip()]
+        else:
+            bcc_list = []
+
+        # Staging Recipient Allowlist Guard (Fail-Closed)
+        if cls.is_staging_environment():
+            is_allowed, unapproved = cls.validate_staging_recipients(to_list, cc_list, bcc_list)
+            if not is_allowed:
+                blocked_count = len(unapproved)
+                logger.warning(
+                    f"[STAGING EMAIL BLOCKED] {blocked_count} recipient(s) not permitted by STAGING_EMAIL_ALLOWLIST."
+                )
+                return {
+                    "success": False,
+                    "mode": "blocked_staging",
+                    "status": "blocked_staging",
+                    "error": f"{blocked_count} recipient(s) not permitted by STAGING_EMAIL_ALLOWLIST.",
+                    "message": "Email delivery blocked by staging recipient allowlist."
+                }
+
         api_key = cls.get_api_key()
-        recipient_name = to_name or to_email.split('@')[0]
         sender = cls.get_sender()
 
-        # Development / Testing fallback
-        if not api_key or api_key == 'test_brevo_api_key' or getattr(settings, 'EMAIL_BACKEND', '').endswith(('console.EmailBackend', 'locmem.EmailBackend')):
+        primary_recipient = to_list[0] if to_list else ""
+        recipient_name = to_name or (primary_recipient.split('@')[0] if primary_recipient else "there")
+
+        # Development / Testing fallback — NEVER send live emails in dev or tests
+        is_dev_or_test = (
+            getattr(settings, 'DEBUG', False)
+            or not api_key
+            or api_key == 'test_brevo_api_key'
+            or getattr(settings, 'EMAIL_BACKEND', '').endswith(('console.EmailBackend', 'locmem.EmailBackend'))
+        )
+        if is_dev_or_test:
+            sender_display = sender.get('email') or f"{sender.get('name')} <unconfigured>"
+            recipients_str = ", ".join(to_list)
+            if cc_list:
+                recipients_str += f" (CC: {', '.join(cc_list)})"
+            if bcc_list:
+                recipients_str += f" (BCC: {', '.join(bcc_list)})"
             logger.info(
-                f"[SIMULATED EMAIL via Brevo] To: {to_email} | Subject: '{subject}' | Sender: {sender['email']}"
+                f"[SIMULATED EMAIL via Brevo] To: {recipients_str} | Subject: '{subject}' | Sender: {sender_display}"
             )
-            return {"success": True, "mode": "simulated", "message_id": f"sim_{to_email}"}
+            return {"success": True, "mode": "simulated", "message_id": f"sim_{primary_recipient}"}
+
+        # In production/live dispatch, require both API key and verified sender email
+        if not sender.get('email'):
+            logger.error("Brevo dispatch aborted: BREVO_SENDER_EMAIL is not configured.")
+            return {"success": False, "mode": "live", "error": "BREVO_SENDER_EMAIL not configured"}
 
         # Live Brevo API Dispatch
         endpoint = "https://api.brevo.com/v3/smtp/email"
@@ -120,22 +290,26 @@ class BrevoEmailService:
         }
         payload = {
             "sender": sender,
-            "to": [{"email": to_email, "name": recipient_name}],
+            "to": [{"email": e, "name": to_name or e.split('@')[0]} for e in to_list],
             "subject": subject,
             "htmlContent": html_content,
         }
+        if cc_list:
+            payload["cc"] = [{"email": e} for e in cc_list]
+        if bcc_list:
+            payload["bcc"] = [{"email": e} for e in bcc_list]
 
         try:
             response = requests.post(endpoint, json=payload, headers=headers, timeout=8)
             if response.status_code in [200, 201, 202]:
                 data = response.json()
-                logger.info(f"Brevo email sent successfully to {to_email}. MessageId: {data.get('messageId')}")
+                logger.info(f"Brevo email sent successfully to {', '.join(to_list)}. MessageId: {data.get('messageId')}")
                 return {"success": True, "mode": "live", "message_id": data.get('messageId')}
             else:
                 logger.error(f"Brevo API error ({response.status_code}): {response.text}")
                 return {"success": False, "mode": "live", "error": f"API {response.status_code}: {response.text}"}
         except Exception as e:
-            logger.error(f"Brevo connection failure to {to_email}: {str(e)}")
+            logger.error(f"Brevo connection failure to {', '.join(to_list)}: {str(e)}")
             return {"success": False, "mode": "live", "error": str(e)}
 
     # -------------------------------------------------------------------------
@@ -165,7 +339,7 @@ class BrevoEmailService:
             subtitle="Your luxury digital identity platform",
             body_html=body,
             cta_text="Access Your Dashboard",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + "/dashboard/"
         )
         return cls.send_transactional_email(user.email, "Welcome to STRIDE — Your Digital Identity", html, user.display_name)
 
@@ -254,7 +428,7 @@ class BrevoEmailService:
             subtitle=f"Hardware {card.card_code} is now live",
             body_html=body,
             cta_text="Manage Card Settings",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/card/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + "/dashboard/card/"
         )
         return cls.send_transactional_email(user.email, f"Smart Card {card.card_code} Activated — STRIDE", html, user.display_name)
 
@@ -281,7 +455,7 @@ class BrevoEmailService:
             subtitle=f"Order #{order.order_number}",
             body_html=body,
             cta_text="View Order Details",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + f"/dashboard/orders/{order.order_number}/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + f"/dashboard/orders/{order.order_number}/"
         )
         return cls.send_transactional_email(user.email, f"Order Confirmed: #{order.order_number} — STRIDE", html, user.display_name)
 
@@ -308,7 +482,7 @@ class BrevoEmailService:
             subtitle=f"Receipt for Order #{order.order_number}",
             body_html=body,
             cta_text="Submit Design Information",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + f"/dashboard/orders/{order.order_number}/submit-info/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + f"/dashboard/orders/{order.order_number}/submit-info/"
         )
         return cls.send_transactional_email(user.email, f"Payment Confirmed for #{order.order_number} — STRIDE", html, user.display_name)
 
@@ -330,7 +504,7 @@ class BrevoEmailService:
             subtitle=f"Hardware {card.card_code}",
             body_html=body,
             cta_text="Manage Cards",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/card/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + "/dashboard/card/"
         )
         return cls.send_transactional_email(user.email, f"Security Alert: Card {card.card_code} {status_label}", html, user.display_name)
 
@@ -354,7 +528,7 @@ class BrevoEmailService:
             subtitle="Important notice regarding your STRIDE account",
             body_html=body,
             cta_text="Security Settings",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + "/dashboard/settings/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + "/dashboard/settings/"
         )
         return cls.send_transactional_email(user.email, f"Security Alert: {alert_type} — STRIDE", html, user.display_name)
 
@@ -401,7 +575,7 @@ class BrevoEmailService:
     def send_business_inquiry_admin_alert(cls, inquiry):
         """Internal alert email sent to STRIDE staff when a new business inquiry arrives."""
         service_label = inquiry.get_service_type_display()
-        admin_email = getattr(settings, 'BREVO_SENDER_EMAIL', 'contact@uzyra.com')
+        admin_email = getattr(settings, 'BREVO_SENDER_EMAIL', getattr(settings, 'BRAND_SUPPORT_EMAIL', 'support@strideid.com'))
         body = f"""
         <p>A new business inquiry has been submitted on the STRIDE platform.</p>
         <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
@@ -427,7 +601,7 @@ class BrevoEmailService:
             subtitle=f"{inquiry.full_name} — {service_label}",
             body_html=body,
             cta_text="View in Operations Portal",
-            cta_url=getattr(settings, 'SITE_URL', 'https://uzyra.com') + f"/ops/inquiries/{inquiry.id}/"
+            cta_url=getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/') + f"/ops/inquiries/{inquiry.id}/"
         )
         return cls.send_transactional_email(
             admin_email,
@@ -444,7 +618,7 @@ class BrevoEmailService:
         """Notification sent to profile owner when a visitor submits their contact details."""
         profile = contact_exchange.profile
         owner_email = profile.email or profile.user.email
-        site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+        site_url = getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/')
         dashboard_url = f"{site_url}/dashboard/contacts/"
 
         body = f"""
@@ -486,7 +660,7 @@ class BrevoEmailService:
             return  # No email to send to
 
         profile = contact_exchange.profile
-        site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
+        site_url = getattr(settings, 'SITE_URL', 'https://strideid.com').rstrip('/')
         profile_url = f"{site_url}/u/{profile.slug}/"
 
         body = f"""

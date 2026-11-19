@@ -572,8 +572,10 @@
 <script>
   // Tag browser as owner of this profile to filter out self-visits from analytics
   try {
+    document.cookie = "stride_owner_{{ user_profile.slug }}=1; path=/; max-age=31536000; SameSite=Lax";
     document.cookie = "uzyra_owner_{{ user_profile.slug }}=1; path=/; max-age=31536000; SameSite=Lax";
     if (window.localStorage) {
+      localStorage.setItem("stride_owner_{{ user_profile.slug }}", "1");
       localStorage.setItem("uzyra_owner_{{ user_profile.slug }}", "1");
     }
   } catch (e) {}

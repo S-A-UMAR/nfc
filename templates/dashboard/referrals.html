@@ -1,18 +1,38 @@
 {% extends "dashboard/base_dashboard.html" %}
 {% load static %}
 
-{% block title %}Referral Program — {{ BRAND_NAME }}{% endblock %}
-{% block page_title %}Referral Program{% endblock %}
+{% block title %}Referral Programme — {{ BRAND_NAME }}{% endblock %}
+{% block page_title %}Referral Programme{% endblock %}
 
 {% block dashboard_content %}
 <div class="dashboard-page-header">
   <div>
-    <h1 class="dashboard-page-title">Referral Program</h1>
-    <p class="dashboard-page-subtitle">Invite people and businesses to {{ BRAND_NAME }}. Earn ₦2,000 credit for every verified NFC card purchase.</p>
+    <h1 class="dashboard-page-title">Referral Programme</h1>
+    <p class="dashboard-page-subtitle">Refer 10 genuine users. Get one free STRIDE Smart NFC Card delivered to you.</p>
   </div>
 </div>
 
-<!-- Personal Referral Link Panel -->
+{# ── Messages ── #}
+{% if messages %}
+  {% for message in messages %}
+  <div style="
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    {% if message.tags == 'success' %}
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #10B981;
+    {% elif message.tags == 'error' %}
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #EF4444;
+    {% else %}
+      background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); color: #818CF8;
+    {% endif %}
+  ">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+{# ── Referral Link Panel ── #}
 <div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
     <div>
@@ -23,40 +43,123 @@
       Copy Referral Link
     </button>
   </div>
-
   <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.85rem 1rem; font-family: monospace; font-size: 0.85rem; color: var(--text-secondary); word-break: break-all;">
     {{ referral_link }}
   </div>
 </div>
 
-<!-- Key Performance Stats -->
-<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
-  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
-    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Total Invites Sent</div>
-    <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">{{ total_count }}</div>
+{# ── Reward Progress Card ── #}
+<div style="background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(16,185,129,0.06) 100%); border: 1px solid rgba(99,102,241,0.25); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: #818CF8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem;">Reward Target</div>
+      <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">One Free Smart NFC Card</div>
+      <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">+ Free nationwide delivery — yours to keep forever</div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 2.5rem; font-weight: 800; color: {% if verified_count >= required_verified %}#10B981{% else %}var(--text-primary){% endif %}; line-height: 1;">
+        {{ verified_count }}<span style="font-size: 1.25rem; color: var(--text-muted);">/{{ required_verified }}</span>
+      </div>
+      <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.1rem;">Verified Referrals</div>
+    </div>
   </div>
 
-  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
-    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Verified Accounts</div>
-    <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">{{ verified_count }}</div>
+  {# Progress bar #}
+  <div style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+      <span style="font-size: 0.75rem; color: var(--text-secondary);">Progress to free card</span>
+      <span style="font-size: 0.75rem; font-weight: 600; color: {% if verified_count >= required_verified %}#10B981{% else %}#818CF8{% endif %};">{{ progress_pct }}%</span>
+    </div>
+    <div style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden;">
+      <div style="height: 100%; width: {{ progress_pct }}%; background: linear-gradient(90deg, #6366F1, #10B981); border-radius: 999px; transition: width 0.6s ease;"></div>
+    </div>
   </div>
 
-  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
-    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Qualified Card Purchases</div>
-    <div style="font-size: 1.75rem; font-weight: 700; color: #10B981;">{{ qualified_count }}</div>
+  {# Two milestones #}
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <div style="background: rgba(0,0,0,0.25); border: 1px solid {% if verified_count >= required_verified %}rgba(16,185,129,0.4){% else %}rgba(255,255,255,0.08){% endif %}; border-radius: var(--radius-md); padding: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        {% if verified_count >= required_verified %}
+          <span style="color: #10B981; font-size: 1rem;">✅</span>
+        {% else %}
+          <span style="color: var(--text-muted); font-size: 1rem;">◻️</span>
+        {% endif %}
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Milestone 1</span>
+      </div>
+      <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">10 Verified Referrals</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+        {% if verified_count >= required_verified %}Complete{% else %}{{ required_verified|add:"-"|add:verified_count }} more to go{% endif %}
+      </div>
+    </div>
+
+    <div style="background: rgba(0,0,0,0.25); border: 1px solid {% if has_activation %}rgba(16,185,129,0.4){% else %}rgba(255,255,255,0.08){% endif %}; border-radius: var(--radius-md); padding: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        {% if has_activation %}
+          <span style="color: #10B981; font-size: 1rem;">✅</span>
+        {% else %}
+          <span style="color: var(--text-muted); font-size: 1rem;">◻️</span>
+        {% endif %}
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Milestone 2</span>
+      </div>
+      <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">1 Card Activated</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+        {% if has_activation %}A referred user activated their card{% else %}Wait for a referred user to activate{% endif %}
+      </div>
+    </div>
   </div>
 
-  <div class="stat-card" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.25rem;">
-    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Total Earned Credits</div>
-    <div style="font-size: 1.75rem; font-weight: 700; color: #F59E0B;">₦{{ total_rewards_ngn|floatformat:0 }}</div>
-  </div>
+  {# Reward status banner #}
+  {% if reward %}
+    <div style="margin-top: 1.5rem; padding: 1.1rem 1.25rem; border-radius: var(--radius-md);
+      {% if reward.status == 'available' %}
+        background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4);
+      {% elif reward.status == 'claimed' or reward.status == 'fulfilled' %}
+        background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.4);
+      {% elif reward.status == 'pending_review' or reward.status == 'approved' %}
+        background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+      {% else %}
+        background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+      {% endif %}
+    ">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem;
+            {% if reward.status == 'available' %}color:#10B981;{% elif reward.status == 'claimed' or reward.status == 'fulfilled' %}color:#818CF8;{% elif reward.status == 'pending_review' or reward.status == 'approved' %}color:#F59E0B;{% else %}color:#EF4444;{% endif %}
+          ">Reward Status</div>
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">
+            {% if reward.status == 'pending_review' %}🕐 Pending Admin Review — we'll notify you shortly.
+            {% elif reward.status == 'approved' %}✅ Reward Approved — awaiting claim window.
+            {% elif reward.status == 'available' %}🎁 Your free card is ready to claim!
+            {% elif reward.status == 'claimed' %}📦 Reward Claimed — processing your delivery.
+            {% elif reward.status == 'fulfilled' %}🚀 Dispatched! Your STRIDE card is on the way.
+            {% elif reward.status == 'rejected' %}❌ Reward Rejected — contact support for details.
+            {% endif %}
+          </div>
+          {% if reward.status == 'fulfilled' and reward.fulfilled_at %}
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Fulfilled {{ reward.fulfilled_at|date:"M d, Y" }}</div>
+          {% endif %}
+        </div>
+
+        {% if reward.status == 'available' %}
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('claimModal').style.display='flex'" style="background: #10B981; border-color: #10B981; white-space: nowrap;">
+          Claim My Free Card
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  {% elif eligible_for_reward %}
+    <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; border-radius: var(--radius-md); background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.4); color: #10B981; font-size: 0.9rem; font-weight: 600;">
+      🎉 You qualify! Your reward is being processed — we'll notify you when it's ready.
+    </div>
+  {% endif %}
 </div>
 
-<!-- Referral History Table -->
+{# ── Referral History Table ── #}
 <div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem;">
   <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: space-between;">
-    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0;">Referral History & Ledger</h3>
-    <span style="font-size: 0.8rem; color: var(--text-muted);">Privacy Protected</span>
+    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0;">Referral History</h3>
+    <span style="font-size: 0.8rem; color: var(--text-muted);">Privacy Protected · {{ total_count }} total</span>
   </div>
 
   {% if referral_history %}
@@ -66,8 +169,8 @@
         <tr style="border-bottom: 1px solid var(--border-primary); background: rgba(255, 255, 255, 0.02);">
           <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Referred Account</th>
           <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Status</th>
-          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Date Registered</th>
-          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600; text-align: right;">Earned Credit</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Card Activated</th>
+          <th style="padding: 0.85rem 1.25rem; color: var(--text-secondary); font-weight: 600;">Date Joined</th>
         </tr>
       </thead>
       <tbody>
@@ -79,20 +182,24 @@
           </td>
           <td style="padding: 1rem 1.25rem;">
             {% if item.status == 'qualified' or item.status == 'rewarded' %}
-              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Qualified</span>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Purchase Qualified</span>
             {% elif item.status == 'verified' %}
               <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Email Verified</span>
             {% elif item.status == 'pending' %}
               <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Pending</span>
             {% else %}
-              <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Rejected / Cancelled</span>
+              <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">Rejected</span>
+            {% endif %}
+          </td>
+          <td style="padding: 1rem 1.25rem;">
+            {% if item.has_activated_card %}
+              <span style="color: #10B981; font-size: 0.85rem; font-weight: 600;">✅ Activated</span>
+            {% else %}
+              <span style="color: var(--text-muted); font-size: 0.85rem;">—</span>
             {% endif %}
           </td>
           <td style="padding: 1rem 1.25rem; color: var(--text-muted); font-size: 0.8rem;">
             {{ item.created_at|date:"M d, Y" }}
-          </td>
-          <td style="padding: 1rem 1.25rem; text-align: right; font-weight: 600; color: {% if item.reward_ngn > 0 %}#10B981{% else %}var(--text-muted){% endif %};">
-            {% if item.reward_ngn > 0 %}+₦{{ item.reward_ngn|floatformat:0 }}{% else %}—{% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -101,21 +208,84 @@
   </div>
   {% else %}
   <div style="padding: 3rem 1.5rem; text-align: center; color: var(--text-secondary);">
-    <p style="margin: 0;">You haven't referred any users yet. Share your referral link above to start earning purchase credits!</p>
+    <p style="margin: 0;">You haven't referred any users yet. Share your referral link above to get started!</p>
   </div>
   {% endif %}
 </div>
 
-<!-- Program Rules & Terms Card -->
+{# ── Programme Rules Card ── #}
 <div class="card-panel" style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 1.5rem;">
-  <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">How the Referral Program Works</h4>
-  <ul style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0; padding-left: 1.25rem;">
-    <li><strong>Qualification Rule:</strong> A referral qualifies when the referred user registers a new {{ BRAND_NAME }} account via your link, verifies their email, and completes one paid physical NFC card order verified by Paystack.</li>
-    <li><strong>Reward Value:</strong> ₦2,000 in {{ BRAND_NAME }} purchase credits per qualified purchase.</li>
-    <li><strong>Fraud & Anti-Self Referral:</strong> Self-referrals, duplicate accounts, and cancelled/refunded orders are automatically rejected to protect platform integrity.</li>
-    <li><strong>Privacy Notice:</strong> Referred user identities are masked in public displays to protect personal data in compliance with NDPA 2023.</li>
+  <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">How the Referral Programme Works</h4>
+  <ul style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; margin: 0; padding-left: 1.25rem;">
+    <li><strong>Milestone 1:</strong> Refer 10 genuine, unique new users who register and verify their email address via your link.</li>
+    <li><strong>Milestone 2:</strong> At least 1 of those referred users must complete a successful paid STRIDE card order and activate their physical card.</li>
+    <li><strong>Reward:</strong> One free STRIDE Smart NFC Card + free nationwide delivery. Non-transferable, non-cash.</li>
+    <li><strong>Upgrade:</strong> You may upgrade to a higher package by paying the price difference.</li>
+    <li><strong>Fraud Prevention:</strong> Self-referrals, duplicate accounts, and unverified or refunded orders are automatically excluded.</li>
+    <li><strong>Privacy:</strong> Referred user identities are masked in this display (NDPA 2023 compliance).</li>
+    <li><strong>Review:</strong> All reward claims are reviewed by the STRIDE team before fulfilment.</li>
   </ul>
 </div>
+
+{# ── Claim Modal ── #}
+{% if reward and reward.status == 'available' %}
+<div id="claimModal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; padding: 1rem;">
+  <div style="background: var(--surface-bg); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: 2rem; max-width: 500px; width: 100%;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">🎁 Claim Your Free STRIDE Card</h3>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Enter your delivery details. Our team will dispatch your free STRIDE Smart NFC Card within 3–5 business days.</p>
+
+    <form method="post" action="{% url 'dashboard:referrals_claim' %}">
+      {% csrf_token %}
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Full Name *</label>
+        <input type="text" name="delivery_name" required maxlength="150"
+          style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.6rem 0.85rem; color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;"
+          placeholder="Your full name as on delivery address">
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Phone Number *</label>
+        <input type="tel" name="delivery_phone" required maxlength="50"
+          style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.6rem 0.85rem; color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;"
+          placeholder="+234...">
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Delivery Address *</label>
+        <textarea name="delivery_address" required rows="2"
+          style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.6rem 0.85rem; color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box; resize: vertical;"
+          placeholder="Street address, house number, landmark..."></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">City</label>
+          <input type="text" name="delivery_city" maxlength="100"
+            style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.6rem 0.85rem; color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;"
+            placeholder="Lagos">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">State</label>
+          <input type="text" name="delivery_state" maxlength="100"
+            style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 0.6rem 0.85rem; color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;"
+            placeholder="Lagos State">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" onclick="document.getElementById('claimModal').style.display='none'"
+          style="padding: 0.6rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-primary); background: transparent; color: var(--text-secondary); font-size: 0.875rem; cursor: pointer;">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" style="background: #10B981; border-color: #10B981;">
+          Confirm Claim
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
 
 <script>
 function copyReferralLink(link, btn) {
@@ -123,6 +293,13 @@ function copyReferralLink(link, btn) {
     var orig = btn.innerText;
     btn.innerText = 'Link Copied!';
     setTimeout(function() { btn.innerText = orig; }, 2000);
+  });
+}
+// Close claim modal on backdrop click
+var modal = document.getElementById('claimModal');
+if (modal) {
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.style.display = 'none';
   });
 }
 </script>

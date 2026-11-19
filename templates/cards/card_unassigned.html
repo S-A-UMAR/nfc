@@ -4,29 +4,48 @@
 
 {% block content %}
 <div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
-  <div style="max-width: 460px; width: 100%;">
+  <div style="max-width: 480px; width: 100%;">
     <div style="width: 70px; height: 70px; background: var(--bg-surface); border: 1px solid var(--border-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
     </div>
 
     <span class="badge badge-silver" style="margin-bottom: 0.75rem;">NEW SMART CARD</span>
     <h2 style="margin-bottom: 0.5rem;">Card #{{ card.card_code }}</h2>
-    <p style="color: var(--text-secondary); margin-bottom: 2rem;">This physical smart card has been manufactured but has not yet been linked to an active digital profile.</p>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">This physical smart card has been manufactured and is ready to be linked to your {{ BRAND_NAME }} digital profile.</p>
 
     <div class="card" style="text-align: left;">
-      <h4 style="font-size: 1rem; margin-bottom: 0.75rem;">Is this your card?</h4>
-      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">Sign in to your {{ BRAND_NAME }} account to instantly activate and connect it to your professional profile.</p>
+      <h4 style="font-size: 1rem; margin-bottom: 0.75rem;">Pair with Your Account</h4>
       
       {% if user.is_authenticated %}
+        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          Signed in as <strong>{{ user.display_name }}</strong> ({{ user.email }}). Enter the security activation PIN printed on your physical card sleeve or packaging to complete setup.
+        </p>
+
         <form method="post" action="{% url 'cards:card_activate' %}">
           {% csrf_token %}
           <input type="hidden" name="card_code" value="{{ card.card_code }}">
+          <input type="hidden" name="next" value="/c/{{ card.card_code }}/">
+
+          <div class="form-group mb-4">
+            <label class="form-label" for="id_card_code_display">Physical Card ID</label>
+            <input type="text" id="id_card_code_display" class="form-control font-mono" value="{{ card.card_code }}" disabled style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary); cursor: not-allowed;">
+          </div>
+
+          <div class="form-group mb-4">
+            <label class="form-label" for="id_activation_code">Security Activation PIN / Code <span style="color: #EF4444;">*</span></label>
+            <input type="text" name="activation_code" id="id_activation_code" class="form-control font-mono tracking-wide" placeholder="e.g. A1B2-C3D4" required autofocus style="text-transform: uppercase;">
+            <div class="form-hint">Found on the security sleeve or packaging delivered with your card.</div>
+          </div>
+
           <button type="submit" class="btn btn-primary btn-block">Activate & Link to My Profile</button>
         </form>
       {% else %}
-        <div style="display: flex; gap: 0.75rem;">
+        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          Sign in or create a {{ BRAND_NAME }} account to pair Card <strong>#{{ card.card_code }}</strong> with your personal digital identity.
+        </p>
+        <div style="display: flex; gap: 0.75rem; flex-direction: column;">
           <a href="{% url 'accounts:login' %}?next=/c/{{ card.card_code }}/" class="btn btn-primary btn-block">Sign In to Activate</a>
-          <a href="{% url 'accounts:register' %}" class="btn btn-secondary btn-block">Create Account</a>
+          <a href="{% url 'accounts:register' %}?next=/c/{{ card.card_code }}/" class="btn btn-secondary btn-block">Create New Account</a>
         </div>
       {% endif %}
     </div>

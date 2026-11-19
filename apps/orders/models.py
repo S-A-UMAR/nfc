@@ -186,7 +186,7 @@ class Order(models.Model):
     ]
 
     order_number = models.CharField(max_length=40, unique=True, db_index=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     package = models.ForeignKey(ProductPackage, on_delete=models.PROTECT, related_name='orders')
     amount = models.PositiveIntegerField(help_text="Final price paid in NGN")
     
@@ -209,7 +209,8 @@ class Order(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"#{self.order_number} - {self.package.name} ({self.user.display_name})"
+        user_name = self.user.display_name if self.user else "[Deleted User]"
+        return f"#{self.order_number} - {self.package.name} ({user_name})"
 
     def save(self, *args, **kwargs):
         if not self.order_number:

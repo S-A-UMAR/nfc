@@ -23,7 +23,7 @@ admin.site.site_title = "STRIDE Admin HQ"
 admin.site.index_title = "Platform Management & Operations"
 
 urlpatterns = [
-    # Health check endpoint for container orchestrators (Render)
+    # Health check endpoint for container orchestrators (Railway)
     path('health/', health_check_view, name='health_check'),
 
     # Obscured Admin URL (Shielded against automated bots scanning /admin/)

@@ -1,17 +1,21 @@
+import logging
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 from apps.profiles.models import Profile
 from apps.cards.models import Card
 from apps.orders.models import Order
 from apps.analytics.models import AnalyticsEvent
 from apps.websites.models import Website
 from .forms import UserUpdateForm
+
+logger = logging.getLogger('stride.accounts')
 from datetime import timedelta
 from django.utils import timezone
-
+from django.db import transaction
 from django.db.models import Count, Q
 
 @login_required
@@ -311,18 +315,66 @@ def delete_account_view(request):
                 messages.error(request, "Email verification did not match your account email address.")
                 return render(request, 'dashboard/delete_account.html')
 
-        # 1. Sanitize physical NFC cards: decouple from user/profile and reset to unassigned
-        Card.objects.filter(user=user).update(
-            user=None,
-            profile=None,
-            status=Card.STATUS_UNASSIGNED
-        )
+        # 1-5. Execute account deletion and anonymization atomically
+        from apps.orders.models import Order, OrderRequirement
+        from apps.core.services.media_cleanup_service import MediaCleanupService
 
-        # 2. Invalidate active session
-        logout(request)
+        with transaction.atomic():
+            # 1. Sanitize physical NFC cards: decouple from user/profile and reset to unassigned
+            Card.objects.filter(user=user).update(
+                user=None,
+                profile=None,
+                status=Card.STATUS_UNASSIGNED
+            )
 
-        # 3. Permanently delete user record (cascades profile, links, websites)
-        user.delete()
+            # 2. Preserve financial ledger: Anonymize personal customer details on orders
+            # while preserving immutable order numbers, packages, amounts, timestamps, and payment references.
+            user_orders = Order.objects.filter(user=user)
+            OrderRequirement.objects.filter(order__in=user_orders).update(
+                full_name="[Account Deleted]",
+                title="",
+                bio="",
+                phone="",
+                whatsapp="",
+                email="",
+                address="",
+                # Business identity fields also removed — can identify the data subject
+                business_name="",
+                business_category="",
+                business_description="",
+                pages_needed="",
+                social_instagram="",
+                social_linkedin="",
+                social_x="",
+                social_tiktok="",
+                social_facebook="",
+                website_url="",
+                design_notes=""
+            )
+            user_orders.update(
+                shipping_name="[Account Deleted]",
+                shipping_phone="",
+                shipping_address="[Deleted for Privacy]",
+                customer_notes=""
+            )
+
+            # 3. Enqueue remote Cloudinary assets for cleanup before cascading profile
+            try:
+                MediaCleanupService.enqueue_user_media(user)
+            except Exception as e:
+                logger.error("Failed to enqueue media cleanup for user %s: %s", user.email, e)
+
+            # 4. Invalidate active session
+            logout(request)
+
+            # 5. Permanently delete user record (cascades profile, links, websites; order.user set to NULL)
+            user.delete()
+
+        # 6. Execute media cleanup strictly AFTER the deletion transaction has committed
+        try:
+            MediaCleanupService.process_pending_tasks()
+        except Exception as e:
+            logger.error("Error processing pending media cleanup after account deletion: %s", e)
 
         messages.success(request, "Your account and personal profile have been permanently deleted.")
         return redirect('core:home')
@@ -334,26 +386,26 @@ def delete_account_view(request):
 def dashboard_referrals_view(request):
     """
     Dashboard Referrals Overview (/dashboard/referrals/).
-    Displays personal referral code, link, stats (verified, qualified),
-    earned rewards balance, and referral history with privacy protection.
+    Shows the new product-reward programme: 10 verified referrals + 1 card activation
+    = one free STRIDE Smart NFC Card reward.
+    Also displays legacy ₦2,000 historical credit data for transparency.
     """
-    from .models import Referral
+    from .models import Referral, ReferralReward
+    from apps.accounts.services.referral_service import get_referral_progress
     from django.conf import settings
-    from django.db.models import Sum
 
     user = request.user
-    site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
-    referral_link = f"{site_url}/join/?ref={user.referral_code}"
+    site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
+    referral_link = f"{site_url.rstrip('/')}/join/?ref={user.referral_code}"
 
-    referrals = Referral.objects.filter(referrer=user).select_related('referred_user', 'qualifying_order')
+    referrals = Referral.objects.filter(referrer=user).select_related(
+        'referred_user', 'qualifying_order', 'activation_card'
+    )
 
     total_count = referrals.count()
-    verified_count = referrals.filter(status__in=[Referral.STATUS_VERIFIED, Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED]).count()
-    qualified_count = referrals.filter(status__in=[Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED]).count()
-    
-    total_rewards_ngn = referrals.filter(status__in=[Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED]).aggregate(
-        total=Sum('reward_amount_ngn')
-    )['total'] or 0
+
+    # Progress data from service
+    progress = get_referral_progress(user)
 
     # Privacy-conscious history formatting
     referral_history = []
@@ -361,12 +413,16 @@ def dashboard_referrals_view(request):
         email = ref.referred_user.email
         parts = email.split('@')
         masked_email = f"{parts[0][0]}***@{parts[1]}" if len(parts) == 2 and len(parts[0]) > 0 else "User"
+        # For display: show activation status
+        has_activated_card = ref.activation_card_id is not None
         referral_history.append({
             'masked_name': ref.referred_user.first_name or masked_email,
             'masked_email': masked_email,
             'status_display': ref.get_status_display(),
             'status': ref.status,
             'created_at': ref.created_at,
+            'has_activated_card': has_activated_card,
+            # Legacy cash credit (historical, shown for transparency)
             'reward_ngn': ref.reward_amount_ngn if ref.status in (Referral.STATUS_QUALIFIED, Referral.STATUS_REWARDED) else 0,
         })
 
@@ -375,10 +431,63 @@ def dashboard_referrals_view(request):
         'referral_code': user.referral_code,
         'referral_link': referral_link,
         'total_count': total_count,
-        'verified_count': verified_count,
-        'qualified_count': qualified_count,
-        'total_rewards_ngn': total_rewards_ngn,
+        # New programme progress
+        'progress': progress,
+        'verified_count': progress['verified_referrals'],
+        'required_verified': progress['required_verified'],
+        'progress_pct': progress['progress_pct'],
+        'has_activation': progress['has_activation'],
+        'reward': progress['reward'],
+        'eligible_for_reward': progress['eligible_for_reward'],
         'referral_history': referral_history,
     })
+
+
+@login_required
+@require_POST
+def claim_referral_reward_view(request):
+    """
+    POST /dashboard/referrals/claim/
+    Customer claims an available referral reward by providing delivery details.
+    Only valid when reward.status == STATUS_AVAILABLE.
+    """
+    from .models import ReferralReward
+    from apps.accounts.services.referral_service import claim_reward
+
+    reward = (
+        request.user.referral_rewards
+        .filter(status=ReferralReward.STATUS_AVAILABLE)
+        .order_by('-created_at')
+        .first()
+    )
+
+    if not reward:
+        messages.error(request, "No available reward found to claim.")
+        return redirect('dashboard:referrals')
+
+    delivery_data = {
+        'name': request.POST.get('delivery_name', '').strip(),
+        'phone': request.POST.get('delivery_phone', '').strip(),
+        'address': request.POST.get('delivery_address', '').strip(),
+        'city': request.POST.get('delivery_city', '').strip(),
+        'state': request.POST.get('delivery_state', '').strip(),
+    }
+
+    # Validate required delivery fields
+    if not delivery_data['name'] or not delivery_data['phone'] or not delivery_data['address']:
+        messages.error(request, "Please fill in your full name, phone number, and delivery address.")
+        return redirect('dashboard:referrals')
+
+    success, error = claim_reward(reward, delivery_data)
+    if success:
+        messages.success(
+            request,
+            "🎉 Your free STRIDE Smart NFC Card reward has been claimed! "
+            "Our team will process your delivery within 3–5 business days."
+        )
+    else:
+        messages.error(request, f"Could not claim reward: {error}")
+
+    return redirect('dashboard:referrals')
 
 

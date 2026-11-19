@@ -30,7 +30,7 @@ def nfc_redirect_view(request, card_code):
     if request.user.is_authenticated:
         if (card.user and request.user == card.user) or (card.profile and card.profile.user and request.user == card.profile.user):
             is_owner = True
-    if not is_owner and card.profile and request.COOKIES.get(f'uzyra_owner_{card.profile.slug}') == '1':
+    if not is_owner and card.profile and (request.COOKIES.get(f'stride_owner_{card.profile.slug}') == '1' or request.COOKIES.get(f'uzyra_owner_{card.profile.slug}') == '1'):
         is_owner = True
 
     # Log Card Event only if visitor is not the owner
@@ -58,6 +58,7 @@ def nfc_redirect_view(request, card_code):
                     )
                 response = redirect(card.profile.direct_link_url)
                 if is_owner:
+                    response.set_cookie(f'stride_owner_{card.profile.slug}', '1', max_age=365 * 24 * 3600, samesite='Lax')
                     response.set_cookie(f'uzyra_owner_{card.profile.slug}', '1', max_age=365 * 24 * 3600, samesite='Lax')
                 return response
 
@@ -74,8 +75,10 @@ def nfc_redirect_view(request, card_code):
             target_url = reverse('profiles:public_profile', kwargs={'slug': card.profile.slug})
             response = redirect(target_url)
             # Short-lived sensory feedback cookie consumed upon profile load (30 seconds)
+            response.set_cookie('stride_tap', '1', max_age=30, samesite='Lax')
             response.set_cookie('uzyra_tap', '1', max_age=30, samesite='Lax')
             if is_owner:
+                response.set_cookie(f'stride_owner_{card.profile.slug}', '1', max_age=365 * 24 * 3600, samesite='Lax')
                 response.set_cookie(f'uzyra_owner_{card.profile.slug}', '1', max_age=365 * 24 * 3600, samesite='Lax')
             return response
         else:
@@ -131,11 +134,14 @@ def card_activate_view(request):
     ip = get_client_ip(request)
     user_id = request.user.id
 
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+    redirect_target = next_url if (next_url and next_url.startswith('/c/')) else 'dashboard:card_manage'
+
     # Rate limiting: max 5 failed activation attempts per user/IP per 10 minutes
     allowed, remaining, retry_after = check_rate_limit(f"card_act:{user_id}", limit=5, window_seconds=600)
     if not allowed:
         messages.error(request, f"Too many failed card activation attempts. Throttled for {retry_after} seconds.")
-        return redirect('dashboard:card_manage')
+        return redirect(redirect_target)
 
     card_code = request.POST.get('card_code', '').strip().upper()
     activation_code = request.POST.get('activation_code', '').strip().upper()
@@ -143,39 +149,39 @@ def card_activate_view(request):
 
     if not card_code:
         messages.error(request, "Please enter the Card ID code.")
-        return redirect('dashboard:card_manage')
+        return redirect(redirect_target)
 
     with transaction.atomic():
         try:
             card = Card.objects.select_for_update().get(card_code__iexact=card_code)
         except Card.DoesNotExist:
             messages.error(request, f"Card '{card_code}' was not found. Please check the code printed on the physical card.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # Guard: Already active
         if card.status == Card.STATUS_ACTIVE:
             messages.error(request, f"Card '{card_code}' is already active and in use.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # Guard: Suspended
         if card.status == Card.STATUS_SUSPENDED:
             messages.error(request, f"Card '{card_code}' is suspended. Suspended cards cannot be activated.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # Guard: Replaced
         if card.status == Card.STATUS_REPLACED:
             messages.error(request, f"Card '{card_code}' has been replaced and cannot be reactivated.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # Guard: Reported Lost
         if card.status == Card.STATUS_LOST:
             messages.error(request, f"Card '{card_code}' has been reported lost and cannot be activated.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # Guard: Assigned to another user
         if card.user and card.user != request.user:
             messages.error(request, f"Card '{card_code}' is already assigned to another account.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # Guard: Activation PIN verification
         if not card.activation_code_hash:
@@ -183,11 +189,11 @@ def card_activate_view(request):
                 request,
                 f"Card '{card_code}' does not have an activation PIN configured. Please contact STRIDE support to activate this card."
             )
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         if not activation_code or not card.check_activation_code(activation_code):
             messages.error(request, "Invalid activation code. Please enter the security PIN provided with your card package.")
-            return redirect('dashboard:card_manage')
+            return redirect(redirect_target)
 
         # All checks passed: Activate & bind
         card.user = request.user
@@ -201,7 +207,18 @@ def card_activate_view(request):
         BrevoEmailService.send_card_activation_notification(request.user, card)
     except Exception as e:
         import logging
-        logging.getLogger('uzyra.cards').error(f"Failed to dispatch card activation email: {e}")
+        logging.getLogger('stride.cards').error(f"Failed to dispatch card activation email: {e}")
+
+    # Referral reward check: runs OUTSIDE the atomic block so the card save is committed
+    # before we query referral state. Failure must never block the user's success response.
+    try:
+        from apps.accounts.services.referral_service import record_card_activation
+        record_card_activation(card)
+    except Exception as e:
+        import logging
+        logging.getLogger('stride.referrals').error(
+            "record_card_activation failed for card %s: %s", card.card_code, e
+        )
 
     messages.success(request, f"Success! Smart Card {card.card_code} is now activated and linked to your digital profile.")
     return redirect('dashboard:card_manage')
@@ -220,7 +237,7 @@ def card_report_lost_view(request, card_id):
         BrevoEmailService.send_card_status_email(request.user, card, action='lost')
     except Exception as e:
         import logging
-        logging.getLogger('uzyra.cards').error(f"Failed to dispatch lost card email: {e}")
+        logging.getLogger('stride.cards').error(f"Failed to dispatch lost card email: {e}")
 
     messages.warning(request, f"Smart Card {card.card_code} has been marked as LOST. It will no longer redirect to your profile.")
     return redirect('dashboard:card_manage')

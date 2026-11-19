@@ -20,7 +20,7 @@ This policy outlines the conditions under which orders for {{ BRAND_NAME }} phys
     <h2 class="legal-section-title"><span class="legal-section-number">01.</span> Order Cancellation Before Production / Dispatch</h2>
     <ul>
       <li><strong>Standard Stock Cards:</strong> You may cancel your physical smart card order within <strong>twenty-four (24) hours</strong> of completing payment on Paystack, provided the order has not entered physical laser etching, programming, or packaging. In this case, you will receive a full 100% refund to your original payment method.</li>
-      <li><strong>Orders Already In Production:</strong> Once a smart card has been programmed with unique hardware security identifiers and prepared for dispatch, cancellation is subject to a 15% administrative and materials recovery fee.</li>
+      <li><strong>Orders Already In Production:</strong> Once custom engraving, programming, or card preparation has commenced, ordinary change-of-mind cancellation is not available. Contact our support desk within 24 hours of payment to request cancellation before production begins.</li>
     </ul>
   </section>
 
@@ -42,7 +42,7 @@ This policy outlines the conditions under which orders for {{ BRAND_NAME }} phys
     <ul>
       <li><strong>Normal Wear and Tear:</strong> Surface scratches, cosmetic scuffs, or discoloration resulting from regular everyday wallet wear.</li>
       <li><strong>Physical Misuse / Force:</strong> Severe card bending, snapping, perforation, exposure to extreme heat, immersion in corrosive solvents, or intentional tampering with the antenna.</li>
-      <li><strong>Lost or Stolen Cards:</strong> If you misplace or lose your card after successful delivery, you can suspend the card immediately in your dashboard to prevent unauthorized taps. Replacement cards can be ordered at standard replacement pricing.</li>
+      <li><strong>Lost or Stolen Cards:</strong> If you misplace or lose your card after successful delivery, navigate to your customer dashboard and select "Report Lost" to prevent unauthorised taps. Replacement cards are available at &#8358;15,000 — contact our <a href="{% url 'legal:complaints' %}?category=card">Hardware Support Desk</a> to place a replacement request.</li>
       <li><strong>Change of Mind After Delivery:</strong> Because {{ BRAND_NAME }} smart cards are serialized hardware products provisioned specifically to your customer profile, we cannot accept returns or issue cash refunds for change of mind once a functioning card has been delivered.</li>
       <li><strong>Incorrect Delivery Details Provided:</strong> Failed or delayed delivery resulting from an inaccurate street address or unreachable recipient telephone number provided during checkout.</li>
     </ul>
@@ -52,9 +52,16 @@ This policy outlines the conditions under which orders for {{ BRAND_NAME }} phys
   <section class="legal-section" id="payment-issues">
     <h2 class="legal-section-title"><span class="legal-section-number">04.</span> Duplicate Charges & Payment Processing Reversals</h2>
     <ul>
-      <li><strong>Duplicate Billing:</strong> In the rare event that network latency or checkout retry causes a duplicate charge on Paystack, please contact us immediately with your transaction reference numbers. Upon verification, the duplicate charge will be reversed in full.</li>
-      <li><strong>Reversal Timeframes:</strong> Approved refunds processed through Paystack typically reflect in your Nigerian bank account or debit card within <strong>five (5) to ten (10) business days</strong>, depending on your commercial bank's interbank settlement timelines.</li>
+      <li><strong>Duplicate Billing:</strong> In the rare event that network latency or checkout retry causes a duplicate charge on Paystack, please contact us immediately with your transaction reference numbers. Upon verification, the duplicate charge will be reversed in full through Paystack's payment administration by our operations team.</li>
+      <li><strong>Reversal Timeframes:</strong> Approved refunds are processed manually by our operations team through Paystack's payment administration. Refund timelines are dependent on your commercial bank's interbank settlement cycles, typically five (5) to ten (10) business days.</li>
     </ul>
+  </section>
+
+  <!-- SECTION 4b -->
+  <section class="legal-section" id="replacement-cards">
+    <h2 class="legal-section-title"><span class="legal-section-number">04b.</span> Replacement Cards</h2>
+    <p>Replacement cards for lost or permanently damaged hardware are available at <strong>&#8358;15,000</strong>. This covers a new encoded NFC card linked to your existing digital profile and analytics history.</p>
+    <p>To request a replacement card, submit a request via our <a href="{% url 'legal:complaints' %}?category=card">Hardware Support Desk</a> with your order reference and account details. Our operations team will process and dispatch the replacement card after verification.</p>
   </section>
 
   <!-- SECTION 5 -->

@@ -22,7 +22,7 @@ These hardware and technical terms govern the ownership, activation, physical ca
     <ul>
       <li><strong>Microchip Standard:</strong> Embedded with genuine NXP NTAG216 silicon operating at high-frequency 13.56 MHz in compliance with ISO/IEC 14443 Type A and NFC Forum Type 2 specifications.</li>
       <li><strong>Passive Energy Induction:</strong> The card contains zero internal battery and emits zero electromagnetic radiation while idle. When placed within 2–4 centimeters of an NFC-enabled smartphone, the card's internal antenna harvests micro-power from the reading phone's magnetic field to transmit its redirect payload in under 50 milliseconds.</li>
-      <li><strong>Payload Architecture:</strong> The chip is encoded with a standardized NDEF (NFC Data Exchange Format) URI record pointing exclusively to our secure routing engine (e.g. <code>https://stride.id/c/STR-CARD-XXXXXX/</code>).</li>
+      <li><strong>Payload Architecture:</strong> The chip is encoded with a standardized NDEF (NFC Data Exchange Format) URI record pointing exclusively to our secure routing engine (e.g. <code>https://{{ BRAND_DOMAIN }}/c/STR-CARD-XXXXXX/</code>).</li>
       <li><strong>Optical QR Redundancy:</strong> The reverse side of every card features a high-contrast precision laser-printed QR code pointing to the identical cloud URL. This guarantees 100% compatibility when networking with older smartphones or devices with disabled NFC sensors.</li>
     </ul>
   </section>
@@ -39,13 +39,13 @@ These hardware and technical terms govern the ownership, activation, physical ca
 
   <!-- SECTION 3 -->
   <section class="legal-section" id="security-controls">
-    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Lost, Stolen & Suspended Card Controls</h2>
+    <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Lost or Stolen Card Controls</h2>
     <p>Physical card loss presents zero risk to your account credentials or stored information:</p>
     <ul>
-      <li><strong>One-Click Remote Suspension:</strong> If your card is misplaced, lost, or stolen, navigate to your <a href="{% url 'dashboard:card_manage' %}">Smart Card Dashboard</a> and toggle the card status to <strong>"Suspended"</strong> or <strong>"Report Lost"</strong>.</li>
-      <li><strong>Suspended Behavior:</strong> Once suspended, our routing engine immediately blocks redirection. Anyone tapping the physical card will see an official "This card has been temporarily suspended by its owner" screen, revealing zero contact details, phone numbers, or links.</li>
-      <li><strong>Reactivation:</strong> If you recover a misplaced card that you marked as suspended, you can restore it back to "Active" status instantly from your dashboard.</li>
-      <li><strong>Replacement Cards:</strong> If a card is permanently lost, you can decouple it permanently and order an affordable replacement card linked seamlessly to your existing digital profile and analytics history.</li>
+      <li><strong>Report Lost:</strong> If your card is lost or stolen, navigate to your <a href="{% url 'dashboard:card_manage' %}">Smart Card Dashboard</a> and select <strong>"Report Lost"</strong>. This immediately flags the card as lost in our routing engine.</li>
+      <li><strong>Lost Card Behavior:</strong> Once flagged as lost, our routing engine immediately blocks all public redirections. Anyone tapping the physical card will be shown an official notice and no contact details, phone numbers, or profile links will be revealed.</li>
+      <li><strong>Card Recovery:</strong> If you recover a card you previously reported as lost, contact our support team at <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a>. Our staff will verify your ownership and, after appropriate security checks, can restore the card to active status on your behalf. Card status changes cannot be self-reversed through the customer dashboard once a card has been marked lost.</li>
+      <li><strong>Replacement Cards:</strong> If a card is permanently lost, a replacement card is available at &#8358;15,000. Contact our <a href="{% url 'legal:complaints' %}?category=card">Hardware Support Desk</a> to place a replacement request, and we will program a new card linked to your existing digital profile and analytics history.</li>
     </ul>
   </section>
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -28,7 +28,7 @@ def public_profile_view(request, slug):
     is_owner = False
     if request.user.is_authenticated and profile.user and request.user == profile.user:
         is_owner = True
-    elif request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1':
+    elif request.COOKIES.get(f'stride_owner_{profile.slug}') == '1' or request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1':
         is_owner = True
 
     # Direct Link Mode routing (bypasses full profile unless visitor is owner or previewing via ?preview=1 or ?full=1)
@@ -65,8 +65,14 @@ def public_profile_view(request, slug):
         'direct_link_active': profile.direct_link_enabled and bool(profile.direct_link_url),
     })
 
-    # If authenticated owner, refresh the long-lived owner cookie
+    # If authenticated owner, refresh the long-lived owner cookie (setting both for seamless transition)
     if request.user.is_authenticated and profile.user and request.user == profile.user:
+        response.set_cookie(
+            f'stride_owner_{profile.slug}',
+            '1',
+            max_age=365 * 24 * 3600,
+            samesite='Lax'
+        )
         response.set_cookie(
             f'uzyra_owner_{profile.slug}',
             '1',
@@ -87,6 +93,7 @@ def download_vcard_view(request, slug):
     # Check if visitor is the profile owner
     is_owner = (
         (request.user.is_authenticated and profile.user and request.user == profile.user)
+        or (request.COOKIES.get(f'stride_owner_{profile.slug}') == '1')
         or (request.COOKIES.get(f'uzyra_owner_{profile.slug}') == '1')
     )
 
@@ -690,152 +697,39 @@ from apps.core.services.email_service import BrevoEmailService
 def submit_contact_exchange_view(request, slug):
     """
     Public Endpoint (/u/<slug>/exchange/).
-    Enables visitors to submit their contact details (two-way contact exchange).
-    Features:
-    - Server-side validation & consent enforcement.
-    - IP Rate limiting (max 5 submissions per IP in 10 minutes).
-    - Email notification to profile owner via Brevo.
-    - XSS & IDOR protection.
+    Contact Exchange is deferred post-production.
+    Endpoint is safely dormant.
     """
-    profile = get_object_or_404(Profile, slug=slug)
-
-    # Rate limiting: limit per IP address
-    client_ip = request.META.get('REMOTE_ADDR')
-    from django.utils import timezone
-    from datetime import timedelta
-    ten_minutes_ago = timezone.now() - timedelta(minutes=10)
-    recent_submissions = ContactExchange.objects.filter(
-        profile=profile,
-        ip_address=client_ip,
-        created_at__gte=ten_minutes_ago
-    ).count()
-
-    if recent_submissions >= 5:
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
-            return JsonResponse({'success': False, 'message': 'Too many contact requests. Please wait a few minutes before trying again.'}, status=429)
-        messages.error(request, "Too many contact requests. Please wait a few minutes before trying again.")
-        return redirect('profiles:public_profile', slug=slug)
-
-    form = ContactExchangeForm(request.POST)
-    if form.is_valid():
-        contact_exchange = form.save(commit=False)
-        contact_exchange.profile = profile
-        contact_exchange.ip_address = client_ip
-        contact_exchange.user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
-        contact_exchange.save()
-
-        # Analytics event
-        AnalyticsEvent.objects.create(
-            profile=profile,
-            event_type=AnalyticsEvent.TYPE_VCARD,
-            target_label="Contact Exchange Submitted",
-            user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
-        )
-
-        # Notify profile owner safely via Brevo
-        try:
-            BrevoEmailService.send_contact_exchange_notification(contact_exchange)
-        except Exception as e:
-            import logging
-            logging.getLogger('uzyra.contact_exchange').error(f"Contact exchange owner notification failed: {e}")
-
-        # Send confirmation to the visitor (only if they provided an email)
-        try:
-            BrevoEmailService.send_contact_exchange_visitor_confirmation(contact_exchange)
-        except Exception as e:
-            import logging
-            logging.getLogger('uzyra.contact_exchange').error(f"Contact exchange visitor confirmation failed: {e}")
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
-            return JsonResponse({'success': True, 'message': f'Your contact details have been shared with {profile.full_name}. Thank you!'})
-
-        messages.success(request, f"Your contact details have been shared with {profile.full_name}. Thank you!")
-        return redirect('profiles:public_profile', slug=slug)
-    else:
-        errors = "; ".join([f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()])
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json':
-            return JsonResponse({'success': False, 'message': f'Could not submit contact: {errors}'}, status=400)
-        messages.error(request, f"Could not submit contact details: {errors}")
-        return redirect('profiles:public_profile', slug=slug)
+    raise Http404("Contact Exchange feature is currently deferred.")
 
 
 @login_required
 def dashboard_contacts_view(request):
     """
     Dashboard Received Contacts (/dashboard/contacts/).
-    Displays leads submitted to request.user.profile via contact exchange.
-    Enforces strict user isolation (IDOR protection).
-    Marks all unread contacts as read when page is visited.
+    Contact Exchange is deferred post-production.
+    Endpoint is safely dormant.
     """
-    from django.utils import timezone
-    profile = request.user.profile
-    contacts = profile.received_contacts.all()
-
-    # Bulk mark all unread contacts as read on page visit
-    unread_qs = contacts.filter(is_read=False)
-    unread_count = unread_qs.count()
-    if unread_count > 0:
-        unread_qs.update(is_read=True, read_at=timezone.now())
-
-    return render(request, 'dashboard/contacts.html', {
-        'profile': profile,
-        'contacts': contacts,
-        'new_count': unread_count,  # how many were newly read this visit
-    })
+    raise Http404("Contact Exchange directory is currently unavailable.")
 
 
 @login_required
 @require_POST
 def delete_contact_exchange_view(request, contact_id):
     """
-    Deletes a received lead. Isolated to request.user.profile.
+    Deletes a received lead.
+    Contact Exchange is deferred post-production.
     """
-    profile = request.user.profile
-    contact = get_object_or_404(ContactExchange, id=contact_id, profile=profile)
-    name = contact.full_name
-    contact.delete()
-    messages.info(request, f"Contact record from '{name}' removed.")
-    return redirect('dashboard:contacts_list')
+    raise Http404("Contact Exchange is currently unavailable.")
 
 
 @login_required
 def export_contact_exchange_vcard_view(request, contact_id):
     """
     Exports a received contact lead as a downloadable .vcf vCard file.
-    Isolated to request.user.profile.
+    Contact Exchange is deferred post-production.
     """
-    profile = request.user.profile
-    contact = get_object_or_404(ContactExchange, id=contact_id, profile=profile)
-
-    def _clean_vcard(text):
-        if not text:
-            return ""
-        return str(text).replace('\r', '').replace('\n', ' ').replace(';', '\\;').strip()
-
-    clean_name = _clean_vcard(contact.full_name)
-    vcard_lines = [
-        "BEGIN:VCARD",
-        "VERSION:3.0",
-        f"FN:{clean_name}",
-        f"N:{clean_name};;;;",
-    ]
-
-    if contact.business_name:
-        vcard_lines.append(f"ORG:{_clean_vcard(contact.business_name)}")
-    if contact.phone:
-        vcard_lines.append(f"TEL;TYPE=CELL,VOICE:{_clean_vcard(contact.phone)}")
-    if contact.email:
-        vcard_lines.append(f"EMAIL;TYPE=PREF,INTERNET:{_clean_vcard(contact.email)}")
-    if contact.notes:
-        vcard_lines.append(f"NOTE:{_clean_vcard(contact.notes)}")
-
-    vcard_lines.append("END:VCARD")
-    vcard_content = "\r\n".join(vcard_lines) + "\r\n"
-
-    safe_name = re.sub(r'[^a-zA-Z0-9_\-]', '', contact.full_name.replace(' ', '_')) or 'contact'
-    response = HttpResponse(vcard_content, content_type='text/vcard; charset=utf-8')
-    response['Content-Disposition'] = f'attachment; filename="{safe_name}_lead.vcf"'
-    return response
+    raise Http404("Contact Exchange is currently unavailable.")
 
 
 def download_profile_qr_view(request, slug):
@@ -843,8 +737,8 @@ def download_profile_qr_view(request, slug):
     Generates a PNG QR code image encoding the canonical profile URL (/u/<slug>/).
     """
     profile = get_object_or_404(Profile, slug=slug)
-    site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
-    canonical_url = f"{site_url}/u/{profile.slug}/"
+    site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
+    canonical_url = f"{site_url.rstrip('/')}/u/{profile.slug}/"
 
     qr = qrcode.QRCode(
         version=1,
@@ -883,9 +777,9 @@ def dashboard_share_view(request):
     """
     profile = request.user.profile
     user = request.user
-    site_url = getattr(settings, 'SITE_URL', 'https://uzyra.com')
-    public_url = f"{site_url}/u/{profile.slug}/"
-    referral_link = f"{site_url}/join/?ref={user.referral_code}"
+    site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
+    public_url = f"{site_url.rstrip('/')}/u/{profile.slug}/"
+    referral_link = f"{site_url.rstrip('/')}/join/?ref={user.referral_code}"
 
     return render(request, 'dashboard/share.html', {
         'profile': profile,

@@ -34,14 +34,15 @@ class Phase4IPAssetsAndThirdPartyTests(TestCase):
         )
 
     def test_third_party_disclosure_includes_google_fonts_and_all_providers(self):
-        """Verify Third-Party Services Disclosure lists all 6 infrastructure providers including Google Fonts."""
+        """Verify Third-Party Services Disclosure lists all verified infrastructure providers including Google Fonts."""
         response = self.client.get(reverse('legal:third_party'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Paystack Payments Limited')
         self.assertContains(response, 'Brevo (Sendinblue SAS)')
-        self.assertContains(response, 'TiDB Cloud (PingCAP, Inc.)')
+        self.assertContains(response, 'Neon PostgreSQL (Neon, Inc.)')
         self.assertContains(response, 'Cloudinary Ltd')
-        self.assertContains(response, 'Render Services, Inc.')
+        self.assertContains(response, 'Railway (Railway Corp.)')
+        self.assertContains(response, 'Redis Cache')
         self.assertContains(response, 'Google Fonts (Google LLC)')
 
     def test_copyright_infringement_complaint_submission(self):

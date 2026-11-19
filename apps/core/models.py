@@ -221,3 +221,55 @@ class BusinessInquiry(models.Model):
             self.STATUS_WON:          'badge-success',
             self.STATUS_CLOSED:       'badge-danger',
         }.get(self.status, 'badge-silver')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Media Cleanup Task Model — Reliable Orphaned Cloudinary Asset Cleanup
+# ─────────────────────────────────────────────────────────────────────────────
+
+class MediaCleanupTask(models.Model):
+    """
+    Durable queue tracking remote media assets (Cloudinary) scheduled for deletion.
+    Ensures account deletions do not leave orphaned remote assets while:
+    1. Executing out-of-band / decoupled from atomic database transactions.
+    2. Preventing accidental deletion of assets shared or referenced by other profiles.
+    3. Supporting retries with backoff and tracking failure diagnostics.
+    4. Providing idempotency (treating already-deleted Cloudinary assets as success).
+    """
+    STATUS_PENDING = 'pending'
+    STATUS_PROCESSING = 'processing'
+    STATUS_COMPLETED = 'completed'
+    STATUS_FAILED = 'failed'
+    STATUS_SKIPPED = 'skipped'
+
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_PROCESSING, 'Processing'),
+        (STATUS_COMPLETED, 'Completed'),
+        (STATUS_FAILED, 'Failed'),
+        (STATUS_SKIPPED, 'Skipped (In Use)'),
+    )
+
+    public_id = models.CharField(max_length=255, db_index=True)
+    resource_type = models.CharField(max_length=50, default='image')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
+    attempts = models.PositiveIntegerField(default=0)
+    max_attempts = models.PositiveIntegerField(default=5)
+    last_error = models.TextField(blank=True)
+    source_repr = models.CharField(max_length=255, blank=True, help_text="e.g. Account deletion for user #42")
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Media Cleanup Task'
+        verbose_name_plural = 'Media Cleanup Tasks'
+        indexes = [
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['public_id']),
+        ]
+
+    def __str__(self):
+        return f"MediaCleanupTask({self.public_id}, status={self.status}, attempts={self.attempts})"
+

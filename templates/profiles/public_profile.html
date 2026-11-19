@@ -1132,7 +1132,7 @@
     <p style="font-size: 0.85rem; color: #D4D4D8; line-height: 1.5; margin-bottom: 1.25rem;">
       STRIDE maintains strict standards against spam, impersonation, or copyright violations. If you believe this profile violates terms or impersonates an individual, report it directly to our Trust & Safety team.
     </p>
-    <a href="mailto:{{ BRAND_SUPPORT_EMAIL|default:'contact@uzyra.com' }}?subject=Report%20Profile%20{{ profile.slug }}" class="prf-btn-dock-save" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #FCA5A5;">
+    <a href="mailto:{{ BRAND_SUPPORT_EMAIL|default:'support@strideid.com' }}?subject=Report%20Profile%20{{ profile.slug }}" class="prf-btn-dock-save" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #FCA5A5;">
       <span>Report this Profile to STRIDE</span>
     </a>
   </div>
@@ -1231,7 +1231,7 @@
 </style>
 
 <script>
-  window.UZYRA_IS_OWNER = {% if is_owner %}true{% else %}false{% endif %};
+  window.STRIDE_IS_OWNER = window.UZYRA_IS_OWNER = {% if is_owner %}true{% else %}false{% endif %};
 </script>
 <script src="{% static 'js/main.js' %}"></script>
 <script>
@@ -1391,10 +1391,14 @@
 
     // 7. Sensory Feedback Engine (Web Audio Micro-Chime & Haptics)
     const urlParams = new URLSearchParams(window.location.search);
-    const hasTapCookie = document.cookie.split(';').some(c => c.trim().startsWith('uzyra_tap=1'));
+    const hasTapCookie = document.cookie.split(';').some(c => {
+      const trimmed = c.trim();
+      return trimmed.startsWith('stride_tap=1') || trimmed.startsWith('uzyra_tap=1');
+    });
     const isNfcTap = urlParams.has('tap') || urlParams.has('scan') || hasTapCookie;
 
     if (hasTapCookie) {
+      document.cookie = 'stride_tap=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
       document.cookie = 'uzyra_tap=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
     }
 

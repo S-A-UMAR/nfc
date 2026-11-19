@@ -22,7 +22,7 @@ from apps.profiles.models import Profile
 from apps.core.security import check_rate_limit, get_client_ip
 from apps.core.services.email_service import BrevoEmailService
 
-logger = logging.getLogger('uzyra.auth')
+logger = logging.getLogger('stride.auth')
 
 User = get_user_model()
 
@@ -38,6 +38,7 @@ def referral_join_view(request):
     
     response = redirect('accounts:register')
     if ref_code:
+        response.set_cookie('stride_ref', ref_code, max_age=30*86400, httponly=True, samesite='Lax')
         response.set_cookie('uzyra_ref', ref_code, max_age=30*86400, httponly=True, samesite='Lax')
     return response
 
@@ -89,7 +90,7 @@ def register_view(request):
                 request.session['auth_next'] = next_url
 
             # Process Referral Attribution if a valid referral code exists in session or cookie
-            ref_code = request.session.get('referral_code') or request.COOKIES.get('uzyra_ref')
+            ref_code = request.session.get('referral_code') or request.COOKIES.get('stride_ref') or request.COOKIES.get('uzyra_ref')
             if ref_code:
                 from .models import Referral
                 referrer = User.objects.filter(referral_code=ref_code).first()
@@ -363,6 +364,12 @@ def password_reset_confirm_view(request, uidb64, token):
         return render(request, 'accounts/password_reset_confirm.html', {'validlink': False})
 
     if request.method == 'POST':
+        ip = get_client_ip(request)
+        allowed, remaining, retry_after = check_rate_limit(f"pwd_reset:{ip}", limit=5, window_seconds=3600)
+        if not allowed:
+            messages.error(request, f"Too many password reset attempts. Please retry in {retry_after} seconds.")
+            return render(request, 'accounts/password_reset_confirm.html', {'form': SetPasswordForm(user), 'validlink': True})
+
         form = SetPasswordForm(user, request.POST)
         if form.is_valid():
             user = form.save()

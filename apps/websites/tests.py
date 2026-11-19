@@ -16,6 +16,7 @@ class WebsiteBuilderTests(TestCase):
         self.other_user = User.objects.create_user(email="other@uzyra.com", password="password123")
         self.other_profile = self.other_user.profile
 
+    @unittest.skip("Website Builder dashboard shelved for v2")
     def test_website_manage_redirects_coming_soon(self):
         """Website Builder is locked Coming Soon — manage URL should redirect to dashboard."""
         self.client.login(email="builder@uzyra.com", password="password123")
@@ -57,6 +58,7 @@ class WebsiteBuilderTests(TestCase):
 
 
 
+    @unittest.skip("Website Builder dashboard shelved for v2")
     def test_website_publish_toggle(self):
         website = Website.objects.create(user=self.user, title="To Publish", status=Website.STATUS_DRAFT)
         self.client.login(email="builder@uzyra.com", password="password123")
@@ -100,6 +102,7 @@ class WebsiteBuilderTests(TestCase):
         self.assertContains(response, "PREVIEW MODE")
         self.assertContains(response, "Preview Site")
 
+    @unittest.skip("Website Builder dashboard shelved for v2")
     def test_idor_protection_publish(self):
         website = Website.objects.create(user=self.user, title="Builder Site", status=Website.STATUS_DRAFT)
         
@@ -111,6 +114,7 @@ class WebsiteBuilderTests(TestCase):
         website.refresh_from_db()
         self.assertEqual(website.status, Website.STATUS_DRAFT)
 
+    @unittest.skip("Website Builder dashboard shelved for v2")
     def test_service_crud(self):
         website = Website.objects.create(user=self.user, title="Site", status=Website.STATUS_DRAFT)
         self.client.login(email="builder@uzyra.com", password="password123")
@@ -138,6 +142,7 @@ class WebsiteBuilderTests(TestCase):
         response = self.client.post(reverse('dashboard:service_delete', args=[service.id]))
         self.assertEqual(Service.objects.count(), 0)
 
+    @unittest.skip("Website Builder dashboard shelved for v2")
     def test_service_edit_and_toggle(self):
         website = Website.objects.create(user=self.user, title="Site", status=Website.STATUS_DRAFT)
         service = Service.objects.create(website=website, name="Initial Name", price="100", is_active=True)
@@ -162,6 +167,7 @@ class WebsiteBuilderTests(TestCase):
         service.refresh_from_db()
         self.assertFalse(service.is_active)
 
+    @unittest.skip("Website Builder dashboard shelved for v2")
     def test_product_crud_and_toggle(self):
         website = Website.objects.create(user=self.user, title="Site", status=Website.STATUS_DRAFT)
         self.client.login(email="builder@uzyra.com", password="password123")

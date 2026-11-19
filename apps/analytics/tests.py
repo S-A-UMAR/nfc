@@ -587,12 +587,25 @@ class ProfileOwnerFilterAndSensoryTests(TestCase):
         # Self-view is filtered out
         self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count(), initial)
         self.assertTrue(response.context.get('is_owner'))
-        # Long-lived owner cookie is set on the response
+        # Long-lived owner cookies are set on the response (STRIDE + backward-compatible UZYRA)
+        self.assertIn(f'stride_owner_{self.profile.slug}', response.cookies)
+        self.assertEqual(response.cookies[f'stride_owner_{self.profile.slug}'].value, '1')
         self.assertIn(f'uzyra_owner_{self.profile.slug}', response.cookies)
         self.assertEqual(response.cookies[f'uzyra_owner_{self.profile.slug}'].value, '1')
 
     def test_cookie_owner_view_does_not_create_event(self):
+        # Test legacy cookie suppresses self-view
         self.client.cookies[f'uzyra_owner_{self.profile.slug}'] = '1'
+        initial = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count()
+        response = self.client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count(), initial)
+        self.assertTrue(response.context.get('is_owner'))
+
+    def test_stride_cookie_owner_view_does_not_create_event(self):
+        # Test new STRIDE cookie suppresses self-view
+        self.client.cookies.clear()
+        self.client.cookies[f'stride_owner_{self.profile.slug}'] = '1'
         initial = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_PROFILE_VIEW).count()
         response = self.client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
         self.assertEqual(response.status_code, 200)
@@ -603,7 +616,9 @@ class ProfileOwnerFilterAndSensoryTests(TestCase):
         initial_card = AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count()
         response = self.client.get(f'/c/{self.card.card_code}/')
         self.assertEqual(response.status_code, 302)
-        # Must set sensory tap cookie for micro-chime and haptic trigger
+        # Must set sensory tap cookies for micro-chime and haptic trigger (STRIDE + legacy)
+        self.assertIn('stride_tap', response.cookies)
+        self.assertEqual(response.cookies['stride_tap'].value, '1')
         self.assertIn('uzyra_tap', response.cookies)
         self.assertEqual(response.cookies['uzyra_tap'].value, '1')
         self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count(), initial_card + 1)
@@ -615,7 +630,8 @@ class ProfileOwnerFilterAndSensoryTests(TestCase):
         self.assertEqual(response.status_code, 302)
         # Owner tap must be filtered out
         self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile, event_type=AnalyticsEvent.TYPE_CARD_TAP).count(), initial_card)
-        # Still receives sensory feedback tap cookie so owner can experience the luxury haptic & chime
+        # Still receives sensory feedback tap cookies so owner can experience the luxury haptic & chime
+        self.assertIn('stride_tap', response.cookies)
         self.assertIn('uzyra_tap', response.cookies)
 
     def test_track_event_api_ignores_owner(self):
@@ -724,6 +740,19 @@ class Phase3BAnalyticsSecurityTests(TestCase):
         """The legitimate server-set uzyra_owner_* cookie still suppresses events for identified owners."""
         initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
         self.client.cookies[f'uzyra_owner_{self.profile.slug}'] = '1'
+        resp = self._post_track({
+            'profile_slug': self.profile.slug,
+            'event_type': AnalyticsEvent.TYPE_VCARD,
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json().get('status'), 'ignored_owner')
+        self.assertEqual(AnalyticsEvent.objects.filter(profile=self.profile).count(), initial)
+
+    def test_stride_owner_cookie_suppresses_beacon_event(self):
+        """The new server-set stride_owner_* cookie suppresses events for identified owners."""
+        initial = AnalyticsEvent.objects.filter(profile=self.profile).count()
+        self.client.cookies.clear()
+        self.client.cookies[f'stride_owner_{self.profile.slug}'] = '1'
         resp = self._post_track({
             'profile_slug': self.profile.slug,
             'event_type': AnalyticsEvent.TYPE_VCARD,

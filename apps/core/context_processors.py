@@ -18,8 +18,11 @@ def brand_context(request):
     return {
         'BRAND_NAME': getattr(settings, 'BRAND_NAME', 'STRIDE'),
         'BRAND_TAGLINE': getattr(settings, 'BRAND_TAGLINE', 'Modern Identity. Seamless Connection.'),
-        'BRAND_SUPPORT_EMAIL': getattr(settings, 'BRAND_SUPPORT_EMAIL', 'contact@uzyra.com'),
-        'BRAND_SUPPORT_PHONE': getattr(settings, 'BRAND_SUPPORT_PHONE', '+234 800 000 0000'),
+        'BRAND_DOMAIN': getattr(settings, 'BRAND_DOMAIN', 'strideid.com'),
+        'BRAND_SUPPORT_EMAIL': getattr(settings, 'BRAND_SUPPORT_EMAIL', 'support@strideid.com'),
+        'BRAND_SUPPORT_PHONE': getattr(settings, 'BRAND_SUPPORT_PHONE', '07045003128'),
+        'BRAND_SUPPORT_PHONE_INTL': getattr(settings, 'BRAND_SUPPORT_PHONE_INTL', '+2347045003128'),
+        'BRAND_SUPPORT_PHONE_WA': getattr(settings, 'BRAND_SUPPORT_PHONE_WA', '2347045003128'),
         'PAYSTACK_PUBLIC_KEY': getattr(settings, 'PAYSTACK_PUBLIC_KEY', ''),
         'user_profile': user_profile,
         'unread_contacts_count': unread_contacts_count,

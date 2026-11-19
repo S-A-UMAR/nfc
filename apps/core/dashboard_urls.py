@@ -50,6 +50,7 @@ urlpatterns = [
     path('contacts/<int:contact_id>/vcard/', prof_views.export_contact_exchange_vcard_view, name='contact_export_vcard'),
     path('share/', prof_views.dashboard_share_view, name='share'),
     path('referrals/', acc_dash.dashboard_referrals_view, name='referrals'),
+    path('referrals/claim/', acc_dash.claim_referral_reward_view, name='referrals_claim'),
     path('settings/', acc_dash.settings_view, name='settings_view'),
     path('settings/delete-account/', acc_dash.delete_account_view, name='delete_account'),
 ]

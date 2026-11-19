@@ -41,7 +41,7 @@ These Terms of Service constitute a legally binding agreement between you and {{
   <!-- SECTION 3 -->
   <section class="legal-section" id="profiles">
     <h2 class="legal-section-title"><span class="legal-section-number">03.</span> Digital Business Profiles & Public URLs</h2>
-    <p>{{ BRAND_NAME }} empowers users to create mobile-first digital business profiles accessible via unique public web addresses (<code>https://stride.id/u/&lt;slug&gt;/</code>):</p>
+    <p>{{ BRAND_NAME }} empowers users to create mobile-first digital business profiles accessible via unique public web addresses (<code>https://{{ BRAND_DOMAIN }}/u/&lt;slug&gt;/</code>):</p>
     <ul>
       <li><strong>Public Visibility:</strong> Information, links, and photographs you place on your digital profile are designed for public viewing by anyone who taps your physical card or visits your link. You control what information you publish.</li>
       <li><strong>Profile Slugs:</strong> You may select an available profile handle/slug. {{ BRAND_NAME }} reserves the right to reclaim, reassign, or modify any slug that infringes on trademark rights, impersonates another individual or business, or violates our <a href="{% url 'legal:acceptable_use' %}">Acceptable Use Policy</a>.</li>
@@ -57,7 +57,7 @@ These Terms of Service constitute a legally binding agreement between you and {{
       <li><strong>Hardware Functionality:</strong> Physical cards operate using passive Near Field Communication (NFC). The embedded chip stores a web redirect URL pointing to your digital profile. It does NOT store private cryptographic keys, passwords, or banking information.</li>
       <li><strong>Device Compatibility:</strong> NFC tap reading requires an NFC-enabled smartphone (iOS 13+ / Android native). For devices without active NFC sensors, the optical QR code on the reverse side serves as a universal camera fallback.</li>
       <li><strong>Card Activation:</strong> Before a newly delivered physical card can route taps to your digital profile, it must be claimed and paired through your customer dashboard using its unique activation security code.</li>
-      <li><strong>Card Suspension & Lost Cards:</strong> If your card is lost, stolen, or misplaced, you can toggle its status to "Suspended" or "Lost" immediately from your customer dashboard. Once suspended, public taps on the card will display a protective notice and will not reveal your contact information.</li>
+      <li><strong>Reporting Lost Cards:</strong> If your card is lost or stolen, navigate to your customer dashboard and select <strong>"Report Lost"</strong>. Once flagged, public taps on the card will display a protective notice and will not reveal your contact information. Card recovery after a lost report requires contacting our support team for identity verification; card status cannot be self-restored through the dashboard once marked lost.</li>
     </ul>
   </section>
 
@@ -145,7 +145,7 @@ These Terms of Service constitute a legally binding agreement between you and {{
     <ul>
       <li><strong>Email:</strong> <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a></li>
       <li><strong>Complaints Desk:</strong> <a href="{% url 'legal:complaints' %}">{{ BRAND_NAME }} Complaints &amp; Inquiries</a></li>
-      <li><strong>Phone / WhatsApp:</strong> {{ BRAND_SUPPORT_PHONE }}</li>
+      <li><strong>Phone / WhatsApp:</strong> {{ BRAND_SUPPORT_PHONE_INTL }} ({{ BRAND_SUPPORT_PHONE }})</li>
     </ul>
   </section>
 

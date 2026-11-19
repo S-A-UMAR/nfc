@@ -41,12 +41,12 @@ def faq_view(request):
         ("Does it work on iPhone?", "Yes. NFC works natively on iPhone 7 and all later models (iOS 11+) without any app. Simply tap your card to the top area of the phone."),
         ("Does it work on Android?", "Yes. NFC is supported on virtually all modern Android smartphones. Go to Settings and ensure NFC is enabled."),
         ("Do I need an app to use or share the card?", "No. The person tapping your card needs zero apps. The card opens a URL in their default web browser instantly."),
-        ("What happens if I lose my card?", "Log in to your dashboard and click 'Report Lost'. The card is instantly deactivated and will no longer redirect to your profile. You can then request a replacement card."),
+        ("What happens if I lose my card?", "Log in to your dashboard and click 'Report Lost'. The card is instantly deactivated and will no longer redirect to your profile. If you recover your card, contact support for verified reactivation. You can also request a replacement card (₦15,000) through our support desk."),
         ("Can I change my information after receiving the card?", "Yes — unlimited times. Log in to your dashboard and update anything. Changes are live immediately without any physical modification to the card."),
         ("Does the card require charging or a battery?", "No. The NFC chip is passive and powered by the electromagnetic field from the reading phone. It requires no battery and never runs out of power."),
         ("Does NFC require internet on the card?", "No. The card itself has no internet connection. The phone that reads the card uses its own internet connection to open your digital profile link."),
         ("What if someone's phone doesn't support NFC?", "Every card includes a precision-printed QR code that points to the same URL. The visitor simply opens their camera app and scans the code instead."),
-        ("How long does it take to receive my card?", "Delivery typically takes 5-10 business days within Nigeria after your design is approved."),
+        ("How long does it take to receive my card?", "Free nationwide standard tracked delivery is included in every package price. After payment confirmation and design/engraving approval, estimated delivery takes 3–5 business days within Lagos, 4–7 business days to Abuja and other major cities, and 5–10 business days to other locations across Nigeria."),
         ("Can I order multiple cards?", "Yes. You can order individual additional cards or bulk fleet cards for your team. Contact us for corporate/fleet pricing."),
         ("Can businesses get cards for all their employees?", "Yes. We offer corporate fleet packages with centralized management, uniform branding, and volume discounts. Contact our enterprise sales team."),
     ]
@@ -127,7 +127,7 @@ def robots_txt_view(request):
 
 def health_check_view(request):
     """
-    Lightweight health check endpoint for container orchestrators (e.g. Render).
+    Lightweight health check endpoint for container orchestrators (e.g. Railway).
     Returns HTTP 200 without exposing internal state, database status, or credentials.
     """
     return HttpResponse("OK", content_type="text/plain; charset=utf-8")

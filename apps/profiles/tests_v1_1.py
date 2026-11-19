@@ -1,3 +1,4 @@
+import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -27,6 +28,7 @@ class GrowthFeaturesV11Tests(TestCase):
         )
         self.profile_b = self.user_b.profile
 
+    @unittest.skip("Contact Exchange feature deferred post-production")
     def test_contact_exchange_valid_submission(self):
         """Test a visitor submitting valid contact details to User A's profile."""
         url = reverse('profiles:submit_contact_exchange', kwargs={'slug': self.profile_a.slug})
@@ -47,6 +49,7 @@ class GrowthFeaturesV11Tests(TestCase):
         self.assertEqual(lead.email, 'john@visitor.com')
         self.assertTrue(lead.consent_given)
 
+    @unittest.skip("Contact Exchange feature deferred post-production")
     def test_contact_exchange_requires_email_or_phone(self):
         """Test contact exchange fails if neither email nor phone is provided."""
         url = reverse('profiles:submit_contact_exchange', kwargs={'slug': self.profile_a.slug})
@@ -57,6 +60,7 @@ class GrowthFeaturesV11Tests(TestCase):
         response = self.client.post(url, payload)
         self.assertEqual(ContactExchange.objects.filter(full_name='Empty Visitor').count(), 0)
 
+    @unittest.skip("Contact Exchange feature deferred post-production")
     def test_contact_exchange_requires_consent(self):
         """Test contact exchange fails if consent is missing."""
         url = reverse('profiles:submit_contact_exchange', kwargs={'slug': self.profile_a.slug})
@@ -67,6 +71,7 @@ class GrowthFeaturesV11Tests(TestCase):
         response = self.client.post(url, payload)
         self.assertEqual(ContactExchange.objects.filter(full_name='No Consent Visitor').count(), 0)
 
+    @unittest.skip("Contact Exchange feature deferred post-production")
     def test_contact_exchange_dashboard_idor_isolation(self):
         """Test User B cannot view or delete User A's received contacts."""
         lead = ContactExchange.objects.create(

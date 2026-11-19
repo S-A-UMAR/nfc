@@ -14,7 +14,7 @@ LEGAL_NAV_ITEMS = [
     {'code': 'nfc_terms', 'title': 'NFC Card Terms', 'url_name': 'legal:nfc_terms', 'desc': 'NTAG216 chip architecture, QR fallback & deactivation'},
     {'code': 'copyright', 'title': 'IP & Copyright Policy', 'url_name': 'legal:copyright', 'desc': 'Trademark rights, user ownership & DMCA/NDPA notices'},
     {'code': 'user_content', 'title': 'User-Generated Content', 'url_name': 'legal:user_content', 'desc': 'Profile media, representations & moderation'},
-    {'code': 'third_party', 'title': 'Third-Party Disclosure', 'url_name': 'legal:third_party', 'desc': 'Paystack, Brevo, TiDB, Cloudinary & Render integrations'},
+    {'code': 'third_party', 'title': 'Third-Party Disclosure', 'url_name': 'legal:third_party', 'desc': 'Paystack, Brevo, Neon, Cloudinary, Railway & Redis integrations'},
     {'code': 'complaints', 'title': 'Complaints & Inquiries', 'url_name': 'legal:complaints', 'desc': 'Formal dispute resolution, privacy requests & contacts'},
 ]
 
@@ -28,7 +28,7 @@ def legal_context(current_code):
 
 
 def legal_index_view(request):
-    """Overview hub for all UZYRA legal and compliance policies."""
+    """Overview hub for all STRIDE legal and compliance policies."""
     ctx = legal_context('index')
     return render(request, 'legal/index.html', ctx)
 
@@ -40,7 +40,7 @@ def privacy_policy_view(request):
 
 
 def terms_of_service_view(request):
-    """Terms of Service for UZYRA digital profiles and NFC smart cards."""
+    """Terms of Service for STRIDE digital profiles and NFC smart cards."""
     ctx = legal_context('terms')
     return render(request, 'legal/terms.html', ctx)
 

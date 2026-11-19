@@ -24,7 +24,7 @@ This Privacy Policy outlines how {{ BRAND_NAME }} collects, processes, stores, a
       <li><strong>Platform Name:</strong> {{ BRAND_NAME }} Platform</li>
       <li><strong>Operating Jurisdiction:</strong> Federal Republic of Nigeria</li>
       <li><strong>Privacy & Data Protection Desk:</strong> <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}">{{ BRAND_SUPPORT_EMAIL }}</a></li>
-      <li><strong>Telephone Inquiries:</strong> {{ BRAND_SUPPORT_PHONE }}</li>
+      <li><strong>Telephone Inquiries:</strong> {{ BRAND_SUPPORT_PHONE_INTL }} ({{ BRAND_SUPPORT_PHONE }})</li>
     </ul>
   </section>
 
@@ -37,7 +37,7 @@ This Privacy Policy outlines how {{ BRAND_NAME }} collects, processes, stores, a
     <ul>
       <li><strong>Account Registration:</strong> First name, last name, email address, password hash, unique referral code, and optional telephone number.</li>
       <li><strong>Digital Profile Information:</strong> Professional title, personal or corporate bio, physical work address, website URLs, WhatsApp numbers, direct phone numbers, and custom links you choose to publish on your digital profile.</li>
-      <li><strong>Two-Way Contact Exchange Submissions:</strong> When a visitor submits their contact details via the "Exchange Contact" feature on a public profile, we collect their name, provided email address, provided phone number, business name, optional message, IP address, and explicit consent record. This information is stored securely and made accessible exclusively to the owner of the receiving digital profile for direct professional follow-up.</li>
+      <li><strong>Stored Contact Submissions (Dormant Feature):</strong> Although the interactive Contact Exchange feature is currently deferred and not active on public profiles, any previously submitted contact records remain stored securely in the database and are accessible strictly to authorised platform administrators for compliance, audit, and deletion requests. Data subjects may submit a deletion request via our <a href="{% url 'legal:complaints' %}?category=privacy">support desk</a> and an administrator will verify and delete the relevant records.</li>
       <li><strong>Referral Programme Attribution:</strong> Unique referral codes (`ref`) stored in secure, short-term HTTP-only session cookies when visiting a referral link (`/join/?ref=CODE`). We record referral links, verification timestamps, and qualified NFC card purchases to attribute referral credits cleanly and prevent fraudulent activity.</li>
       <li><strong>Profile Media:</strong> Avatar or profile photographs you upload to customize your card interface.</li>
       <li><strong>Hardware Order & Delivery Details:</strong> Recipient name, street delivery address, delivery city, delivery state, recipient phone number for courier coordination, and packaging notes.</li>
@@ -98,33 +98,39 @@ This Privacy Policy outlines how {{ BRAND_NAME }} collects, processes, stores, a
         <tbody>
           <tr>
             <td><strong>Paystack Payments Ltd</strong></td>
-            <td>Payment processing & checkout gateway</td>
+            <td>Payment processing &amp; checkout gateway</td>
             <td>Payment reference, billing amount, customer email</td>
             <td>Nigeria (CBN Regulated, PCI-DSS Level 1)</td>
           </tr>
           <tr>
             <td><strong>Brevo (Sendinblue SAS)</strong></td>
-            <td>Transactional email & OTP dispatch</td>
+            <td>Transactional email &amp; OTP dispatch</td>
             <td>Email address, verification codes, delivery notices</td>
             <td>EU / Global (GDPR / ISO 27001)</td>
           </tr>
           <tr>
-            <td><strong>TiDB Cloud (PingCAP, Inc.)</strong></td>
-            <td>Serverless relational database</td>
-            <td>Encrypted account, profile, card & order records</td>
-            <td>Frankfurt, Germany (AWS / TLS 1.3 Encryption)</td>
+            <td><strong>Neon PostgreSQL (Neon, Inc.)</strong></td>
+            <td>Serverless relational PostgreSQL database</td>
+            <td>Encrypted account, profile, card &amp; order records</td>
+            <td>AWS US-East-1 (SOC 2 Type II, TLS 1.3 Encryption)</td>
+          </tr>
+          <tr>
+            <td><strong>Railway (Railway Corp.)</strong></td>
+            <td>Application hosting &amp; runtime deployment</td>
+            <td>Application runtime execution &amp; server request logs</td>
+            <td>Global Cloud Infrastructure (SOC 2 Type II)</td>
+          </tr>
+          <tr>
+            <td><strong>Redis Cache</strong></td>
+            <td>Distributed cache, rate limiting &amp; session security</td>
+            <td>Ephemeral IP rate-limit keys &amp; temporary session tokens</td>
+            <td>Encrypted in-memory storage (TLS 1.3)</td>
           </tr>
           <tr>
             <td><strong>Cloudinary Ltd</strong></td>
-            <td>Persistent media asset hosting</td>
+            <td>Persistent media asset hosting &amp; CDN</td>
             <td>User-uploaded profile photographs and media</td>
             <td>Global CDN (SOC 2, ISO 27001)</td>
-          </tr>
-          <tr>
-            <td><strong>Render Services, Inc.</strong></td>
-            <td>Cloud application server infrastructure</td>
-            <td>Encrypted application runtime and server access logs</td>
-            <td>Global Cloud (SOC 2 Type II)</td>
           </tr>
         </tbody>
       </table>
@@ -133,12 +139,12 @@ This Privacy Policy outlines how {{ BRAND_NAME }} collects, processes, stores, a
 
   <!-- SECTION 6 -->
   <section class="legal-section" id="data-retention">
-    <h2 class="legal-section-title"><span class="legal-section-number">06.</span> Data Retention & Account Deletion</h2>
-    <p>We retain personal data only for as long as necessary to fulfill the purposes for which it was collected, or as required by statutory accounting and tax regulations:</p>
+    <h2 class="legal-section-title"><span class="legal-section-number">06.</span> Data Retention &amp; Account Deletion</h2>
+    <p>We retain personal data only for as long as necessary to fulfill the purposes for which it was collected, or as required for legitimate business, financial, and tax obligations:</p>
     <ul>
-      <li><strong>Active Accounts:</strong> Profile data, social links, and card assignments remain accessible while your account is in good standing.</li>
-      <li><strong>Account Deletion:</strong> Upon a verified account deletion request, your public profile (<code>/u/&lt;slug&gt;/</code>) is immediately taken offline, associated physical cards are unlinked and deactivated, and personal profile information is removed from active production access.</li>
-      <li><strong>Accounting & Statutory Archival:</strong> Under Nigerian financial and tax regulations, order records, delivery invoices, and payment references are archived securely for a minimum statutory period (typically 6 years) before permanent purging.</li>
+      <li><strong>Active Accounts:</strong> Profile data, custom links, and card assignments remain accessible while your account is in good standing.</li>
+      <li><strong>Account Deletion:</strong> Authenticated users may delete their account at any time through their customer dashboard. Deleting an account immediately takes your public profile (<code>/u/&lt;slug&gt;/</code>) offline, unlinks and deactivates associated physical cards, and permanently deletes profile data, uploaded images, and custom links from active production storage. Personal shipping details stored against completed orders (recipient name, delivery address, and phone number) are anonymised at the point of deletion.</li>
+      <li><strong>Financial &amp; Order Ledger:</strong> Following account deletion, completed order and payment records are retained in our financial archives to comply with statutory accounting standards, tax obligations, and dispute resolution requirements. The order reference, package tier, amount paid, Paystack payment reference, and broad destination region (shipping city and state, retained for regional tax and logistics reconciliation) are preserved. Your recipient name, specific street address, phone number, customer notes, and custom profile submission requirements are permanently erased or replaced with redaction placeholders. These retained financial records are decoupled from your deleted account and are completely isolated from marketing systems.</li>
       <li><strong>Security Logs:</strong> Technical IP address logs and authentication security logs are purged on rolling retention cycles (typically 90 days).</li>
     </ul>
   </section>

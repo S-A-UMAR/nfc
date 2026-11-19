@@ -62,7 +62,7 @@ class User(AbstractUser):
         if not self.referral_code:
             import secrets, string
             while True:
-                candidate = "UZY-" + "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+                candidate = "STR-" + "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
                 if not User.objects.filter(referral_code=candidate).exists():
                     self.referral_code = candidate
                     break
@@ -92,7 +92,13 @@ class Referral(models.Model):
     code_used = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
     qualifying_order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='qualifying_referrals')
-    reward_amount_ngn = models.PositiveIntegerField(default=2000, help_text="Configurable reward value in NGN")
+    # Tracks the physical card activated by the referred user (new programme: required for reward eligibility)
+    activation_card = models.ForeignKey(
+        'cards.Card', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='qualifying_referrals',
+        help_text="Physical card activated by the referred user, confirming purchase+activation."
+    )
+    reward_amount_ngn = models.PositiveIntegerField(default=2000, help_text="Legacy cash reward value in NGN (historical, not used in new programme)")
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     verified_at = models.DateTimeField(null=True, blank=True)
@@ -103,6 +109,81 @@ class Referral(models.Model):
 
     def __str__(self):
         return f"Referral: {self.referrer.email} -> {self.referred_user.email} ({self.status})"
+
+
+class ReferralReward(models.Model):
+    """
+    Tracks a single product-reward milestone per referrer.
+    Created when: referrer has >= 10 verified referrals AND >= 1 referred user has
+    activated their physical NFC card (confirming genuine purchase + activation).
+    Reward: one free STRIDE Smart NFC Card + free nationwide delivery.
+    Non-transferable. Non-cash. One per milestone set.
+    """
+    STATUS_PENDING_REVIEW = 'pending_review'
+    STATUS_APPROVED = 'approved'
+    STATUS_AVAILABLE = 'available'
+    STATUS_CLAIMED = 'claimed'
+    STATUS_FULFILLED = 'fulfilled'
+    STATUS_REJECTED = 'rejected'
+
+    STATUS_CHOICES = (
+        (STATUS_PENDING_REVIEW, 'Pending Admin Review'),
+        (STATUS_APPROVED, 'Approved — Awaiting Claim'),
+        (STATUS_AVAILABLE, 'Available to Claim'),
+        (STATUS_CLAIMED, 'Claimed by Customer'),
+        (STATUS_FULFILLED, 'Fulfilled — Card Dispatched'),
+        (STATUS_REJECTED, 'Rejected'),
+    )
+
+    referrer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='referral_rewards'
+    )
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING_REVIEW, db_index=True
+    )
+    # The referral whose card activation triggered this reward creation
+    triggering_referral = models.ForeignKey(
+        'accounts.Referral', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='triggered_rewards',
+        help_text="The specific referred user's card activation that triggered reward creation."
+    )
+    # The card that was activated (the activation event that triggered the reward)
+    triggering_card = models.ForeignKey(
+        'cards.Card', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='reward_triggers',
+        help_text="The physical card whose activation triggered this reward."
+    )
+    # The free card assigned to this referrer upon fulfilment (staff-assigned)
+    free_card_assigned = models.ForeignKey(
+        'cards.Card', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='reward_fulfilments',
+        help_text="The physical card assigned to the referrer as the reward."
+    )
+    # Delivery information collected at claim time
+    delivery_name = models.CharField(max_length=150, blank=True)
+    delivery_phone = models.CharField(max_length=50, blank=True)
+    delivery_address = models.TextField(blank=True)
+    delivery_city = models.CharField(max_length=100, blank=True)
+    delivery_state = models.CharField(max_length=100, blank=True)
+
+    admin_notes = models.TextField(blank=True)
+    reviewed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='rewards_reviewed'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    claimed_at = models.DateTimeField(null=True, blank=True)
+    fulfilled_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        # One active (non-rejected) reward per referrer at a time
+        # Enforced at service level; unique constraint would block re-qualification after rejection
+
+    def __str__(self):
+        return f"ReferralReward: {self.referrer.email} [{self.get_status_display()}]"
 
 
 

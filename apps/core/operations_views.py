@@ -324,7 +324,7 @@ def operations_card_create_view(request):
 def operations_card_bulk_create_view(request):
     """Bulk generate sequential unassigned cards."""
     if request.method == 'POST':
-        prefix = request.POST.get('prefix', 'UZY-CARD-').strip().upper()
+        prefix = request.POST.get('prefix', 'ST-').strip().upper()
         start_num_str = request.POST.get('start_number', '1').strip()
         count_str = request.POST.get('count', '20').strip()
         material = request.POST.get('material', 'matte_black')
@@ -370,16 +370,19 @@ def operations_card_bulk_create_view(request):
         return redirect('operations:cards_list')
 
     # Detect recommended next number
-    last_card = Card.objects.filter(card_code__startswith='UZY-CARD-').order_by('-card_code').first()
+    last_card = Card.objects.filter(card_code__startswith='ST-').order_by('-card_code').first()
+    if not last_card:
+        last_card = Card.objects.filter(card_code__startswith='UZY-CARD-').order_by('-card_code').first()
     next_num = 1
     if last_card:
         try:
-            num_part = last_card.card_code.replace('UZY-CARD-', '')
+            num_part = last_card.card_code.replace('ST-', '').replace('UZY-CARD-', '')
             next_num = int(num_part) + 1
         except ValueError:
             pass
 
     return render(request, 'operations/card_bulk_create.html', {
+        'default_prefix': 'ST-',
         'next_num': next_num,
         'material_choices': Card.MATERIAL_CHOICES,
     })
@@ -809,8 +812,22 @@ def operations_order_update_status_view(request, order_number):
         if assign_card_id:
             try:
                 card = Card.objects.select_for_update().get(id=assign_card_id, status=Card.STATUS_UNASSIGNED)
+                # If order previously had a reserved card, release it back to UNASSIGNED stock
+                if order.card_assigned and order.card_assigned != card:
+                    old_card = Card.objects.select_for_update().filter(id=order.card_assigned_id).first()
+                    if old_card and old_card.status == Card.STATUS_RESERVED:
+                        old_card.status = Card.STATUS_UNASSIGNED
+                        old_card.user = None
+                        old_card.save(update_fields=['status', 'user'])
+
+                # Reserve new card exclusively for the ordering customer
+                card.status = Card.STATUS_RESERVED
+                if order.user:
+                    card.user = order.user
+                card.save(update_fields=['status', 'user'])
+
                 order.card_assigned = card
-                changed.append(f"Card assigned: {card.card_code}")
+                changed.append(f"Card assigned & reserved: {card.card_code}")
             except Card.DoesNotExist:
                 messages.error(request, "Card not found or no longer unassigned.")
                 return redirect('operations:order_detail', order_number=order.order_number)

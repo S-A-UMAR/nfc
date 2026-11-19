@@ -11,7 +11,7 @@ from .models import AnalyticsEvent
 from apps.profiles.models import Profile
 
 import logging
-logger = logging.getLogger('uzyra.analytics')
+logger = logging.getLogger('stride.analytics')
 
 ALLOWED_EVENT_TYPES = {choice[0] for choice in AnalyticsEvent.TYPE_CHOICES}
 

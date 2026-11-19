@@ -297,6 +297,12 @@ class Phase3PaymentAndWebhookTests(TestCase):
 class Phase5PaymentSecurityAndReliabilityTests(TestCase):
     def setUp(self):
         self.client = Client()
+        self.settings_override = self.settings(
+            PAYSTACK_SECRET_KEY="sk_test_phase5_mock_secret",
+            PAYSTACK_PUBLIC_KEY="pk_test_phase5_mock_public",
+            PAYSTACK_TEST_MODE=True
+        )
+        self.settings_override.enable()
         self.user = User.objects.create_user(
             email='shopper@example.com',
             password='Password123!',
@@ -327,6 +333,9 @@ class Phase5PaymentSecurityAndReliabilityTests(TestCase):
             provider='paystack',
             status=Payment.STATUS_PENDING
         )
+
+    def tearDown(self):
+        self.settings_override.disable()
 
     def test_simulation_rejected_in_production_environment(self):
         """Simulated payment request (?simulated=true) is rejected when not permitted."""
@@ -394,7 +403,7 @@ class Phase5PaymentSecurityAndReliabilityTests(TestCase):
         self.client.force_login(self.user)
         url = reverse('payments:verify')
 
-        with self.settings(PAYSTACK_SECRET_KEY='sk_live_mock_secret'):
+        with self.settings(PAYSTACK_SECRET_KEY='sk_test_mock_secret'):
             response = self.client.get(f"{url}?reference={self.payment.reference}", follow=True)
 
             messages = list(response.context['messages'])
