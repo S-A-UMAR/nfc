@@ -29,9 +29,9 @@
   {% endif %}
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   {% if profile.profile_type == 'business' and profile.business_logo %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
+    <meta property="og:image" content="{% if '://' in profile.business_logo.url %}{{ profile.business_logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}{% endif %}">
   {% elif profile.profile_image %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+    <meta property="og:image" content="{% if '://' in profile.profile_image.url %}{{ profile.profile_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}{% endif %}">
   {% else %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/stride-og-default.png' %}">
   {% endif %}
@@ -43,7 +43,7 @@
   <meta name="twitter:title" content="{{ profile.full_name }}{% if profile.title %} — {{ profile.title }}{% endif %}">
   <meta name="twitter:description" content="{{ profile.bio|default:'Connect with me on STRIDE.'|truncatechars:155 }}">
   {% if profile.profile_image %}
-    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+    <meta name="twitter:image" content="{% if '://' in profile.profile_image.url %}{{ profile.profile_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}{% endif %}">
   {% endif %}
 
   <!-- Structured Data: Person -->

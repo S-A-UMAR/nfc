@@ -379,9 +379,10 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET and no
         'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
         'API_KEY': CLOUDINARY_API_KEY,
         'API_SECRET': CLOUDINARY_API_SECRET,
+        'SECURE': True,
     }
-    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
-    default_storage_backend = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+    default_storage_backend = 'apps.core.storage.StrideMediaCloudinaryStorage'
 elif _is_running_tests or _is_collectstatic or DEBUG:
     MEDIA_URL = '/media/'
     default_storage_backend = 'django.core.files.storage.FileSystemStorage'

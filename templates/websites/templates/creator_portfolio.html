@@ -29,9 +29,9 @@
   <meta property="og:description" content="{{ website.tagline|default:profile.bio|default:website.title|truncatechars:155 }}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   {% if profile.profile_image %}
-  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}">
+  <meta property="og:image" content="{% if '://' in profile.profile_image.url %}{{ profile.profile_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ profile.profile_image.url }}{% endif %}">
   {% elif profile.business_logo %}
-  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}">
+  <meta property="og:image" content="{% if '://' in profile.business_logo.url %}{{ profile.business_logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ profile.business_logo.url }}{% endif %}">
   {% endif %}
 
   {# Twitter Card #}
