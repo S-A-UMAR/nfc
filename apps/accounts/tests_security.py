@@ -375,12 +375,19 @@ class CardActivationMatrixTests(TestCase):
                 'card_code': 'TEST-000001',
                 'activation_code': 'BAD-PIN'
             })
-        # 6th attempt must be throttled
+        # 6th attempt must be rate-limited (per-card or per-account limit)
+        # With layered rate limiting, the per-card limit (same card, 5/hr) fires first,
+        # producing a "Too many activation attempts for this card" message.
+        # The per-account limit produces "Throttled for X seconds".
+        # Either message confirms the system is rate-limiting correctly.
         resp = self.client.post(reverse('cards:card_activate'), {
             'card_code': 'TEST-000001',
             'activation_code': self.pin
         }, follow=True)
-        self.assertContains(resp, "Throttled")
+        self.assertTrue(
+            'Throttled' in resp.content.decode() or 'Too many' in resp.content.decode(),
+            "Expected a rate-limit message ('Throttled' or 'Too many') after 5 failed attempts"
+        )
 
     def test_case_9_concurrent_activation_requests_handled_safely(self):
         """Atomic transaction ensures card activation is mutually exclusive."""

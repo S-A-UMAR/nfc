@@ -5,6 +5,7 @@ app_name = 'cards'
 
 urlpatterns = [
     path('c/<str:card_code>/', views.nfc_redirect_view, name='nfc_redirect'),
+    path('c/<str:card_code>/success/', views.card_activation_success_view, name='activation_success'),
     path('activate/', views.card_activate_view, name='card_activate'),
     path('report-lost/<int:card_id>/', views.card_report_lost_view, name='card_report_lost'),
 ]

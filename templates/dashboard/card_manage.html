@@ -20,6 +20,27 @@
   {% endif %}
 </div>
 
+{% if just_activated_card %}
+  <div class="card card-carbon mb-6" style="border: 1px solid rgba(34, 197, 94, 0.35); background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(10, 10, 10, 0.95) 100%);">
+    <div class="d-flex items-center gap-3 mb-2 flex-wrap">
+      <span class="badge badge-active"><span class="dot dot-active"></span> CARD ACTIVE</span>
+      <h3 class="font-bold text-white mb-0" style="font-size: 1.125rem;">Smart Card #{{ just_activated_card }} Successfully Linked</h3>
+    </div>
+    <p class="text-secondary text-sm mb-4" style="line-height: 1.6;">
+      Your contactless smart card is fully active. Tapping the card against any modern smartphone or scanning its QR code will open your live profile immediately.
+    </p>
+    <div class="d-flex gap-2 flex-wrap">
+      {% if profile.slug %}
+        <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-primary btn-sm">
+          <span>Test Live Profile</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      {% endif %}
+      <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-secondary btn-sm">Edit Profile Information</a>
+    </div>
+  </div>
+{% endif %}
+
 {% if primary_card %}
   <!-- ========================================================================
        ASSIGNED PHYSICAL SMART CARD VIEW

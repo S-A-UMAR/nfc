@@ -107,17 +107,108 @@ def card_manage_view(request):
     profile = request.user.profile
     cards = Card.objects.filter(user=request.user)
     primary_card = cards.first()
+    just_activated_card = request.session.pop('just_activated_card', None)
 
     return render(request, 'dashboard/card_manage.html', {
         'profile': profile,
         'cards': cards,
         'primary_card': primary_card,
+        'just_activated_card': just_activated_card,
     })
 
 
 from django.db import transaction
-from apps.core.security import check_rate_limit, get_client_ip
+import urllib.parse
+from django.urls import resolve, Resolver404
+from apps.core.security import check_rate_limit, get_client_ip, is_safe_redirect_url
 from apps.core.services.email_service import BrevoEmailService
+
+
+def _get_safe_activation_redirect(request, card_code=None):
+    """
+    Resolves a safe internal redirection destination for card activation error and return flows.
+    Guards:
+    1. Evaluates candidate URLs in order: request.POST.get('next'), request.META.get('HTTP_REFERER').
+    2. Enforces host and scheme safety via is_safe_redirect_url().
+    3. Rejects external schemes, external hosts, and protocol-relative URLs.
+    4. Rejects URL-encoded path bypasses (e.g. %2f, %5c, %2e%2e), double slashes (//), backslashes, and path traversal (/../).
+    5. Resolves candidate path against Django's URLconf and ensures it targets an intended destination:
+       - cards:nfc_redirect (verifying card_code matches if provided)
+       - cards:activation_success
+    6. Falls back safely to dashboard:card_manage.
+    """
+    candidates = []
+    post_next = request.POST.get('next')
+    if post_next:
+        candidates.append(post_next)
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        candidates.append(referer)
+
+    normalized_card_code = card_code.strip().upper() if (card_code and isinstance(card_code, str)) else None
+    default_fallback = reverse('dashboard:card_manage')
+
+    for candidate in candidates:
+        if not candidate or not isinstance(candidate, str):
+            continue
+        candidate = candidate.strip()
+        if not candidate:
+            continue
+
+        # Check for control characters or null bytes in candidate string
+        if any(ord(c) < 32 or ord(c) == 127 for c in candidate):
+            continue
+
+        # Reject protocol-relative or backslash-prefixed evasions
+        if candidate.startswith('//') or candidate.startswith('/\\') or candidate.startswith('\\\\'):
+            continue
+
+        # Parse candidate URL
+        try:
+            parsed = urllib.parse.urlsplit(candidate)
+        except Exception:
+            continue
+
+        # Reject external netloc if present (allow only empty netloc or exact host match)
+        if parsed.netloc and parsed.netloc != request.get_host():
+            continue
+
+        # Reject non-http(s) schemes if scheme is present
+        if parsed.scheme and parsed.scheme not in ('http', 'https'):
+            continue
+
+        path = parsed.path
+        if not path or not path.startswith('/'):
+            continue
+
+        # Verify against base safety validator
+        if not is_safe_redirect_url(request, path):
+            continue
+
+        # Unquote path to detect encoded bypass attempts (%2f, %5c, %2e%2e, etc.)
+        unquoted_path = urllib.parse.unquote(path)
+        if any(ord(c) < 32 or ord(c) == 127 for c in unquoted_path):
+            continue
+        # Disallow double slashes, backslashes, or directory traversal
+        if '//' in unquoted_path or '\\' in unquoted_path or '/../' in unquoted_path or unquoted_path.endswith('/..') or unquoted_path.startswith('/..'):
+            continue
+
+        # Resolve path against Django URLconf to ensure it is a valid, registered route
+        try:
+            match = resolve(path)
+        except Resolver404:
+            continue
+
+        # Ensure destination is an intended activation/cards destination
+        if match.app_name == 'cards' and match.url_name in ('nfc_redirect', 'activation_success'):
+            dest_card_code = match.kwargs.get('card_code', '').strip().upper()
+            # If a specific card_code is being activated, ensure redirect targets that same card
+            if normalized_card_code and dest_card_code and dest_card_code != normalized_card_code:
+                continue
+            return path
+
+    return default_fallback
+
 
 @login_required
 @require_POST
@@ -125,27 +216,54 @@ def card_activate_view(request):
     """
     Customer activates or links a physical card to their profile.
     Security protections:
-    1. Rate-limiting against brute force code guessing.
+    1. Layered rate-limiting: per-account, per-card-code, and per-IP (all fail closed with HTTP 503 during outages).
     2. Atomic transaction with select_for_update() to eliminate race conditions.
-    3. Proof of physical ownership: secret activation PIN check.
+    3. Proof of physical ownership: secret activation PIN check (hyphen-tolerant).
     4. Status guards: Active, Suspended, Replaced, Lost cards rejected.
     5. Reassignment guards: Cannot reassign card belonging to another user.
+    6. Warehouse inventory protection: Unallocated warehouse inventory cards (is_warehouse_stock=True)
+       are blocked from customer self-activation until allocated/dispatched by operations staff.
+       Unassigned cards not flagged as warehouse stock remain activatable for backward compatibility.
+    7. Safe redirect validation: Activation destination is strictly validated to prevent open redirects.
     """
     ip = get_client_ip(request)
     user_id = request.user.id
 
-    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
-    redirect_target = next_url if (next_url and next_url.startswith('/c/')) else 'dashboard:card_manage'
+    # Extract card_code early for per-card rate limit key and redirect resolution (before DB lock)
+    card_code = request.POST.get('card_code', '').strip().upper()
+    activation_code = request.POST.get('activation_code', '').strip()
+    profile = request.user.profile
 
-    # Rate limiting: max 5 failed activation attempts per user/IP per 10 minutes
-    allowed, remaining, retry_after = check_rate_limit(f"card_act:{user_id}", limit=5, window_seconds=600)
+    redirect_target = _get_safe_activation_redirect(request, card_code=card_code)
+
+    # --- Layered Rate Limiting (all checks before the DB lock) ---
+
+    # 1. Per-card rate limit: max 5 activation attempts on a specific card per hour (across all users/IPs).
+    #    Protects against distributed brute-force across multiple accounts targeting one card.
+    allowed_card, _, retry_card = check_rate_limit(
+        f"card_act_card:{card_code}", limit=5, window_seconds=3600, sensitive=True
+    )
+    if not allowed_card:
+        messages.error(request, f"Too many activation attempts for this card. Please try again in {retry_card} seconds.")
+        return redirect(redirect_target)
+
+    # 2. Per-IP rate limit: max 10 activation attempts per IP per 10 minutes.
+    #    Protects against a single host cycling through many card codes or accounts.
+    allowed_ip, _, retry_ip = check_rate_limit(
+        f"card_act_ip:{ip}", limit=10, window_seconds=600, sensitive=True
+    )
+    if not allowed_ip:
+        messages.error(request, f"Too many activation attempts from your connection. Please try again in {retry_ip} seconds.")
+        return redirect(redirect_target)
+
+    # 3. Per-account rate limit: max 5 activation attempts per user per 10 minutes.
+    #    Fail closed consistently with per-card and per-IP (sensitive=True).
+    allowed, remaining, retry_after = check_rate_limit(
+        f"card_act:{user_id}", limit=5, window_seconds=600, sensitive=True
+    )
     if not allowed:
         messages.error(request, f"Too many failed card activation attempts. Throttled for {retry_after} seconds.")
         return redirect(redirect_target)
-
-    card_code = request.POST.get('card_code', '').strip().upper()
-    activation_code = request.POST.get('activation_code', '').strip().upper()
-    profile = request.user.profile
 
     if not card_code:
         messages.error(request, "Please enter the Card ID code.")
@@ -176,6 +294,17 @@ def card_activate_view(request):
         # Guard: Reported Lost
         if card.status == Card.STATUS_LOST:
             messages.error(request, f"Card '{card_code}' has been reported lost and cannot be activated.")
+            return redirect(redirect_target)
+
+        # Guard: Warehouse Inventory Protection
+        # Cards marked as warehouse stock cannot be self-activated by customers until
+        # they have been assigned to an order and dispatched by operations staff.
+        if card.status == Card.STATUS_UNASSIGNED and getattr(card, 'is_warehouse_stock', False):
+            messages.error(
+                request,
+                f"Card '{card_code}' is registered as unallocated warehouse inventory and cannot be activated yet. "
+                "Please ensure your order has been processed and dispatched, or contact STRIDE support."
+            )
             return redirect(redirect_target)
 
         # Guard: Assigned to another user
@@ -220,8 +349,23 @@ def card_activate_view(request):
             "record_card_activation failed for card %s: %s", card.card_code, e
         )
 
+    request.session['just_activated_card'] = card.card_code
     messages.success(request, f"Success! Smart Card {card.card_code} is now activated and linked to your digital profile.")
     return redirect('dashboard:card_manage')
+
+
+@login_required
+def card_activation_success_view(request, card_code):
+    """
+    Dedicated post-activation success screen (/c/<card_code>/success/).
+    Shows active confirmation, what happens on future taps, and clear next steps.
+    """
+    card = get_object_or_404(Card, card_code__iexact=card_code.strip(), user=request.user)
+    profile = getattr(request.user, 'profile', None)
+    return render(request, 'cards/card_activation_success.html', {
+        'card': card,
+        'profile': profile,
+    })
 
 
 @login_required

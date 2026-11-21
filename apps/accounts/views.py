@@ -19,7 +19,7 @@ from .forms import (
 )
 from .models import OTPCode
 from apps.profiles.models import Profile
-from apps.core.security import check_rate_limit, get_client_ip
+from apps.core.security import check_rate_limit, get_client_ip, is_safe_redirect_url
 from apps.core.services.email_service import BrevoEmailService
 
 logger = logging.getLogger('stride.auth')
@@ -43,24 +43,59 @@ def referral_join_view(request):
     return response
 
 
+_is_safe_redirect_url = is_safe_redirect_url
+
+
+def _get_safe_redirect_url(request, explicit_url=None):
+    """
+    Resolves a safe redirection target checking in priority:
+    1. explicit_url (if provided)
+    2. request.GET.get('next')
+    3. request.POST.get('next')
+    4. request.session.get('auth_next')
+    Returns the validated URL string or None.
+    """
+    candidates = []
+    if explicit_url:
+        candidates.append(explicit_url)
+    get_next = request.GET.get('next')
+    if get_next:
+        candidates.append(get_next)
+    post_next = request.POST.get('next')
+    if post_next:
+        candidates.append(post_next)
+    session_next = request.session.get('auth_next')
+    if session_next:
+        candidates.append(session_next)
+
+    for cand in candidates:
+        if _is_safe_redirect_url(request, cand):
+            return cand.strip()
+    return None
+
+
 def register_view(request):
     """Register new customer, dispatch welcome email + OTP, and auto-provision digital profile."""
+    safe_next = _get_safe_redirect_url(request)
+
     if request.user.is_authenticated:
-        next_url = request.GET.get('next') or request.POST.get('next')
-        if next_url and url_has_allowed_host_and_scheme(
-            url=next_url,
-            allowed_hosts={request.get_host()},
-            require_https=request.is_secure()
-        ):
-            return redirect(next_url)
+        if safe_next:
+            return redirect(safe_next)
         return redirect('dashboard:overview')
+
+    # Persist safe_next in session so it survives across validation errors and OTP verification
+    if safe_next:
+        request.session['auth_next'] = safe_next
 
     ip = get_client_ip(request)
     # Rate limit: max 5 registrations per IP per hour
     allowed, remaining, retry_after = check_rate_limit(f"reg:{ip}", limit=5, window_seconds=3600)
     if not allowed:
         messages.error(request, f"Too many registration attempts. Please try again in {retry_after} seconds.")
-        return render(request, 'accounts/register.html', {'form': UserRegisterForm()})
+        return render(request, 'accounts/register.html', {
+            'form': UserRegisterForm(),
+            'next_url': safe_next
+        })
 
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -80,14 +115,9 @@ def register_view(request):
                 profile.whatsapp = user.phone
             profile.save()
 
-            # Preserve next_url for post-verification redirection if present
-            next_url = request.GET.get('next') or request.POST.get('next')
-            if next_url and url_has_allowed_host_and_scheme(
-                url=next_url,
-                allowed_hosts={request.get_host()},
-                require_https=request.is_secure()
-            ):
-                request.session['auth_next'] = next_url
+            # Preserve safe_next in session for post-verification redirection if present
+            if safe_next:
+                request.session['auth_next'] = safe_next
 
             # Process Referral Attribution if a valid referral code exists in session or cookie
             ref_code = request.session.get('referral_code') or request.COOKIES.get('stride_ref') or request.COOKIES.get('uzyra_ref')
@@ -122,7 +152,11 @@ def register_view(request):
                 logger.error("Failed to dispatch welcome email: %s", e)
 
             login(request, user)
+            # Re-assert auth_next after login to ensure session cycling preserves it
+            if safe_next:
+                request.session['auth_next'] = safe_next
             request.session['pending_verification_email'] = user.email
+
             if email_res.get('success'):
                 messages.success(request, f"Welcome to STRIDE, {user.first_name or 'there'}! A 6-digit verification code has been sent to your email.")
             else:
@@ -132,14 +166,25 @@ def register_view(request):
     else:
         form = UserRegisterForm()
 
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'accounts/register.html', {
+        'form': form,
+        'next_url': safe_next
+    })
 
 
 
 def login_view(request):
     """Customer & Admin login with brute-force rate-limiting and Open Redirect protection."""
+    safe_next = _get_safe_redirect_url(request)
+
     if request.user.is_authenticated:
+        if safe_next:
+            return redirect(safe_next)
         return redirect('dashboard:overview')
+
+    # Store safe_next in session if valid so it survives credential errors
+    if safe_next:
+        request.session['auth_next'] = safe_next
 
     ip = get_client_ip(request)
 
@@ -148,7 +193,10 @@ def login_view(request):
         allowed, remaining, retry_after = check_rate_limit(f"login:{ip}", limit=5, window_seconds=300)
         if not allowed:
             messages.error(request, f"Too many failed login attempts. Account access is throttled. Please try again in {retry_after} seconds.")
-            return render(request, 'accounts/login.html', {'form': UserLoginForm()})
+            return render(request, 'accounts/login.html', {
+                'form': UserLoginForm(),
+                'next_url': safe_next
+            })
 
         form = UserLoginForm(request, data=request.POST)
         if form.is_valid():
@@ -156,21 +204,20 @@ def login_view(request):
             login(request, user)
             messages.success(request, f"Welcome back, {user.display_name}!")
 
-            # Open Redirect defense: validate destination host strictly
-            next_url = request.GET.get('next') or request.POST.get('next')
-            if next_url and url_has_allowed_host_and_scheme(
-                url=next_url,
-                allowed_hosts={request.get_host()},
-                require_https=request.is_secure()
-            ):
-                return redirect(next_url)
+            # Destination resolution: check session first, then safe_next
+            dest = request.session.pop('auth_next', None) or safe_next
+            if dest and _is_safe_redirect_url(request, dest):
+                return redirect(dest)
             return redirect('dashboard:overview')
         else:
             messages.error(request, "Invalid email or password. Please check your credentials.")
     else:
         form = UserLoginForm()
 
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'next_url': safe_next
+    })
 
 
 def logout_view(request):
@@ -239,11 +286,7 @@ def verify_email_otp_view(request):
 
                 messages.success(request, "Email verified successfully! Your account is now fully active.")
                 next_url = request.session.pop('auth_next', None)
-                if next_url and url_has_allowed_host_and_scheme(
-                    url=next_url,
-                    allowed_hosts={request.get_host()},
-                    require_https=request.is_secure()
-                ):
+                if next_url and _is_safe_redirect_url(request, next_url):
                     return redirect(next_url)
 
                 user_profile = getattr(verified_user, 'profile', None)

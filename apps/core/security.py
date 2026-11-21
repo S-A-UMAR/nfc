@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 
 logger = logging.getLogger('stride.security')
 
@@ -12,6 +13,8 @@ SENSITIVE_RATE_LIMIT_PREFIXES = {
     'login',
     'reg',
     'card_act',
+    'card_act_card',
+    'card_act_ip',
     'otp_verify',
     'otp_resend',
     'pwd_reset',
@@ -209,3 +212,32 @@ def rate_limited(key_prefix: str, limit: int = 5, window_seconds: int = 300, red
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
+
+
+def is_safe_redirect_url(request, url):
+    """
+    Validates that a URL is safe for internal redirection.
+    Guards:
+    1. Must be a non-empty string.
+    2. Must not contain null bytes or control/newline characters.
+    3. Must not be protocol-relative (cannot start with '//', '/\\', '\\\\').
+    4. Must pass Django's url_has_allowed_host_and_scheme for request.get_host().
+    """
+    if not url or not isinstance(url, str):
+        return False
+    url = url.strip()
+    if not url:
+        return False
+    # Check for null bytes or control characters
+    if any(ord(c) < 32 or ord(c) == 127 for c in url):
+        return False
+    # Explicitly disallow protocol-relative and backslash evasion attempts
+    if url.startswith('//') or url.startswith('/\\') or url.startswith('\\\\'):
+        return False
+    # Django host & scheme validation
+    return url_has_allowed_host_and_scheme(
+        url=url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure()
+    )
+

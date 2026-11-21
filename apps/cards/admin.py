@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from django.contrib import messages
 from .models import Card, CardEvent
 
-@admin.action(description="Batch Generate 20 Sequential Cards (Unassigned)")
+@admin.action(description="Batch Generate 20 Sequential Cards (Warehouse Stock)")
 def batch_generate_20_cards(modeladmin, request, queryset):
     # Find highest existing ST- code
     existing = Card.objects.filter(card_code__startswith='ST-').order_by('-card_code').first()
@@ -18,20 +18,32 @@ def batch_generate_20_cards(modeladmin, request, queryset):
     for i in range(20):
         code = f"ST-{start_num + i:06d}"
         if not Card.objects.filter(card_code=code).exists():
-            card = Card(card_code=code, status=Card.STATUS_UNASSIGNED)
+            card = Card(card_code=code, status=Card.STATUS_UNASSIGNED, is_warehouse_stock=True)
             card.generate_activation_code()
             card.save()
             created_count += 1
             
-    messages.success(request, f"Successfully created {created_count} new unassigned cards in batch.")
+    messages.success(request, f"Successfully created {created_count} new warehouse stock cards in batch.")
+
+
+@admin.action(description="Mark selected cards as Warehouse Stock (Locked)")
+def mark_as_warehouse_stock(modeladmin, request, queryset):
+    updated = queryset.filter(status=Card.STATUS_UNASSIGNED).update(is_warehouse_stock=True)
+    messages.success(request, f"Marked {updated} unassigned card(s) as warehouse stock.")
+
+
+@admin.action(description="Release selected cards from Warehouse Stock (Allow Self-Activation)")
+def release_from_warehouse_stock(modeladmin, request, queryset):
+    updated = queryset.update(is_warehouse_stock=False)
+    messages.success(request, f"Released {updated} card(s) from warehouse stock locking.")
 
 
 @admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
-    list_display = ('card_code', 'status_badge', 'user', 'profile', 'material', 'qr_preview', 'created_at', 'activated_at')
-    list_filter = ('status', 'material', 'created_at')
+    list_display = ('card_code', 'status_badge', 'is_warehouse_stock', 'user', 'profile', 'material', 'qr_preview', 'created_at', 'activated_at')
+    list_filter = ('status', 'is_warehouse_stock', 'material', 'created_at')
     search_fields = ('card_code', 'user__email', 'user__first_name', 'profile__full_name')
-    actions = [batch_generate_20_cards]
+    actions = [batch_generate_20_cards, mark_as_warehouse_stock, release_from_warehouse_stock]
     readonly_fields = ('qr_preview', 'created_at')
 
     def status_badge(self, obj):

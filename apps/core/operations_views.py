@@ -349,6 +349,7 @@ def operations_card_bulk_create_view(request):
                         card_code=code,
                         material=material if material in dict(Card.MATERIAL_CHOICES) else 'matte_black',
                         status=Card.STATUS_UNASSIGNED,
+                        is_warehouse_stock=True,
                     )
                     card.generate_activation_code()
                     card.save()
@@ -433,6 +434,7 @@ def operations_card_assign_view(request, card_id):
         card.user = customer
         card.profile = profile
         card.status = Card.STATUS_ACTIVE
+        card.is_warehouse_stock = False
         if not card.activated_at:
             card.activated_at = timezone.now()
         card.save()
@@ -818,13 +820,15 @@ def operations_order_update_status_view(request, order_number):
                     if old_card and old_card.status == Card.STATUS_RESERVED:
                         old_card.status = Card.STATUS_UNASSIGNED
                         old_card.user = None
-                        old_card.save(update_fields=['status', 'user'])
+                        old_card.is_warehouse_stock = True
+                        old_card.save(update_fields=['status', 'user', 'is_warehouse_stock'])
 
                 # Reserve new card exclusively for the ordering customer
                 card.status = Card.STATUS_RESERVED
+                card.is_warehouse_stock = False
                 if order.user:
                     card.user = order.user
-                card.save(update_fields=['status', 'user'])
+                card.save(update_fields=['status', 'user', 'is_warehouse_stock'])
 
                 order.card_assigned = card
                 changed.append(f"Card assigned & reserved: {card.card_code}")

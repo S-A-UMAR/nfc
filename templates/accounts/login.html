@@ -18,8 +18,11 @@
     </div>
 
     <div class="auth-card">
-      <form id="login-form" method="post" action="{% url 'accounts:login' %}" novalidate>
+      <form id="login-form" method="post" action="{% url 'accounts:login' %}{% if next_url %}?next={{ next_url|urlencode }}{% endif %}" novalidate>
         {% csrf_token %}
+        {% if next_url %}
+          <input type="hidden" name="next" value="{{ next_url }}">
+        {% endif %}
 
         {% if form.non_field_errors %}
           <div class="alert alert-error mb-4" role="alert">
@@ -68,7 +71,7 @@
 
       <div class="auth-footer-nav">
         Don't have an account yet?
-        <a href="{% url 'accounts:register' %}">Create Account</a>
+        <a href="{% url 'accounts:register' %}{% if next_url %}?next={{ next_url|urlencode }}{% endif %}">Create Account</a>
       </div>
     </div>
   </div>

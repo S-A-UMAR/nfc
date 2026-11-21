@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Smart Card Activated — {{ BRAND_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="activation-page-wrapper">
+  <div class="activation-container">
+
+    <!-- Success Badge & Icon -->
+    <div class="activation-icon-wrap activation-icon-success">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" aria-hidden="true">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+
+    <span class="badge badge-active mb-3">
+      <span class="dot dot-active"></span> CARD ACTIVE & LINKED
+    </span>
+
+    <h1 class="activation-title">Smart Card Is Live</h1>
+    <p class="activation-subtitle">
+      Your physical card <strong>#{{ card.card_code }}</strong> is now permanently paired with your {{ BRAND_NAME }} digital identity.
+    </p>
+
+    <!-- Tactile Card Graphic -->
+    <div class="activation-card-mockup mb-6">
+      <div class="d-flex justify-between items-center mb-4">
+        <div class="mockup-chip">
+          <div class="chip-wire"></div>
+          <span class="chip-label">NFC</span>
+        </div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="opacity: 0.85;" aria-hidden="true">
+          <path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/>
+          <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/>
+          <path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+        </svg>
+      </div>
+
+      <div class="text-center my-4">
+        {% include 'components/brand_logo.html' with variant='dark' height='26' %}
+      </div>
+
+      <div class="d-flex justify-between items-end mt-4">
+        <div>
+          <div class="mockup-owner">{{ profile.full_name|default:user.display_name|upper }}</div>
+          <div class="mockup-subtitle">{% if profile.title %}{{ profile.title|upper }}{% else %}PROFESSIONAL IDENTITY{% endif %}</div>
+        </div>
+        <div class="mockup-code font-mono">{{ card.card_code }}</div>
+      </div>
+    </div>
+
+    <!-- Explainer Card -->
+    <div class="card card-carbon text-left mb-6">
+      <h3 class="font-bold text-white mb-2" style="font-size: 1rem;">What happens when you tap:</h3>
+      <p class="text-secondary text-sm mb-4" style="line-height: 1.6;">
+        Anyone who taps your card with an NFC-enabled smartphone or scans the laser-etched QR code on the back will instantly see your public digital profile. No app, battery, or subscription is ever required.
+      </p>
+
+      <div class="d-flex flex-column gap-3">
+        {% if profile.slug %}
+          <a href="{% url 'profiles:public_profile' profile.slug %}" target="_blank" class="btn btn-primary btn-block">
+            <span>View Live Profile</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        {% endif %}
+
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-secondary flex-1">
+            <span>Customize Profile</span>
+          </a>
+          <a href="{% url 'dashboard:card_manage' %}" class="btn btn-ghost flex-1">
+            <span>Manage Hardware</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.activation-page-wrapper {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+}
+.activation-container {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+.activation-icon-wrap {
+  width: 68px;
+  height: 68px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+.activation-icon-success {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+.activation-title {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+.activation-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+.activation-card-mockup {
+  background: linear-gradient(135deg, #18181A 0%, #0A0A0A 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+.activation-card-mockup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+}
+.mockup-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip-wire {
+  width: 22px;
+  height: 16px;
+  border: 1px solid rgba(196, 196, 196, 0.4);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.chip-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--silver-steel);
+  letter-spacing: 0.05em;
+}
+.mockup-owner {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.04em;
+}
+.mockup-subtitle {
+  font-size: 0.6875rem;
+  color: var(--silver-steel);
+  font-weight: 500;
+}
+.mockup-code {
+  font-size: 0.8125rem;
+  color: var(--silver-accent);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+{% endblock %}

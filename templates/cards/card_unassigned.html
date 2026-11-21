@@ -1,54 +1,390 @@
 {% extends 'base.html' %}
-{% block title %}Activate Smart Card — {{ BRAND_NAME }}{% endblock %}
+{% load static %}
+{% block title %}Activate Smart Card #{{ card.card_code }} — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Activate your STRIDE smart card to pair your physical contactless card with your digital profile.{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
-<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center;">
-  <div style="max-width: 480px; width: 100%;">
-    <div style="width: 70px; height: 70px; background: var(--bg-surface); border: 1px solid var(--border-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--silver-accent)" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+<div class="activation-page-wrapper">
+  <div class="activation-container">
+
+    <!-- Brand Header -->
+    <div class="text-center mb-6">
+      <a href="{% url 'core:home' %}" class="d-inline-block mb-3" aria-label="{{ BRAND_NAME }} Home">
+        {% include 'components/brand_logo.html' with variant='dark' height='30' %}
+      </a>
+      <div class="d-flex items-center justify-center gap-2 mb-2">
+        <span class="badge badge-silver">
+          <span class="dot dot-silver"></span> READY TO ACTIVATE
+        </span>
+      </div>
+      <h1 class="activation-hero-title">Pair Your Smart Card</h1>
+      <p class="activation-hero-subtitle">
+        Link physical card <strong class="text-white font-mono">#{{ card.card_code }}</strong> to your digital identity.
+      </p>
     </div>
 
-    <span class="badge badge-silver" style="margin-bottom: 0.75rem;">NEW SMART CARD</span>
-    <h2 style="margin-bottom: 0.5rem;">Card #{{ card.card_code }}</h2>
-    <p style="color: var(--text-secondary); margin-bottom: 2rem;">This physical smart card has been manufactured and is ready to be linked to your {{ BRAND_NAME }} digital profile.</p>
+    <!-- Tactile Card Graphic (Obsidian Minimalist) -->
+    <div class="card-mockup-wrap mb-6" aria-label="STRIDE Smart Card Preview">
+      <div class="card-mockup-inner">
+        <div class="d-flex justify-between items-center mb-4">
+          <div class="mockup-chip-tag">
+            <span class="chip-graphic"></span>
+            <span class="chip-text">NFC NTAG</span>
+          </div>
+          <svg class="contactless-wave" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" aria-hidden="true">
+            <path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/>
+            <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/>
+            <path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
 
-    <div class="card" style="text-align: left;">
-      <h4 style="font-size: 1rem; margin-bottom: 0.75rem;">Pair with Your Account</h4>
-      
+        <div class="mockup-brand text-center my-3">
+          {% include 'components/brand_logo.html' with variant='dark' height='24' %}
+        </div>
+
+        <div class="d-flex justify-between items-end mt-4">
+          <div>
+            <div class="mockup-status-label">STATUS</div>
+            <div class="mockup-status-val">READY FOR SETUP</div>
+          </div>
+          <div class="mockup-code-pill font-mono">
+            {{ card.card_code }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activation Card Box -->
+    <div class="auth-card text-left">
       {% if user.is_authenticated %}
-        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-          Signed in as <strong>{{ user.display_name }}</strong> ({{ user.email }}). Enter the security activation PIN printed on your physical card sleeve or packaging to complete setup.
-        </p>
+        <!-- AUTHENTICATED STATE -->
+        <div class="account-badge-box mb-4">
+          <div class="d-flex justify-between items-start gap-2">
+            <div>
+              <div class="text-caption" style="color: var(--silver-steel); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Activating as</div>
+              <div class="font-bold text-white text-sm mt-0.5">{{ user.display_name }}</div>
+              <div class="text-muted text-xs font-mono">{{ user.email }}</div>
+            </div>
+            <a href="{% url 'accounts:login' %}?next=/c/{{ card.card_code }}/" class="btn btn-ghost btn-sm text-xs" title="Switch to another account">
+              <span>Switch Account</span>
+            </a>
+          </div>
+        </div>
 
-        <form method="post" action="{% url 'cards:card_activate' %}">
+        <form id="activation-form" method="post" action="{% url 'cards:card_activate' %}" novalidate>
           {% csrf_token %}
           <input type="hidden" name="card_code" value="{{ card.card_code }}">
           <input type="hidden" name="next" value="/c/{{ card.card_code }}/">
 
+          <!-- Card Code Display (Locked) -->
           <div class="form-group mb-4">
-            <label class="form-label" for="id_card_code_display">Physical Card ID</label>
-            <input type="text" id="id_card_code_display" class="form-control font-mono" value="{{ card.card_code }}" disabled style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary); cursor: not-allowed;">
+            <label class="form-label" for="id_card_code_locked">Physical Card ID</label>
+            <div class="input-with-icon">
+              <input type="text" id="id_card_code_locked" class="form-control font-mono" value="{{ card.card_code }}" readonly aria-readonly="true" tabindex="-1" style="background: rgba(255, 255, 255, 0.03); color: var(--silver-accent); cursor: not-allowed; border-color: rgba(255, 255, 255, 0.08);">
+              <span class="input-suffix-badge" aria-hidden="true">LOCKED</span>
+            </div>
           </div>
 
+          <!-- Activation PIN Input with Auto-hyphenation and Show/Hide -->
           <div class="form-group mb-4">
-            <label class="form-label" for="id_activation_code">Security Activation PIN / Code <span style="color: #EF4444;">*</span></label>
-            <input type="text" name="activation_code" id="id_activation_code" class="form-control font-mono tracking-wide" placeholder="e.g. A1B2-C3D4" required autofocus style="text-transform: uppercase;">
-            <div class="form-hint">Found on the security sleeve or packaging delivered with your card.</div>
+            <div class="d-flex justify-between items-center mb-1">
+              <label class="form-label mb-0" for="id_activation_code">
+                Activation Security PIN <span class="text-danger" title="Required">*</span>
+              </label>
+              <span class="text-caption text-silver text-xs">Printed on Card Sleeve</span>
+            </div>
+
+            <div style="position: relative;">
+              <input
+                type="text"
+                name="activation_code"
+                id="id_activation_code"
+                class="form-control font-mono tracking-wide"
+                placeholder="e.g. 9K2M-7P4X"
+                required
+                autofocus
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="12"
+                style="text-transform: uppercase; padding-right: 48px; font-size: 1.125rem; letter-spacing: 0.12em;"
+                aria-describedby="pin-help-text"
+              >
+              <button
+                type="button"
+                id="btn-toggle-pin"
+                class="btn-toggle-pin"
+                onclick="togglePinMask()"
+                aria-label="Toggle PIN visibility"
+                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; display: flex; align-items: center;"
+              >
+                <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div id="pin-help-text" class="form-hint mt-2">
+              Found on the security sleeve delivered with your card. Grouped (<code>XXXX-XXXX</code>) or ungrouped (<code>XXXXXXXX</code>) both work.
+            </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block">Activate & Link to My Profile</button>
+          <!-- Submit Button with Double-Submission Prevention -->
+          <button type="submit" id="btn-activate-submit" class="btn btn-primary btn-block mt-6">
+            <span id="btn-activate-text">Activate & Link Smart Card</span>
+            <svg id="btn-activate-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </button>
         </form>
+
       {% else %}
-        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-          Sign in or create a {{ BRAND_NAME }} account to pair Card <strong>#{{ card.card_code }}</strong> with your personal digital identity.
-        </p>
-        <div style="display: flex; gap: 0.75rem; flex-direction: column;">
-          <a href="{% url 'accounts:login' %}?next=/c/{{ card.card_code }}/" class="btn btn-primary btn-block">Sign In to Activate</a>
-          <a href="{% url 'accounts:register' %}?next=/c/{{ card.card_code }}/" class="btn btn-secondary btn-block">Create New Account</a>
+        <!-- UNAUTHENTICATED STATE -->
+        <div class="text-center py-2">
+          <h3 class="font-bold text-white mb-2" style="font-size: 1.05rem;">Connect to Your Account</h3>
+          <p class="text-secondary text-sm mb-6" style="line-height: 1.6;">
+            Sign in or create a free {{ BRAND_NAME }} account to link Card <strong class="text-white font-mono">#{{ card.card_code }}</strong> to your personal digital profile.
+          </p>
+
+          <div class="d-flex flex-column gap-3">
+            <a href="{% url 'accounts:login' %}?next=/c/{{ card.card_code }}/" class="btn btn-primary btn-block">
+              <span>Sign In to Activate</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a href="{% url 'accounts:register' %}?next=/c/{{ card.card_code }}/" class="btn btn-secondary btn-block">
+              <span>Create New Account</span>
+            </a>
+          </div>
+
+          <div class="d-flex items-center justify-center gap-2 mt-6 text-xs text-muted">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>No subscription required · Permanent NFC redirect</span>
+          </div>
         </div>
       {% endif %}
     </div>
+
+    <!-- Troubleshooting Fallback Accordion -->
+    <div class="mt-6 text-center">
+      <details class="activation-help-details">
+        <summary class="activation-help-summary">
+          <span>Need help activating your card?</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="activation-help-content text-left mt-3">
+          <div class="help-item mb-3">
+            <div class="font-bold text-white text-xs mb-1">Where is my Activation PIN?</div>
+            <p class="text-secondary text-xs" style="line-height: 1.5;">
+              The 8-character security PIN is printed on the protective card sleeve or inside the physical packaging box sent with your card.
+            </p>
+          </div>
+          <div class="help-item mb-3">
+            <div class="font-bold text-white text-xs mb-1">NFC tap didn't trigger automatically?</div>
+            <p class="text-secondary text-xs" style="line-height: 1.5;">
+              Make sure NFC is turned on in your phone's settings (Settings &rarr; Connected Devices / NFC on Android; iPhone XR and newer read NFC automatically at the top-rear edge). Alternatively, scan the QR code on the back of the card.
+            </p>
+          </div>
+          <div class="help-item">
+            <div class="font-bold text-white text-xs mb-1">Still having trouble?</div>
+            <p class="text-secondary text-xs" style="line-height: 1.5;">
+              Reach our support concierge directly at <a href="mailto:{{ BRAND_SUPPORT_EMAIL }}" style="color: var(--silver-accent); text-decoration: underline;">{{ BRAND_SUPPORT_EMAIL }}</a>.
+            </p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
 </div>
+
+<style>
+.activation-page-wrapper {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+}
+.activation-container {
+  max-width: 480px;
+  width: 100%;
+}
+.activation-hero-title {
+  font-family: var(--font-heading);
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+.activation-hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.card-mockup-wrap {
+  perspective: 1000px;
+}
+.card-mockup-inner {
+  background: linear-gradient(135deg, #242424 0%, #121214 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+}
+.card-mockup-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+}
+.mockup-chip-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip-graphic {
+  width: 20px;
+  height: 14px;
+  border: 1px solid rgba(196, 196, 196, 0.4);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.chip-text {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--silver-steel);
+  letter-spacing: 0.06em;
+}
+.mockup-status-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--silver-steel);
+  letter-spacing: 0.08em;
+}
+.mockup-status-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.04em;
+}
+.mockup-code-pill {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--silver-accent);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.account-badge-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.75rem 1rem;
+}
+.input-with-icon {
+  position: relative;
+}
+.input-suffix-badge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--silver-steel);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.activation-help-details {
+  cursor: pointer;
+}
+.activation-help-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--silver-steel);
+  list-style: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.activation-help-summary::-webkit-details-marker {
+  display: none;
+}
+.activation-help-summary:hover {
+  color: #FFFFFF;
+}
+.activation-help-content {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md, 10px);
+  padding: 1rem 1.25rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
+<script>
+// PIN masking toggle
+var isPinMasked = false;
+function togglePinMask() {
+  var pinInput = document.getElementById('id_activation_code');
+  var eyeIcon = document.getElementById('eye-icon');
+  if (!pinInput) return;
+  if (isPinMasked) {
+    pinInput.type = 'text';
+    isPinMasked = false;
+    eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  } else {
+    pinInput.type = 'password';
+    isPinMasked = true;
+    eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  }
+}
+
+// Optional Auto-hyphenation formatting & Double-submit defense
+document.addEventListener('DOMContentLoaded', function() {
+  var pinInput = document.getElementById('id_activation_code');
+  var form = document.getElementById('activation-form');
+  var submitBtn = document.getElementById('btn-activate-submit');
+  var submitText = document.getElementById('btn-activate-text');
+  var submitIcon = document.getElementById('btn-activate-icon');
+
+  if (pinInput) {
+    pinInput.addEventListener('input', function(e) {
+      var val = pinInput.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+      // If typing without hyphen and length reaches 5, format as XXXX-X
+      var cleaned = val.replace(/-/g, '');
+      if (cleaned.length > 4 && !val.includes('-')) {
+        val = cleaned.slice(0, 4) + '-' + cleaned.slice(4, 8);
+      }
+      pinInput.value = val;
+    });
+  }
+
+  if (form && submitBtn) {
+    form.addEventListener('submit', function(e) {
+      if (form.checkValidity && !form.checkValidity()) {
+        return;
+      }
+      setTimeout(function() {
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = 'Verifying & Activating...';
+        if (submitIcon) submitIcon.style.display = 'none';
+      }, 50);
+    });
+  }
+});
+</script>
 {% endblock %}

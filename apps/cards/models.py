@@ -79,6 +79,11 @@ class Card(models.Model):
         null=True, 
         help_text="SHA-256 hashed secret PIN/code printed on physical packaging"
     )
+    is_warehouse_stock = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Designates unallocated warehouse inventory that cannot be claimed until assigned/dispatched."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     activated_at = models.DateTimeField(null=True, blank=True)
 
@@ -86,21 +91,49 @@ class Card(models.Model):
         ordering = ['card_code']
 
     def set_activation_code(self, code: str):
-        """Hashes and sets the physical card secret activation code."""
+        """Hashes and sets the physical card secret activation code.
+        Hyphens are stripped before hashing so set('XXXX-XXXX') and set('XXXXXXXX') produce
+        the same stored hash, keeping set/check symmetric.
+        """
         import hashlib
-        self.activation_code_hash = hashlib.sha256(code.strip().upper().encode('utf-8')).hexdigest()
+        self.activation_code_hash = hashlib.sha256(code.strip().upper().replace('-', '').encode('utf-8')).hexdigest()
 
     def check_activation_code(self, code: str) -> bool:
-        """Constant-time verification of physical card activation code."""
+        """Constant-time verification of physical card activation code.
+        Accepts both hyphenated (XXXX-XXXX) and unhyphenated (XXXXXXXX) formats.
+        Supports:
+        1. Ungrouped / normalized format (XXXXXXXX)
+        2. Historical grouped format with hyphen (XXXX-XXXX)
+        3. Raw entered format
+        Performs constant-time comparison across candidate hashes to prevent timing side channels.
+        """
         import hashlib
         import hmac
         if not self.activation_code_hash or not code or not isinstance(code, str):
             return False
-        cleaned = code.strip().upper()
+        raw = code.strip().upper()
+        if not raw:
+            return False
+        cleaned = raw.replace('-', '')
         if not cleaned:
             return False
-        actual = hashlib.sha256(cleaned.encode('utf-8')).hexdigest()
-        return hmac.compare_digest(self.activation_code_hash, actual)
+
+        # Candidate 1: Normalized without hyphen
+        cand1 = hashlib.sha256(cleaned.encode('utf-8')).hexdigest()
+        match1 = hmac.compare_digest(self.activation_code_hash, cand1)
+
+        # Candidate 2: Raw as entered (handles historical hash if entered with hyphen)
+        cand2 = hashlib.sha256(raw.encode('utf-8')).hexdigest()
+        match2 = hmac.compare_digest(self.activation_code_hash, cand2)
+
+        # Candidate 3: Standard 4-4 hyphenated format if cleaned length is 8 (handles historical hash if customer entered without hyphen)
+        match3 = False
+        if len(cleaned) == 8:
+            hyphenated = f"{cleaned[:4]}-{cleaned[4:]}"
+            cand3 = hashlib.sha256(hyphenated.encode('utf-8')).hexdigest()
+            match3 = hmac.compare_digest(self.activation_code_hash, cand3)
+
+        return match1 or match2 or match3
 
     def generate_activation_code(self) -> str:
         """Generates a secure 8-character activation PIN, sets the hash, and returns the plaintext PIN."""
