@@ -46,23 +46,26 @@ class ProfileForm(forms.ModelForm):
         return val
 
     def clean_profile_image(self):
+        from django.core.files.uploadedfile import UploadedFile
         from apps.core.validators import validate_image_upload
         image = self.cleaned_data.get('profile_image')
-        if image:
+        if image and isinstance(image, UploadedFile):
             validate_image_upload(image)
         return image
 
     def clean_cover_image(self):
+        from django.core.files.uploadedfile import UploadedFile
         from apps.core.validators import validate_image_upload
         image = self.cleaned_data.get('cover_image')
-        if image:
+        if image and isinstance(image, UploadedFile):
             validate_image_upload(image)
         return image
 
     def clean_business_logo(self):
+        from django.core.files.uploadedfile import UploadedFile
         from apps.core.validators import validate_image_upload
         logo = self.cleaned_data.get('business_logo')
-        if logo:
+        if logo and isinstance(logo, UploadedFile):
             validate_image_upload(logo)
         return logo
 
@@ -263,9 +266,10 @@ class ProfileGalleryItemForm(forms.ModelForm):
         }
 
     def clean_image(self):
+        from django.core.files.uploadedfile import UploadedFile
         from apps.core.validators import validate_image_upload
         image = self.cleaned_data.get('image')
-        if image:
+        if image and isinstance(image, UploadedFile):
             validate_image_upload(image)
         return image
 
@@ -291,9 +295,10 @@ class ProfileTestimonialForm(forms.ModelForm):
         }
 
     def clean_client_avatar(self):
+        from django.core.files.uploadedfile import UploadedFile
         from apps.core.validators import validate_image_upload
         avatar = self.cleaned_data.get('client_avatar')
-        if avatar:
+        if avatar and isinstance(avatar, UploadedFile):
             validate_image_upload(avatar)
         return avatar
 

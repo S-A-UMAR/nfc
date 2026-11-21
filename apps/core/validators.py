@@ -1,10 +1,13 @@
 from urllib.parse import urlparse
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import UploadedFile
+from django.db.models.fields.files import FieldFile
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
 ALLOWED_IMAGE_FORMATS = {'JPEG', 'PNG', 'WEBP'}
+DANGEROUS_EXTENSIONS = {'svg', 'html', 'htm', 'exe', 'php', 'js', 'sh', 'bat', 'cmd', 'py', 'vbs', 'dll', 'bin', 'cgi'}
 # MIME type → extension fallback for browsers that omit file extensions
 CONTENT_TYPE_TO_EXT = {
     'image/jpeg': 'jpg',
@@ -18,10 +21,11 @@ MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
 def validate_image_upload(file, max_size_bytes=MAX_IMAGE_SIZE_BYTES):
     """
     Strict validation for uploaded raster images:
-    1. Checks file extension whitelist, with MIME-type fallback when the browser
-       omits an extension (e.g. some iOS / Android uploads).
-    2. Enforces maximum file size (default 5 MB).
-    3. Verifies file content integrity using Pillow.
+    1. Bypasses already-persisted model FieldFile instances (e.g. existing cover images
+       stored on Cloudinary when re-saving a profile form without uploading a new file).
+    2. Checks file extension whitelist and strictly rejects dangerous extensions.
+    3. Enforces maximum file size (default 5 MB).
+    4. Verifies file content integrity using Pillow.
        IMPORTANT: img.format is captured BEFORE img.verify() because verify()
        is destructive — it closes Pillow's internal stream and can clear
        img.format to None in some Pillow builds.
@@ -29,23 +33,31 @@ def validate_image_upload(file, max_size_bytes=MAX_IMAGE_SIZE_BYTES):
     if not file:
         return file
 
+    # 0. Bypass validation if file is already a persisted FieldFile on a model instance
+    if isinstance(file, FieldFile) and not isinstance(file, UploadedFile):
+        return file
+
     # 1. Resolve extension (with MIME-type fallback)
     filename = getattr(file, 'name', '') or ''
     ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+
+    if ext in DANGEROUS_EXTENSIONS:
+        raise ValidationError(_(f"Unsupported file format '.{ext}'. Files of type '{ext}' are not permitted."))
+
+    if ext in ('heic', 'heif', 'avif'):
+        raise ValidationError(
+            _("HEIC/HEIF/AVIF photos are not supported. Please convert to JPG or PNG before uploading.")
+        )
 
     if not ext:
         # Browser sent no extension — try the declared content type
         content_type = (getattr(file, 'content_type', '') or '').lower().split(';')[0].strip()
         ext = CONTENT_TYPE_TO_EXT.get(content_type, '')
 
-    if ext not in ALLOWED_IMAGE_EXTENSIONS:
-        if ext in ('heic', 'heif', 'avif'):
-            raise ValidationError(
-                _("HEIC/HEIF/AVIF photos are not supported. Please convert to JPG or PNG before uploading.")
-            )
-        display_ext = f'.{ext}' if ext else '(unknown format — no extension detected)'
+    # Reject known non-image extensions (e.g. .pdf, .docx, .txt, .zip)
+    if ext and ext not in ALLOWED_IMAGE_EXTENSIONS:
         raise ValidationError(
-            _(f"Unsupported file format '{display_ext}'. Only JPG, PNG, and WEBP images are accepted.")
+            _(f"Unsupported file format '.{ext}'. Only JPG, PNG, and WEBP images are accepted.")
         )
 
     # 2. Check file size
