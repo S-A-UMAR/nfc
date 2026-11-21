@@ -1,141 +1,181 @@
 {% extends 'console/base_console.html' %}
 {% load static humanize %}
 
-{% block title %}Operations Hub — {{ BRAND_NAME }}{% endblock %}
+{% block title %}STRIDE Console — Operations Overview{% endblock %}
 
 {% block operations_content %}
-<div class="dashboard-header">
+<!-- Console Page Header -->
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap;">
   <div>
-    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
-      <h1 class="dashboard-title">Operations Hub</h1>
-      <span class="ops-badge-staff">CONFIDENTIAL INTERNAL</span>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+      <h1 class="dashboard-title" style="font-size: 1.65rem; font-weight: 700; margin: 0; letter-spacing: -0.02em;">Operations Hub</h1>
+      <span class="console-badge-staff" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.28); font-size: 0.68rem;">LIVE SYSTEM</span>
     </div>
-    <p class="dashboard-subtitle">Operational oversight, card inventory, customer records, and system health.</p>
+    <p class="dashboard-subtitle" style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">
+      Operational oversight, card inventory, customer records, and hardware lifecycle health.
+    </p>
   </div>
-  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-    <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm">+ Generate Smart Cards</a>
-  </div>
-</div>
-
-<!-- =====================================================================
-     METRICS OVERVIEW
-     ===================================================================== -->
-<h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem;">1. Smart Card Inventory</h3>
-<div class="ops-stat-grid">
-  <div class="stat-card">
-    <div class="stat-card-title">Total Cards</div>
-    <div class="stat-card-value">{{ card_counts.total|default:0 }}</div>
-    <div class="stat-card-sub">In database</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Unassigned Stock</div>
-    <div class="stat-card-value" style="color: #9A9A9A;">{{ card_counts.unassigned|default:0 }}</div>
-    <div class="stat-card-sub">Ready to allocate</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Active &amp; Linked</div>
-    <div class="stat-card-value" style="color: #10B981;">{{ card_counts.active|default:0 }}</div>
-    <div class="stat-card-sub">In customer hands</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Suspended</div>
-    <div class="stat-card-value" style="color: #F59E0B;">{{ card_counts.suspended|default:0 }}</div>
-    <div class="stat-card-sub">Temporarily disabled</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Reported Lost</div>
-    <div class="stat-card-value" style="color: #EF4444;">{{ card_counts.lost|default:0 }}</div>
-    <div class="stat-card-sub">Taps blocked</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Replaced</div>
-    <div class="stat-card-value" style="color: #6B7280;">{{ card_counts.replaced|default:0 }}</div>
-    <div class="stat-card-sub">Superseded cards</div>
-  </div>
-</div>
-
-<h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem;">2. Platform Entities</h3>
-<div class="ops-stat-grid">
-  <div class="stat-card">
-    <div class="stat-card-title">Total Customers</div>
-    <div class="stat-card-value">{{ total_customers|default:0 }}</div>
-    <div class="stat-card-sub">{{ active_customers }} active accounts</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Staff Members</div>
-    <div class="stat-card-value" style="color: #a3e635;">{{ total_staff|default:0 }}</div>
-    <div class="stat-card-sub">Internal operators</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Published Websites</div>
-    <div class="stat-card-value" style="color: #10B981;">{{ website_counts.published|default:0 }}</div>
-    <div class="stat-card-sub">{{ website_counts.draft|default:0 }} in draft</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-title">Total Orders</div>
-    <div class="stat-card-value">{{ order_counts.total|default:0 }}</div>
-    <div class="stat-card-sub">{{ order_counts.paid|default:0 }} confirmed paid</div>
+  <div style="display: flex; gap: 0.6rem; align-items: center;">
+    <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600; padding: 0.55rem 1.05rem; border-radius: 8px; font-size: 0.84rem;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Generate Smart Cards</span>
+    </a>
   </div>
 </div>
 
 <!-- =====================================================================
-     RECENT ACTIVITY & AUDIT TRAIL
+     SECTION 1: SMART CARD INVENTORY
      ===================================================================== -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.45rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+  <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--stride-silver);"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    <h2 style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin: 0;">Smart Card Inventory</h2>
+  </div>
+  <a href="{% url 'console:cards_list' %}" style="font-size: 0.78rem; color: var(--stride-silver); text-decoration: none; font-weight: 500;">View Card Inventory →</a>
+</div>
+
+<div class="ops-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.85rem; margin-bottom: 2.25rem;">
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Total Cards</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #FFFFFF;">{{ card_counts.total|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">In database</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Unassigned Stock</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #C4C4C4;">{{ card_counts.unassigned|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Ready to allocate</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Active &amp; Linked</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if card_counts.active %}#10B981{% else %}#71717A{% endif %};">{{ card_counts.active|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">In customer hands</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Suspended</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if card_counts.suspended %}#F59E0B{% else %}#71717A{% endif %};">{{ card_counts.suspended|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Temporarily disabled</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Reported Lost</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if card_counts.lost %}#EF4444{% else %}#71717A{% endif %};">{{ card_counts.lost|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Taps blocked</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Superseded</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #71717A;">{{ card_counts.replaced|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Replaced cards</div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     SECTION 2: PLATFORM OPERATIONS & FULFILLMENT
+     ===================================================================== -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.45rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+  <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--stride-silver);"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <h2 style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin: 0;">Platform Operations</h2>
+  </div>
+  <a href="{% url 'console:customers_list' %}" style="font-size: 0.78rem; color: var(--stride-silver); text-decoration: none; font-weight: 500;">View Customers →</a>
+</div>
+
+<div class="ops-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-bottom: 2.25rem;">
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Total Customers</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #FFFFFF;">{{ total_customers|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">{{ active_customers }} active accounts</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Staff Operators</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #C4C4C4;">{{ total_staff|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Internal operators</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Published Websites</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if website_counts.published %}#10B981{% else %}#71717A{% endif %};">{{ website_counts.published|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">{{ website_counts.draft|default:0 }} in draft</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Total Orders</div>
+    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #FFFFFF;">{{ order_counts.total|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">{{ order_counts.paid|default:0 }} confirmed paid</div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     SECTION 3: RECENT STAFF OPERATIONS & LIVE HARDWARE TAPS
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 1.25rem; margin-top: 0.5rem;">
 
   <!-- Recent Audit Logs -->
-  <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Recent Staff Operations</h2>
-      <a href="{% url 'console:audit_logs' %}" style="font-size: 0.8rem; color: var(--silver-steel);">View All →</a>
+  <div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.8); border-radius: 14px; padding: 1.25rem;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.65rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--stride-silver);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <h3 style="font-size: 0.88rem; margin: 0; font-weight: 600; color: #FFFFFF;">Recent Staff Operations</h3>
+      </div>
+      <a href="{% url 'console:audit_logs' %}" style="font-size: 0.76rem; color: var(--stride-silver); text-decoration: none; font-weight: 500;">View All →</a>
     </div>
+
     {% if recent_audit_logs %}
-      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <div style="display: flex; flex-direction: column; gap: 0.6rem;">
         {% for log in recent_audit_logs %}
-        <div style="padding: 0.65rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.825rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-            <span class="badge badge-silver" style="font-size: 0.68rem;">{{ log.get_action_display }}</span>
-            <span style="font-size: 0.72rem; color: var(--text-muted);">{{ log.created_at|date:"M d, H:i" }}</span>
+        <div style="padding: 0.75rem 0.85rem; background: rgba(12, 12, 15, 0.75); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; font-size: 0.82rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <span class="console-badge-staff" style="font-size: 0.64rem; padding: 0.15rem 0.45rem;">{{ log.get_action_display }}</span>
+            <span style="font-size: 0.70rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">{{ log.created_at|date:"M d, H:i" }}</span>
           </div>
-          <div style="font-weight: 600; color: var(--text-primary);">{{ log.target_repr }}</div>
+          <div style="font-weight: 600; color: var(--text-primary); font-size: 0.84rem;">{{ log.target_repr }}</div>
           {% if log.details %}
-            <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem;">{{ log.details|truncatechars:70 }}</div>
+            <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.2rem; line-height: 1.35;">{{ log.details|truncatechars:80 }}</div>
           {% endif %}
-          <div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.25rem;">
-            By: <strong style="color: var(--text-secondary);">{{ log.staff_user.email|default:"System" }}</strong>
+          <div style="color: var(--text-muted); font-size: 0.70rem; margin-top: 0.35rem;">
+            Operator: <strong style="color: var(--text-secondary); font-weight: 500;">{{ log.staff_user.email|default:"System" }}</strong>
           </div>
         </div>
         {% endfor %}
       </div>
     {% else %}
-      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
-        No operational audit logs recorded yet.
+      <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.84rem;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; opacity: 0.4;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>No operational audit events recorded yet.</div>
       </div>
     {% endif %}
   </div>
 
   <!-- Recent Hardware NFC/QR Taps -->
-  <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="font-size: 0.95rem; margin: 0; font-weight: 600;">Live Card Scans &amp; Taps</h2>
-      <a href="{% url 'console:cards_list' %}" style="font-size: 0.8rem; color: var(--silver-steel);">Card Inventory →</a>
+  <div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.8); border-radius: 14px; padding: 1.25rem;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.65rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #10B981;"><path d="M8.5 16.5a5 5 0 0 1 0-9"/><path d="M12 19a8.5 8.5 0 0 0 0-14"/><path d="M15.5 21.5a12 12 0 0 0 0-19"/></svg>
+        <h3 style="font-size: 0.88rem; margin: 0; font-weight: 600; color: #FFFFFF;">Live Hardware Scans &amp; Taps</h3>
+      </div>
+      <a href="{% url 'console:cards_list' %}" style="font-size: 0.76rem; color: var(--stride-silver); text-decoration: none; font-weight: 500;">Card Inventory →</a>
     </div>
+
     {% if recent_card_events %}
-      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <div style="display: flex; flex-direction: column; gap: 0.6rem;">
         {% for evt in recent_card_events %}
-        <div style="padding: 0.65rem 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.825rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 0.75rem 0.85rem; background: rgba(12, 12, 15, 0.75); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <div style="font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+            <div style="font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #FFFFFF;">
               {{ evt.card.card_code }}
             </div>
-            <div style="font-size: 0.72rem; color: var(--text-muted);">
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;">
               {{ evt.get_event_type_display }}
               {% if evt.card.user %} · {{ evt.card.user.display_name }}{% endif %}
             </div>
           </div>
           <div style="text-align: right;">
-            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.68rem;">LIVE</span>
-            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+            <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.65rem; font-weight: 600;">LIVE</span>
+            <div style="font-size: 0.70rem; color: var(--text-muted); margin-top: 0.2rem; font-family: 'JetBrains Mono', monospace;">
               {{ evt.created_at|date:"H:i:s" }}
             </div>
           </div>
@@ -143,8 +183,9 @@
         {% endfor %}
       </div>
     {% else %}
-      <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
-        No hardware taps recorded recently.
+      <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.84rem;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; opacity: 0.4;"><path d="M8.5 16.5a5 5 0 0 1 0-9"/><path d="M12 19a8.5 8.5 0 0 0 0-14"/><path d="M15.5 21.5a12 12 0 0 0 0-19"/></svg>
+        <div>No hardware NFC taps or QR scans recorded recently.</div>
       </div>
     {% endif %}
   </div>

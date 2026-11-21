@@ -2,9 +2,11 @@
 {% load static %}
 
 {% block robots_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block master_navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=1.4">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=1.5">
 <style>
   /* ── STRIDE Command Console Luxury Palette ──
      Primary: Graphite #242424 | Accent: Silver #C4C4C4 | Light: #F5F5F5
@@ -17,16 +19,21 @@
     --stride-border-dark: rgba(196, 196, 196, 0.16);
   }
 
+  /* Full viewport height without marketing navbar */
+  .dashboard-shell {
+    min-height: 100vh;
+  }
+
   .console-badge-staff {
-    background: rgba(196, 196, 196, 0.12);
+    background: rgba(196, 196, 196, 0.10);
     color: var(--stride-soft-white);
     border: 1px solid var(--stride-border-dark);
-    font-size: 0.72rem;
+    font-size: 0.70rem;
     padding: 0.2rem 0.55rem;
     border-radius: var(--radius-xs);
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
   }
   .console-badge-manager {
     background: rgba(245, 158, 11, 0.12);
@@ -166,13 +173,22 @@
        ===================================================================== -->
   <aside class="dashboard-sidebar" aria-label="Console Navigation">
     <div>
-      <div class="sidebar-user">
-        <div class="sidebar-user-avatar" style="border-color: var(--stride-silver);">
-          <span>SC</span>
+      <!-- Brand Header -->
+      <div style="padding: 0.25rem 0.25rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+        <a href="{% url 'console:overview' %}" aria-label="STRIDE Console" style="display: flex; align-items: center; text-decoration: none;">
+          {% include 'components/brand_logo.html' with variant='dark' height='22' %}
+        </a>
+        <span class="console-badge-staff" style="font-size: 0.65rem; padding: 0.15rem 0.45rem; letter-spacing: 0.08em; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);">CONSOLE</span>
+      </div>
+
+      <!-- User Badge -->
+      <div class="sidebar-user" style="margin-bottom: 1.25rem;">
+        <div class="sidebar-user-avatar" style="border-color: var(--stride-silver); background: #18181D;">
+          <span style="font-weight: 700; color: #FFF; font-size: 0.85rem;">{{ user.first_name|default:user.email|make_list|first|upper }}</span>
         </div>
-        <div>
-          <div class="sidebar-user-name">{{ user.first_name|default:user.display_name }}</div>
-          <div class="sidebar-user-role" style="color: var(--stride-silver); font-weight: 600;">STRIDE Console</div>
+        <div style="min-width: 0;">
+          <div class="sidebar-user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.88rem; font-weight: 600;">{{ user.first_name|default:user.display_name }}</div>
+          <div class="sidebar-user-role" style="color: var(--stride-silver); font-weight: 500; font-size: 0.72rem;">Operations Staff</div>
         </div>
       </div>
 
