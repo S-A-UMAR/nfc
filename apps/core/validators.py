@@ -5,15 +5,18 @@ from django.db.models.fields.files import FieldFile
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
-ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
-ALLOWED_IMAGE_FORMATS = {'JPEG', 'PNG', 'WEBP'}
+ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'jfif'}
+ALLOWED_IMAGE_FORMATS = {'JPEG', 'PNG', 'WEBP', 'MPO'}
 DANGEROUS_EXTENSIONS = {'svg', 'html', 'htm', 'exe', 'php', 'js', 'sh', 'bat', 'cmd', 'py', 'vbs', 'dll', 'bin', 'cgi'}
 # MIME type → extension fallback for browsers that omit file extensions
 CONTENT_TYPE_TO_EXT = {
-    'image/jpeg': 'jpg',
-    'image/jpg':  'jpg',
-    'image/png':  'png',
-    'image/webp': 'webp',
+    'image/jpeg':  'jpg',
+    'image/jpg':   'jpg',
+    'image/pjpeg': 'jpg',
+    'image/jfif':  'jpg',
+    'image/png':   'png',
+    'image/x-png': 'png',
+    'image/webp':  'webp',
 }
 MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
 
@@ -28,7 +31,7 @@ def validate_image_upload(file, max_size_bytes=MAX_IMAGE_SIZE_BYTES):
     4. Verifies file content integrity using Pillow.
        IMPORTANT: img.format is captured BEFORE img.verify() because verify()
        is destructive — it closes Pillow's internal stream and can clear
-       img.format to None in some Pillow builds.
+       img.format to None in some Pillow builds. Always rewinds the file stream.
     """
     if not file:
         return file
@@ -69,7 +72,8 @@ def validate_image_upload(file, max_size_bytes=MAX_IMAGE_SIZE_BYTES):
 
     # 3. Pillow integrity check
     try:
-        initial_pos = file.tell() if hasattr(file, 'tell') else 0
+        if hasattr(file, 'seek'):
+            file.seek(0)
         img = Image.open(file)
         # Capture format BEFORE verify() — verify() is destructive and clears
         # img.format in many Pillow versions once the stream is exhausted.
@@ -80,13 +84,13 @@ def validate_image_upload(file, max_size_bytes=MAX_IMAGE_SIZE_BYTES):
             raise ValidationError(
                 _(f"Unsupported image type '{detected_format}'. Only JPG, PNG, and WEBP are accepted.")
             )
-
-        if hasattr(file, 'seek'):
-            file.seek(initial_pos)
     except Exception as e:
         if isinstance(e, ValidationError):
             raise
         raise ValidationError(_("Corrupt or invalid image file. Please upload a valid JPG, PNG, or WEBP image."))
+    finally:
+        if hasattr(file, 'seek'):
+            file.seek(0)
 
     return file
 

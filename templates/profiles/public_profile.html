@@ -735,6 +735,7 @@
     <!-- ======================================================================
          SECTION: GALLERY / PORTFOLIO
          ====================================================================== -->
+    {% if gallery_items or is_owner %}
     <div class="prf-tab-panel" id="tab-gallery">
       <div class="prf-section-heading">
         <span>{% if profile.profile_type == 'personal' %}My Gallery{% else %}Portfolio &amp; Work{% endif %}</span>
@@ -762,13 +763,14 @@
             {% if item.link_url %}</a>{% else %}</div>{% endif %}
           {% endfor %}
         </div>
-      {% else %}
+      {% elif is_owner %}
         <div style="text-align: center; padding: 2rem 1rem; color: #A1A1AA; font-size: 0.875rem; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; color: #71717A;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <div>{% if profile.profile_type == 'personal' %}No photos added yet.{% else %}No gallery portfolio items added yet.{% endif %}</div>
+          <div>{% if profile.profile_type == 'personal' %}No photos added yet. Upload from dashboard to showcase here.{% else %}No gallery portfolio items added yet.{% endif %}</div>
         </div>
       {% endif %}
     </div>
+    {% endif %}
 
     <!-- ======================================================================
          SECTION: REVIEWS & MORE
@@ -865,13 +867,6 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
-
-      <!-- Bottom Save Contact fallback -->
-      <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-btn-dock-save"
-         data-track-event="vcard_download" data-profile-slug="{{ profile.slug }}" data-track-label="Save Contact">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>Save Contact</span>
-      </a>
     </div>
 
     <!-- Subtle Footer Branding -->

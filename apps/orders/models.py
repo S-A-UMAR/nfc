@@ -200,6 +200,8 @@ class Order(models.Model):
     shipping_address = models.TextField(blank=True)
     shipping_city = models.CharField(max_length=100, blank=True)
     shipping_state = models.CharField(max_length=100, blank=True)
+    shipping_tracking_number = models.CharField(max_length=100, blank=True, help_text="Courier tracking number")
+    shipping_carrier = models.CharField(max_length=100, blank=True, help_text="Courier carrier e.g. DHL, FedEx, GIG")
     
     customer_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

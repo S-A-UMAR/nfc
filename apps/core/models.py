@@ -34,6 +34,9 @@ class AdminAuditLog(models.Model):
     ACTION_CUSTOMER_STATUS = 'customer_status_changed'
     ACTION_WEBSITE_STATUS = 'website_status_changed'
     ACTION_ORDER_STATUS = 'order_status_changed'
+    ACTION_PIN_REGENERATED = 'pin_regenerated'
+    ACTION_CARD_BATCH_EXPORTED = 'card_batch_exported'
+    ACTION_PACKAGING_MANIFEST_DOWNLOADED = 'packaging_manifest_downloaded'
 
     ACTION_CHOICES = (
         (ACTION_CARD_CREATED, 'Card Created'),
@@ -47,6 +50,9 @@ class AdminAuditLog(models.Model):
         (ACTION_CUSTOMER_STATUS, 'Customer Status Changed'),
         (ACTION_WEBSITE_STATUS, 'Website Status Changed'),
         (ACTION_ORDER_STATUS, 'Order Status Changed'),
+        (ACTION_PIN_REGENERATED, 'Activation PIN Regenerated'),
+        (ACTION_CARD_BATCH_EXPORTED, 'Card Batch Exported'),
+        (ACTION_PACKAGING_MANIFEST_DOWNLOADED, 'Packaging Manifest Downloaded'),
     )
 
     action = models.CharField(max_length=40, choices=ACTION_CHOICES, db_index=True)

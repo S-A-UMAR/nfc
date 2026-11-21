@@ -72,6 +72,18 @@ class Card(models.Model):
         blank=True, 
         related_name='replacements'
     )
+    STAGE_GENERATED = 'generated'
+    STAGE_ENCODED = 'encoded'
+    STAGE_PACKAGED = 'packaged'
+    STAGE_READY = 'ready'
+
+    PROVISIONING_STAGE_CHOICES = (
+        (STAGE_GENERATED, 'Record Generated'),
+        (STAGE_ENCODED, 'NFC Written & QR Printed'),
+        (STAGE_PACKAGED, 'Sleeve Sealed with PIN'),
+        (STAGE_READY, 'Ready for Dispatch / Storage'),
+    )
+
     notes = models.TextField(blank=True)
     activation_code_hash = models.CharField(
         max_length=128, 
@@ -83,6 +95,19 @@ class Card(models.Model):
         default=False,
         db_index=True,
         help_text="Designates unallocated warehouse inventory that cannot be claimed until assigned/dispatched."
+    )
+    batch_reference = models.CharField(
+        max_length=64,
+        blank=True,
+        db_index=True,
+        help_text="Manufacturing batch identifier, e.g. BATCH-20261121-7K9M"
+    )
+    provisioning_stage = models.CharField(
+        max_length=30,
+        choices=PROVISIONING_STAGE_CHOICES,
+        default=STAGE_GENERATED,
+        db_index=True,
+        help_text="Manufacturing and provisioning readiness stage"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     activated_at = models.DateTimeField(null=True, blank=True)

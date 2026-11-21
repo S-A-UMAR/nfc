@@ -1,0 +1,172 @@
+{% extends 'console/base_console.html' %}
+{% load static %}
+
+{% block title %}NFC Card Inventory — STRIDE Console{% endblock %}
+
+{% block console_content %}
+<div class="dashboard-header" style="margin-bottom: 1.5rem;">
+  <div>
+    <h1 class="dashboard-title">Smart Card Inventory</h1>
+    <p class="dashboard-subtitle">Manage physical NFC hardware, batch allocations, customer assignments, and status lifecycles.</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm" style="background: var(--stride-soft-white); color: #000; font-weight: 600;">+ Generate Cards</a>
+    {% if can_export_zip %}
+    <form method="post" action="{% url 'console:card_batch_export_zip' %}" style="display: inline;">
+      {% csrf_token %}
+      {% if batch_filter != 'all' %}<input type="hidden" name="batch_reference" value="{{ batch_filter }}">{% endif %}
+      {% if stage_filter != 'all' %}<input type="hidden" name="stage" value="{{ stage_filter }}">{% endif %}
+      <button type="submit" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Manufacturing ZIP
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Status Chips Summary -->
+<div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    Total: <strong>{{ status_counts.total }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-unassigned"></span>Unassigned: <strong>{{ status_counts.unassigned }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-reserved"></span>Reserved: <strong>{{ status_counts.reserved }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-active"></span>Active: <strong>{{ status_counts.active }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-suspended"></span>Suspended: <strong>{{ status_counts.suspended }}</strong>
+  </div>
+  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-lost"></span>Lost: <strong>{{ status_counts.lost }}</strong>
+  </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="ops-filter-bar">
+  <form method="get" class="ops-search-box">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search card ID, batch, customer name, email..." class="form-control" style="font-size: 0.85rem;">
+    {% if status_filter != 'all' %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+    {% if stage_filter != 'all' %}<input type="hidden" name="stage" value="{{ stage_filter }}">{% endif %}
+    {% if batch_filter != 'all' %}<input type="hidden" name="batch" value="{{ batch_filter }}">{% endif %}
+    <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+    {% if search_query or status_filter != 'all' or stage_filter != 'all' or batch_filter != 'all' %}
+      <a href="{% url 'console:cards_list' %}" class="btn btn-ghost btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Stage:</span>
+    <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
+    <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
+    <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
+    <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
+  </div>
+</div>
+
+<!-- Cards Table -->
+<div class="ops-table-container">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th scope="col">Card ID</th>
+        <th scope="col">Status</th>
+        <th scope="col">Stage</th>
+        <th scope="col">Batch</th>
+        <th scope="col">Material</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Warehouse</th>
+        <th scope="col" style="text-align: right;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for card in cards %}
+      <tr>
+        <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-primary);">
+          <a href="{% url 'console:card_detail' card.id %}" style="color: inherit; text-decoration: none;">
+            {{ card.card_code }}
+          </a>
+        </td>
+        <td>
+          {% if card.status == 'ACTIVE' %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Active</span>
+          {% elif card.status == 'UNASSIGNED' %}
+            <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Unassigned</span>
+          {% elif card.status == 'RESERVED' %}
+            <span style="color: #3B82F6; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-reserved"></span>Reserved</span>
+          {% elif card.status == 'SUSPENDED' %}
+            <span style="color: #F59E0B; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-suspended"></span>Suspended</span>
+          {% elif card.status == 'LOST' %}
+            <span style="color: #EF4444; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-lost"></span>Lost</span>
+          {% elif card.status == 'REPLACED' %}
+            <span style="color: #6B7280; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-replaced"></span>Replaced</span>
+          {% else %}
+            <span class="badge badge-silver">{{ card.get_status_display }}</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="ops-stage-pill ops-stage-{{ card.provisioning_stage }}">
+            {{ card.get_provisioning_stage_display }}
+          </span>
+        </td>
+        <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">
+          {{ card.batch_reference|default:"—" }}
+        </td>
+        <td style="text-transform: capitalize;">
+          {{ card.material }}
+        </td>
+        <td>
+          {% if card.user %}
+            <a href="{% url 'console:customer_detail' card.user.id %}" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">
+              {{ card.user.first_name|default:card.user.email }}
+            </a>
+          {% else %}
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Unassigned</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if card.is_warehouse_stock %}
+            <span style="color: #FBBF24; font-size: 0.75rem; font-weight: 600;">Warehouse</span>
+          {% else %}
+            <span style="color: var(--text-muted); font-size: 0.75rem;">Allocated</span>
+          {% endif %}
+        </td>
+        <td style="text-align: right; white-space: nowrap;">
+          <a href="{% url 'console:card_qr_png' card.id %}" class="btn btn-ghost btn-sm" title="Download QR PNG" style="padding: 0.2rem 0.4rem; font-size: 0.75rem;">QR</a>
+          <a href="{% url 'console:card_detail' card.id %}" class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.55rem; font-size: 0.75rem;">Manage</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+          No smart cards found matching current filters.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if cards.has_other_pages %}
+<div class="ops-pagination">
+  <div>
+    Showing {{ cards.start_index }}–{{ cards.end_index }} of {{ cards.paginator.count }} cards
+  </div>
+  <div style="display: flex; gap: 0.35rem;">
+    {% if cards.has_previous %}
+      <a href="?page={{ cards.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-secondary btn-sm">&larr; Prev</a>
+    {% endif %}
+    {% if cards.has_next %}
+      <a href="?page={{ cards.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-secondary btn-sm">Next &rarr;</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

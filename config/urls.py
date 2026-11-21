@@ -52,6 +52,9 @@ urlpatterns = [
     # Internal Staff Operations Portal
     path('operations/', include('apps.core.operations_urls', namespace='operations')),
 
+    # STRIDE Command Console (NFC Provisioning & Hardware Lifecycle)
+    path('console/', include('apps.core.console_urls', namespace='console')),
+
     # NFC Redirect Hub: /c/<card_code>/
     path('', include('apps.cards.urls', namespace='cards')),
 

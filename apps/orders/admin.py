@@ -24,7 +24,7 @@ class ProductPackageAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'user', 'package', 'amount_display', 'payment_badge', 'order_status', 'card_assigned', 'created_at')
     list_filter = ('payment_status', 'order_status', 'package', 'created_at')
-    search_fields = ('order_number', 'user__email', 'user__first_name', 'shipping_name', 'shipping_phone')
+    search_fields = ('order_number', 'shipping_tracking_number', 'user__email', 'user__first_name', 'shipping_name', 'shipping_phone')
     inlines = [OrderRequirementInline]
     list_editable = ('order_status',)
 

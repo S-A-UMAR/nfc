@@ -1,0 +1,72 @@
+{% extends 'console/base_console.html' %}
+{% load static %}
+
+{% block title %}Generate STRIDE Cards — Console{% endblock %}
+
+{% block console_content %}
+<div class="dashboard-header" style="margin-bottom: 1.5rem;">
+  <div>
+    <h1 class="dashboard-title">Generate Physical NFC Cards</h1>
+    <p class="dashboard-subtitle">Provision canonical STRIDE card identifiers (ST-XXXXXXXX) with cryptographically secure activation PINs.</p>
+  </div>
+  <a href="{% url 'console:cards_list' %}" class="btn btn-secondary">
+    &larr; Back to Inventory
+  </a>
+</div>
+
+<div style="max-width: 680px;">
+  <div class="ops-action-card" style="background: var(--bg-surface); border: 1px solid var(--border-primary); padding: 1.75rem; border-radius: 8px;">
+    <form method="post" action="{% url 'console:card_generate' %}">
+      {% csrf_token %}
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label" for="count" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Quantity to Provision *</label>
+        <select name="count" id="count" class="form-control" style="width: 100%; max-width: 320px;" required>
+          {% for cnt in supported_counts %}
+            <option value="{{ cnt }}" {% if cnt == 1 %}selected{% endif %}>{{ cnt }} Card{% if cnt > 1 %}s{% endif %}</option>
+          {% endfor %}
+        </select>
+        <small class="form-hint" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.35rem; display: block;">
+          Select production batch size. Cards are initialized in <code>generated</code> stage as warehouse stock.
+        </small>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label" for="material" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Card Material *</label>
+        <select name="material" id="material" class="form-control" style="width: 100%; max-width: 320px;" required>
+          {% for mat_key, mat_name in material_choices %}
+            <option value="{{ mat_key }}">{{ mat_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.75rem;">
+        <label class="form-label" for="batch_reference" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Manufacturing Batch Reference</label>
+        <input type="text" name="batch_reference" id="batch_reference" class="form-control" value="{{ default_batch_ref }}" style="width: 100%; max-width: 320px; font-family: monospace;">
+        <small class="form-hint" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.35rem; display: block;">
+          Used to trace production runs, manufacturing lots, and packaging inserts.
+        </small>
+      </div>
+
+      <div style="background: rgba(196, 196, 196, 0.06); border: 1px solid var(--border-primary); border-radius: 6px; padding: 1rem; margin-bottom: 1.75rem;">
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div style="font-size: 0.825rem; color: var(--text-secondary); line-height: 1.45;">
+            <strong style="color: #FBBF24;">Important Security Notice:</strong>
+            Activation PINs are generated in real-time and held in ephemeral cache for <strong>15 minutes</strong> for one-time packaging slip printing and restricted export. Plaintext PINs are <strong>never stored</strong> in the database.
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button type="submit" class="btn btn-primary" style="background: var(--stride-soft-white); color: #000; font-weight: 600; padding: 0.65rem 1.4rem;">
+          Generate Cards &amp; PINs
+        </button>
+        <a href="{% url 'console:cards_list' %}" class="btn btn-secondary">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

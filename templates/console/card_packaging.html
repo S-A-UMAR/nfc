@@ -1,0 +1,87 @@
+{% extends 'console/base_console.html' %}
+{% load static %}
+
+{% block title %}Packaging Credentials — Batch {{ manifest.batch_reference }}{% endblock %}
+
+{% block console_content %}
+<div class="dashboard-header" style="margin-bottom: 1.5rem;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+      <h1 class="dashboard-title">Packaging Credentials Manifest</h1>
+      <span class="console-badge-staff">{{ manifest.batch_reference }}</span>
+    </div>
+    <p class="dashboard-subtitle">One-time reveal for factory packaging inserts and physical delivery preparation.</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <a href="{% url 'console:packaging_print' token %}" target="_blank" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print Packaging Slips
+    </a>
+    {% if can_download_csv %}
+    <a href="{% url 'console:packaging_csv' token %}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download CSV (Manager)
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="alert alert-warning" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: #FCD34D; margin-bottom: 1.5rem; padding: 1rem 1.25rem; border-radius: 6px;">
+  <strong>One-Time Ephemeral View:</strong>
+  Plaintext PINs shown below are never saved to the database. They will expire from temporary memory automatically in 15 minutes or as soon as acknowledged. Print packaging slips or record credentials immediately.
+</div>
+
+<div class="ops-table-container" style="margin-bottom: 1.5rem;">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th>Card ID</th>
+        <th>Material</th>
+        <th>Activation PIN</th>
+        <th>NFC Programming URL</th>
+        <th>QR Code</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for card in cards %}
+      <tr>
+        <td style="font-family: monospace; font-weight: 700; color: #FFF;">
+          {{ card.card_code }}
+        </td>
+        <td style="text-transform: capitalize;">
+          {{ card.material }}
+        </td>
+        <td style="font-family: monospace; font-size: 1.05rem; font-weight: 700; color: #10B981; letter-spacing: 0.1em;">
+          {{ card.pin }}
+        </td>
+        <td style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted);">
+          {{ card.canonical_url }}
+        </td>
+        <td>
+          {% if card.card_id %}
+          <a href="{% url 'console:card_qr_png' card.card_id %}" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+            PNG
+          </a>
+          <a href="{% url 'console:card_qr_svg' card.card_id %}" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+            SVG
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1rem; background: var(--bg-surface); border: 1px solid var(--border-primary); border-radius: 6px;">
+  <div style="font-size: 0.825rem; color: var(--text-muted);">
+    Total cards in manifest: <strong>{{ cards|length }}</strong>
+  </div>
+  <form method="post" action="{% url 'console:packaging_acknowledge' token %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Confirm you have printed or recorded all packaging slips? This will permanently wipe plaintext PINs from memory.');">
+      Acknowledge &amp; Purge PINs from Memory
+    </button>
+  </form>
+</div>
+{% endblock %}
