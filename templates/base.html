@@ -67,6 +67,12 @@
       <!-- Auth Actions -->
       <div class="nav-actions">
         {% if user.is_authenticated %}
+          {% if request.user.is_staff %}
+          <a href="{% url 'console:overview' %}" class="btn btn-ghost btn-sm nav-hide-mobile" style="color: #a3e635; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Console</span>
+          </a>
+          {% endif %}
           {% if request.resolver_match.namespace != 'dashboard' %}
           <a href="{% url 'dashboard:overview' %}" class="btn btn-secondary btn-sm nav-btn-pill">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -155,10 +161,10 @@
             <span>Settings</span>
           </a>
           {% if request.user.is_staff %}
-            <div class="drawer-section-title" style="color:#a3e635;margin-top:var(--space-4);">Operations</div>
-            <a href="{% url 'operations:overview' %}" class="nav-link {% if request.resolver_match.namespaces.0 == 'operations' %}active{% endif %}" style="color:#a3e635;">
+            <div class="drawer-section-title" style="color:#a3e635;margin-top:var(--space-4);">Staff Operations</div>
+            <a href="{% url 'console:overview' %}" class="nav-link {% if request.resolver_match.namespaces.0 == 'console' %}active{% endif %}" style="color:#a3e635;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              <span>Operations Portal</span>
+              <span>STRIDE Console</span>
             </a>
           {% endif %}
 

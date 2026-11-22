@@ -4,6 +4,22 @@
 {% block title %}Operations Hub — {{ BRAND_NAME }}{% endblock %}
 
 {% block operations_content %}
+<!-- Upgrade Notice to New STRIDE Console -->
+<div style="background: linear-gradient(135deg, rgba(24, 24, 27, 0.95), rgba(39, 39, 42, 0.8)); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; color: #FFF;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </div>
+    <div>
+      <div style="font-weight: 600; color: #FFF; font-size: 0.92rem;">STRIDE Console is Active</div>
+      <div style="font-size: 0.8rem; color: var(--text-muted);">The modern operations console with Production Batches, A4 PDF slips, and automatic ST- IDs is now live.</div>
+    </div>
+  </div>
+  <a href="{% url 'console:overview' %}" class="btn btn-sm" style="background: #FFFFFF; color: #0C0D11; font-weight: 600; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none;">
+    Open STRIDE Console →
+  </a>
+</div>
+
 <div class="dashboard-header">
   <div>
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
