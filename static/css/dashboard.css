@@ -2218,6 +2218,114 @@
   margin-top: 2px;
 }
 
+/* Floating Order Toast Notification */
+.dash-order-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1050;
+  max-width: 440px;
+  width: calc(100% - 48px);
+  background: rgba(18, 18, 24, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  padding: 0.85rem 1rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: dashToastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dash-order-toast.dismissed {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+}
+
+@keyframes dashToastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dash-order-toast-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dash-order-toast-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #60A5FA;
+  flex-shrink: 0;
+}
+
+.dash-order-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-order-toast-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #F4F4F5;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.dash-order-toast-sub {
+  font-size: 0.73rem;
+  color: #A1A1AA;
+  margin-top: 1px;
+}
+
+.dash-order-toast-btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.dash-order-toast-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+}
+
+.dash-order-toast-close {
+  background: none;
+  border: none;
+  color: #71717A;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.dash-order-toast-close:hover {
+  color: #FFFFFF;
+}
+
 /* ── Mobile & Tablet Responsiveness ──────────────────────────────────────── */
 @media (max-width: 900px) {
   .dashboard-shell {

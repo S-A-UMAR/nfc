@@ -2037,3 +2037,16 @@
 .profile-verified-badge {
   color: var(--prf-accent-silver, #BFC5CF) !important;
 }
+
+/* ==========================================================================
+   MASTER COVER BANNER AVATAR ELEVATION ACROSS ALL THEMES & LAYOUTS
+   ========================================================================== */
+.profile-card.has-cover .prf-avatar-wrap,
+[data-profile-type][data-layout] .profile-card.has-cover .prf-avatar-wrap,
+.profile-card.has-cover[data-profile-type][data-layout] .prf-avatar-wrap {
+  margin-top: -95px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative !important;
+  z-index: 25 !important;
+}

@@ -71,8 +71,20 @@
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
-  <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=4.0">
-  <link rel="stylesheet" href="{% static 'css/profile_themes.css' %}?v=4.0">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=4.2">
+  <link rel="stylesheet" href="{% static 'css/profile_themes.css' %}?v=4.2">
+  <style>
+    /* ── Apple Modern Glass Capsule Dock & Raised Avatar Overrides ── */
+    .profile-card.has-cover .prf-avatar-wrap,
+    [data-profile-type][data-layout] .profile-card.has-cover .prf-avatar-wrap,
+    .profile-card.has-cover[data-profile-type][data-layout] .prf-avatar-wrap {
+      margin-top: -95px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      position: relative !important;
+      z-index: 25 !important;
+    }
+  </style>
 </head>
 <body class="profile-body" data-theme="{{ profile.theme|default:'graphite' }}" data-layout="{{ profile.profile_layout|default:'classic' }}" data-profile-type="{{ profile.profile_type|default:'personal' }}">
 
