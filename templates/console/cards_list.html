@@ -29,7 +29,7 @@
 </div>
 
 <!-- Pairing & Inventory Filter Tabs -->
-<div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+<div class="ops-filter-scroll">
   <a href="?pairing=all{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-sm {% if pairing_filter == 'all' or not pairing_filter %}btn-secondary{% else %}btn-ghost{% endif %}" style="text-decoration: none; font-size: 0.8rem; font-weight: 600;">
     All Cards ({{ pairing_counts.total|default:0 }})
   </a>
@@ -51,6 +51,7 @@
 <div class="ops-filter-bar">
   <form method="get" class="ops-search-box">
     <input type="text" name="q" value="{{ search_query }}" placeholder="Search card ID, batch, customer name, email..." class="form-control" style="font-size: 0.85rem;">
+    {% if pairing_filter and pairing_filter != 'all' %}<input type="hidden" name="pairing" value="{{ pairing_filter }}">{% endif %}
     {% if status_filter != 'all' %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
     {% if stage_filter != 'all' %}<input type="hidden" name="stage" value="{{ stage_filter }}">{% endif %}
     {% if batch_filter != 'all' %}<input type="hidden" name="batch" value="{{ batch_filter }}">{% endif %}
@@ -60,13 +61,13 @@
     {% endif %}
   </form>
 
-  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Stage:</span>
-    <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
-    <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
-    <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
-    <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
-    <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
+  <div class="ops-filter-group">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Stage:</span>
+    <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
+    <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
+    <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
+    <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
   </div>
 </div>
 

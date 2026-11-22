@@ -67,14 +67,14 @@
         </div>
       </div>
       <div style="font-size: 0.825rem; line-height: 1.7;">
-        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; word-break: break-all;">
           <span>Canonical NFC:</span>
-          <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary); font-size: 0.78rem;">{{ canonical_url|default:card.nfc_url_path }}</strong>
+          <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary); font-size: 0.78rem; word-break: break-all;">{{ canonical_url|default:card.nfc_url_path }}</strong>
           <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('{{ canonical_url }}'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000)" style="padding: 0.1rem 0.35rem; font-size: 0.68rem; color: var(--stride-silver);">Copy</button>
         </div>
-        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; word-break: break-all;">
           <span>Staging Route:</span>
-          <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-size: 0.75rem;">{{ staging_url }}</strong>
+          <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-size: 0.75rem; word-break: break-all;">{{ staging_url }}</strong>
           <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('{{ staging_url }}'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000)" style="padding: 0.1rem 0.35rem; font-size: 0.68rem; color: var(--stride-silver);">Copy</button>
         </div>
         <div>

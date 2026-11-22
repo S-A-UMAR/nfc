@@ -26,7 +26,7 @@
     {% endif %}
   </form>
 
-  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+  <div class="ops-filter-group">
     <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Payment:</span>
     <a href="?payment_status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if payment_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
     <a href="?payment_status=paid{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if payment_filter == 'paid' %}badge-silver{% endif %}" style="text-decoration:none;">Paid</a>

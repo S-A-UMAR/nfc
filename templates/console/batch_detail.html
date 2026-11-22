@@ -59,7 +59,7 @@
   </div>
 
   <!-- Horizontal 4-Step Journey Bar -->
-  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; position: relative; margin-top: 1rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 1rem; position: relative; margin-top: 1rem;">
     <!-- Step 1: Generated -->
     <div style="padding: 1rem; border-radius: 10px; background: {% if current_step_num >= 1 %}rgba(16, 185, 129, 0.08){% else %}rgba(255,255,255,0.02){% endif %}; border: 1px solid {% if current_step_num >= 1 %}rgba(16, 185, 129, 0.3){% else %}rgba(255,255,255,0.06){% endif %}; text-align: left;">
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">

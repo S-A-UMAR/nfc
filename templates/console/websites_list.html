@@ -25,7 +25,7 @@
     {% endif %}
   </form>
 
-  <div style="display: flex; gap: 0.5rem; align-items: center;">
+  <div class="ops-filter-group">
     <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Status:</span>
     <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
     <a href="?status=published{% if search_query %}&q={{ search_query }}{% endif %}" class="badge {% if status_filter == 'published' %}badge-silver{% endif %}" style="text-decoration:none;">Published</a>

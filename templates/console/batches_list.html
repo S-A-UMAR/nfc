@@ -24,7 +24,7 @@
 
 <!-- Search & Filters Bar -->
 <div class="ops-filter-bar" style="background: rgba(24, 24, 27, 0.6); padding: 0.85rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 1.25rem;">
-  <form method="get" class="ops-search-box" style="display: flex; gap: 0.5rem; flex: 1; max-width: 480px;">
+  <form method="get" class="ops-search-box" style="display: flex; gap: 0.5rem; flex: 1 1 320px; max-width: 520px;">
     <input type="text" name="q" value="{{ search_query }}" placeholder="Search batch reference (e.g. BATCH-20261121)..." class="form-control" style="font-size: 0.85rem; background: rgba(12, 12, 15, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #FFF;">
     {% if material_filter != 'all' %}<input type="hidden" name="material" value="{{ material_filter }}">{% endif %}
     {% if stage_filter != 'all' %}<input type="hidden" name="stage" value="{{ stage_filter }}">{% endif %}
@@ -34,16 +34,13 @@
     {% endif %}
   </form>
 
-  <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-    <!-- Stage Filter -->
-    <div style="display: flex; gap: 0.35rem; align-items: center;">
-      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Stage:</span>
-      <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
-      <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
-      <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
-      <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
-      <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
-    </div>
+  <div class="ops-filter-group">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Stage:</span>
+    <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
+    <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
+    <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
+    <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
   </div>
 </div>
 
