@@ -1,0 +1,142 @@
+{% extends 'console/base_console.html' %}
+{% load static humanize %}
+
+{% block title %}Production Batches — STRIDE Console{% endblock %}
+
+{% block console_content %}
+<div class="dashboard-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+      <h1 class="dashboard-title" style="font-size: 1.65rem; font-weight: 700; margin: 0; letter-spacing: -0.02em;">Production Batches</h1>
+      <span class="console-badge-staff">HARDWARE OPERATIONS</span>
+    </div>
+    <p class="dashboard-subtitle" style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">
+      Centralized batch command, manufacturing manifests, and hardware provisioning pipelines.
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm" style="background: var(--stride-soft-white); color: #000; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1rem; border-radius: 8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      + Generate New Production Batch
+    </a>
+  </div>
+</div>
+
+<!-- Search & Filters Bar -->
+<div class="ops-filter-bar" style="background: rgba(24, 24, 27, 0.6); padding: 0.85rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 1.25rem;">
+  <form method="get" class="ops-search-box" style="display: flex; gap: 0.5rem; flex: 1; max-width: 480px;">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search batch reference (e.g. BATCH-20261121)..." class="form-control" style="font-size: 0.85rem; background: rgba(12, 12, 15, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #FFF;">
+    {% if material_filter != 'all' %}<input type="hidden" name="material" value="{{ material_filter }}">{% endif %}
+    {% if stage_filter != 'all' %}<input type="hidden" name="stage" value="{{ stage_filter }}">{% endif %}
+    <button type="submit" class="btn btn-secondary btn-sm" style="font-weight: 600;">Search</button>
+    {% if search_query or material_filter != 'all' or stage_filter != 'all' %}
+      <a href="{% url 'console:batches_list' %}" class="btn btn-ghost btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+    <!-- Stage Filter -->
+    <div style="display: flex; gap: 0.35rem; align-items: center;">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Stage:</span>
+      <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+      <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
+      <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
+      <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
+      <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}{% if material_filter != 'all' %}&material={{ material_filter }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
+    </div>
+  </div>
+</div>
+
+<!-- Batches Table -->
+<div class="ops-table-container" style="border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; background: rgba(20, 20, 24, 0.85);">
+  <table class="ops-table">
+    <thead>
+      <tr>
+        <th scope="col" style="padding-left: 1.25rem;">Batch Reference</th>
+        <th scope="col">Created Date</th>
+        <th scope="col">Material</th>
+        <th scope="col">Total</th>
+        <th scope="col">Unpaired</th>
+        <th scope="col">Pending</th>
+        <th scope="col">Active</th>
+        <th scope="col">Provisioning Progress</th>
+        <th scope="col" style="text-align: right; padding-right: 1.25rem;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in batches %}
+      <tr>
+        <td style="padding-left: 1.25rem; font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+          <a href="{% url 'console:batch_detail' b.batch_reference %}" style="color: #FFFFFF; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <span>{{ b.batch_reference }}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </td>
+        <td style="color: var(--text-muted); font-size: 0.82rem; white-space: nowrap;">
+          {{ b.created_at|date:"M d, Y" }}
+        </td>
+        <td style="text-transform: capitalize; font-size: 0.82rem; color: var(--stride-silver);">
+          {{ b.materials }}
+        </td>
+        <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #FFF;">
+          {{ b.total_cards }}
+        </td>
+        <td style="font-family: 'JetBrains Mono', monospace; color: #C4C4C4; font-size: 0.85rem;">
+          {{ b.unpaired_count }}
+        </td>
+        <td style="font-family: 'JetBrains Mono', monospace; color: #FBBF24; font-size: 0.85rem;">
+          {{ b.paired_pending_count }}
+        </td>
+        <td style="font-family: 'JetBrains Mono', monospace; color: #10B981; font-weight: 600; font-size: 0.85rem;">
+          {{ b.active_count }}
+        </td>
+        <td style="min-width: 170px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem;">
+            <span class="ops-stage-pill ops-stage-{{ b.stage }}" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">{{ b.stage_display }}</span>
+            <span style="font-size: 0.70rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">{{ b.progress_pct }}%</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 9999px; overflow: hidden;">
+            <div style="width: {{ b.progress_pct }}%; height: 100%; background: {% if b.stage == 'ready' %}#10B981{% elif b.stage == 'packaged' %}#F59E0B{% elif b.stage == 'encoded' %}#3B82F6{% else %}#94A3B8{% endif %}; border-radius: 9999px;"></div>
+          </div>
+        </td>
+        <td style="text-align: right; padding-right: 1.25rem; white-space: nowrap;">
+          <a href="{% url 'console:batch_detail' b.batch_reference %}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem; padding: 0.25rem 0.65rem;">
+            View Batch
+          </a>
+          <a href="{% url 'console:card_batch_export_zip' %}?batch={{ b.batch_reference }}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem; padding: 0.25rem 0.65rem;" title="Download manufacturing SVGs, PNGs, and NFC encoding CSV">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ZIP
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="9" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+          <div style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #FFF;">No production batches found</div>
+          <p style="font-size: 0.85rem; margin: 0 0 1rem;">Generate a new batch to create hardware records and start the provisioning lifecycle.</p>
+          <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm">+ Generate First Production Batch</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if batches.has_other_pages %}
+<div class="ops-pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
+  <div>
+    Showing {{ batches.start_index }} to {{ batches.end_index }} of {{ total_batches_count }} batches
+  </div>
+  <div style="display: flex; gap: 0.4rem;">
+    {% if batches.has_previous %}
+      <a href="?page={{ batches.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-secondary btn-sm">Previous</a>
+    {% endif %}
+    <span class="btn btn-ghost btn-sm" style="color: #FFF; font-weight: 600;">Page {{ batches.number }} of {{ batches.paginator.num_pages }}</span>
+    {% if batches.has_next %}
+      <a href="?page={{ batches.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-secondary btn-sm">Next</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

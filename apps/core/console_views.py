@@ -6,11 +6,12 @@ from django.http import HttpResponse, Http404, FileResponse
 from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Min, Max
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 
 from apps.cards.models import Card, CardEvent
 from apps.orders.models import Order, ProductPackage
@@ -40,7 +41,9 @@ from apps.cards.services.packaging_service import (
     get_packaging_manifest,
     acknowledge_packaging_manifest,
     build_packaging_csv_content,
+    generate_packaging_slips_pdf,
     regenerate_card_activation_pin,
+    regenerate_batch_activation_pins,
 )
 
 User = get_user_model()
@@ -108,18 +111,29 @@ def console_overview_view(request):
     ).exclude(
         order_status=Order.STATUS_COMPLETED
     ).select_related('user', 'package', 'card_assigned').order_by('-created_at')[:6]
+    recent_card_events = CardEvent.objects.select_related('card', 'card__user').order_by('-created_at')[:6]
+
+    # Explicit pairing metrics for top cards
+    unpaired_stock = Card.objects.filter(status=Card.STATUS_UNASSIGNED, user__isnull=True).count()
+    pending_activation = Card.objects.filter(
+        Q(status=Card.STATUS_RESERVED) | Q(user__isnull=False, status=Card.STATUS_UNASSIGNED)
+    ).count()
 
     return render(request, 'console/overview.html', {
         'total_customers': total_customers,
         'active_customers': active_customers,
         'total_staff': total_staff,
         'card_counts': card_counts,
+        'unpaired_stock': unpaired_stock,
+        'pending_activation': pending_activation,
+        'active_linked': card_counts.get('active', 0),
         'provisioning_counts': provisioning_counts,
         'order_counts': order_counts,
         'inquiry_counts': inquiry_counts,
         'website_counts': website_counts,
         'recent_audit_logs': recent_audit_logs,
         'pending_orders': pending_orders,
+        'recent_card_events': recent_card_events,
     })
 
 
@@ -135,6 +149,17 @@ def console_cards_list_view(request):
     status_filter = request.GET.get('status', 'all')
     if status_filter != 'all' and status_filter in dict(Card.STATUS_CHOICES):
         qs = qs.filter(status=status_filter)
+
+    # Pairing filter
+    pairing_filter = request.GET.get('pairing', 'all')
+    if pairing_filter == 'unpaired':
+        qs = qs.filter(status=Card.STATUS_UNASSIGNED, user__isnull=True)
+    elif pairing_filter == 'paired_pending':
+        qs = qs.filter(Q(status=Card.STATUS_RESERVED) | Q(user__isnull=False, status=Card.STATUS_UNASSIGNED))
+    elif pairing_filter == 'active':
+        qs = qs.filter(status=Card.STATUS_ACTIVE)
+    elif pairing_filter == 'inactive':
+        qs = qs.filter(status__in=[Card.STATUS_SUSPENDED, Card.STATUS_LOST, Card.STATUS_REPLACED])
 
     # Material filter
     material_filter = request.GET.get('material', 'all')
@@ -181,6 +206,14 @@ def console_cards_list_view(request):
         replaced=Count('id', filter=Q(status=Card.STATUS_REPLACED)),
     )
 
+    pairing_counts = Card.objects.aggregate(
+        total=Count('id'),
+        unpaired=Count('id', filter=Q(status=Card.STATUS_UNASSIGNED, user__isnull=True)),
+        paired_pending=Count('id', filter=Q(status=Card.STATUS_RESERVED) | Q(user__isnull=False, status=Card.STATUS_UNASSIGNED)),
+        active=Count('id', filter=Q(status=Card.STATUS_ACTIVE)),
+        inactive=Count('id', filter=Q(status__in=[Card.STATUS_SUSPENDED, Card.STATUS_LOST, Card.STATUS_REPLACED])),
+    )
+
     # Available batches for quick dropdown filter
     recent_batches = (
         Card.objects.exclude(batch_reference='')
@@ -196,16 +229,19 @@ def console_cards_list_view(request):
         'cards': cards_page,
         'search_query': q,
         'status_filter': status_filter,
+        'pairing_filter': pairing_filter,
         'material_filter': material_filter,
         'stage_filter': stage_filter,
         'warehouse_filter': warehouse_filter,
         'batch_filter': batch_filter,
         'status_counts': status_counts,
+        'pairing_counts': pairing_counts,
         'status_choices': Card.STATUS_CHOICES,
         'material_choices': Card.MATERIAL_CHOICES,
         'stage_choices': Card.PROVISIONING_STAGE_CHOICES,
         'recent_batches': recent_batches,
         'total_count': paginator.count,
+        'can_export_zip': is_operations_manager(request.user),
     })
 
 
@@ -337,6 +373,44 @@ def console_packaging_csv_download(request, token):
 
 
 @console_staff_required
+def console_packaging_pdf_download(request, token):
+    """
+    High-quality print-ready A4 PDF download of all packaging slips in the manifest.
+    Formatted 8 slips per page with cutting guides and confidential PIN styling.
+    Strict no-cache headers and manager/creator authorization check.
+    """
+    manifest = get_packaging_manifest(token)
+    if not manifest:
+        messages.error(request, "Manifest expired or unavailable.")
+        return redirect('console:cards_list')
+
+    creator_email = manifest.get('staff_email')
+    if creator_email and creator_email != request.user.email and not is_operations_manager(request.user):
+        raise PermissionDenied("You do not have permission to view or print packaging credentials generated by another staff member.")
+
+    AdminAuditLog.log(
+        action=AdminAuditLog.ACTION_PACKAGING_MANIFEST_DOWNLOADED,
+        staff_user=request.user,
+        target_repr=f"Batch {manifest.get('batch_reference')}",
+        target_model="Card",
+        target_id=manifest.get('batch_reference', ''),
+        details=f"Staff downloaded packaging PDF for {len(manifest.get('cards', []))} cards",
+        ip_address=get_client_ip(request),
+    )
+
+    pdf_buffer = generate_packaging_slips_pdf(manifest)
+    batch_ref = manifest.get('batch_reference', 'BATCH')
+    filename = f"STRIDE_SLIPS_{batch_ref}.pdf"
+
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
+
+
+@console_staff_required
 def console_packaging_print_view(request, token):
     """
     Printable packaging slips view.
@@ -392,6 +466,7 @@ def console_card_detail_view(request, card_id):
 
     # Active order if assigned to one
     linked_order = Order.objects.filter(card_assigned=card).first()
+    batch_cards_count = Card.objects.filter(batch_reference=card.batch_reference).count() if card.batch_reference else 0
 
     return render(request, 'console/card_detail.html', {
         'card': card,
@@ -401,7 +476,12 @@ def console_card_detail_view(request, card_id):
         'unassigned_cards': unassigned_cards,
         'linked_order': linked_order,
         'can_regen_pin': can_manage_pins(request.user) and card.status != Card.STATUS_ACTIVE,
-        'canonical_nfc_url': get_canonical_card_url(card.card_code, force_production=True),
+        'can_regenerate_pin': can_manage_pins(request.user) and card.status != Card.STATUS_ACTIVE,
+        'canonical_url': card.get_canonical_production_url(),
+        'staging_url': card.get_staging_test_url(),
+        'canonical_nfc_url': card.get_canonical_production_url(),
+        'batch_cards_count': batch_cards_count,
+        'stage_choices': Card.PROVISIONING_STAGE_CHOICES,
     })
 
 
@@ -766,6 +846,257 @@ def console_card_replace_view(request, card_id):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 8. PRODUCTION BATCHES COMMAND HUB
+# ─────────────────────────────────────────────────────────────────────────────
+@console_staff_required
+def console_batches_list_view(request):
+    """
+    Centralized production batches list with live hardware counts, stages, and manifests.
+    """
+    material_filter = request.GET.get('material', 'all').strip()
+    stage_filter = request.GET.get('stage', 'all').strip()
+    search_q = request.GET.get('q', '').strip()
+
+    base_qs = Card.objects.exclude(batch_reference='')
+
+    if search_q:
+        base_qs = base_qs.filter(batch_reference__icontains=search_q)
+
+    if material_filter != 'all' and material_filter in dict(Card.MATERIAL_CHOICES):
+        base_qs = base_qs.filter(material=material_filter)
+
+    if stage_filter != 'all' and stage_filter in dict(Card.PROVISIONING_STAGE_CHOICES):
+        base_qs = base_qs.filter(provisioning_stage=stage_filter)
+
+    # Aggregated batch metrics
+    batch_rows = base_qs.values('batch_reference').annotate(
+        total_cards=Count('id'),
+        unpaired_count=Count('id', filter=Q(status=Card.STATUS_UNASSIGNED, user__isnull=True)),
+        paired_pending_count=Count('id', filter=Q(status=Card.STATUS_RESERVED) | Q(user__isnull=False, status=Card.STATUS_UNASSIGNED)),
+        active_count=Count('id', filter=Q(status=Card.STATUS_ACTIVE)),
+        stage_generated=Count('id', filter=Q(provisioning_stage=Card.STAGE_GENERATED)),
+        stage_encoded=Count('id', filter=Q(provisioning_stage=Card.STAGE_ENCODED)),
+        stage_packaged=Count('id', filter=Q(provisioning_stage=Card.STAGE_PACKAGED)),
+        stage_ready=Count('id', filter=Q(provisioning_stage=Card.STAGE_READY)),
+        created_at=Min('created_at'),
+    ).order_by('-created_at')
+
+    # Enrich each batch with dominant material, display stage, and progress percentage
+    enriched_batches = []
+    for b in batch_rows:
+        ref = b['batch_reference']
+        materials = list(Card.objects.filter(batch_reference=ref).values_list('material', flat=True).distinct())
+        material_labels = [dict(Card.MATERIAL_CHOICES).get(m, m) for m in materials]
+        
+        total = b['total_cards']
+        ready_c = b['stage_ready']
+        packaged_c = b['stage_packaged']
+        encoded_c = b['stage_encoded']
+
+        if ready_c == total and total > 0:
+            stage_slug = 'ready'
+            progress_pct = 100
+        elif (packaged_c + ready_c) == total and total > 0:
+            stage_slug = 'packaged'
+            progress_pct = 75
+        elif (encoded_c + packaged_c + ready_c) == total and total > 0:
+            stage_slug = 'encoded'
+            progress_pct = 50
+        else:
+            stage_slug = 'generated'
+            progress_pct = 25
+
+        enriched_batches.append({
+            'batch_reference': ref,
+            'total_cards': total,
+            'unpaired_count': b['unpaired_count'],
+            'paired_pending_count': b['paired_pending_count'],
+            'active_count': b['active_count'],
+            'materials': ", ".join(material_labels) or "Standard",
+            'stage': stage_slug,
+            'stage_display': dict(Card.PROVISIONING_STAGE_CHOICES).get(stage_slug, stage_slug.capitalize()),
+            'progress_pct': progress_pct,
+            'created_at': b['created_at'],
+        })
+
+    paginator = Paginator(enriched_batches, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'console/batches_list.html', {
+        'batches': page_obj,
+        'search_query': search_q,
+        'material_filter': material_filter,
+        'stage_filter': stage_filter,
+        'material_choices': Card.MATERIAL_CHOICES,
+        'stage_choices': Card.PROVISIONING_STAGE_CHOICES,
+        'total_batches_count': len(enriched_batches),
+    })
+
+
+@console_staff_required
+def console_batch_detail_view(request, batch_reference):
+    """
+    Dedicated batch command center:
+    - 4-step provisioning journey tracker
+    - Bulk stage advancement
+    - Bulk QR & NFC manufacturing ZIP download
+    - Cards in batch with pairing status
+    - Manager-only emergency bulk PIN regeneration
+    """
+    clean_batch = batch_reference.strip()
+    cards_qs = Card.objects.filter(batch_reference=clean_batch).select_related('user', 'profile').order_by('card_code')
+    total_cards = cards_qs.count()
+
+    if total_cards == 0:
+        messages.error(request, f"No cards found matching batch reference '{clean_batch}'.")
+        return redirect('console:batches_list')
+
+    unpaired_count = cards_qs.filter(status=Card.STATUS_UNASSIGNED, user__isnull=True).count()
+    paired_pending_count = cards_qs.filter(
+        Q(status=Card.STATUS_RESERVED) | Q(user__isnull=False, status=Card.STATUS_UNASSIGNED)
+    ).count()
+    active_count = cards_qs.filter(status=Card.STATUS_ACTIVE).count()
+    decommissioned_count = cards_qs.filter(status__in=[Card.STATUS_LOST, Card.STATUS_REPLACED, Card.STATUS_SUSPENDED]).count()
+
+    stage_counts = {
+        'generated': cards_qs.filter(provisioning_stage=Card.STAGE_GENERATED).count(),
+        'encoded': cards_qs.filter(provisioning_stage=Card.STAGE_ENCODED).count(),
+        'packaged': cards_qs.filter(provisioning_stage=Card.STAGE_PACKAGED).count(),
+        'ready': cards_qs.filter(provisioning_stage=Card.STAGE_READY).count(),
+    }
+
+    if stage_counts['ready'] == total_cards:
+        current_stage = 'ready'
+        next_stage = None
+        current_step_num = 4
+    elif (stage_counts['packaged'] + stage_counts['ready']) == total_cards:
+        current_stage = 'packaged'
+        next_stage = 'ready'
+        current_step_num = 3
+    elif (stage_counts['encoded'] + stage_counts['packaged'] + stage_counts['ready']) == total_cards:
+        current_stage = 'encoded'
+        next_stage = 'packaged'
+        current_step_num = 2
+    else:
+        current_stage = 'generated'
+        next_stage = 'encoded'
+        current_step_num = 1
+
+    materials = list(cards_qs.values_list('material', flat=True).distinct())
+    material_labels = [dict(Card.MATERIAL_CHOICES).get(m, m) for m in materials]
+
+    first_card = cards_qs.first()
+    batch_created_at = first_card.created_at if first_card else None
+
+    audit_logs = AdminAuditLog.objects.filter(
+        target_model='Card',
+        target_id=clean_batch
+    ).select_related('staff_user').order_by('-created_at')[:15]
+
+    can_regen = (
+        is_operations_manager(request.user) and
+        active_count == 0 and
+        decommissioned_count == 0
+    )
+
+    return render(request, 'console/batch_detail.html', {
+        'batch_reference': clean_batch,
+        'cards': cards_qs,
+        'total_cards': total_cards,
+        'unpaired_count': unpaired_count,
+        'paired_pending_count': paired_pending_count,
+        'active_count': active_count,
+        'materials_display': ", ".join(material_labels),
+        'created_at': batch_created_at,
+        'current_stage': current_stage,
+        'current_stage_display': dict(Card.PROVISIONING_STAGE_CHOICES).get(current_stage, current_stage.capitalize()),
+        'current_step_num': current_step_num,
+        'next_stage': next_stage,
+        'next_stage_display': dict(Card.PROVISIONING_STAGE_CHOICES).get(next_stage, next_stage.capitalize()) if next_stage else None,
+        'stage_choices': Card.PROVISIONING_STAGE_CHOICES,
+        'can_regen_pins': can_regen,
+        'audit_logs': audit_logs,
+    })
+
+
+@console_staff_required
+@require_POST
+def console_batch_update_stage_view(request, batch_reference):
+    """
+    Advance or update provisioning stage for an entire batch atomically.
+    """
+    clean_batch = batch_reference.strip()
+    new_stage = request.POST.get('stage', '').strip()
+
+    valid_stages = dict(Card.PROVISIONING_STAGE_CHOICES)
+    if new_stage not in valid_stages:
+        messages.error(request, f"Invalid provisioning stage '{new_stage}'.")
+        return redirect('console:batch_detail', batch_reference=clean_batch)
+
+    cards = Card.objects.filter(batch_reference=clean_batch)
+    count = cards.count()
+    if count == 0:
+        messages.error(request, f"No cards found matching batch '{clean_batch}'.")
+        return redirect('console:batches_list')
+
+    with transaction.atomic():
+        cards.update(provisioning_stage=new_stage)
+
+        AdminAuditLog.log(
+            action=AdminAuditLog.ACTION_CARD_BULK_CREATED,
+            staff_user=request.user,
+            target_repr=f"Batch {clean_batch} ({count} cards)",
+            target_model="Card",
+            target_id=clean_batch,
+            new_state=new_stage,
+            details=f"Staff updated provisioning stage of all {count} cards in batch {clean_batch} to '{valid_stages[new_stage]}'",
+            ip_address=get_client_ip(request),
+        )
+
+    messages.success(request, f"All {count} cards in batch {clean_batch} advanced to '{valid_stages[new_stage]}'.")
+    return redirect('console:batch_detail', batch_reference=clean_batch)
+
+
+@console_staff_required
+@manager_required
+@require_POST
+def console_batch_regenerate_pins_view(request, batch_reference):
+    """
+    Emergency bulk PIN regeneration for unactivated batch.
+    Requires manager role and minimum 5-character reason.
+    """
+    clean_batch = batch_reference.strip()
+    reason = request.POST.get('reason', '').strip()
+
+    if not reason or len(reason) < 5:
+        messages.error(request, "A valid reason (minimum 5 characters) is required for emergency bulk PIN regeneration.")
+        return redirect('console:batch_detail', batch_reference=clean_batch)
+
+    ip = get_client_ip(request)
+
+    try:
+        updated_cards, token = regenerate_batch_activation_pins(
+            batch_reference=clean_batch,
+            staff_user=request.user,
+            reason=reason,
+            ip_address=ip,
+        )
+        messages.success(
+            request,
+            f"Successfully regenerated activation PINs for {len(updated_cards)} cards in batch {clean_batch}. "
+            "Download or print the replacement packaging slips immediately."
+        )
+        return redirect('console:card_packaging', token=token)
+    except ValueError as e:
+        messages.error(request, f"Emergency PIN regeneration rejected: {e}")
+        return redirect('console:batch_detail', batch_reference=clean_batch)
+    except Exception as e:
+        messages.error(request, f"PIN regeneration failed: {e}")
+        return redirect('console:batch_detail', batch_reference=clean_batch)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 9. ORDERS & FULFILLMENT
 # ─────────────────────────────────────────────────────────────────────────────
 @console_staff_required
@@ -803,6 +1134,7 @@ def console_orders_list_view(request):
         'payment_choices': Order.PAYMENT_STATUS_CHOICES,
         'order_status_choices': Order.ORDER_STATUS_CHOICES,
         'total_count': paginator.count,
+        'can_export_zip': is_operations_manager(request.user),
     })
 
 
@@ -954,6 +1286,7 @@ def console_customers_list_view(request):
         'search_query': q,
         'status_filter': status_filter,
         'total_count': paginator.count,
+        'can_export_zip': is_operations_manager(request.user),
     })
 
 
@@ -1028,6 +1361,7 @@ def console_inquiries_list_view(request):
         'status_filter': status_filter,
         'status_choices': BusinessInquiry.STATUS_CHOICES,
         'total_count': paginator.count,
+        'can_export_zip': is_operations_manager(request.user),
     })
 
 
@@ -1075,6 +1409,7 @@ def console_websites_list_view(request):
     return render(request, 'console/websites_list.html', {
         'websites': websites_page,
         'total_count': paginator.count,
+        'can_export_zip': is_operations_manager(request.user),
     })
 
 
@@ -1124,4 +1459,5 @@ def console_audit_logs_view(request):
         'action_choices': AdminAuditLog.ACTION_CHOICES,
         'search_query': q,
         'total_count': paginator.count,
+        'can_export_zip': is_operations_manager(request.user),
     })

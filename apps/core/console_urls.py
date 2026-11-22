@@ -20,9 +20,16 @@ urlpatterns = [
 
     # 4. Packaging Slips & CSV Manifest (One-Time Handoff)
     path('cards/packaging/<str:token>/', views.console_card_packaging_view, name='card_packaging'),
+    path('cards/packaging/<str:token>/pdf/', views.console_packaging_pdf_download, name='packaging_pdf'),
     path('cards/packaging/<str:token>/csv/', views.console_packaging_csv_download, name='packaging_csv'),
     path('cards/packaging/<str:token>/print/', views.console_packaging_print_view, name='packaging_print'),
     path('cards/packaging/<str:token>/acknowledge/', views.console_packaging_acknowledge_view, name='packaging_acknowledge'),
+
+    # 5. Production Batches Hub
+    path('batches/', views.console_batches_list_view, name='batches_list'),
+    path('batches/<str:batch_reference>/', views.console_batch_detail_view, name='batch_detail'),
+    path('batches/<str:batch_reference>/update-stage/', views.console_batch_update_stage_view, name='batch_update_stage'),
+    path('batches/<str:batch_reference>/regenerate-pins/', views.console_batch_regenerate_pins_view, name='batch_regenerate_pins'),
 
     # 5. PIN Regeneration (Manager Only)
     path('cards/<int:card_id>/regenerate-pin/', views.console_card_regenerate_pin_view, name='card_regenerate_pin'),

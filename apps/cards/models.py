@@ -212,6 +212,55 @@ class Card(models.Model):
             self.generate_qr_code()
         super().save(*args, **kwargs)
 
+    @property
+    def pairing_status(self) -> str:
+        """
+        Operational pairing classification for STRIDE Console:
+        - 'ACTIVE': Fully activated by customer.
+        - 'PAIRED_PENDING': Reserved/assigned to customer/order, awaiting customer PIN activation.
+        - 'UNPAIRED': Unassigned inventory stock in warehouse.
+        - Other states: 'SUSPENDED', 'LOST', 'REPLACED'.
+        """
+        if self.status == self.STATUS_ACTIVE:
+            return 'ACTIVE'
+        if self.status in (self.STATUS_SUSPENDED, self.STATUS_LOST, self.STATUS_REPLACED):
+            return self.status
+        if self.user or self.status == self.STATUS_RESERVED:
+            return 'PAIRED_PENDING'
+        return 'UNPAIRED'
+
+    @property
+    def pairing_status_display(self) -> str:
+        labels = {
+            'UNPAIRED': 'Unpaired Stock',
+            'PAIRED_PENDING': 'Paired — Not Activated',
+            'ACTIVE': 'Active & Linked',
+            'SUSPENDED': 'Suspended',
+            'LOST': 'Reported Lost',
+            'REPLACED': 'Replaced',
+        }
+        return labels.get(self.pairing_status, self.get_status_display())
+
+    @property
+    def pairing_status_badge(self) -> str:
+        classes = {
+            'UNPAIRED': 'ops-badge-unpaired',
+            'PAIRED_PENDING': 'ops-badge-paired',
+            'ACTIVE': 'ops-badge-active',
+            'SUSPENDED': 'ops-badge-suspended',
+            'LOST': 'ops-badge-lost',
+            'REPLACED': 'ops-badge-replaced',
+        }
+        return classes.get(self.pairing_status, 'ops-badge-unpaired')
+
+    def get_canonical_production_url(self) -> str:
+        """Hardware canonical URL written to physical chip / laser QR."""
+        return f"https://strideid.com/c/{self.card_code}/"
+
+    def get_staging_test_url(self) -> str:
+        """Staging environment testing route."""
+        return f"https://nfc-staging.up.railway.app/c/{self.card_code}/"
+
 
 class CardEvent(models.Model):
     EVENT_NFC = 'nfc_tap'

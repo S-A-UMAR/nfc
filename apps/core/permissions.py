@@ -24,7 +24,8 @@ def is_operations_manager(user) -> bool:
         return True
     if "Support Staff" in user_groups:
         return False
-    return True
+    # Explicit group membership required; plain staff without a manager group are not managers
+    return False
 
 
 def can_manage_pins(user) -> bool:

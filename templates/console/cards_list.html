@@ -25,26 +25,23 @@
   </div>
 </div>
 
-<!-- Status Chips Summary -->
-<div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
-  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
-    Total: <strong>{{ status_counts.total }}</strong>
-  </div>
-  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
-    <span class="ops-status-dot ops-dot-unassigned"></span>Unassigned: <strong>{{ status_counts.unassigned }}</strong>
-  </div>
-  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
-    <span class="ops-status-dot ops-dot-reserved"></span>Reserved: <strong>{{ status_counts.reserved }}</strong>
-  </div>
-  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
-    <span class="ops-status-dot ops-dot-active"></span>Active: <strong>{{ status_counts.active }}</strong>
-  </div>
-  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
-    <span class="ops-status-dot ops-dot-suspended"></span>Suspended: <strong>{{ status_counts.suspended }}</strong>
-  </div>
-  <div style="background: var(--bg-surface); padding: 0.5rem 0.85rem; border: 1px solid var(--border-primary); border-radius: var(--radius-xs); font-size: 0.8rem;">
-    <span class="ops-status-dot ops-dot-lost"></span>Lost: <strong>{{ status_counts.lost }}</strong>
-  </div>
+<!-- Pairing & Inventory Filter Tabs -->
+<div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+  <a href="?pairing=all{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-sm {% if pairing_filter == 'all' or not pairing_filter %}btn-secondary{% else %}btn-ghost{% endif %}" style="text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+    All Cards ({{ pairing_counts.total|default:0 }})
+  </a>
+  <a href="?pairing=unpaired{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-sm {% if pairing_filter == 'unpaired' %}btn-secondary{% else %}btn-ghost{% endif %}" style="text-decoration: none; font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-unassigned"></span>Unpaired Stock ({{ pairing_counts.unpaired|default:0 }})
+  </a>
+  <a href="?pairing=paired_pending{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-sm {% if pairing_filter == 'paired_pending' %}btn-secondary{% else %}btn-ghost{% endif %}" style="text-decoration: none; font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-reserved"></span>Paired (Pending Activation) ({{ pairing_counts.paired_pending|default:0 }})
+  </a>
+  <a href="?pairing=active{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-sm {% if pairing_filter == 'active' %}btn-secondary{% else %}btn-ghost{% endif %}" style="text-decoration: none; font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-active"></span>Active &amp; Linked ({{ pairing_counts.active|default:0 }})
+  </a>
+  <a href="?pairing=inactive{% if search_query %}&q={{ search_query }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="btn btn-sm {% if pairing_filter == 'inactive' %}btn-secondary{% else %}btn-ghost{% endif %}" style="text-decoration: none; font-size: 0.8rem;">
+    <span class="ops-status-dot ops-dot-suspended"></span>Inactive / Suspended / Lost ({{ pairing_counts.inactive|default:0 }})
+  </a>
 </div>
 
 <!-- Search & Filter Controls -->
@@ -76,7 +73,7 @@
     <thead>
       <tr>
         <th scope="col">Card ID</th>
-        <th scope="col">Status</th>
+        <th scope="col">Pairing Status</th>
         <th scope="col">Stage</th>
         <th scope="col">Batch</th>
         <th scope="col">Material</th>
@@ -94,12 +91,12 @@
           </a>
         </td>
         <td>
-          {% if card.status == 'ACTIVE' %}
-            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Active</span>
-          {% elif card.status == 'UNASSIGNED' %}
-            <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Unassigned</span>
-          {% elif card.status == 'RESERVED' %}
-            <span style="color: #3B82F6; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-reserved"></span>Reserved</span>
+          {% if card.pairing_status == 'ACTIVE' %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Active &amp; Linked</span>
+          {% elif card.pairing_status == 'PAIRED_PENDING' %}
+            <span style="color: #FBBF24; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-reserved"></span>Paired — Not Activated</span>
+          {% elif card.pairing_status == 'UNPAIRED' %}
+            <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Unpaired Stock</span>
           {% elif card.status == 'SUSPENDED' %}
             <span style="color: #F59E0B; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-suspended"></span>Suspended</span>
           {% elif card.status == 'LOST' %}
@@ -115,8 +112,14 @@
             {{ card.get_provisioning_stage_display }}
           </span>
         </td>
-        <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">
-          {{ card.batch_reference|default:"—" }}
+        <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+          {% if card.batch_reference %}
+            <a href="{% url 'console:batch_detail' card.batch_reference %}" style="color: var(--stride-silver); text-decoration: none; font-weight: 600;">
+              {{ card.batch_reference }}
+            </a>
+          {% else %}
+            <span style="color: var(--text-muted);">—</span>
+          {% endif %}
         </td>
         <td style="text-transform: capitalize;">
           {{ card.material }}

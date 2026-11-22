@@ -1,0 +1,256 @@
+{% extends 'console/base_console.html' %}
+{% load static humanize %}
+
+{% block title %}Batch {{ batch_reference }} — STRIDE Console{% endblock %}
+
+{% block console_content %}
+<!-- Batch Header -->
+<div class="dashboard-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+      <h1 class="dashboard-title" style="font-family: 'JetBrains Mono', monospace; font-size: 1.65rem; font-weight: 700; margin: 0; letter-spacing: -0.02em;">
+        {{ batch_reference }}
+      </h1>
+      <span class="console-badge-staff">{{ materials_display|upper }}</span>
+      <span class="ops-stage-pill ops-stage-{{ current_stage }}">{{ current_stage_display }}</span>
+    </div>
+    <p class="dashboard-subtitle" style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">
+      Batch created {{ created_at|date:"M d, Y H:i" }} UTC · Total: <strong style="color: #FFF;">{{ total_cards }} cards</strong> ({{ unpaired_count }} unpaired, {{ paired_pending_count }} pending, {{ active_count }} active)
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <a href="{% url 'console:card_batch_export_zip' %}?batch={{ batch_reference }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Manufacturing ZIP
+    </a>
+    <a href="{% url 'console:batches_list' %}" class="btn btn-ghost btn-sm">← Back to Batches</a>
+  </div>
+</div>
+
+<!-- =====================================================================
+     PROVISIONING LIFECYCLE JOURNEY TRACKER
+     ===================================================================== -->
+<div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.85); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.75rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <h2 style="font-size: 0.95rem; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; color: var(--stride-soft-white);">
+        Provisioning Lifecycle Pipeline
+      </h2>
+      <p style="margin: 0.25rem 0 0; font-size: 0.78rem; color: var(--text-muted);">
+        Hardware manufacturing and packaging pipeline for batch {{ batch_reference }}.
+      </p>
+    </div>
+
+    <!-- Bulk Stage Advancement -->
+    {% if next_stage %}
+    <form method="post" action="{% url 'console:batch_update_stage' batch_reference %}" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+      {% csrf_token %}
+      <input type="hidden" name="stage" value="{{ next_stage }}">
+      <button type="submit" class="btn btn-primary btn-sm" style="background: var(--stride-soft-white); color: #000; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem;">
+        <span>Advance Batch to {{ next_stage_display }} →</span>
+      </button>
+    </form>
+    {% else %}
+    <div style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: #10B981; font-weight: 600;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Batch Fully Ready for Fulfillment
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Horizontal 4-Step Journey Bar -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; position: relative; margin-top: 1rem;">
+    <!-- Step 1: Generated -->
+    <div style="padding: 1rem; border-radius: 10px; background: {% if current_step_num >= 1 %}rgba(16, 185, 129, 0.08){% else %}rgba(255,255,255,0.02){% endif %}; border: 1px solid {% if current_step_num >= 1 %}rgba(16, 185, 129, 0.3){% else %}rgba(255,255,255,0.06){% endif %}; text-align: left;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        <span style="width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; background: {% if current_step_num >= 1 %}#10B981{% else %}#3F3F46{% endif %}; color: #000;">1</span>
+        <strong style="font-size: 0.82rem; color: {% if current_step_num >= 1 %}#FFF{% else %}var(--text-muted){% endif %};">Generated</strong>
+      </div>
+      <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
+        ST-XXXXXXXX IDs generated and hashed PIN credentials stored.
+      </div>
+    </div>
+
+    <!-- Step 2: Encoded -->
+    <div style="padding: 1rem; border-radius: 10px; background: {% if current_step_num >= 2 %}rgba(59, 130, 246, 0.08){% else %}rgba(255,255,255,0.02){% endif %}; border: 1px solid {% if current_step_num >= 2 %}rgba(59, 130, 246, 0.3){% else %}rgba(255,255,255,0.06){% endif %}; text-align: left;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        <span style="width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; background: {% if current_step_num >= 2 %}#3B82F6{% else %}#3F3F46{% endif %}; color: #FFF;">2</span>
+        <strong style="font-size: 0.82rem; color: {% if current_step_num >= 2 %}#FFF{% else %}var(--text-muted){% endif %};">NFC Encoded</strong>
+      </div>
+      <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
+        Canonical URLs flashed to physical NTAG216 NFC chips.
+      </div>
+    </div>
+
+    <!-- Step 3: Packaged -->
+    <div style="padding: 1rem; border-radius: 10px; background: {% if current_step_num >= 3 %}rgba(245, 158, 11, 0.08){% else %}rgba(255,255,255,0.02){% endif %}; border: 1px solid {% if current_step_num >= 3 %}rgba(245, 158, 11, 0.3){% else %}rgba(255,255,255,0.06){% endif %}; text-align: left;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        <span style="width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; background: {% if current_step_num >= 3 %}#F59E0B{% else %}#3F3F46{% endif %}; color: #000;">3</span>
+        <strong style="font-size: 0.82rem; color: {% if current_step_num >= 3 %}#FFF{% else %}var(--text-muted){% endif %};">Packaged</strong>
+      </div>
+      <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
+        A4 activation slips printed &amp; sealed into envelopes.
+      </div>
+    </div>
+
+    <!-- Step 4: Ready -->
+    <div style="padding: 1rem; border-radius: 10px; background: {% if current_step_num >= 4 %}rgba(16, 185, 129, 0.08){% else %}rgba(255,255,255,0.02){% endif %}; border: 1px solid {% if current_step_num >= 4 %}rgba(16, 185, 129, 0.3){% else %}rgba(255,255,255,0.06){% endif %}; text-align: left;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        <span style="width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; background: {% if current_step_num >= 4 %}#10B981{% else %}#3F3F46{% endif %}; color: #000;">4</span>
+        <strong style="font-size: 0.82rem; color: {% if current_step_num >= 4 %}#FFF{% else %}var(--text-muted){% endif %};">Fulfillment Ready</strong>
+      </div>
+      <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4;">
+        In warehouse inventory, ready to be paired with customer orders.
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Stage Override Form -->
+  <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+    <div style="font-size: 0.78rem; color: var(--text-muted);">
+      Manual Stage Adjustment (All {{ total_cards }} cards in batch):
+    </div>
+    <form method="post" action="{% url 'console:batch_update_stage' batch_reference %}" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+      {% csrf_token %}
+      <select name="stage" class="form-control" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; width: auto; background: rgba(12,12,15,0.8); color: #FFF; border-color: rgba(255,255,255,0.15);">
+        {% for s_val, s_lbl in stage_choices %}
+          <option value="{{ s_val }}" {% if current_stage == s_val %}selected{% endif %}>{{ s_lbl }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 0.3rem 0.75rem;">Set Stage</button>
+    </form>
+  </div>
+</div>
+
+<!-- =====================================================================
+     PRODUCTION DOWNLOADS & EMERGENCY PIN REGENERATION
+     ===================================================================== -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
+  
+  <!-- Manufacturing Assets -->
+  <div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.85); border-radius: 12px; padding: 1.25rem;">
+    <h3 style="font-size: 0.90rem; margin: 0 0 0.5rem; font-weight: 600; color: #FFF; display: flex; align-items: center; gap: 0.45rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Manufacturing &amp; Encoding Assets
+    </h3>
+    <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+      Download production ZIP containing vector SVGs and PNG QR codes for laser engraving, along with <code>nfc_encoding_manifest.csv</code> for the NFC hardware programmer. Zero plaintext PINs exposed.
+    </p>
+    <a href="{% url 'console:card_batch_export_zip' %}?batch={{ batch_reference }}" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Bulk QR &amp; NFC Manifest (.ZIP)
+    </a>
+  </div>
+
+  <!-- Emergency Batch PIN Regeneration (Manager Only) -->
+  {% if can_regen_pins %}
+  <div class="card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04); border-radius: 12px; padding: 1.25rem;">
+    <h3 style="font-size: 0.90rem; margin: 0 0 0.5rem; font-weight: 600; color: #F87171; display: flex; align-items: center; gap: 0.45rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Emergency Batch PIN Regeneration
+    </h3>
+    <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.85rem;">
+      If physical packaging slips for this entire batch were damaged or lost before customer dispatch, managers can re-key all unactivated cards atomically and generate new replacement packaging slips.
+    </p>
+    <form method="post" action="{% url 'console:batch_regenerate_pins' batch_reference %}" onsubmit="return confirm('WARNING: Are you sure you want to regenerate PINs for all {{ total_cards }} cards in batch {{ batch_reference }}? This invalidates previous slips immediately.');">
+      {% csrf_token %}
+      <div style="margin-bottom: 0.65rem;">
+        <input type="text" name="reason" required placeholder="Reason for bulk re-keying (min 5 chars)..." class="form-control" style="font-size: 0.78rem; background: rgba(12,12,15,0.8); border-color: rgba(239,68,68,0.3); color: #FFF;">
+      </div>
+      <button type="submit" class="btn btn-danger btn-sm" style="width: 100%; font-size: 0.78rem; justify-content: center;">
+        Regenerate Batch PINs &amp; Get Replacement Slips
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.85); border-radius: 12px; padding: 1.25rem;">
+    <h3 style="font-size: 0.90rem; margin: 0 0 0.5rem; font-weight: 600; color: var(--stride-silver);">
+      Packaging Slips Status
+    </h3>
+    <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.5rem;">
+      Activation PINs for unassigned cards are protected by one-way cryptographic hashing. 
+      {% if active_count > 0 %}
+        This batch contains active cards in customer hands; batch-wide PIN re-keying is blocked to protect operational customers.
+      {% else %}
+        Only Operations Managers can trigger emergency PIN regeneration if physical packaging slips were misplaced.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- =====================================================================
+     CARDS IN THIS BATCH TABLE
+     ===================================================================== -->
+<div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.85); border-radius: 12px; padding: 1.25rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <h2 style="font-size: 0.92rem; font-weight: 700; margin: 0; color: #FFF; text-transform: uppercase; letter-spacing: 0.05em;">
+      Cards in Batch {{ batch_reference }} ({{ total_cards }})
+    </h2>
+    <span style="font-size: 0.78rem; color: var(--text-muted);">
+      Hardware Stock
+    </span>
+  </div>
+
+  <div class="ops-table-container">
+    <table class="ops-table">
+      <thead>
+        <tr>
+          <th scope="col">Card ID</th>
+          <th scope="col">Material</th>
+          <th scope="col">Pairing Status</th>
+          <th scope="col">Provisioning Stage</th>
+          <th scope="col">Assigned Customer</th>
+          <th scope="col" style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for card in cards %}
+        <tr>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+            <a href="{% url 'console:card_detail' card.id %}" style="color: #FFF; text-decoration: none;">
+              {{ card.card_code }}
+            </a>
+          </td>
+          <td style="text-transform: capitalize; color: var(--stride-silver); font-size: 0.82rem;">
+            {{ card.get_material_display }}
+          </td>
+          <td>
+            {% if card.pairing_status == 'ACTIVE' %}
+              <span style="color: #10B981; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-active"></span>Active &amp; Linked</span>
+            {% elif card.pairing_status == 'PAIRED_PENDING' %}
+              <span style="color: #FBBF24; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-reserved"></span>Paired — Not Activated</span>
+            {% elif card.pairing_status == 'UNPAIRED' %}
+              <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Unpaired Stock</span>
+            {% else %}
+              <span style="color: #EF4444; font-weight: 600; font-size: 0.8rem;">{{ card.pairing_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="ops-stage-pill ops-stage-{{ card.provisioning_stage }}" style="font-size: 0.68rem;">
+              {{ card.get_provisioning_stage_display }}
+            </span>
+          </td>
+          <td style="font-size: 0.82rem;">
+            {% if card.user %}
+              <a href="{% url 'console:customer_detail' card.user.id %}" style="color: #FFF; text-decoration: none;">
+                {{ card.user.display_name }}
+              </a>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">{{ card.user.email }}</div>
+            {% else %}
+              <span style="color: var(--text-muted);">Warehouse Stock</span>
+            {% endif %}
+          </td>
+          <td style="text-align: right;">
+            <a href="{% url 'console:card_detail' card.id %}" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">
+              Inspect
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

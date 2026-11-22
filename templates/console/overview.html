@@ -5,7 +5,7 @@
 
 {% block operations_content %}
 <!-- Console Page Header -->
-<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap;">
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
   <div>
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
       <h1 class="dashboard-title" style="font-size: 1.65rem; font-weight: 700; margin: 0; letter-spacing: -0.02em;">Operations Hub</h1>
@@ -16,59 +16,58 @@
     </p>
   </div>
   <div style="display: flex; gap: 0.6rem; align-items: center;">
-    <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600; padding: 0.55rem 1.05rem; border-radius: 8px; font-size: 0.84rem;">
+    <a href="{% url 'console:card_generate' %}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600; padding: 0.55rem 1.05rem; border-radius: 8px; font-size: 0.84rem; background: var(--stride-soft-white); color: #000;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Generate Smart Cards</span>
+      <span>+ Generate New Production Batch</span>
     </a>
   </div>
 </div>
 
-<!-- =====================================================================
-     SECTION 1: SMART CARD INVENTORY
-     ===================================================================== -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.45rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-  <div style="display: flex; align-items: center; gap: 0.5rem;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--stride-silver);"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    <h2 style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin: 0;">Smart Card Inventory</h2>
-  </div>
-  <a href="{% url 'console:cards_list' %}" style="font-size: 0.78rem; color: var(--stride-silver); text-decoration: none; font-weight: 500;">View Card Inventory →</a>
+<!-- Quick Actions Bar -->
+<div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.75rem; padding: 0.85rem 1.15rem; background: rgba(24, 24, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; align-items: center;">
+  <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted); margin-right: 0.25rem;">
+    Quick Actions:
+  </span>
+  <a href="{% url 'console:card_generate' %}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem; font-weight: 600;">
+    + New Batch
+  </a>
+  <a href="{% url 'console:batches_list' %}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem;">
+    View Batches Hub
+  </a>
+  <a href="{% url 'console:cards_list' %}?pairing=unpaired" class="btn btn-sm btn-secondary" style="font-size: 0.78rem;">
+    View Unassigned Stock
+  </a>
+  <a href="{% url 'console:orders_list' %}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem;">
+    Open Fulfillment &amp; Orders
+  </a>
 </div>
 
-<div class="ops-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.85rem; margin-bottom: 2.25rem;">
-  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
-    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Total Cards</div>
-    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #FFFFFF;">{{ card_counts.total|default:0 }}</div>
-    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">In database</div>
+<!-- =====================================================================
+     SECTION 1: 4 KEY OPERATIONAL NUMBERS
+     ===================================================================== -->
+<div class="ops-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+  <div class="stat-card" style="padding: 1.25rem 1.15rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.75); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Total Manufactured</div>
+    <div class="stat-card-value" style="font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #FFFFFF;">{{ card_counts.total|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Total physical NFC stock in database</div>
   </div>
 
-  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
-    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Unassigned Stock</div>
-    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #C4C4C4;">{{ card_counts.unassigned|default:0 }}</div>
-    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Ready to allocate</div>
+  <div class="stat-card" style="padding: 1.25rem 1.15rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.75); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Unpaired Stock</div>
+    <div class="stat-card-value" style="font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #C4C4C4;">{{ unpaired_stock|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Ready in warehouse inventory</div>
   </div>
 
-  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
+  <div class="stat-card" style="padding: 1.25rem 1.15rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.75); border-radius: 12px;">
+    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Pending Activation</div>
+    <div class="stat-card-value" style="font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if pending_activation %}#FBBF24{% else %}#71717A{% endif %};">{{ pending_activation|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Assigned to orders / awaiting tap &amp; PIN</div>
+  </div>
+
+  <div class="stat-card" style="padding: 1.25rem 1.15rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.75); border-radius: 12px;">
     <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Active &amp; Linked</div>
-    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if card_counts.active %}#10B981{% else %}#71717A{% endif %};">{{ card_counts.active|default:0 }}</div>
-    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">In customer hands</div>
-  </div>
-
-  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
-    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Suspended</div>
-    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if card_counts.suspended %}#F59E0B{% else %}#71717A{% endif %};">{{ card_counts.suspended|default:0 }}</div>
-    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Temporarily disabled</div>
-  </div>
-
-  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
-    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Reported Lost</div>
-    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if card_counts.lost %}#EF4444{% else %}#71717A{% endif %};">{{ card_counts.lost|default:0 }}</div>
-    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Taps blocked</div>
-  </div>
-
-  <div class="stat-card" style="padding: 1.15rem 1rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(24, 24, 27, 0.65); border-radius: 12px;">
-    <div class="stat-card-title" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem;">Superseded</div>
-    <div class="stat-card-value" style="font-size: 1.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #71717A;">{{ card_counts.replaced|default:0 }}</div>
-    <div class="stat-card-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Replaced cards</div>
+    <div class="stat-card-value" style="font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: {% if active_linked %}#10B981{% else %}#71717A{% endif %};">{{ active_linked|default:0 }}</div>
+    <div class="stat-card-sub" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">In field with live customer profiles</div>
   </div>
 </div>
 

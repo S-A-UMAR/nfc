@@ -4,30 +4,44 @@
 {% block title %}Card: {{ card.card_code }} — Operations{% endblock %}
 
 {% block operations_content %}
-<div class="dashboard-header">
+<div class="dashboard-header" style="margin-bottom: 1.5rem;">
   <div>
-    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
-      <h1 class="dashboard-title" style="font-family: 'JetBrains Mono', monospace;">{{ card.card_code }}</h1>
-      {% if card.status == 'ACTIVE' %}
-        <span class="badge" style="background: rgba(16,185,129,0.12); color: #10b981;">Active &amp; Linked</span>
-      {% elif card.status == 'UNASSIGNED' %}
-        <span class="badge badge-silver">Unassigned Stock</span>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+      <h1 class="dashboard-title" style="font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; margin: 0; display: inline-flex; align-items: center; gap: 0.5rem;">
+        <span>{{ card.card_code }}</span>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('{{ card.card_code }}'); this.innerText='Copied!'; setTimeout(() => this.innerHTML='<svg width=14 height=14 viewBox=\'0 0 24 24\' fill=none stroke=currentColor stroke-width=2><rect x=9 y=9 width=13 height=13 rx=2 ry=2></rect><path d=\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\'></path></svg>', 2000)" title="Copy Card ID" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--stride-silver);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
+      </h1>
+      
+      <!-- Pairing Status Badge -->
+      {% if card.pairing_status == 'ACTIVE' %}
+        <span class="badge" style="background: rgba(16,185,129,0.12); color: #10b981; font-weight: 600;"><span class="ops-status-dot ops-dot-active"></span>Active &amp; Linked</span>
+      {% elif card.pairing_status == 'PAIRED_PENDING' %}
+        <span class="badge" style="background: rgba(245,158,11,0.12); color: #FBBF24; font-weight: 600;"><span class="ops-status-dot ops-dot-reserved"></span>Paired — Not Activated</span>
+      {% elif card.pairing_status == 'UNPAIRED' %}
+        <span class="badge badge-silver" style="font-weight: 600;"><span class="ops-status-dot ops-dot-unassigned"></span>Unpaired Stock</span>
       {% elif card.status == 'SUSPENDED' %}
-        <span class="badge" style="background: rgba(245,158,11,0.12); color: #f59e0b;">Suspended</span>
+        <span class="badge" style="background: rgba(245,158,11,0.12); color: #f59e0b;"><span class="ops-status-dot ops-dot-suspended"></span>Suspended</span>
       {% elif card.status == 'LOST' %}
-        <span class="badge" style="background: rgba(239,68,68,0.12); color: #ef4444;">Reported Lost</span>
+        <span class="badge" style="background: rgba(239,68,68,0.12); color: #ef4444;"><span class="ops-status-dot ops-dot-lost"></span>Reported Lost</span>
       {% elif card.status == 'REPLACED' %}
-        <span class="badge" style="background: rgba(107,114,128,0.12); color: #9ca3af;">Replaced</span>
+        <span class="badge" style="background: rgba(107,114,128,0.12); color: #9ca3af;"><span class="ops-status-dot ops-dot-replaced"></span>Replaced</span>
       {% else %}
         <span class="badge badge-silver">{{ card.get_status_display }}</span>
       {% endif %}
     </div>
-    <p class="dashboard-subtitle">
-      Hardware finish: <strong>{{ card.get_material_display }}</strong> · Created {{ card.created_at|date:"M d, Y H:i" }}
+    <p class="dashboard-subtitle" style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">
+      Hardware finish: <strong style="color: #FFF;">{{ card.get_material_display }}</strong> · Created {{ card.created_at|date:"M d, Y H:i" }} UTC
+      {% if card.batch_reference %}
+        · Batch: <a href="{% url 'console:batch_detail' card.batch_reference %}" style="color: var(--stride-silver); font-family: 'JetBrains Mono', monospace; font-weight: 600;">{{ card.batch_reference }}</a>
+      {% endif %}
     </p>
   </div>
-  <div style="display: flex; gap: 0.5rem; align-items: center;">
-    <a href="{{ card.nfc_url_path }}" target="_blank" class="btn btn-secondary btn-sm">Test NFC Route ↗</a>
+  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <a href="{{ staging_url }}" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+      Test Staging NFC ↗
+    </a>
     <a href="{% url 'console:cards_list' %}" class="btn btn-ghost btn-sm">← Back to Cards</a>
   </div>
 </div>
@@ -52,9 +66,27 @@
           <a href="{% url 'console:card_qr_svg' card.id %}" class="btn btn-sm btn-secondary" style="font-size: 0.68rem; padding: 0.15rem 0.35rem;" title="Download vector SVG">SVG</a>
         </div>
       </div>
-      <div style="font-size: 0.825rem; line-height: 1.6;">
-        <div>Canonical NFC: <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary);">{{ canonical_url|default:card.nfc_url_path }}</strong></div>
-        <div>Batch Ref: <strong>{{ card.batch_reference|default:"None" }}</strong></div>
+      <div style="font-size: 0.825rem; line-height: 1.7;">
+        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+          <span>Canonical NFC:</span>
+          <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary); font-size: 0.78rem;">{{ canonical_url|default:card.nfc_url_path }}</strong>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('{{ canonical_url }}'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000)" style="padding: 0.1rem 0.35rem; font-size: 0.68rem; color: var(--stride-silver);">Copy</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+          <span>Staging Route:</span>
+          <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-size: 0.75rem;">{{ staging_url }}</strong>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('{{ staging_url }}'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000)" style="padding: 0.1rem 0.35rem; font-size: 0.68rem; color: var(--stride-silver);">Copy</button>
+        </div>
+        <div>
+          Batch Ref: 
+          {% if card.batch_reference %}
+            <a href="{% url 'console:batch_detail' card.batch_reference %}" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #FFF; text-decoration: none;">
+              {{ card.batch_reference }} ↗
+            </a>
+          {% else %}
+            <strong>None</strong>
+          {% endif %}
+        </div>
         <div>Stage: <span class="ops-stage-pill ops-stage-{{ card.provisioning_stage }}">{{ card.get_provisioning_stage_display }}</span></div>
         <div>Material: <strong>{{ card.get_material_display }}</strong></div>
         <div>Activation PIN: 

@@ -449,3 +449,115 @@ class CardProvisioningEngineTests(TestCase):
         # Should redirect back to card detail without regenerating
         card.refresh_from_db()
         self.assertEqual(card.status, Card.STATUS_ACTIVE)
+
+    def test_generate_packaging_slips_pdf_service(self):
+        """Verifies high-quality print-ready A4 PDF generation for packaging slips."""
+        from apps.cards.services.packaging_service import generate_packaging_slips_pdf
+
+        # Manifest with 9 cards (spans 2 pages: 8 slips on page 1, 1 slip on page 2)
+        mock_manifest = {
+            "batch_reference": "TEST-BATCH-PDF",
+            "staff_email": "staff@strideid.com",
+            "cards": [
+                {
+                    "card_id": i,
+                    "card_code": f"ST-{i:08d}",
+                    "pin": "123456",
+                    "material": "Matte Black",
+                    "created_at": "2026-11-21 10:00 UTC",
+                }
+                for i in range(1, 10)
+            ],
+        }
+
+        pdf_buf = generate_packaging_slips_pdf(mock_manifest)
+        self.assertIsNotNone(pdf_buf)
+        pdf_bytes = pdf_buf.getvalue()
+        self.assertTrue(len(pdf_bytes) > 1000)
+        # Standard PDF magic header
+        self.assertTrue(pdf_bytes.startswith(b'%PDF-'))
+
+    def test_regenerate_batch_activation_pins_service(self):
+        """
+        Verifies bulk PIN regeneration:
+        - Re-keys hashes atomically
+        - Creates replacement cache manifest
+        - Audits with zero plaintext secrets
+        - Fails closed on batches with active cards
+        """
+        from apps.cards.services.packaging_service import regenerate_batch_activation_pins
+        from apps.core.models import AdminAuditLog
+        from django.core.cache import cache
+
+        cards, token = create_card_batch(
+            count=3,
+            material="metallic_silver",
+            batch_reference="BATCH-REGEN-001",
+            staff_user=self.staff_user,
+        )
+        old_hashes = [c.activation_code_hash for c in cards]
+
+        updated_cards, new_token = regenerate_batch_activation_pins(
+            batch_reference="BATCH-REGEN-001",
+            staff_user=self.manager_user,
+            reason="Physical packaging slips lost by courier",
+            ip_address="127.0.0.1",
+        )
+
+        self.assertEqual(len(updated_cards), 3)
+        self.assertNotEqual(token, new_token)
+
+        # Confirm all hashes changed
+        for idx, c in enumerate(updated_cards):
+            c.refresh_from_db()
+            self.assertNotEqual(c.activation_code_hash, old_hashes[idx])
+
+        # Confirm replacement manifest exists in cache
+        replacement_manifest = cache.get(f"packaging_manifest:{new_token}")
+        self.assertIsNotNone(replacement_manifest)
+        self.assertEqual(len(replacement_manifest["cards"]), 3)
+
+        # Confirm audit log created with zero plaintext PINs
+        audit = AdminAuditLog.objects.filter(
+            action=AdminAuditLog.ACTION_PIN_REGENERATED,
+            target_id="BATCH-REGEN-001",
+        ).first()
+        self.assertIsNotNone(audit)
+        self.assertIn("lost by courier", audit.details.lower())
+
+        # Now test failure when batch contains an ACTIVE card
+        active_card = cards[0]
+        active_card.status = Card.STATUS_ACTIVE
+        active_card.save(update_fields=["status"])
+
+        with self.assertRaises(ValueError) as ctx:
+            regenerate_batch_activation_pins(
+                batch_reference="BATCH-REGEN-001",
+                staff_user=self.manager_user,
+                reason="Attempt re-key with active card",
+            )
+        self.assertIn("Active card", str(ctx.exception))
+
+    def test_card_model_pairing_status_and_urls(self):
+        """Verifies operational pairing classifications and canonical/staging URLs."""
+        card = Card.objects.create(
+            card_code="ST-PAIRTEST",
+            status=Card.STATUS_UNASSIGNED,
+            is_warehouse_stock=True,
+        )
+        self.assertEqual(card.pairing_status, 'UNPAIRED')
+        self.assertEqual(card.pairing_status_display, 'Unpaired Stock')
+
+        card.status = Card.STATUS_RESERVED
+        card.user = self.customer
+        card.save()
+        self.assertEqual(card.pairing_status, 'PAIRED_PENDING')
+        self.assertEqual(card.pairing_status_display, 'Paired — Not Activated')
+
+        card.status = Card.STATUS_ACTIVE
+        card.save()
+        self.assertEqual(card.pairing_status, 'ACTIVE')
+        self.assertEqual(card.pairing_status_display, 'Active & Linked')
+
+        self.assertEqual(card.get_canonical_production_url(), "https://strideid.com/c/ST-PAIRTEST/")
+        self.assertEqual(card.get_staging_test_url(), "https://nfc-staging.up.railway.app/c/ST-PAIRTEST/")
