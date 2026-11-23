@@ -429,7 +429,7 @@
         <div class="prf-screen1-social-hub" id="prf-screen1-social-hub" aria-label="Social and Direct Links">
           <div class="prf-screen1-social-header">
             <span class="prf-screen1-social-title">Connect &amp; Follow</span>
-            <span class="prf-screen1-social-count">{{ total_channels_count|default:social_links|length }} channel{{ total_channels_count|default:social_links|length|pluralize }}</span>
+            <span class="prf-screen1-social-count">{{ total_channels_count }} channel{{ total_channels_count|pluralize }}</span>
           </div>
           <div class="prf-screen1-social-grid">
             {% for social in social_links %}
