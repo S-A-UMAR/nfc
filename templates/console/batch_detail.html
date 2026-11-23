@@ -123,6 +123,50 @@
 </div>
 
 <!-- =====================================================================
+     HARDWARE VERIFICATION & BATCH QA TESTING
+     ===================================================================== -->
+<div class="card" style="margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(20, 20, 24, 0.85); border-radius: 12px; padding: 1.25rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <h3 style="font-size: 0.95rem; margin: 0 0 0.25rem; font-weight: 600; color: #FFF; display: flex; align-items: center; gap: 0.45rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Physical Hardware Verification
+      </h3>
+      <div style="font-size: 0.78rem; color: var(--text-muted);">
+        Record QA testing for physical NFC chips in this batch. Passed tests advance cards to NFC Encoded stage.
+      </div>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <span style="font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(16,185,129,0.12); color: #10B981; border: 1px solid rgba(16,185,129,0.3); font-weight: 600;">
+        ✓ {{ verified_count }} Verified
+      </span>
+      {% if failed_test_count %}
+      <span style="font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(239,68,68,0.12); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); font-weight: 600;">
+        ✗ {{ failed_test_count }} Failed
+      </span>
+      {% endif %}
+      <span style="font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);">
+        {{ untested_count }} Untested
+      </span>
+    </div>
+  </div>
+
+  <form method="post" action="{% url 'console:batch_hardware_test' batch_reference %}" style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06);">
+    {% csrf_token %}
+    <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 500;">Bulk Record Test:</span>
+    <select name="test_result" class="form-control" style="font-size: 0.78rem; padding: 0.3rem 0.6rem; width: auto; background: rgba(12,12,15,0.8); color: #FFF; border-color: rgba(255,255,255,0.15);">
+      <option value="passed">Pass All Cards (Verified)</option>
+      <option value="failed">Mark All as Failed Test</option>
+      <option value="untested">Reset to Untested</option>
+    </select>
+    <input type="text" name="notes" placeholder="Physical test evidence log (required for Passed, e.g. ACR122U station tap log)" class="form-control" style="font-size: 0.78rem; padding: 0.3rem 0.6rem; flex: 1; min-width: 220px; background: rgba(12,12,15,0.8); color: #FFF; border-color: rgba(255,255,255,0.15);">
+    <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; white-space: nowrap;">
+      Record Batch QA Test
+    </button>
+  </form>
+</div>
+
+<!-- =====================================================================
      PRODUCTION DOWNLOADS & EMERGENCY PIN REGENERATION
      ===================================================================== -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">

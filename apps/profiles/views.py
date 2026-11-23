@@ -57,6 +57,7 @@ def public_profile_view(request, slug):
         'profile': profile,
         'social_links': social_links,
         'custom_links': custom_links,
+        'total_channels_count': social_links.count() + custom_links.count(),
         'services': services,
         'gallery_items': gallery_items,
         'testimonials': testimonials,

@@ -107,8 +107,14 @@ class SocialLinkForm(forms.ModelForm):
                     'tiktok': 'https://tiktok.com/@',
                     'facebook': 'https://facebook.com/',
                     'youtube': 'https://youtube.com/@',
-                    'github': 'https://github.com/',
+                    'snapchat': 'https://snapchat.com/add/',
+                    'threads': 'https://threads.net/@',
                     'telegram': 'https://t.me/',
+                    'discord': 'https://discord.gg/',
+                    'spotify': 'https://open.spotify.com/',
+                    'twitch': 'https://twitch.tv/',
+                    'pinterest': 'https://pinterest.com/',
+                    'github': 'https://github.com/',
                 }
                 if platform in prefixes and ('/' not in clean_handle and '.' not in clean_handle):
                     url = prefixes[platform] + clean_handle

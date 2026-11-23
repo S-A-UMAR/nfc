@@ -114,6 +114,36 @@
       </form>
     </div>
 
+    <!-- Physical Hardware Verification -->
+    <div style="background: rgba(196,196,196,0.04); border: 1px solid var(--border-primary); border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Physical Hardware Test</span>
+        {% if card.hardware_test_status == 'passed' %}
+          <span style="color: #10B981; font-size: 0.78rem; font-weight: 600;">✓ Verified</span>
+        {% elif card.hardware_test_status == 'failed' %}
+          <span style="color: #EF4444; font-size: 0.78rem; font-weight: 600;">✗ Failed Test</span>
+        {% else %}
+          <span style="color: var(--text-muted); font-size: 0.78rem;">Not yet tested</span>
+        {% endif %}
+      </div>
+      {% if card.hardware_test_status != 'untested' %}
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+          Tested {{ card.hardware_tested_at|date:"M d, Y H:i" }} by {{ card.hardware_tested_by.email|default:"Unknown" }}
+          {% if card.hardware_test_notes %} · {{ card.hardware_test_notes|truncatechars:60 }}{% endif %}
+        </div>
+      {% endif %}
+      <form method="post" action="{% url 'console:card_hardware_test' card.id %}" style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+        {% csrf_token %}
+        <select name="test_result" class="form-control" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: auto;">
+          {% for val, label in hardware_test_choices %}
+            <option value="{{ val }}" {% if card.hardware_test_status == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="notes" placeholder="Notes (optional)" class="form-control" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; flex: 1; min-width: 120px;">
+        <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; white-space: nowrap;">Record Test</button>
+      </form>
+    </div>
+
     <!-- Emergency PIN Regeneration (Manager Only for Unactivated Cards) -->
     {% if can_regenerate_pin %}
       <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem;">
@@ -188,19 +218,30 @@
       <div class="ops-action-card">
         <h3 style="font-size: 0.85rem; margin: 0 0 0.5rem; font-weight: 600; color: #10B981;">Assign to Customer</h3>
         <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-          Binds this card to a customer's account and profile.
+          Search and bind this card to a customer (status: RESERVED until customer activation).
         </p>
-        <form method="post" action="{% url 'console:card_assign' card.id %}">
+        <form method="post" action="{% url 'console:card_assign' card.id %}" id="assignForm">
           {% csrf_token %}
-          <div class="form-group" style="margin-bottom: 0.75rem;">
-            <select name="user_id" required class="form-control" style="font-size: 0.8rem;">
-              <option value="">-- Select Customer --</option>
-              {% for u in customers %}
-                <option value="{{ u.id }}">{{ u.display_name }} ({{ u.email }})</option>
-              {% endfor %}
-            </select>
+          <div style="position: relative; margin-bottom: 0.6rem;">
+            <input type="text" id="customerSearchInput" placeholder="Search by name or email..." 
+                   class="form-control" style="font-size: 0.8rem;" autocomplete="off">
+            <div id="customerSearchResults" style="display:none; position:absolute; top:100%; left:0; right:0; 
+                 background:#111217; border:1px solid rgba(255,255,255,0.18); border-radius:6px; 
+                 z-index:50; max-height:220px; overflow-y:auto; box-shadow: 0 12px 30px rgba(0,0,0,0.7);"></div>
           </div>
-          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">Confirm Assignment</button>
+          <input type="hidden" name="user_id" id="selectedUserId">
+          <div id="selectedCustomerDisplay" style="display:none; padding:0.45rem 0.65rem; 
+               background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); 
+               border-radius:6px; font-size:0.78rem; margin-bottom:0.6rem; color:#6EE7B7;"></div>
+          <div style="margin-bottom: 0.65rem;">
+            <label style="font-size:0.74rem; color:var(--text-secondary); display:flex; align-items:flex-start; gap:0.4rem; cursor:pointer;">
+              <input type="checkbox" name="confirm_assign" value="yes" required id="confirmAssignCheck" style="margin-top: 2px;">
+              <span>I confirm allocating card <strong>{{ card.card_code }}</strong> to this customer.</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;" id="assignSubmitBtn" disabled>
+            Confirm Assignment
+          </button>
         </form>
       </div>
     {% else %}
@@ -210,25 +251,28 @@
         <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
           Transfer ownership from {{ card.user.display_name }} to another customer.
         </p>
-        <form method="post" action="{% url 'console:card_reassign' card.id %}" onsubmit="return confirm('WARNING: Are you sure you want to transfer ownership of this card?');">
+        <form method="post" action="{% url 'console:card_reassign' card.id %}" id="reassignForm" onsubmit="return confirm('WARNING: Are you sure you want to transfer ownership of this card?');">
           {% csrf_token %}
-          <div class="form-group" style="margin-bottom: 0.5rem;">
-            <select name="new_user_id" required class="form-control" style="font-size: 0.8rem;">
-              <option value="">-- Select New Customer --</option>
-              {% for u in customers %}
-                {% if u.id != card.user.id %}
-                  <option value="{{ u.id }}">{{ u.display_name }} ({{ u.email }})</option>
-                {% endif %}
-              {% endfor %}
-            </select>
+          <div style="position: relative; margin-bottom: 0.6rem;">
+            <input type="text" id="reassignSearchInput" placeholder="Search new customer..." 
+                   class="form-control" style="font-size: 0.8rem;" autocomplete="off">
+            <div id="reassignSearchResults" style="display:none; position:absolute; top:100%; left:0; right:0; 
+                 background:#111217; border:1px solid rgba(255,255,255,0.18); border-radius:6px; 
+                 z-index:50; max-height:220px; overflow-y:auto; box-shadow: 0 12px 30px rgba(0,0,0,0.7);"></div>
           </div>
-          <div style="margin-bottom: 0.75rem;">
-            <label style="font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.35rem;">
-              <input type="checkbox" name="confirm_reassign" value="yes" required>
-              I confirm changing card ownership.
+          <input type="hidden" name="new_user_id" id="reassignSelectedUserId">
+          <div id="reassignCustomerDisplay" style="display:none; padding:0.45rem 0.65rem; 
+               background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); 
+               border-radius:6px; font-size:0.78rem; margin-bottom:0.6rem; color:#93C5FD;"></div>
+          <div style="margin-bottom: 0.65rem;">
+            <label style="font-size: 0.74rem; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 0.4rem; cursor:pointer;">
+              <input type="checkbox" name="confirm_reassign" value="yes" required id="confirmReassignCheck" style="margin-top: 2px;">
+              <span>I confirm transferring card ownership.</span>
             </label>
           </div>
-          <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%;">Reassign Card</button>
+          <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%;" id="reassignSubmitBtn" disabled>
+            Reassign Card
+          </button>
         </form>
       </div>
     {% endif %}
@@ -355,4 +399,73 @@
   </div>
 
 </div>
+
+<script>
+// Customer search & assignment controller
+(function() {
+  function setupCustomerSearch(inputId, resultsId, hiddenId, displayId, checkId, submitId) {
+    const inp = document.getElementById(inputId);
+    const results = document.getElementById(resultsId);
+    const hidden = document.getElementById(hiddenId);
+    const display = document.getElementById(displayId);
+    const check = document.getElementById(checkId);
+    const btn = document.getElementById(submitId);
+    if (!inp || !results || !hidden || !btn) return;
+
+    let debounce;
+    function updateBtn() {
+      btn.disabled = !(hidden.value && (!check || check.checked));
+    }
+    if (check) check.addEventListener('change', updateBtn);
+
+    inp.addEventListener('input', function() {
+      clearTimeout(debounce);
+      hidden.value = '';
+      if (display) display.style.display = 'none';
+      updateBtn();
+      const q = inp.value.trim();
+      if (q.length < 2) { results.style.display = 'none'; return; }
+      debounce = setTimeout(() => {
+        fetch(`{% url 'console:customer_search' %}?q=${encodeURIComponent(q)}`)
+          .then(r => r.json())
+          .then(data => {
+            results.innerHTML = '';
+            if (!data.results || !data.results.length) {
+              results.innerHTML = '<div style="padding:0.6rem 0.75rem;font-size:0.78rem;color:var(--text-muted);">No customers found</div>';
+            } else {
+              data.results.forEach(u => {
+                const item = document.createElement('div');
+                item.style.cssText = 'padding:0.55rem 0.75rem;font-size:0.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:0.5rem;';
+                item.innerHTML = `<span style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.1);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:0.72rem;flex-shrink:0;">${u.initial}</span><div><div style="font-weight:600;color:#FFF;">${u.name}</div><div style="color:var(--text-muted);font-size:0.72rem;">${u.email} · ${u.cards_count} card(s)</div></div>`;
+                item.addEventListener('mouseenter', () => item.style.background = 'rgba(255,255,255,0.06)');
+                item.addEventListener('mouseleave', () => item.style.background = '');
+                item.addEventListener('click', () => {
+                  hidden.value = u.id;
+                  inp.value = `${u.name} (${u.email})`;
+                  if (display) {
+                    display.textContent = `✓ Selected: ${u.name} (${u.email})`;
+                    display.style.display = 'block';
+                  }
+                  results.style.display = 'none';
+                  updateBtn();
+                });
+                results.appendChild(item);
+              });
+            }
+            results.style.display = 'block';
+          });
+      }, 250);
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!inp.contains(e.target) && !results.contains(e.target)) {
+        results.style.display = 'none';
+      }
+    });
+  }
+
+  setupCustomerSearch('customerSearchInput', 'customerSearchResults', 'selectedUserId', 'selectedCustomerDisplay', 'confirmAssignCheck', 'assignSubmitBtn');
+  setupCustomerSearch('reassignSearchInput', 'reassignSearchResults', 'reassignSelectedUserId', 'reassignCustomerDisplay', 'confirmReassignCheck', 'reassignSubmitBtn');
+})();
+</script>
 {% endblock %}

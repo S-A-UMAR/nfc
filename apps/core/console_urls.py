@@ -12,6 +12,7 @@ urlpatterns = [
     path('cards/generate/', views.console_card_generate_view, name='card_generate'),
     path('cards/<int:card_id>/', views.console_card_detail_view, name='card_detail'),
     path('cards/<int:card_id>/update-stage/', views.console_card_update_stage_view, name='card_update_stage'),
+    path('cards/<int:card_id>/hardware-test/', views.console_card_hardware_test_view, name='card_hardware_test'),
 
     # 3. Provisioning Downloads & Exports
     path('cards/<int:card_id>/qr/png/', views.console_card_qr_download_png, name='card_qr_png'),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('batches/', views.console_batches_list_view, name='batches_list'),
     path('batches/<str:batch_reference>/', views.console_batch_detail_view, name='batch_detail'),
     path('batches/<str:batch_reference>/update-stage/', views.console_batch_update_stage_view, name='batch_update_stage'),
+    path('batches/<str:batch_reference>/hardware-test/', views.console_batch_hardware_test_view, name='batch_hardware_test'),
     path('batches/<str:batch_reference>/regenerate-pins/', views.console_batch_regenerate_pins_view, name='batch_regenerate_pins'),
 
     # 5. PIN Regeneration (Manager Only)
@@ -49,6 +51,7 @@ urlpatterns = [
 
     # 8. Customers Directory
     path('customers/', views.console_customers_list_view, name='customers_list'),
+    path('customers/search/', views.console_customer_search_api, name='customer_search'),
     path('customers/<int:user_id>/', views.console_customer_detail_view, name='customer_detail'),
     path('customers/<int:user_id>/toggle-status/', views.console_customer_toggle_status_view, name='customer_toggle_status'),
 

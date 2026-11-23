@@ -224,9 +224,15 @@ class SocialLink(models.Model):
         ('tiktok', 'TikTok'),
         ('facebook', 'Facebook'),
         ('youtube', 'YouTube'),
-        ('github', 'GitHub'),
+        ('snapchat', 'Snapchat'),
+        ('threads', 'Threads'),
         ('whatsapp', 'WhatsApp Channel'),
         ('telegram', 'Telegram'),
+        ('discord', 'Discord'),
+        ('spotify', 'Spotify'),
+        ('twitch', 'Twitch'),
+        ('pinterest', 'Pinterest'),
+        ('github', 'GitHub'),
         ('behance', 'Behance'),
         ('dribbble', 'Dribbble'),
         ('other', 'Other'),
@@ -244,6 +250,56 @@ class SocialLink(models.Model):
 
     def __str__(self):
         return f"{self.get_platform_display()} - {self.profile.full_name}"
+
+    @property
+    def tile_title(self):
+        if self.platform == 'other':
+            if self.display_label and self.display_label.strip() and not self.display_label.strip().startswith('@'):
+                return self.display_label.strip()
+            return "Website"
+        if self.display_label:
+            clean_lbl = self.display_label.strip()
+            if clean_lbl.lower() not in (self.platform.lower(), self.get_platform_display().lower()) and not clean_lbl.startswith('@'):
+                return clean_lbl
+        return self.get_platform_display()
+
+    @property
+    def tile_subtitle(self):
+        if self.display_label and self.display_label.strip().startswith('@'):
+            return self.display_label.strip()
+
+        clean = self.url.strip() if self.url else ""
+        for prefix in ('https://', 'http://', 'www.'):
+            if clean.startswith(prefix):
+                clean = clean[len(prefix):]
+
+        prefixes_to_strip = (
+            'instagram.com/', 'www.instagram.com/',
+            'x.com/', 'twitter.com/', 'www.twitter.com/',
+            'tiktok.com/@', 'tiktok.com/',
+            'snapchat.com/add/', 'snapchat.com/',
+            'threads.net/@', 'threads.net/',
+            'twitch.tv/', 'pinterest.com/',
+            'github.com/', 't.me/', 'telegram.me/',
+            'youtube.com/@', 'youtube.com/',
+            'linkedin.com/in/', 'linkedin.com/',
+            'facebook.com/', 'behance.net/', 'dribbble.com/',
+            'open.spotify.com/', 'discord.gg/', 'discord.com/users/'
+        )
+        for p in prefixes_to_strip:
+            if clean.startswith(p):
+                handle = clean[len(p):].strip('/')
+                if self.platform in ('instagram', 'x_twitter', 'tiktok', 'snapchat', 'threads', 'twitch', 'pinterest', 'github', 'telegram') and not handle.startswith('@'):
+                    return f"@{handle}"
+                return handle
+
+        if clean.startswith('@'):
+            return clean
+
+        if self.display_label and self.display_label.strip().lower() not in (self.platform.lower(), self.get_platform_display().lower()):
+            return self.display_label.strip()
+
+        return clean.rstrip('/')[:22]
 
 
 class CustomLink(models.Model):

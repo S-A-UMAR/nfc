@@ -133,5 +133,7 @@ def create_card_batch(
         },
         timeout=900,  # 15 minutes
     )
+    if batch_reference:
+        cache.set(f"batch_active_packaging_token:{batch_reference}", token, timeout=900)
 
     return created_cards, token

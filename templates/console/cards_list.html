@@ -63,11 +63,19 @@
 
   <div class="ops-filter-group">
     <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Stage:</span>
-    <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
-    <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
-    <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
-    <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
-    <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
+    <a href="?stage=all{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if hardware_test_filter != 'all' %}&hardware_test={{ hardware_test_filter }}{% endif %}" class="badge {% if stage_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?stage=generated{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if hardware_test_filter != 'all' %}&hardware_test={{ hardware_test_filter }}{% endif %}" class="badge {% if stage_filter == 'generated' %}badge-silver{% endif %}" style="text-decoration:none;">Generated</a>
+    <a href="?stage=encoded{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if hardware_test_filter != 'all' %}&hardware_test={{ hardware_test_filter }}{% endif %}" class="badge {% if stage_filter == 'encoded' %}badge-silver{% endif %}" style="text-decoration:none;">Encoded</a>
+    <a href="?stage=packaged{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if hardware_test_filter != 'all' %}&hardware_test={{ hardware_test_filter }}{% endif %}" class="badge {% if stage_filter == 'packaged' %}badge-silver{% endif %}" style="text-decoration:none;">Packaged</a>
+    <a href="?stage=ready{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if hardware_test_filter != 'all' %}&hardware_test={{ hardware_test_filter }}{% endif %}" class="badge {% if stage_filter == 'ready' %}badge-silver{% endif %}" style="text-decoration:none;">Ready</a>
+  </div>
+
+  <div class="ops-filter-group">
+    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">QA Test:</span>
+    <a href="?hardware_test=all{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="badge {% if hardware_test_filter == 'all' %}badge-silver{% endif %}" style="text-decoration:none;">All</a>
+    <a href="?hardware_test=passed{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="badge {% if hardware_test_filter == 'passed' %}badge-silver{% endif %}" style="text-decoration:none; color: #10B981;">✓ Verified</a>
+    <a href="?hardware_test=failed{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="badge {% if hardware_test_filter == 'failed' %}badge-silver{% endif %}" style="text-decoration:none; color: #EF4444;">✗ Failed</a>
+    <a href="?hardware_test=untested{% if search_query %}&q={{ search_query }}{% endif %}{% if pairing_filter %}&pairing={{ pairing_filter }}{% endif %}{% if stage_filter != 'all' %}&stage={{ stage_filter }}{% endif %}" class="badge {% if hardware_test_filter == 'untested' %}badge-silver{% endif %}" style="text-decoration:none;">Untested</a>
   </div>
 </div>
 
@@ -79,6 +87,7 @@
         <th scope="col">Card ID</th>
         <th scope="col">Pairing Status</th>
         <th scope="col">Stage</th>
+        <th scope="col">QA Test</th>
         <th scope="col">Batch</th>
         <th scope="col">Material</th>
         <th scope="col">Customer</th>
@@ -115,6 +124,15 @@
           <span class="ops-stage-pill ops-stage-{{ card.provisioning_stage }}">
             {{ card.get_provisioning_stage_display }}
           </span>
+        </td>
+        <td>
+          {% if card.hardware_test_status == 'passed' %}
+            <span style="color: #10B981; font-weight: 600; font-size: 0.76rem;">✓ Verified</span>
+          {% elif card.hardware_test_status == 'failed' %}
+            <span style="color: #EF4444; font-weight: 600; font-size: 0.76rem;">✗ Failed</span>
+          {% else %}
+            <span style="color: var(--text-muted); font-size: 0.76rem;">Untested</span>
+          {% endif %}
         </td>
         <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
           {% if card.batch_reference %}

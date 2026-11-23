@@ -84,6 +84,16 @@ class Card(models.Model):
         (STAGE_READY, 'Ready for Dispatch / Storage'),
     )
 
+    HARDWARE_TEST_UNTESTED = 'untested'
+    HARDWARE_TEST_PASSED = 'passed'
+    HARDWARE_TEST_FAILED = 'failed'
+
+    HARDWARE_TEST_CHOICES = (
+        (HARDWARE_TEST_UNTESTED, 'Untested'),
+        (HARDWARE_TEST_PASSED, 'Passed Physical Verification'),
+        (HARDWARE_TEST_FAILED, 'Failed Physical Test'),
+    )
+
     notes = models.TextField(blank=True)
     activation_code_hash = models.CharField(
         max_length=128, 
@@ -109,6 +119,22 @@ class Card(models.Model):
         db_index=True,
         help_text="Manufacturing and provisioning readiness stage"
     )
+    hardware_test_status = models.CharField(
+        max_length=20,
+        choices=HARDWARE_TEST_CHOICES,
+        default=HARDWARE_TEST_UNTESTED,
+        db_index=True,
+        help_text="Physical NFC hardware and antenna testing verification status"
+    )
+    hardware_tested_at = models.DateTimeField(null=True, blank=True)
+    hardware_tested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='hardware_tested_cards'
+    )
+    hardware_test_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     activated_at = models.DateTimeField(null=True, blank=True)
 
@@ -211,6 +237,23 @@ class Card(models.Model):
         if not self.qr_code_image:
             self.generate_qr_code()
         super().save(*args, **kwargs)
+
+    @property
+    def is_hardware_verified(self) -> bool:
+        """True if and only if card has passed real physical hardware/antenna verification."""
+        return self.hardware_test_status == self.HARDWARE_TEST_PASSED
+
+    @property
+    def hardware_test_display(self) -> str:
+        return dict(self.HARDWARE_TEST_CHOICES).get(self.hardware_test_status, 'Untested')
+
+    @property
+    def hardware_test_badge_class(self) -> str:
+        if self.hardware_test_status == self.HARDWARE_TEST_PASSED:
+            return 'ops-stage-ready'
+        if self.hardware_test_status == self.HARDWARE_TEST_FAILED:
+            return 'ops-dot-lost'
+        return 'ops-stage-generated'
 
     @property
     def pairing_status(self) -> str:

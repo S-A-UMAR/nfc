@@ -216,3 +216,100 @@ class ConsoleSecurityAndLifecycleTests(TestCase):
         )
         self.assertEqual(resp_regen_mgr.status_code, 302)
         self.assertIn('/console/cards/packaging/', resp_regen_mgr.url)
+
+    def test_hardware_testing_card_and_batch(self):
+        """Tests individual and bulk physical NFC hardware testing."""
+        self.client.login(email="staff@strideid.com", password="StaffPassword123!")
+        
+        # Test individual card hardware test - passed
+        self.card.provisioning_stage = Card.STAGE_GENERATED
+        self.card.save()
+
+        resp_pass = self.client.post(
+            reverse('console:card_hardware_test', kwargs={'card_id': self.card.id}),
+            {'test_result': 'passed', 'notes': 'Proxmark3 HF 14443A read verified'}
+        )
+        self.assertEqual(resp_pass.status_code, 302)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.hardware_test_status, 'passed')
+        self.assertTrue(self.card.is_hardware_verified)
+        self.assertEqual(self.card.provisioning_stage, Card.STAGE_ENCODED)
+        self.assertEqual(self.card.hardware_tested_by, self.staff_user)
+        self.assertIsNotNone(self.card.hardware_tested_at)
+
+        # Test individual card hardware test - failed (does NOT advance stage)
+        self.card.provisioning_stage = Card.STAGE_GENERATED
+        self.card.save()
+        resp_fail = self.client.post(
+            reverse('console:card_hardware_test', kwargs={'card_id': self.card.id}),
+            {'test_result': 'failed', 'notes': 'NFC antenna damaged'}
+        )
+        self.assertEqual(resp_fail.status_code, 302)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.hardware_test_status, 'failed')
+        self.assertFalse(self.card.is_hardware_verified)
+        self.assertEqual(self.card.provisioning_stage, Card.STAGE_GENERATED)  # Crucial: did NOT advance!
+
+        # Test bulk batch hardware test - rejection when missing physical verification evidence
+        self.card.batch_reference = "BATCH-HW-001"
+        self.card.save()
+        resp_no_evidence = self.client.post(
+            reverse('console:batch_hardware_test', kwargs={'batch_reference': 'BATCH-HW-001'}),
+            {'test_result': 'passed', 'notes': ''}
+        )
+        self.assertEqual(resp_no_evidence.status_code, 302)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.hardware_test_status, 'failed')  # Did not change to passed!
+
+        # Test bulk batch hardware test - success when evidence notes provided
+        resp_batch = self.client.post(
+            reverse('console:batch_hardware_test', kwargs={'batch_reference': 'BATCH-HW-001'}),
+            {'test_result': 'passed', 'notes': 'All 50 cards batch tested with ACR122U tap sweep'}
+        )
+        self.assertEqual(resp_batch.status_code, 302)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.hardware_test_status, 'passed')
+
+    def test_customer_search_api(self):
+        """Tests server-side JSON customer search endpoint."""
+        # Unauthenticated rejected
+        resp_anon = self.client.get(reverse('console:customer_search') + '?q=cust')
+        self.assertEqual(resp_anon.status_code, 302)
+
+        # Authenticated staff
+        self.client.login(email="staff@strideid.com", password="StaffPassword123!")
+        
+        # Query < 2 chars returns empty list
+        resp_short = self.client.get(reverse('console:customer_search') + '?q=c')
+        self.assertEqual(resp_short.status_code, 200)
+        self.assertEqual(resp_short.json()['results'], [])
+
+        # Query matches customer email
+        resp_found = self.client.get(reverse('console:customer_search') + '?q=customer')
+        self.assertEqual(resp_found.status_code, 200)
+        data = resp_found.json()
+        self.assertTrue(len(data['results']) >= 1)
+        self.assertEqual(data['results'][0]['email'], "customer@example.com")
+
+    def test_card_assign_with_confirmation(self):
+        """Tests assigning a card requires explicit confirm_assign and sets RESERVED status."""
+        self.client.login(email="staff@strideid.com", password="StaffPassword123!")
+        
+        # Attempt with confirm_assign=no fails
+        resp_no_conf = self.client.post(
+            reverse('console:card_assign', kwargs={'card_id': self.card.id}),
+            {'user_id': self.customer.id, 'confirm_assign': 'no'}
+        )
+        self.assertEqual(resp_no_conf.status_code, 302)
+        self.card.refresh_from_db()
+        self.assertIsNone(self.card.user)
+
+        # Attempt with confirm_assign=yes succeeds and sets STATUS_RESERVED
+        resp_conf = self.client.post(
+            reverse('console:card_assign', kwargs={'card_id': self.card.id}),
+            {'user_id': self.customer.id, 'confirm_assign': 'yes'}
+        )
+        self.assertEqual(resp_conf.status_code, 302)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.user, self.customer)
+        self.assertEqual(self.card.status, Card.STATUS_RESERVED)  # Preserved RESERVED until activated!

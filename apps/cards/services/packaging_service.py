@@ -20,6 +20,9 @@ def acknowledge_packaging_manifest(token: str) -> bool:
     """Explicitly deletes the ephemeral packaging manifest from cache."""
     if not token:
         return False
+    manifest = cache.get(f"packaging_manifest:{token}")
+    if manifest and manifest.get("batch_reference"):
+        cache.delete(f"batch_active_packaging_token:{manifest['batch_reference']}")
     return bool(cache.delete(f"packaging_manifest:{token}"))
 
 
@@ -351,5 +354,6 @@ def regenerate_batch_activation_pins(
         "cards": manifest_records,
     }
     cache.set(f"packaging_manifest:{token}", batch_manifest, timeout=900)
+    cache.set(f"batch_active_packaging_token:{clean_batch}", token, timeout=900)
 
     return updated_cards, token

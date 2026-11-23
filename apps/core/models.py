@@ -37,6 +37,7 @@ class AdminAuditLog(models.Model):
     ACTION_PIN_REGENERATED = 'pin_regenerated'
     ACTION_CARD_BATCH_EXPORTED = 'card_batch_exported'
     ACTION_PACKAGING_MANIFEST_DOWNLOADED = 'packaging_manifest_downloaded'
+    ACTION_CARD_HARDWARE_TESTED = 'card_hardware_tested'
 
     ACTION_CHOICES = (
         (ACTION_CARD_CREATED, 'Card Created'),
@@ -53,6 +54,7 @@ class AdminAuditLog(models.Model):
         (ACTION_PIN_REGENERATED, 'Activation PIN Regenerated'),
         (ACTION_CARD_BATCH_EXPORTED, 'Card Batch Exported'),
         (ACTION_PACKAGING_MANIFEST_DOWNLOADED, 'Packaging Manifest Downloaded'),
+        (ACTION_CARD_HARDWARE_TESTED, 'Card Hardware Tested'),
     )
 
     action = models.CharField(max_length=40, choices=ACTION_CHOICES, db_index=True)

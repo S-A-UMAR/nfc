@@ -2,12 +2,13 @@ import csv
 import io
 import re
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, Http404, FileResponse
+from django.http import HttpResponse, Http404, FileResponse, JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
 from django.db.models import Count, Q, Min, Max
 from django.core.paginator import Paginator
+from django.core.cache import cache
 from django.utils import timezone
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import get_user_model
@@ -171,6 +172,11 @@ def console_cards_list_view(request):
     if stage_filter != 'all' and stage_filter in dict(Card.PROVISIONING_STAGE_CHOICES):
         qs = qs.filter(provisioning_stage=stage_filter)
 
+    # Hardware verification filter
+    hardware_test_filter = request.GET.get('hardware_test', 'all').strip().lower()
+    if hardware_test_filter != 'all' and hardware_test_filter in dict(Card.HARDWARE_TEST_CHOICES):
+        qs = qs.filter(hardware_test_status=hardware_test_filter)
+
     # Warehouse stock filter
     warehouse_filter = request.GET.get('warehouse', 'all')
     if warehouse_filter == 'yes':
@@ -232,6 +238,7 @@ def console_cards_list_view(request):
         'pairing_filter': pairing_filter,
         'material_filter': material_filter,
         'stage_filter': stage_filter,
+        'hardware_test_filter': hardware_test_filter,
         'warehouse_filter': warehouse_filter,
         'batch_filter': batch_filter,
         'status_counts': status_counts,
@@ -239,6 +246,7 @@ def console_cards_list_view(request):
         'status_choices': Card.STATUS_CHOICES,
         'material_choices': Card.MATERIAL_CHOICES,
         'stage_choices': Card.PROVISIONING_STAGE_CHOICES,
+        'hardware_test_choices': Card.HARDWARE_TEST_CHOICES,
         'recent_batches': recent_batches,
         'total_count': paginator.count,
         'can_export_zip': is_operations_manager(request.user),
@@ -453,14 +461,14 @@ def console_packaging_acknowledge_view(request, token):
 def console_card_detail_view(request, card_id):
     """Comprehensive Card Detail View in STRIDE Console."""
     card = get_object_or_404(
-        Card.objects.select_related('user', 'profile', 'replacement_for'),
+        Card.objects.select_related('user', 'profile', 'replacement_for', 'hardware_tested_by'),
         id=card_id
     )
     card_events = card.events.all()[:25]
     audit_trail = AdminAuditLog.objects.filter(target_model='Card', target_id=str(card.id)).order_by('-created_at')[:20]
 
-    # Customers list for assignment
-    customers = User.objects.filter(is_active=True).order_by('email')[:100]
+    # Initial customers list for quick assignment (fallback when search query is empty)
+    customers = User.objects.filter(is_active=True).order_by('email')[:30]
     # Unassigned cards for replacement
     unassigned_cards = Card.objects.filter(status=Card.STATUS_UNASSIGNED).exclude(id=card.id)[:50]
 
@@ -482,6 +490,7 @@ def console_card_detail_view(request, card_id):
         'canonical_nfc_url': card.get_canonical_production_url(),
         'batch_cards_count': batch_cards_count,
         'stage_choices': Card.PROVISIONING_STAGE_CHOICES,
+        'hardware_test_choices': Card.HARDWARE_TEST_CHOICES,
     })
 
 
@@ -625,29 +634,240 @@ def console_card_update_stage_view(request, card_id):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 7b. HARDWARE VERIFICATION (PHYSICAL CHIP TESTING)
+# ─────────────────────────────────────────────────────────────────────────────
+@console_staff_required
+@require_POST
+def console_card_hardware_test_view(request, card_id):
+    """
+    Record manual physical hardware verification result for a programmed NFC card.
+    Staff physically taps/tests the programmed chip and records:
+    - passed: Physical chip tested and verified working.
+    - failed: Physical test failed (records failure reason, does NOT mark verified).
+    - untested: Resets test status.
+    """
+    test_result = request.POST.get('test_result', '').strip().lower()
+    notes = request.POST.get('notes', '').strip()
+
+    valid_results = dict(Card.HARDWARE_TEST_CHOICES)
+    if test_result not in valid_results:
+        messages.error(request, f"Invalid hardware test result '{test_result}'.")
+        return redirect('console:card_detail', card_id=card_id)
+
+    with transaction.atomic():
+        card = Card.objects.select_for_update().get(id=card_id)
+        prev_test_status = card.get_hardware_test_status_display()
+        prev_stage = card.provisioning_stage
+
+        card.hardware_test_status = test_result
+        card.hardware_test_notes = notes
+
+        if test_result == Card.HARDWARE_TEST_PASSED:
+            card.hardware_tested_at = timezone.now()
+            card.hardware_tested_by = request.user
+            # If still in generated stage, advance to encoded stage since physical chip was verified
+            if card.provisioning_stage == Card.STAGE_GENERATED:
+                card.provisioning_stage = Card.STAGE_ENCODED
+            msg_type = messages.SUCCESS
+            msg_text = f"Hardware verification PASSED for card {card.card_code}. Recorded physical verification."
+        elif test_result == Card.HARDWARE_TEST_FAILED:
+            card.hardware_tested_at = timezone.now()
+            card.hardware_tested_by = request.user
+            # Crucial requirement: Does NOT mark verified, does NOT advance stage!
+            msg_type = messages.WARNING
+            msg_text = f"Hardware test recorded as FAILED for card {card.card_code}. Card is NOT verified. Reason: {notes or 'No reason provided'}."
+        else:
+            card.hardware_tested_at = None
+            card.hardware_tested_by = None
+            msg_type = messages.INFO
+            msg_text = f"Hardware test status reset to Untested for card {card.card_code}."
+
+        fields_to_update = ['hardware_test_status', 'hardware_tested_at', 'hardware_tested_by', 'hardware_test_notes']
+        if card.provisioning_stage != prev_stage:
+            fields_to_update.append('provisioning_stage')
+
+        card.save(update_fields=fields_to_update)
+
+        AdminAuditLog.log(
+            action=AdminAuditLog.ACTION_CARD_HARDWARE_TESTED,
+            staff_user=request.user,
+            target_repr=f"Card {card.card_code}",
+            target_model="Card",
+            target_id=str(card.id),
+            previous_state=f"Test: {prev_test_status}",
+            new_state=f"Test: {card.get_hardware_test_status_display()}",
+            details=f"Staff {request.user.email} recorded hardware test '{card.get_hardware_test_status_display()}'. Notes: {notes or 'None'}",
+            ip_address=get_client_ip(request),
+        )
+
+    if msg_type == messages.SUCCESS:
+        messages.success(request, msg_text)
+    elif msg_type == messages.WARNING:
+        messages.warning(request, msg_text)
+    else:
+        messages.info(request, msg_text)
+
+    return redirect('console:card_detail', card_id=card.id)
+
+
+@console_staff_required
+@require_POST
+def console_batch_hardware_test_view(request, batch_reference):
+    """
+    Bulk hardware verification recording for an entire batch.
+    Allows recording all cards in the batch as physically tested.
+    """
+    clean_batch = batch_reference.strip()
+    test_result = request.POST.get('test_result', '').strip().lower()
+    notes = request.POST.get('notes', '').strip()
+
+    valid_results = dict(Card.HARDWARE_TEST_CHOICES)
+    if test_result not in valid_results:
+        messages.error(request, f"Invalid hardware test result '{test_result}'.")
+        return redirect('console:batch_detail', batch_reference=clean_batch)
+
+    if test_result == Card.HARDWARE_TEST_PASSED and not notes:
+        messages.error(
+            request,
+            "Physical verification evidence notes (e.g. QA station, antenna sweep log, reader tap confirmation) are required before bulk recording hardware as passed."
+        )
+        return redirect('console:batch_detail', batch_reference=clean_batch)
+
+    cards = Card.objects.filter(batch_reference=clean_batch)
+    count = cards.count()
+    if count == 0:
+        messages.error(request, f"No cards found matching batch '{clean_batch}'.")
+        return redirect('console:batches_list')
+
+    with transaction.atomic():
+        cards_to_update = list(cards.select_for_update())
+        now = timezone.now() if test_result != Card.HARDWARE_TEST_UNTESTED else None
+        tester = request.user if test_result != Card.HARDWARE_TEST_UNTESTED else None
+
+        updated_count = 0
+        for card in cards_to_update:
+            card.hardware_test_status = test_result
+            card.hardware_tested_at = now
+            card.hardware_tested_by = tester
+            if notes:
+                card.hardware_test_notes = notes
+            if test_result == Card.HARDWARE_TEST_PASSED and card.provisioning_stage == Card.STAGE_GENERATED:
+                card.provisioning_stage = Card.STAGE_ENCODED
+            card.save(update_fields=['hardware_test_status', 'hardware_tested_at', 'hardware_tested_by', 'hardware_test_notes', 'provisioning_stage'])
+            updated_count += 1
+
+        AdminAuditLog.log(
+            action=AdminAuditLog.ACTION_CARD_HARDWARE_TESTED,
+            staff_user=request.user,
+            target_repr=f"Batch {clean_batch} ({updated_count} cards)",
+            target_model="Card",
+            target_id=clean_batch,
+            previous_state="",
+            new_state=f"Hardware Test: {valid_results[test_result]}",
+            details=f"Staff recorded bulk hardware test '{valid_results[test_result]}' for {updated_count} cards in batch {clean_batch}. Notes: {notes or 'None'}",
+            ip_address=get_client_ip(request),
+        )
+
+    messages.success(request, f"Recorded hardware verification '{valid_results[test_result]}' for all {updated_count} cards in batch {clean_batch}.")
+    return redirect('console:batch_detail', batch_reference=clean_batch)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7c. CUSTOMER SEARCH API (FOR ASSIGNMENT)
+# ─────────────────────────────────────────────────────────────────────────────
+@console_staff_required
+@require_GET
+def console_customer_search_api(request):
+    """
+    Server-side search for customer assignment in Console.
+    Searches by name and email.
+    Returns JSON list of matching active customers with profile details and card count.
+    """
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse({'results': [], 'count': 0})
+
+    users = (
+        User.objects.filter(is_active=True)
+        .filter(
+            Q(email__icontains=q) |
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(profile__full_name__icontains=q)
+        )
+        .select_related('profile')
+        .annotate(cards_count=Count('cards'))
+        .order_by('email')[:15]
+    )
+
+    results = []
+    for u in users:
+        full_name = u.get_full_name() or (u.profile.full_name if hasattr(u, 'profile') and u.profile else '')
+        display = full_name.strip() if full_name and full_name.strip() else u.email
+        results.append({
+            'id': u.id,
+            'email': u.email,
+            'name': display,
+            'initial': (display[0] if display else 'U').upper(),
+            'cards_count': u.cards_count,
+            'phone': getattr(u, 'phone_number', '') or (u.profile.phone if hasattr(u, 'profile') and u.profile else ''),
+        })
+
+    return JsonResponse({'results': results, 'count': len(results)})
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 8. CARD ASSIGNMENT & LIFECYCLE (STATUS_RESERVED ENFORCEMENT)
 # ─────────────────────────────────────────────────────────────────────────────
 @console_staff_required
 @require_POST
 def console_card_assign_view(request, card_id):
     """
-    Assign an unassigned card to a customer.
+    Assign an unassigned card to a customer with explicit confirmation.
     IMPORTANT: Normal staff assignment sets card.status = STATUS_RESERVED,
     NOT STATUS_ACTIVE! The card activates only when the customer taps and enters PIN.
     """
     user_id = request.POST.get('user_id')
+    confirm_assign = request.POST.get('confirm_assign')
+
+    if not user_id:
+        messages.error(request, "Please search and select a customer to assign.")
+        return redirect('console:card_detail', card_id=card_id)
+
+    # If confirm_assign is submitted (e.g. from web form), it must be explicitly checked
+    if confirm_assign is not None and confirm_assign.strip().lower() not in ('yes', 'true', '1'):
+        messages.error(request, "Assignment requires explicit confirmation. Please check the confirmation box.")
+        return redirect('console:card_detail', card_id=card_id)
+
     customer = get_object_or_404(User, id=user_id)
+    if not customer.is_active:
+        messages.error(request, f"Customer account '{customer.email}' is inactive or suspended.")
+        return redirect('console:card_detail', card_id=card_id)
+
     profile = getattr(customer, 'profile', None)
 
     with transaction.atomic():
         card = Card.objects.select_for_update().get(id=card_id)
 
-        if card.status == Card.STATUS_ACTIVE and card.user and card.user != customer:
-            messages.error(request, f"Card '{card.card_code}' is already active for {card.user.email}. Use Reassign instead.")
+        # Decommissioned check
+        if card.status in (Card.STATUS_LOST, Card.STATUS_REPLACED):
+            messages.error(request, f"Cannot assign decommissioned card '{card.card_code}' ({card.get_status_display()}).")
+            return redirect('console:card_detail', card_id=card.id)
+
+        # Duplicate assignment check
+        if card.user == customer and card.status == Card.STATUS_RESERVED:
+            messages.warning(request, f"Card '{card.card_code}' is already reserved for {customer.email}.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        if card.status == Card.STATUS_ACTIVE:
+            if card.user == customer:
+                messages.warning(request, f"Card '{card.card_code}' is already active and linked to {customer.email}.")
+            else:
+                messages.error(request, f"Card '{card.card_code}' is already active for {card.user.email}. Use Reassign instead.")
             return redirect('console:card_detail', card_id=card.id)
 
         if card.status == Card.STATUS_RESERVED and card.user and card.user != customer:
-            messages.error(request, f"Card '{card.card_code}' is already reserved for {card.user.email}.")
+            messages.error(request, f"Card '{card.card_code}' is already reserved for another customer ({card.user.email}).")
             return redirect('console:card_detail', card_id=card.id)
 
         prev_status = card.status
@@ -657,7 +877,7 @@ def console_card_assign_view(request, card_id):
         card.profile = profile
         card.status = Card.STATUS_RESERVED
         card.is_warehouse_stock = False
-        card.activated_at = None  # NOT active yet!
+        card.activated_at = None  # STRICT: NOT active yet!
         card.save(update_fields=['user', 'profile', 'status', 'is_warehouse_stock', 'activated_at'])
 
         AdminAuditLog.log(
@@ -878,6 +1098,8 @@ def console_batches_list_view(request):
         stage_encoded=Count('id', filter=Q(provisioning_stage=Card.STAGE_ENCODED)),
         stage_packaged=Count('id', filter=Q(provisioning_stage=Card.STAGE_PACKAGED)),
         stage_ready=Count('id', filter=Q(provisioning_stage=Card.STAGE_READY)),
+        verified_count=Count('id', filter=Q(hardware_test_status=Card.HARDWARE_TEST_PASSED)),
+        failed_count=Count('id', filter=Q(hardware_test_status=Card.HARDWARE_TEST_FAILED)),
         created_at=Min('created_at'),
     ).order_by('-created_at')
 
@@ -912,6 +1134,8 @@ def console_batches_list_view(request):
             'unpaired_count': b['unpaired_count'],
             'paired_pending_count': b['paired_pending_count'],
             'active_count': b['active_count'],
+            'verified_count': b['verified_count'],
+            'failed_count': b['failed_count'],
             'materials': ", ".join(material_labels) or "Standard",
             'stage': stage_slug,
             'stage_display': dict(Card.PROVISIONING_STAGE_CHOICES).get(stage_slug, stage_slug.capitalize()),
@@ -966,6 +1190,15 @@ def console_batch_detail_view(request, batch_reference):
         'ready': cards_qs.filter(provisioning_stage=Card.STAGE_READY).count(),
     }
 
+    hardware_counts = {
+        'verified': cards_qs.filter(hardware_test_status=Card.HARDWARE_TEST_PASSED).count(),
+        'failed': cards_qs.filter(hardware_test_status=Card.HARDWARE_TEST_FAILED).count(),
+        'untested': cards_qs.filter(hardware_test_status=Card.HARDWARE_TEST_UNTESTED).count(),
+    }
+
+    active_token = cache.get(f"batch_active_packaging_token:{clean_batch}")
+    active_manifest = get_packaging_manifest(active_token) if active_token else None
+
     if stage_counts['ready'] == total_cards:
         current_stage = 'ready'
         next_stage = None
@@ -1007,6 +1240,16 @@ def console_batch_detail_view(request, batch_reference):
         'unpaired_count': unpaired_count,
         'paired_pending_count': paired_pending_count,
         'active_count': active_count,
+        'stage_counts': stage_counts,
+        'hardware_counts': hardware_counts,
+        'verified_count': hardware_counts['verified'],
+        'failed_test_count': hardware_counts['failed'],
+        'untested_count': hardware_counts['untested'],
+        'active_token': active_token,
+        'active_manifest': active_manifest,
+        'manifest_active': bool(active_token and active_manifest),
+        'can_download_csv': can_manage_pins(request.user),
+        'hardware_test_choices': Card.HARDWARE_TEST_CHOICES,
         'materials_display': ", ".join(material_labels),
         'created_at': batch_created_at,
         'current_stage': current_stage,
