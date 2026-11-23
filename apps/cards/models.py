@@ -261,7 +261,7 @@ class Card(models.Model):
         Operational pairing classification for STRIDE Console:
         - 'ACTIVE': Fully activated by customer.
         - 'PAIRED_PENDING': Reserved/assigned to customer/order, awaiting customer PIN activation.
-        - 'UNPAIRED': Unassigned inventory stock in warehouse.
+        - 'UNPAIRED': Unassigned inventory stock.
         - Other states: 'SUSPENDED', 'LOST', 'REPLACED'.
         """
         if self.status == self.STATUS_ACTIVE:
@@ -271,6 +271,27 @@ class Card(models.Model):
         if self.user or self.status == self.STATUS_RESERVED:
             return 'PAIRED_PENDING'
         return 'UNPAIRED'
+
+    @property
+    def is_activation_ready(self) -> bool:
+        """True if unassigned, released from warehouse stock, and ready for open customer claim."""
+        return (
+            self.status == self.STATUS_UNASSIGNED
+            and not self.is_warehouse_stock
+            and self.user is None
+        )
+
+    @property
+    def distribution_status_display(self) -> str:
+        if self.status == self.STATUS_ACTIVE:
+            return 'Active & Linked'
+        if self.user or self.status == self.STATUS_RESERVED:
+            return 'Assigned to Customer'
+        if self.status == self.STATUS_UNASSIGNED:
+            if self.is_warehouse_stock:
+                return 'Warehouse Stock (Locked)'
+            return 'Activation-Ready (Open)'
+        return self.get_status_display()
 
     @property
     def pairing_status_display(self) -> str:

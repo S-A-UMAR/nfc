@@ -20,7 +20,11 @@
       {% elif card.pairing_status == 'PAIRED_PENDING' %}
         <span class="badge" style="background: rgba(245,158,11,0.12); color: #FBBF24; font-weight: 600;"><span class="ops-status-dot ops-dot-reserved"></span>Paired — Not Activated</span>
       {% elif card.pairing_status == 'UNPAIRED' %}
-        <span class="badge badge-silver" style="font-weight: 600;"><span class="ops-status-dot ops-dot-unassigned"></span>Unpaired Stock</span>
+        {% if card.is_warehouse_stock %}
+          <span class="badge" style="background: rgba(245,158,11,0.12); color: #F59E0B; font-weight: 600;"><span class="ops-status-dot ops-dot-unassigned"></span>Warehouse Locked</span>
+        {% else %}
+          <span class="badge" style="background: rgba(56,189,248,0.15); color: #38BDF8; font-weight: 600;"><span class="ops-status-dot" style="background:#38BDF8; box-shadow:0 0 6px rgba(56,189,248,0.4);"></span>Activation-Ready</span>
+        {% endif %}
       {% elif card.status == 'SUSPENDED' %}
         <span class="badge" style="background: rgba(245,158,11,0.12); color: #f59e0b;"><span class="ops-status-dot ops-dot-suspended"></span>Suspended</span>
       {% elif card.status == 'LOST' %}
@@ -212,6 +216,56 @@
   </div>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.25rem; padding-top: 0.5rem;">
+
+    <!-- Distribution Pool: Release / Recall -->
+    {% if card.status == 'UNASSIGNED' and not card.user %}
+      <div class="ops-action-card">
+        <h3 style="font-size: 0.85rem; margin: 0 0 0.5rem; font-weight: 600; color: #38BDF8;">Distribution Pool</h3>
+        {% if card.is_warehouse_stock %}
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Currently: <strong style="color: #F59E0B;">Warehouse Stock (Locked)</strong>. Customer self-activation is blocked.
+          </p>
+          {% if card.hardware_test_status == 'passed' and card.activation_code_hash %}
+            <form method="post" action="{% url 'console:card_release_distribution' card.id %}">
+              {% csrf_token %}
+              <div style="margin-bottom: 0.65rem;">
+                <label style="font-size:0.74rem; color:var(--text-secondary); display:flex; align-items:flex-start; gap:0.4rem; cursor:pointer;">
+                  <input type="checkbox" name="confirm_release" value="yes" required style="margin-top: 2px;">
+                  <span>I confirm releasing card <strong>{{ card.card_code }}</strong> for open customer activation.</span>
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; background: #0284C7; border-color: #38BDF8;">
+                Release for Activation
+              </button>
+            </form>
+          {% else %}
+            <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 6px; padding: 0.6rem; font-size: 0.75rem; color: #FCA5A5;">
+              {% if card.hardware_test_status != 'passed' %}
+                ⚠️ Physical hardware QA must be <strong>PASSED</strong> before releasing card to open distribution (currently {{ card.get_hardware_test_status_display }}).
+              {% elif not card.activation_code_hash %}
+                ⚠️ Secret activation PIN must be generated before releasing card.
+              {% endif %}
+            </div>
+          {% endif %}
+        {% else %}
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Currently: <strong style="color: #38BDF8;">Activation-Ready (Open Pool)</strong>. Any authenticated customer with the physical PIN can activate this card.
+          </p>
+          <form method="post" action="{% url 'console:card_recall_warehouse' card.id %}">
+            {% csrf_token %}
+            <div style="margin-bottom: 0.65rem;">
+              <label style="font-size:0.74rem; color:var(--text-secondary); display:flex; align-items:flex-start; gap:0.4rem; cursor:pointer;">
+                <input type="checkbox" name="confirm_recall" value="yes" required style="margin-top: 2px;">
+                <span>I confirm recalling card <strong>{{ card.card_code }}</strong> back to protected warehouse stock.</span>
+              </label>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%; color: #FBBF24; border-color: rgba(245,158,11,0.3);">
+              Recall to Warehouse
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
 
     <!-- 1. Assignment / Allocation -->
     {% if card.status == 'UNASSIGNED' or not card.user %}

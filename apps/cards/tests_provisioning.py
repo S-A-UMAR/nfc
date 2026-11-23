@@ -26,12 +26,14 @@ from apps.cards.services.qr_service import (
     generate_batch_manufacturing_zip,
 )
 from apps.core.models import AdminAuditLog
+from django.core.cache import cache
 
 User = get_user_model()
 
 
 class CardProvisioningEngineTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.staff_user = User.objects.create_user(
             email="staff@strideid.com",
             password="TestPassword123!",

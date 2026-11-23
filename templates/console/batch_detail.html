@@ -266,7 +266,11 @@
             {% elif card.pairing_status == 'PAIRED_PENDING' %}
               <span style="color: #FBBF24; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-reserved"></span>Paired — Not Activated</span>
             {% elif card.pairing_status == 'UNPAIRED' %}
-              <span style="color: #9A9A9A; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Unpaired Stock</span>
+              {% if card.is_warehouse_stock %}
+                <span style="color: #F59E0B; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot ops-dot-unassigned"></span>Warehouse Locked</span>
+              {% else %}
+                <span style="color: #38BDF8; font-weight: 600; font-size: 0.8rem;"><span class="ops-status-dot" style="background:#38BDF8; box-shadow:0 0 6px rgba(56, 189, 248, 0.4);"></span>Activation-Ready</span>
+              {% endif %}
             {% else %}
               <span style="color: #EF4444; font-weight: 600; font-size: 0.8rem;">{{ card.pairing_status_display }}</span>
             {% endif %}

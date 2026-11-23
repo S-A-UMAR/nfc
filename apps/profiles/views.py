@@ -172,6 +172,8 @@ def onboarding_view(request):
             profile.full_name = full_name
         
         profile.title = request.POST.get('title', '').strip()
+        if profile_type == 'personal' and not profile.title:
+            profile.title = 'Professional'
         profile.bio = request.POST.get('bio', '').strip()
 
         # Contact Hub

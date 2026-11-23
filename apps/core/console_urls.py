@@ -39,6 +39,8 @@ urlpatterns = [
     # 6. Card Lifecycle Mutations (Atomic)
     path('cards/<int:card_id>/assign/', views.console_card_assign_view, name='card_assign'),
     path('cards/<int:card_id>/reassign/', views.console_card_reassign_view, name='card_reassign'),
+    path('cards/<int:card_id>/release-distribution/', views.console_card_release_distribution_view, name='card_release_distribution'),
+    path('cards/<int:card_id>/recall-warehouse/', views.console_card_recall_warehouse_view, name='card_recall_warehouse'),
     path('cards/<int:card_id>/suspend/', views.console_card_suspend_view, name='card_suspend'),
     path('cards/<int:card_id>/restore/', views.console_card_restore_view, name='card_restore'),
     path('cards/<int:card_id>/mark-lost/', views.console_card_mark_lost_view, name='card_mark_lost'),

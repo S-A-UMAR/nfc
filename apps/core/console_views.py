@@ -942,6 +942,144 @@ def console_card_reassign_view(request, card_id):
 
 @console_staff_required
 @require_POST
+def console_card_release_distribution_view(request, card_id):
+    """
+    Explicitly release an unassigned card from warehouse stock to activation-ready distribution.
+    Requirements:
+    1. Staff authorization.
+    2. Card is unassigned (user is None, status == STATUS_UNASSIGNED).
+    3. Card is currently in warehouse stock (is_warehouse_stock == True).
+    4. Physical hardware QA status is 'passed' (cannot release untested or failed cards).
+    5. Card has not been activated, suspended, replaced, or reported lost.
+    6. Activation PIN hash is configured.
+    7. Explicit staff confirmation.
+    8. Atomic transaction and audit logging.
+    """
+    confirm = request.POST.get('confirm_release', '').strip().lower()
+    if confirm not in ('yes', 'true', '1'):
+        messages.error(request, "Explicit staff confirmation is required to release card for open distribution.")
+        return redirect('console:card_detail', card_id=card_id)
+
+    with transaction.atomic():
+        try:
+            card = Card.objects.select_for_update().get(id=card_id)
+        except Card.DoesNotExist:
+            messages.error(request, "Card not found.")
+            return redirect('console:cards_list')
+
+        if card.status != Card.STATUS_UNASSIGNED or card.user is not None:
+            messages.error(request, f"Cannot release card '{card.card_code}': only unassigned cards can be released to open stock.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        # Conflict guard: cannot release if card is allocated to an active customer order or fulfillment
+        if card.order_assignments.exclude(order_status=Order.STATUS_CANCELLED).exists():
+            messages.error(
+                request,
+                f"Cannot release card '{card.card_code}': it is linked to an existing customer order or fulfillment reservation."
+            )
+            return redirect('console:card_detail', card_id=card.id)
+
+        if not card.is_warehouse_stock:
+            messages.warning(request, f"Card '{card.card_code}' is already released for activation.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        if card.hardware_test_status != Card.HARDWARE_TEST_PASSED:
+            messages.error(
+                request,
+                f"Cannot release card '{card.card_code}' to open distribution: physical hardware verification status is "
+                f"'{card.get_hardware_test_status_display()}'. Cards must pass physical QA before release."
+            )
+            return redirect('console:card_detail', card_id=card.id)
+
+        if not card.activation_code_hash:
+            messages.error(request, f"Cannot release card '{card.card_code}': secret activation PIN is not configured.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        card.is_warehouse_stock = False
+        card.save(update_fields=['is_warehouse_stock'])
+
+        AdminAuditLog.log(
+            action=AdminAuditLog.ACTION_CARD_DISTRIBUTION_CHANGED,
+            staff_user=request.user,
+            target_repr=f"Card {card.card_code}",
+            target_model="Card",
+            target_id=str(card.id),
+            previous_state="Warehouse Stock (Locked)",
+            new_state="Activation-Ready (Open)",
+            details=f"Released card {card.card_code} from warehouse to open customer activation pool. Hardware QA verified: {card.hardware_test_status}.",
+            ip_address=get_client_ip(request),
+        )
+
+    messages.success(request, f"Card '{card.card_code}' successfully released for open customer activation.")
+    return redirect('console:card_detail', card_id=card.id)
+
+
+@console_staff_required
+@require_POST
+def console_card_recall_warehouse_view(request, card_id):
+    """
+    Recall an unassigned, unactivated card back to protected warehouse stock.
+    Requirements:
+    1. Staff authorization.
+    2. Card is unassigned (user is None, status == STATUS_UNASSIGNED).
+    3. Card is currently released (is_warehouse_stock == False).
+    4. Card has not been activated (status != STATUS_ACTIVE and activated_at is None).
+    5. Explicit staff confirmation.
+    6. Atomic transaction and audit logging.
+    """
+    confirm = request.POST.get('confirm_recall', '').strip().lower()
+    if confirm not in ('yes', 'true', '1'):
+        messages.error(request, "Explicit staff confirmation is required to recall card to warehouse stock.")
+        return redirect('console:card_detail', card_id=card_id)
+
+    with transaction.atomic():
+        try:
+            card = Card.objects.select_for_update().get(id=card_id)
+        except Card.DoesNotExist:
+            messages.error(request, "Card not found.")
+            return redirect('console:cards_list')
+
+        if card.status == Card.STATUS_ACTIVE or card.activated_at is not None or card.user is not None:
+            messages.error(request, f"Cannot recall card '{card.card_code}': active or assigned cards cannot be recalled to warehouse stock.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        # Conflict guard: cannot recall if card is allocated to an existing customer order
+        if card.order_assignments.exclude(order_status=Order.STATUS_CANCELLED).exists():
+            messages.error(
+                request,
+                f"Cannot recall card '{card.card_code}': it is linked to an existing customer order or fulfillment reservation."
+            )
+            return redirect('console:card_detail', card_id=card.id)
+
+        if card.status != Card.STATUS_UNASSIGNED:
+            messages.error(request, f"Cannot recall card '{card.card_code}': status is '{card.get_status_display()}'.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        if card.is_warehouse_stock:
+            messages.warning(request, f"Card '{card.card_code}' is already in warehouse stock.")
+            return redirect('console:card_detail', card_id=card.id)
+
+        card.is_warehouse_stock = True
+        card.save(update_fields=['is_warehouse_stock'])
+
+        AdminAuditLog.log(
+            action=AdminAuditLog.ACTION_CARD_DISTRIBUTION_CHANGED,
+            staff_user=request.user,
+            target_repr=f"Card {card.card_code}",
+            target_model="Card",
+            target_id=str(card.id),
+            previous_state="Activation-Ready (Open)",
+            new_state="Warehouse Stock (Locked)",
+            details=f"Recalled unassigned card {card.card_code} back to protected warehouse inventory.",
+            ip_address=get_client_ip(request),
+        )
+
+    messages.success(request, f"Card '{card.card_code}' recalled to warehouse inventory.")
+    return redirect('console:card_detail', card_id=card.id)
+
+
+@console_staff_required
+@require_POST
 def console_card_suspend_view(request, card_id):
     """Temporarily suspend a card."""
     with transaction.atomic():
