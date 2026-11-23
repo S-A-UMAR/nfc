@@ -120,6 +120,39 @@
   background: #229ED9;
   color: #FFFFFF;
 }
+.prf-social-tile--snapchat .prf-social-tile-icon {
+  background: #FFFC00;
+  color: #000000;
+}
+.prf-social-tile--threads .prf-social-tile-icon {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+.prf-social-tile--spotify .prf-social-tile-icon {
+  background: #1DB954;
+  color: #000000;
+}
+.prf-social-tile--discord .prf-social-tile-icon {
+  background: #5865F2;
+  color: #FFFFFF;
+}
+.prf-social-tile--twitch .prf-social-tile-icon {
+  background: #9146FF;
+  color: #FFFFFF;
+}
+.prf-social-tile--pinterest .prf-social-tile-icon {
+  background: #E60023;
+  color: #FFFFFF;
+}
+.prf-social-tile--whatsapp .prf-social-tile-icon {
+  background: #25D366;
+  color: #FFFFFF;
+}
+.prf-social-tile--behance .prf-social-tile-icon {
+  background: #1769FF;
+  color: #FFFFFF;
+}
 .prf-social-tile--dribbble .prf-social-tile-icon {
   background: #EA4C89;
   color: #FFFFFF;

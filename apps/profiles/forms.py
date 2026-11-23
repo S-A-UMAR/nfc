@@ -97,32 +97,83 @@ class SocialLinkForm(forms.ModelForm):
             if url.lower().startswith(('javascript:', 'data:', 'vbscript:', 'file:')):
                 raise ValidationError("Invalid URL scheme.")
 
+            prefixes = {
+                'instagram': 'https://instagram.com/',
+                'linkedin': 'https://linkedin.com/in/',
+                'x_twitter': 'https://x.com/',
+                'tiktok': 'https://tiktok.com/@',
+                'facebook': 'https://facebook.com/',
+                'youtube': 'https://youtube.com/@',
+                'snapchat': 'https://snapchat.com/add/',
+                'threads': 'https://threads.net/@',
+                'telegram': 'https://t.me/',
+                'discord': 'https://discord.gg/',
+                'spotify': 'https://open.spotify.com/',
+                'twitch': 'https://twitch.tv/',
+                'pinterest': 'https://pinterest.com/',
+                'github': 'https://github.com/',
+            }
+
+            # Handle URLs that incorrectly start with https://@ or http://@
+            if url.startswith('https://@') or url.startswith('http://@'):
+                clean_handle = url.split('@', 1)[-1].strip('/')
+                if platform in prefixes:
+                    url = prefixes[platform] + clean_handle
+                else:
+                    url = f'https://snapchat.com/add/{clean_handle}'
+                    self.cleaned_data['platform'] = 'snapchat'
+
             # Normalize handles (e.g. @username) or domains without scheme
-            if not (url.startswith('http://') or url.startswith('https://')):
+            elif not (url.startswith('http://') or url.startswith('https://')):
                 clean_handle = url.lstrip('@').strip()
-                prefixes = {
-                    'instagram': 'https://instagram.com/',
-                    'linkedin': 'https://linkedin.com/in/',
-                    'x_twitter': 'https://x.com/',
-                    'tiktok': 'https://tiktok.com/@',
-                    'facebook': 'https://facebook.com/',
-                    'youtube': 'https://youtube.com/@',
-                    'snapchat': 'https://snapchat.com/add/',
-                    'threads': 'https://threads.net/@',
-                    'telegram': 'https://t.me/',
-                    'discord': 'https://discord.gg/',
-                    'spotify': 'https://open.spotify.com/',
-                    'twitch': 'https://twitch.tv/',
-                    'pinterest': 'https://pinterest.com/',
-                    'github': 'https://github.com/',
-                }
                 if platform in prefixes and ('/' not in clean_handle and '.' not in clean_handle):
                     url = prefixes[platform] + clean_handle
+                elif (platform == 'other' or not platform) and url.startswith('@'):
+                    # An @handle entered under Other is most commonly Snapchat
+                    url = 'https://snapchat.com/add/' + clean_handle
+                    self.cleaned_data['platform'] = 'snapchat'
                 else:
                     url = 'https://' + url
 
             validate_safe_url(url, allow_relative=False)
         return url
+
+    def clean(self):
+        cleaned_data = super().clean()
+        url = (cleaned_data.get('url') or '').strip()
+        platform = cleaned_data.get('platform', '')
+
+        # Auto-detect platform from URL if left as 'other' or empty
+        if url and platform in ('other', '', None):
+            url_lower = url.lower()
+            if 'snapchat.com' in url_lower or 'snap.com' in url_lower:
+                cleaned_data['platform'] = 'snapchat'
+            elif 'instagram.com' in url_lower:
+                cleaned_data['platform'] = 'instagram'
+            elif 'tiktok.com' in url_lower:
+                cleaned_data['platform'] = 'tiktok'
+            elif 'x.com' in url_lower or 'twitter.com' in url_lower:
+                cleaned_data['platform'] = 'x_twitter'
+            elif 'linkedin.com' in url_lower:
+                cleaned_data['platform'] = 'linkedin'
+            elif 'youtube.com' in url_lower or 'youtu.be' in url_lower:
+                cleaned_data['platform'] = 'youtube'
+            elif 'threads.net' in url_lower:
+                cleaned_data['platform'] = 'threads'
+            elif 't.me' in url_lower or 'telegram.me' in url_lower:
+                cleaned_data['platform'] = 'telegram'
+            elif 'spotify.com' in url_lower:
+                cleaned_data['platform'] = 'spotify'
+            elif 'discord.gg' in url_lower or 'discord.com' in url_lower:
+                cleaned_data['platform'] = 'discord'
+            elif 'github.com' in url_lower:
+                cleaned_data['platform'] = 'github'
+            elif 'twitch.tv' in url_lower:
+                cleaned_data['platform'] = 'twitch'
+            elif 'pinterest.com' in url_lower:
+                cleaned_data['platform'] = 'pinterest'
+
+        return cleaned_data
 
 
 class CustomLinkForm(forms.ModelForm):

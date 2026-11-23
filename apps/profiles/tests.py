@@ -856,8 +856,34 @@ class DirectLinkAnd3DCardTests(TestCase):
         self.assertContains(res, 'prf-direct-mode-banner')
         self.assertContains(res, 'Direct Link Active:')
 
-    # def test_3d_smart_card_elements_rendered(self):
-    #     """Shelved for v2."""
-    #     pass
+    def test_social_link_handle_normalization_and_target_url(self):
+        """Test handle resolution, target_url, tile_title, and tile_subtitle."""
+        from apps.profiles.forms import SocialLinkForm
+        # Form normalizes snapchat handle
+        form = SocialLinkForm(data={'platform': 'snapchat', 'url': '@omar_sani01'})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['url'], 'https://snapchat.com/add/omar_sani01')
+
+        # Form auto-detects snapchat from url
+        form2 = SocialLinkForm(data={'platform': 'other', 'url': 'https://snapchat.com/add/omar_sani01'})
+        self.assertTrue(form2.is_valid())
+        self.assertEqual(form2.cleaned_data['platform'], 'snapchat')
+
+        # Model target_url and title/subtitle for legacy broken https://@ URL
+        link = SocialLink.objects.create(
+            profile=self.profile,
+            platform='other',
+            url='https://@omar_sani01'
+        )
+        self.assertEqual(link.target_url, 'https://snapchat.com/add/omar_sani01')
+        self.assertEqual(link.tile_title, 'Snapchat')
+        self.assertEqual(link.tile_subtitle, '@omar_sani01')
+
+        # Public profile renders target_url and accurate channel count
+        res = self.visitor_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'https://snapchat.com/add/omar_sani01')
+        self.assertContains(res, '1 channel')
+
 
 

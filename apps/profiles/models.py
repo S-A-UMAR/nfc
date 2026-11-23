@@ -252,10 +252,34 @@ class SocialLink(models.Model):
         return f"{self.get_platform_display()} - {self.profile.full_name}"
 
     @property
+    def target_url(self):
+        u = (self.url or "").strip()
+        if u.startswith('https://@') or u.startswith('http://@'):
+            handle = u.split('@', 1)[-1].strip('/')
+            if self.platform == 'snapchat' or self.platform == 'other':
+                return f"https://snapchat.com/add/{handle}"
+            elif self.platform == 'instagram':
+                return f"https://instagram.com/{handle}"
+            elif self.platform == 'tiktok':
+                return f"https://tiktok.com/@{handle}"
+            elif self.platform == 'x_twitter':
+                return f"https://x.com/{handle}"
+            elif self.platform == 'threads':
+                return f"https://threads.net/@{handle}"
+            elif self.platform == 'telegram':
+                return f"https://t.me/{handle}"
+            return f"https://snapchat.com/add/{handle}"
+        return u
+
+    @property
     def tile_title(self):
         if self.platform == 'other':
             if self.display_label and self.display_label.strip() and not self.display_label.strip().startswith('@'):
                 return self.display_label.strip()
+            if 'snapchat.com' in (self.url or '').lower():
+                return "Snapchat"
+            if self.url and (self.url.strip().startswith(('https://@', 'http://@', '@'))):
+                return "Snapchat"
             return "Website"
         if self.display_label:
             clean_lbl = self.display_label.strip()

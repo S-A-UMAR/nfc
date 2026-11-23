@@ -433,7 +433,7 @@
           </div>
           <div class="prf-screen1-social-grid">
             {% for social in social_links %}
-              <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer"
+              <a href="{{ social.target_url|default:social.url }}" target="_blank" rel="noopener noreferrer"
                  class="prf-social-tile prf-social-tile--{{ social.platform }}"
                  data-platform="{{ social.platform }}"
                  data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ social.tile_title }}"
@@ -686,9 +686,9 @@
       <div class="prf-links-list">
         <!-- Connected Social Links -->
         {% for social in social_links %}
-          <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer" 
+          <a href="{{ social.target_url|default:social.url }}" target="_blank" rel="noopener noreferrer" 
              class="prf-link-row-card"
-             data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ social.get_platform_display }}">
+             data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ social.tile_title }}">
             <div class="prf-link-row-left">
               <div class="prf-link-platform-icon">
                 {% if social.platform == 'instagram' %}
@@ -726,8 +726,8 @@
                 {% endif %}
               </div>
               <div class="prf-link-meta">
-                <span class="prf-link-title">{{ social.display_label|default:social.get_platform_display }}</span>
-                <span class="prf-link-subtitle">{{ social.url|cut:"https://"|cut:"http://" }}</span>
+                <span class="prf-link-title">{{ social.tile_title }}</span>
+                <span class="prf-link-subtitle">{{ social.tile_subtitle }}</span>
               </div>
             </div>
             <svg class="prf-link-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
