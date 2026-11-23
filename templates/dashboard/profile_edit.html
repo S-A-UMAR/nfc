@@ -317,7 +317,7 @@
     <section id="sec-advanced-features" class="mb-3">
       <!-- Hidden test-compat label -->
       <span style="display:none;">3. Advanced &amp; Optional Features</span>
-      <details class="prf-accordion-card" {% if profile.cover_image or profile.location or profile.address %}open{% endif %}>
+      <details class="prf-accordion-card" {% if form.cover_image.errors or form.location.errors or form.address.errors or form.is_search_indexed.errors %}open{% endif %}>
         <summary class="prf-accordion-summary">
           <div class="prf-summary-left">
             <div class="prf-summary-icon">
@@ -405,7 +405,7 @@
     <!-- ======================================================================
          CREDIBILITY & HIGHLIGHTS (Collapsible Accordion)
          ====================================================================== -->
-    <details class="prf-accordion-card mb-3" {% if profile.skills_tags or profile.languages or profile.stat_experience %}open{% endif %}>
+    <details class="prf-accordion-card mb-3" {% if form.skills_tags.errors or form.languages.errors or form.stat_experience.errors or form.stat_projects.errors or form.stat_followers.errors or form.cta_banner_text.errors %}open{% endif %}>
       <summary class="prf-accordion-summary">
         <div class="prf-summary-left">
           <div class="prf-summary-icon">
@@ -488,7 +488,7 @@
   <!-- ========================================================================
        INTERACTIVE SHOWCASE MODULES (Collapsible)
        ======================================================================== -->
-  <details class="prf-accordion-card mb-4" {% if services or gallery_items or testimonials %}open{% endif %}>
+  <details class="prf-accordion-card mb-4">
     <summary class="prf-accordion-summary">
       <div class="prf-summary-left">
         <div class="prf-summary-icon">
