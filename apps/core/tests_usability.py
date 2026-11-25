@@ -828,6 +828,14 @@ class Phase3COverviewCommandCenterTests(TestCase):
         self.assertNotContains(response2, "Profile Setup Status")
         self.assertNotContains(response2, "Name &amp; Public Handle")
 
+        # Even if user later removes their photo, setup widget stays hidden
+        self.profile.refresh_from_db()
+        self.assertTrue(self.profile.setup_completed)
+        self.profile.profile_image = ""
+        self.profile.save()
+        response3 = self.client.get(reverse('dashboard:overview'))
+        self.assertNotContains(response3, "Profile Setup Status")
+
     def test_overview_smart_card_states_unpaired_and_active(self):
         """Smart card section distinguishes between unpaired accounts and active cardholders."""
         # Unpaired state

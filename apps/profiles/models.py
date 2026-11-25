@@ -85,6 +85,7 @@ class Profile(models.Model):
     theme = models.CharField(max_length=25, choices=THEME_CHOICES, default='graphite')
     profile_layout = models.CharField(max_length=25, choices=LAYOUT_CHOICES, default='classic')
     is_search_indexed = models.BooleanField(default=True, help_text="Allow search engines to index profile")
+    setup_completed = models.BooleanField(default=False, help_text="Latches True once initial 6-step profile setup reaches 100%")
 
     # Direct Link Mode (Bypass Profile to open single destination on tap)
     direct_link_enabled = models.BooleanField(

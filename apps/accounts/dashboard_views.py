@@ -103,6 +103,10 @@ def dashboard_overview_view(request):
     completed_checklist_count = sum(1 for item in checklist if item['done'])
     total_checklist_count = len(checklist)
     completion_percentage = round((completed_checklist_count / total_checklist_count) * 100)
+    if completion_percentage == 100 and not profile.setup_completed:
+        profile.setup_completed = True
+        profile.save(update_fields=['setup_completed'])
+    show_setup_checklist = not profile.setup_completed and completion_percentage < 100
     next_step = next((item for item in checklist if not item['done']), None)
     is_profile_configured = bool(profile.slug and (profile.title or profile.business_name))
 
@@ -218,6 +222,7 @@ def dashboard_overview_view(request):
         'has_bio': has_bio,
         'has_photo': has_photo,
         'checklist': checklist,
+        'show_setup_checklist': show_setup_checklist,
         'completed_checklist_count': completed_checklist_count,
         'total_checklist_count': total_checklist_count,
         'completion_percentage': completion_percentage,

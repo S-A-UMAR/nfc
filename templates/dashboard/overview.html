@@ -261,8 +261,8 @@
 
 </div>
 
-<!-- 3. PROFILE COMPLETION ENGINE (hidden once all steps done) -->
-{% if completion_percentage < 100 %}
+<!-- 3. PROFILE COMPLETION ENGINE (hidden permanently once completed) -->
+{% if show_setup_checklist %}
 <div class="dash-completion-box" role="region" aria-label="Profile Completion Engine">
   <div class="dash-section-header">
     <div class="dash-section-title-wrap">
