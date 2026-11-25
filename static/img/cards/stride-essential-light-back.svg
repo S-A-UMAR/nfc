@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" fill="none" role="img" aria-label="STRIDE Essential Light Card — Back">
+  <defs>
+    <linearGradient id="bg-light-b" x1="0" y1="0" x2="640" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F5F5F5"/>
+      <stop offset="100%" stop-color="#E5E5E5"/>
+    </linearGradient>
+    <linearGradient id="card-light-b" x1="110" y1="70" x2="530" y2="350" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#F5F5F5"/>
+      <stop offset="100%" stop-color="#EBEBEB"/>
+    </linearGradient>
+    <filter id="shadow-lb" x="80" y="55" width="480" height="330" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#242424" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="640" height="420" rx="16" fill="url(#bg-light-b)"/>
+  <g filter="url(#shadow-lb)">
+    <rect x="110" y="75" width="420" height="264" rx="18" fill="url(#card-light-b)" stroke="#C4C4C4" stroke-width="1.5"/>
+    <rect x="396" y="196" width="96" height="96" rx="10" fill="#242424"/>
+    <g fill="#F5F5F5">
+      <rect x="408" y="208" width="22" height="22" rx="3"/>
+      <rect x="413" y="213" width="12" height="12" rx="1" fill="#242424"/>
+      <rect x="416" y="216" width="6" height="6" fill="#F5F5F5"/>
+      <rect x="458" y="208" width="22" height="22" rx="3"/>
+      <rect x="463" y="213" width="12" height="12" rx="1" fill="#242424"/>
+      <rect x="466" y="216" width="6" height="6" fill="#F5F5F5"/>
+      <rect x="408" y="258" width="22" height="22" rx="3"/>
+      <rect x="413" y="263" width="12" height="12" rx="1" fill="#242424"/>
+      <rect x="416" y="266" width="6" height="6" fill="#F5F5F5"/>
+      <rect x="436" y="212" width="16" height="6" rx="1"/>
+      <rect x="436" y="224" width="8" height="14" rx="1"/>
+      <rect x="448" y="236" width="12" height="8" rx="1"/>
+      <rect x="436" y="248" width="16" height="12" rx="1"/>
+      <rect x="458" y="246" width="22" height="8" rx="1"/>
+      <rect x="458" y="260" width="10" height="20" rx="1"/>
+      <rect x="472" y="264" width="8" height="16" rx="1"/>
+    </g>
+    <g transform="translate(150, 114)" stroke="#242424" stroke-width="2" stroke-linecap="round" fill="none">
+      <path d="M4 12a6 6 0 0 0 0-7"/>
+      <path d="M9 14.5a10 10 0 0 0 0-12"/>
+      <path d="M14 17a14 14 0 0 0 0-17"/>
+    </g>
+    <text x="178" y="127" fill="#242424" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5">TAP NFC OR SCAN QR</text>
+    <text x="150" y="286" fill="#525252" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500">strideid.com</text>
+  </g>
+</svg>

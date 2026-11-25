@@ -26,9 +26,20 @@ def checkout_view(request, package_code):
         package = ProductPackage.objects.filter(is_active=True).first()
 
     if not package:
-        messages.error(request, "The selected package is currently unavailable. Please choose an active package below.")
-        return redirect('core:pricing')
+        messages.error(request, "The selected package is currently unavailable. Please choose an active product below.")
+        return redirect('core:shop')
+
+    # STRIDE Teams (corporate-fleet) is quotation-based; prevent direct checkout
+    if package.code == 'corporate-fleet' or package.package_type == ProductPackage.TYPE_CORPORATE or package.price_ngn <= 0:
+        messages.info(request, "STRIDE Teams is quotation-based. Please share your team size and requirements for a custom quote.")
+        return redirect(f"{redirect('core:contact').url}?subject=STRIDE+Teams+Corporate+Quote")
+
     profile = getattr(request.user, 'profile', None)
+
+    selected_colour = (request.POST.get('selected_colour') or request.GET.get('colour', '')).strip().lower()
+    if selected_colour not in ('dark', 'light'):
+        selected_colour = ''
+    selected_engraving = (request.POST.get('selected_engraving') or request.GET.get('engraving', '')).strip()[:80]
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
@@ -39,6 +50,13 @@ def checkout_view(request, package_code):
             order.amount = package.price_ngn
             order.payment_status = Order.PAYMENT_PENDING
             order.order_status = Order.STATUS_RECEIVED
+            if not order.customer_notes.strip() and (selected_colour or selected_engraving):
+                notes_parts = []
+                if selected_colour:
+                    notes_parts.append(f"Finish: {selected_colour.title()}")
+                if selected_engraving:
+                    notes_parts.append(f"Personalization: {selected_engraving}")
+                order.customer_notes = ' | '.join(notes_parts)
             order.save()
 
             # Dispatch order confirmation email (failure must not break checkout)
@@ -51,16 +69,24 @@ def checkout_view(request, package_code):
             return redirect('payments:initialize', order_number=order.order_number)
     else:
         # Pre-fill shipping defaults if profile exists
+        notes_parts = []
+        if selected_colour:
+            notes_parts.append(f"Finish: {selected_colour.title()}")
+        if selected_engraving:
+            notes_parts.append(f"Personalization: {selected_engraving}")
         initial_data = {
             'shipping_name': profile.full_name if profile else request.user.display_name,
             'shipping_phone': profile.phone if profile else request.user.phone or '',
             'shipping_address': profile.address if profile else '',
+            'customer_notes': ' | '.join(notes_parts),
         }
         form = CheckoutForm(initial=initial_data)
 
     return render(request, 'orders/checkout.html', {
         'package': package,
         'form': form,
+        'selected_colour': selected_colour,
+        'selected_engraving': selected_engraving,
     })
 
 

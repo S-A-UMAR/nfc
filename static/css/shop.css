@@ -1,0 +1,565 @@
+/* ==========================================================================
+   STRIDE SHOP — Light-Surface Product-First E-Commerce Styles
+   Brand Palette: #242424 (Graphite), #C4C4C4 (Border/Silver), #F5F5F5 (Soft Grey)
+   ========================================================================== */
+
+.shop-page,
+.shop-page * {
+  box-sizing: border-box;
+}
+
+.shop-page {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 55%, #EBEBEB 100%);
+  color: #242424;
+  min-height: calc(100vh - 80px);
+  padding: 6.5rem 0 5rem;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.shop-container {
+  max-width: 1160px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* Header (Clean, Product-First — No Oversized Marketing Hero) */
+.shop-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid #C4C4C4;
+}
+
+.shop-header > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.shop-header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.shop-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #525252;
+}
+
+.shop-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #242424;
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
+}
+
+.shop-subtitle {
+  font-size: 1rem;
+  color: #525252;
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.55;
+}
+
+.shop-trust-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.shop-trust-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  background: #FFFFFF;
+  border: 1px solid #C4C4C4;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #242424;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+/* Product Grid */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.shop-card {
+  background: #FFFFFF;
+  border: 1px solid #C4C4C4;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 32px rgba(36, 36, 36, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shop-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(36, 36, 36, 0.1);
+}
+
+.shop-card-media {
+  position: relative;
+  display: block;
+  background: #F5F5F5;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.shop-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shop-card-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: #242424;
+  color: #FFFFFF;
+}
+
+.shop-card-body {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.shop-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.shop-card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #242424;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.shop-card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.shop-card-title a:hover {
+  text-decoration: underline;
+}
+
+.shop-card-price {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #242424;
+  white-space: nowrap;
+}
+
+.shop-card-tagline {
+  font-size: 0.95rem;
+  color: #525252;
+  line-height: 1.55;
+  margin: 0 0 1.5rem;
+  flex: 1;
+}
+
+.shop-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Graphite Buttons */
+.shop-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  background: #242424;
+  color: #FFFFFF;
+  border: 1px solid #242424;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  min-height: 46px;
+}
+
+.shop-btn-primary:hover {
+  background: #111111;
+  color: #FFFFFF;
+}
+
+.shop-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.25rem;
+  background: #F5F5F5;
+  color: #242424;
+  border: 1px solid #C4C4C4;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  min-height: 46px;
+}
+
+.shop-btn-secondary:hover {
+  background: #E8E8E8;
+  border-color: #242424;
+  color: #242424;
+}
+
+/* ==========================================================================
+   PRODUCT DETAIL PAGE (/shop/<slug>/)
+   ========================================================================== */
+
+.shop-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #525252;
+  text-decoration: none;
+  margin-bottom: 1.75rem;
+}
+
+.shop-breadcrumb:hover {
+  color: #242424;
+}
+
+.shop-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 3rem;
+  align-items: start;
+}
+
+/* Gallery */
+.shop-gallery-card {
+  background: #FFFFFF;
+  border: 1px solid #C4C4C4;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 12px 32px rgba(36, 36, 36, 0.06);
+}
+
+.shop-gallery-stage {
+  background: #F5F5F5;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10.5;
+  margin-bottom: 1rem;
+  border: 1px solid #E5E5E5;
+}
+
+.shop-gallery-stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shop-gallery-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.shop-gallery-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: #F5F5F5;
+  border: 1.5px solid #C4C4C4;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: #242424;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.shop-gallery-tab.active {
+  background: #FFFFFF;
+  border-color: #242424;
+}
+
+.shop-gallery-tab img {
+  width: 48px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #C4C4C4;
+}
+
+/* Product Info Column */
+.shop-detail-panel {
+  background: #FFFFFF;
+  border: 1px solid #C4C4C4;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 12px 32px rgba(36, 36, 36, 0.06);
+}
+
+.shop-detail-badge {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: #F5F5F5;
+  border: 1px solid #C4C4C4;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #242424;
+  margin-bottom: 0.85rem;
+}
+
+.shop-detail-title {
+  font-size: clamp(1.65rem, 3vw, 2.15rem);
+  font-weight: 700;
+  color: #242424;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.shop-detail-price {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #242424;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.shop-detail-price-note {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #525252;
+}
+
+.shop-detail-desc {
+  font-size: 0.9625rem;
+  color: #404040;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+.shop-option-group {
+  margin-bottom: 1.5rem;
+}
+
+.shop-option-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #242424;
+  margin-bottom: 0.6rem;
+}
+
+.shop-colour-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.shop-colour-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  background: #F5F5F5;
+  border: 1.5px solid #C4C4C4;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #242424;
+  text-align: left;
+}
+
+.shop-colour-btn.active {
+  background: #FFFFFF;
+  border-color: #242424;
+  box-shadow: 0 0 0 1px #242424;
+}
+
+.shop-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid #C4C4C4;
+  flex-shrink: 0;
+}
+
+.shop-swatch--dark {
+  background: #242424;
+}
+
+.shop-swatch--light {
+  background: #F5F5F5;
+}
+
+.shop-custom-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #C4C4C4;
+  border-radius: 12px;
+  background: #FFFFFF;
+  color: #242424;
+  font-size: 0.9375rem;
+}
+
+.shop-custom-input:focus {
+  outline: none;
+  border-color: #242424;
+}
+
+.shop-custom-hint {
+  font-size: 0.8125rem;
+  color: #525252;
+  margin-top: 0.4rem;
+}
+
+.shop-buy-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.shop-buy-stack .shop-btn-primary,
+.shop-buy-stack .shop-btn-secondary {
+  width: 100%;
+  padding: 0.95rem 1.5rem;
+  font-size: 1rem;
+}
+
+/* Info Accordions / Blocks */
+.shop-info-block {
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid #E5E5E5;
+}
+
+.shop-info-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #242424;
+  margin: 0 0 0.65rem;
+}
+
+.shop-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.shop-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  color: #404040;
+  line-height: 1.45;
+}
+
+.shop-feature-list svg {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: #242424;
+}
+
+.shop-info-copy {
+  font-size: 0.9rem;
+  color: #525252;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .shop-page {
+    padding: 5.5rem 0 4rem;
+  }
+
+  .shop-grid,
+  .shop-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .shop-card,
+  .shop-gallery-card,
+  .shop-detail-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .shop-card-body,
+  .shop-detail-panel {
+    padding: 1.35rem;
+  }
+
+  .shop-card-top {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .shop-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .shop-colour-options {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Shop — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Shop STRIDE NFC smart cards: Essential Dark, Essential Light, Signature Personalized, and Teams corporate fleet orders. One-time purchase with lifetime digital profile.{% endblock %}
+{% block og_title %}STRIDE Shop — Smart NFC Cards{% endblock %}
+{% block og_description %}Explore STRIDE's smart NFC card collection. One-time purchase, lifetime digital profile, tracked nationwide delivery.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop.css' %}?v=1.0">
+{% endblock %}
+
+{% block content %}
+<section class="shop-page" aria-label="STRIDE Shop">
+  <div class="shop-container">
+
+    <!-- Clean Product-First Shop Header -->
+    <div class="shop-header">
+      <div>
+        <div class="shop-header-brand">
+          <img src="{% static 'img/brand/stride-logo-light.svg' %}" alt="STRIDE" height="22" style="height: 22px; width: auto;">
+          <span class="shop-eyebrow">Official Store</span>
+        </div>
+        <h1 class="shop-title">STRIDE Shop</h1>
+        <p class="shop-subtitle">
+          Physical NFC smart cards paired with your lifetime STRIDE digital profile. One-time purchase, zero monthly fees.
+        </p>
+      </div>
+
+      <div class="shop-trust-pills" aria-label="Store Guarantees">
+        <span class="shop-trust-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Paystack Secured
+        </span>
+        <span class="shop-trust-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Tracked Delivery (Fee Quoted Separately)
+        </span>
+      </div>
+    </div>
+
+    <!-- 4-Card Product Collection -->
+    <div class="shop-grid">
+      {% for item in products %}
+      <article class="shop-card">
+        <a href="{% url 'core:shop_product' item.slug %}" class="shop-card-media" aria-label="View {{ item.name }}">
+          <img src="{% static item.front_img %}" alt="{{ item.name }}" loading="lazy">
+          {% if item.badge %}
+            <span class="shop-card-badge">{{ item.badge }}</span>
+          {% endif %}
+        </a>
+
+        <div class="shop-card-body">
+          <div class="shop-card-top">
+            <h2 class="shop-card-title">
+              <a href="{% url 'core:shop_product' item.slug %}">{{ item.name }}</a>
+            </h2>
+            <div class="shop-card-price">{% if item.is_teams %}Request a Quote{% else %}₦{{ item.package.price_ngn|intcomma }}{% endif %}</div>
+          </div>
+
+          <p class="shop-card-tagline">{{ item.tagline }}</p>
+
+          <div class="shop-card-actions">
+            {% if item.is_teams %}
+              <a href="{% url 'core:contact' %}?subject=STRIDE+Teams+Corporate+Quote" class="shop-btn-primary">
+                Request Quote
+              </a>
+              <a href="{% url 'core:shop_product' item.slug %}" class="shop-btn-secondary">
+                View Fleet Details
+              </a>
+            {% elif item.supports_customization %}
+              <a href="{% url 'core:shop_product' item.slug %}#customize" class="shop-btn-primary">
+                Customize &amp; Buy
+              </a>
+              <a href="{% url 'core:shop_product' item.slug %}" class="shop-btn-secondary">
+                Product Details
+              </a>
+            {% else %}
+              <a href="{% url 'orders:checkout' item.package.code %}?colour={{ item.colour }}" class="shop-btn-primary">
+                Buy Now
+              </a>
+              <a href="{% url 'core:shop_product' item.slug %}" class="shop-btn-secondary">
+                View Card
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

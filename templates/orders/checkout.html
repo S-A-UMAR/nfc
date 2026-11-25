@@ -8,9 +8,9 @@
 
     <!-- Top Navigation & Security Header -->
     <div class="checkout-nav-bar">
-      <a href="{% url 'core:pricing' %}" class="checkout-back-link">
+      <a href="{% url 'core:shop' %}" class="checkout-back-link">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        <span>Change Package</span>
+        <span>Back to Shop</span>
       </a>
 
       <div class="checkout-security-badge">
@@ -49,7 +49,7 @@
     <div class="checkout-mobile-summary" id="checkout-mobile-summary" role="button" tabindex="0" aria-expanded="false" aria-controls="mobile-summary-details">
       <div class="checkout-mobile-summary-header">
         <div class="checkout-mobile-summary-left">
-          <img src="{% if package.code == 'corporate-fleet' or package.code == 'business-pro' %}{% static 'img/cards/card-premium.jpg' %}{% elif package.code == 'business-suite' or package.code == 'business' or package.code == 'personal-suite' %}{% static 'img/cards/card-bundle.jpg' %}{% else %}{% static 'img/cards/card-single.jpg' %}{% endif %}" alt="{{ package.name }}" class="checkout-mobile-thumb">
+          <img src="{% if selected_colour == 'light' %}{% static 'img/cards/stride-essential-light-front.svg' %}{% elif package.code == 'corporate-fleet' or package.code == 'business-pro' %}{% static 'img/cards/stride-teams-front.svg' %}{% elif package.code == 'business-suite' or package.code == 'business' or package.code == 'personal-suite' %}{% static 'img/cards/stride-signature-front.svg' %}{% else %}{% static 'img/cards/stride-essential-dark-front.svg' %}{% endif %}" alt="{{ package.name }}" class="checkout-mobile-thumb">
           <div class="checkout-mobile-info">
             <h4>{{ package.name }}</h4>
             <span>Tap to review items & features</span>
@@ -108,6 +108,8 @@
 
         <form method="post" id="checkout-form" novalidate>
           {% csrf_token %}
+          <input type="hidden" name="selected_colour" value="{{ selected_colour }}">
+          <input type="hidden" name="selected_engraving" value="{{ selected_engraving }}">
 
           <!-- Full Name -->
           <div class="checkout-field-group">
@@ -215,8 +217,8 @@
           <div class="checkout-trust-badge-item">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             <div>
-              <strong>Standard Tracked Courier</strong>
-              <div>Free tracked courier delivery across Nigeria</div>
+              <strong>Tracked Courier Delivery</strong>
+              <div>Delivery charges communicated separately before dispatch</div>
             </div>
           </div>
           <div class="checkout-trust-badge-item">
@@ -248,7 +250,7 @@
 
         <!-- Product Preview Image -->
         <div class="checkout-product-media">
-          <img src="{% if package.code == 'corporate-fleet' or package.code == 'business-pro' %}{% static 'img/cards/card-premium.jpg' %}{% elif package.code == 'business-suite' or package.code == 'business' or package.code == 'personal-suite' %}{% static 'img/cards/card-bundle.jpg' %}{% else %}{% static 'img/cards/card-single.jpg' %}{% endif %}" alt="{{ package.name }} Preview">
+          <img src="{% if selected_colour == 'light' %}{% static 'img/cards/stride-essential-light-front.svg' %}{% elif package.code == 'corporate-fleet' or package.code == 'business-pro' %}{% static 'img/cards/stride-teams-front.svg' %}{% elif package.code == 'business-suite' or package.code == 'business' or package.code == 'personal-suite' %}{% static 'img/cards/stride-signature-front.svg' %}{% else %}{% static 'img/cards/stride-essential-dark-front.svg' %}{% endif %}" alt="{{ package.name }} Preview">
           <div class="checkout-media-overlay-tag">
             <span class="dot"></span>
             <span>Laser-Engraved NTAG216</span>
@@ -282,7 +284,7 @@
           </div>
           <div class="checkout-price-row">
             <span>Nationwide Courier Delivery</span>
-            <span class="checkout-free-badge">FREE</span>
+            <span style="color: #94A3B8;">Quoted Separately</span>
           </div>
           <div class="checkout-price-row">
             <span>Cloud Hosting & Activation</span>

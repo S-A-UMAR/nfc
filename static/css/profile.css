@@ -2297,3 +2297,429 @@
   color: #A1A1AA;
   flex-shrink: 0;
 }
+
+/* ==========================================================================
+   CONTACT CARD HERO LAYOUT
+   Full-portrait photo hero → identity → CTA → quick-actions → info → socials
+   Matches the premium dark contact-card reference design.
+   ========================================================================== */
+
+/* Override hero-section alignment for the new layout */
+.prf-contact-card-hero {
+  padding: 0 !important;
+  align-items: stretch !important;
+  text-align: left !important;
+}
+
+/* ── Hero Photo Area ──────────────────────────────────────────────── */
+.prf-contact-hero-photo {
+  position: relative;
+  width: 100%;
+  /* Tall portrait area — roughly 55% of a typical phone screen */
+  height: clamp(260px, 58vw, 360px);
+  background: radial-gradient(ellipse 80% 90% at 50% 20%, rgba(50, 50, 60, 0.9) 0%, #0A0A0C 100%);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.prf-contact-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* Logo variant: contain + center for business logos */
+.prf-contact-hero-img--logo {
+  object-fit: contain;
+  object-position: center center;
+  padding: 2rem;
+  background: rgba(18, 18, 22, 0.6);
+}
+
+/* Fallback letter avatar when no image */
+.prf-contact-hero-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 5rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.15);
+  letter-spacing: -0.04em;
+  user-select: none;
+}
+
+/* Gradient that fades the photo into the card background below */
+.prf-contact-hero-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 10, 14, 0.5) 45%,
+    rgba(10, 10, 14, 0.85) 75%,
+    #0A0A0C 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Identity Block ───────────────────────────────────────────────── */
+.prf-contact-identity {
+  padding: 1.1rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Name + verified badge in a row */
+.prf-contact-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+
+.prf-contact-name {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.prf-contact-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #22C55E;
+  color: #FFFFFF;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
+
+/* Role / title line */
+.prf-contact-role {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: #A1A1AA;
+  margin-bottom: 0.1rem;
+  line-height: 1.4;
+}
+
+/* Company / org line */
+.prf-contact-company {
+  font-size: 0.85rem;
+  color: #71717A;
+  margin-bottom: 0.5rem;
+}
+
+.prf-contact-identity .prf-tag-chips-row {
+  justify-content: flex-start;
+  margin: 0.45rem 0 0.25rem;
+}
+
+/* Thin horizontal rule */
+.prf-contact-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0.65rem 0;
+  flex-shrink: 0;
+}
+
+/* Bio text */
+.prf-contact-bio {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #D4D4D8;
+  margin: 0 0 1rem;
+}
+
+/* ── Primary CTA Row: Save Contact + Call ──────────────────────────── */
+.prf-contact-cta-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: nowrap;
+}
+
+.prf-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem;
+  border-radius: 9999px;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  box-sizing: border-box;
+  border: none;
+}
+
+/* Save Contact: white pill (prominent) */
+.prf-contact-btn--save {
+  flex: 2;
+  background: #FFFFFF;
+  color: #09090B;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.prf-contact-btn--save:hover {
+  background: #F0F0F0;
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  color: #09090B;
+}
+
+/* Call / secondary: dark glass pill */
+.prf-contact-btn--call {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.prf-contact-btn--call:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+  color: #FFFFFF;
+}
+
+/* ── 4 Quick Action Icon Buttons ───────────────────────────────────── */
+.prf-contact-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.prf-contact-quick-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.7rem 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  color: #FFFFFF;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1.2;
+}
+
+.prf-contact-quick-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.20);
+  transform: translateY(-2px);
+  color: #FFFFFF;
+}
+
+.prf-contact-quick-btn span {
+  color: #A1A1AA;
+  font-size: 0.675rem;
+}
+
+.prf-contact-quick-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  transition: transform 0.2s ease;
+}
+
+.prf-contact-quick-btn:hover .prf-contact-quick-icon {
+  transform: scale(1.07);
+}
+
+/* WhatsApp quick button: green tint */
+.prf-contact-quick-btn--wa .prf-contact-quick-icon {
+  background: rgba(37, 211, 102, 0.12);
+  color: #25D366;
+}
+
+/* Focus rings */
+.prf-contact-btn:focus-visible,
+.prf-contact-quick-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 2px;
+}
+
+/* ── Info Rows: location, website ─────────────────────────────────── */
+.prf-contact-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.prf-contact-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.prf-contact-info-row:last-child {
+  border-bottom: none;
+}
+
+.prf-contact-info-icon {
+  flex-shrink: 0;
+  color: #71717A;
+  display: flex;
+  align-items: center;
+}
+
+.prf-contact-info-text {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #D4D4D8;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.prf-contact-info-link {
+  text-decoration: none;
+  color: #D4D4D8;
+  transition: color 0.15s ease;
+}
+
+.prf-contact-info-link:hover {
+  color: #FFFFFF;
+}
+
+.prf-contact-info-arrow {
+  flex-shrink: 0;
+  color: #52525B;
+}
+
+/* Copy button for website row */
+.prf-contact-copy-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 7px;
+  color: #71717A;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.prf-contact-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Social Icon Strip ────────────────────────────────────────────── */
+.prf-contact-social-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding-top: 0.1rem;
+}
+
+.prf-contact-social-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #A1A1AA;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.prf-contact-social-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* Platform brand colours on hover */
+.prf-contact-social-pill[data-platform="instagram"]:hover  { color: #E1306C; border-color: rgba(225,48,108,0.35); }
+.prf-contact-social-pill[data-platform="linkedin"]:hover   { color: #0A66C2; border-color: rgba(10,102,194,0.35); }
+.prf-contact-social-pill[data-platform="x_twitter"]:hover  { color: #FFFFFF; }
+.prf-contact-social-pill[data-platform="youtube"]:hover    { color: #FF0000; border-color: rgba(255,0,0,0.35); }
+.prf-contact-social-pill[data-platform="tiktok"]:hover     { color: #00F2FE; border-color: rgba(0,242,254,0.35); }
+.prf-contact-social-pill[data-platform="facebook"]:hover   { color: #1877F2; border-color: rgba(24,119,242,0.35); }
+.prf-contact-social-pill[data-platform="github"]:hover     { color: #FFFFFF; }
+.prf-contact-social-pill[data-platform="telegram"]:hover   { color: #229ED9; border-color: rgba(34,158,217,0.35); }
+.prf-contact-social-pill[data-platform="spotify"]:hover    { color: #1DB954; border-color: rgba(29,185,84,0.35); }
+.prf-contact-social-pill[data-platform="snapchat"]:hover   { color: #FFFC00; border-color: rgba(255,252,0,0.35); }
+.prf-contact-social-pill[data-platform="discord"]:hover    { color: #5865F2; border-color: rgba(88,101,242,0.35); }
+
+/* ── Responsive adjustments ──────────────────────────────────────── */
+@media (max-width: 360px) {
+  .prf-contact-name {
+    font-size: 1.5rem;
+  }
+  .prf-contact-quick-grid {
+    gap: 0.4rem;
+  }
+  .prf-contact-quick-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .prf-contact-btn {
+    font-size: 0.8rem;
+    padding: 0.65rem 0.75rem;
+  }
+  .prf-contact-hero-photo {
+    height: clamp(230px, 55vw, 290px);
+  }
+}
+
+/* On wider screens (desktop card view), cap the hero photo height */
+@media (min-width: 480px) {
+  .prf-contact-hero-photo {
+    height: clamp(280px, 50%, 400px);
+    border-radius: 24px 24px 0 0;
+  }
+}

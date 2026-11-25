@@ -9,7 +9,7 @@
     <h1 class="dashboard-title">My Orders</h1>
     <p class="dashboard-subtitle">Track hardware production, smart card engraving, and website delivery.</p>
   </div>
-  <a href="{% url 'core:pricing' %}" class="btn btn-primary btn-sm">+ New Order</a>
+  <a href="{% url 'core:shop' %}" class="btn btn-primary btn-sm">+ New Order</a>
 </div>
 
 {% if orders %}
@@ -48,7 +48,7 @@
     </div>
     <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">No Orders Yet</h2>
     <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 1.5rem;">Choose a package to order your custom laser-engraved Smart Card or Website.</p>
-    <a href="{% url 'core:pricing' %}" class="btn btn-primary">Browse Packages</a>
+    <a href="{% url 'core:shop' %}" class="btn btn-primary">Browse Packages</a>
   </div>
 {% endif %}
 {% endblock %}

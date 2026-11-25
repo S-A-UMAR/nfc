@@ -392,7 +392,7 @@
           {% else %}
             <a href="{% url 'accounts:register' %}" class="btn btn-primary">Create Personal Profile</a>
           {% endif %}
-          <a href="{% url 'core:pricing' %}" class="btn btn-ghost btn-sm">View Card Options &rarr;</a>
+          <a href="{% url 'core:shop' %}" class="btn btn-ghost btn-sm">View Card Options &rarr;</a>
         </div>
       </div>
 
@@ -485,7 +485,7 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
       <div class="d-flex justify-between items-center w-100 flex-wrap gap-3">
         <span>You do not need a physical card to use your digital profile, but having one makes meeting clients in person unforgettable.</span>
-        <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Get Your Smart Card &rarr;</a>
+        <a href="{% url 'core:shop' %}" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Get Your Smart Card &rarr;</a>
       </div>
     </div>
   </div>
@@ -576,7 +576,7 @@
         <span class="pc-sub-label">
           <span class="pc-dot"></span> Ready to ship &middot; Order in one click
         </span>
-        <a href="{% url 'core:pricing' %}" class="pc-all-link">View all packages &rarr;</a>
+        <a href="{% url 'core:shop' %}" class="pc-all-link">View all packages &rarr;</a>
       </div>
     </div>
 
@@ -588,12 +588,12 @@
 
           <!-- Product Image -->
           <div class="pc-img-wrap">
-            {% if package.code == 'smart-nfc' or package.code == 'basic' or package.code == 'starter' %}
-              <img src="{% static 'img/cards/card-single.jpg' %}" alt="{{ package.name }} NFC card product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
-            {% elif package.code == 'bundle' or package.code == 'duo' or package.code == 'double' %}
-              <img src="{% static 'img/cards/card-bundle.jpg' %}" alt="{{ package.name }} NFC card bundle product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
+            {% if package.package_type == 'card_only' or package.code == 'smart-card' %}
+              <img src="{% static 'img/cards/stride-essential-dark-front.svg' %}" alt="{{ package.name }} NFC card product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
+            {% elif package.package_type == 'corporate' or package.code == 'corporate-fleet' %}
+              <img src="{% static 'img/cards/stride-teams-front.svg' %}" alt="{{ package.name }} corporate NFC card fleet photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
             {% else %}
-              <img src="{% static 'img/cards/card-premium.jpg' %}" alt="{{ package.name }} premium NFC card product photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
+              <img src="{% static 'img/cards/stride-signature-front.svg' %}" alt="{{ package.name }} personalized NFC card photo" class="pc-img" loading="lazy" onerror="this.parentElement.classList.add('pc-img-wrap--fallback')">
             {% endif %}
             {% if package.badge %}
               <span class="pc-img-badge">{{ package.badge }}</span>
@@ -619,16 +619,28 @@
 
             <!-- Price Row -->
             <div class="pc-price-row">
-              <span class="pc-price">₦{{ package.price_ngn|floatformat:0 }}</span>
-              <span class="pc-price-note">one-time</span>
+              {% if package.package_type == 'corporate' or package.code == 'corporate-fleet' or package.price_ngn == 0 %}
+                <span class="pc-price">Request a Quote</span>
+              {% else %}
+                <span class="pc-price">₦{{ package.price_ngn|floatformat:0 }}</span>
+                <span class="pc-price-note">one-time</span>
+              {% endif %}
             </div>
 
             <!-- CTA -->
-            <a href="{% url 'orders:checkout' package.code %}"
-               class="pc-order-btn {% if package.badge %}pc-order-btn--primary{% endif %}"
-               aria-label="Order {{ package.name }}">
-              Order &rarr;
-            </a>
+            {% if package.package_type == 'corporate' or package.code == 'corporate-fleet' or package.price_ngn == 0 %}
+              <a href="{% url 'core:contact' %}?subject=STRIDE+Teams+Corporate+Quote"
+                 class="pc-order-btn {% if package.badge %}pc-order-btn--primary{% endif %}"
+                 aria-label="Request quote for {{ package.name }}">
+                Request Quote &rarr;
+              </a>
+            {% else %}
+              <a href="{% url 'orders:checkout' package.code %}"
+                 class="pc-order-btn {% if package.badge %}pc-order-btn--primary{% endif %}"
+                 aria-label="Order {{ package.name }}">
+                Order &rarr;
+              </a>
+            {% endif %}
 
           </div>
         </article>
@@ -654,7 +666,7 @@
               <span class="pc-price">₦15000</span>
               <span class="pc-price-note">one-time</span>
             </div>
-            <a href="{% url 'core:pricing' %}" class="pc-order-btn pc-order-btn--primary">View Packages &rarr;</a>
+            <a href="{% url 'core:shop' %}" class="pc-order-btn pc-order-btn--primary">View Packages &rarr;</a>
           </div>
         </article>
       </div>
@@ -801,7 +813,7 @@
             <span>Manage Your Digital Profile</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-          <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
+          <a href="{% url 'core:shop' %}" class="btn btn-secondary btn-lg">
             <span>Get Your Smart Card</span>
           </a>
         {% else %}
@@ -809,7 +821,7 @@
             <span>Create Your Profile Free</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-          <a href="{% url 'core:pricing' %}" class="btn btn-secondary btn-lg">
+          <a href="{% url 'core:shop' %}" class="btn btn-secondary btn-lg">
             <span>Get Your Smart Card</span>
           </a>
         {% endif %}

@@ -23,7 +23,7 @@ class StaticViewSitemap(Sitemap):
             "core:smart_card",
             "core:websites",
             "core:how_it_works",
-            "core:pricing",
+            "core:shop",
             "core:faq",
             "core:business",
             "core:contact",

@@ -48,8 +48,8 @@ class ProductPackage(models.Model):
                 'code': 'smart-card',
                 'name': 'Smart NFC Card',
                 'package_type': cls.TYPE_CARD,
-                'price_ngn': 25000,
-                'description': 'Sleek matte-black physical NFC smart card paired with a lifetime digital profile. One-time purchase, zero monthly fees.',
+                'price_ngn': 15000,
+                'description': 'Sleek matte-black or soft-stone physical NFC smart card paired with a lifetime digital profile. One-time purchase, zero monthly fees.',
                 'features': (
                     'Matte Obsidian NFC Card with Silver Finish\n'
                     'Embedded NTAG216 High-Speed Microchip\n'
@@ -68,7 +68,7 @@ class ProductPackage(models.Model):
                 'code': 'personal-suite',
                 'name': 'Personal Identity Suite',
                 'package_type': cls.TYPE_PERSONAL,
-                'price_ngn': 65000,
+                'price_ngn': 25000,
                 'description': 'For executives, creators, and consultants wanting complete personal branding, direct link mode, and interactive networking.',
                 'features': (
                     'Premium Matte Obsidian NFC Smart Card Included\n'
@@ -78,7 +78,7 @@ class ProductPackage(models.Model):
                     '15+ Luxury Theme Styles & Custom Color Palettes\n'
                     'Bio, Services & Project Showcase Hub\n'
                     'Real-time Tap & Scan Interaction Analytics\n'
-                    'Free Express Tracked Delivery Nationwide\n'
+                    'Tracked Nationwide Delivery (Fee Communicated Separately)\n'
                     'Lifetime Access — Buy Once, Own Forever'
                 ),
                 'badge': 'Most Popular',
@@ -109,19 +109,19 @@ class ProductPackage(models.Model):
                 'code': 'corporate-fleet',
                 'name': 'Corporate Team Fleet',
                 'package_type': cls.TYPE_CORPORATE,
-                'price_ngn': 280000,
-                'description': 'For corporate organizations, executive boards, and sales teams ordering 10 cards with centralized management and unified company branding.',
+                'price_ngn': 0,
+                'description': 'For corporate organizations, executive boards, and sales teams ordering bulk NFC cards with centralized management and unified company branding.',
                 'features': (
-                    '10 Custom Laser-Engraved NFC Cards with Company Branding\n'
+                    'Custom Laser-Engraved NFC Cards with Company Branding\n'
                     'Centralized Company Management Portal\n'
                     'Standardized Corporate Identity for All Staff\n'
                     'Team Tap, Engagement & Networking Analytics\n'
                     'Rapid Card Reassignment for New Employees\n'
                     'Dedicated Corporate Account Manager & Priority Support\n'
                     'Luxury Presentation Gift Box Packaging\n'
-                    'Free Express Delivery for Whole Fleet'
+                    'Custom Volume & Delivery Quotation'
                 ),
-                'badge': 'Enterprise Fleet',
+                'badge': 'Request a Quote',
                 'is_active': True,
                 'order_index': 4,
             },

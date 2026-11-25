@@ -2341,7 +2341,7 @@
   }
 
   .dashboard-content {
-    padding: 1.25rem 1rem calc(96px + env(safe-area-inset-bottom, 0px));
+    padding: 1.25rem 1rem calc(128px + env(safe-area-inset-bottom, 0px));
   }
 
   .dash-essentials-grid {

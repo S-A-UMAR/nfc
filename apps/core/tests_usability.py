@@ -189,9 +189,11 @@ class UsabilityJourneyTests(TestCase):
     # JOURNEY G: Card Ordering & Paystack Checkout
     # --------------------------------------------------------------------------
     def test_journey_g_pricing_and_checkout(self):
-        """Test pricing page navigation and checkout form submission."""
-        pricing_resp = self.client.get(reverse('core:pricing'))
-        self.assertEqual(pricing_resp.status_code, 200)
+        """Test shop page navigation, pricing redirect, and checkout form submission."""
+        pricing_resp = self.client.get(reverse('core:pricing'), follow=False)
+        self.assertEqual(pricing_resp.status_code, 302)
+        shop_resp = self.client.get(reverse('core:shop'))
+        self.assertEqual(shop_resp.status_code, 200)
 
         self.client.login(email=self.user.email, password=self.user_password)
         checkout_url = reverse('orders:checkout', kwargs={'package_code': self.package.code})

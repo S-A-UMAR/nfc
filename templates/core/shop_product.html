@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}{{ product.name }} — Shop — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}{{ product.tagline }} Order {{ product.name }} in Nigeria for ₦{{ package.price_ngn|intcomma }} with free tracked nationwide delivery.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop.css' %}?v=1.0">
+{% endblock %}
+
+{% block content %}
+<section class="shop-page" aria-label="{{ product.name }}">
+  <div class="shop-container">
+
+    <a href="{% url 'core:shop' %}" class="shop-breadcrumb">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      <span>Back to STRIDE Shop</span>
+    </a>
+
+    <div class="shop-detail-grid">
+
+      <!-- Left: Product Gallery (Front & Back) -->
+      <div class="shop-gallery-card">
+        <div class="shop-gallery-stage">
+          <img id="shop-stage-img" src="{% static product.front_img %}" alt="{{ product.name }} Front View">
+        </div>
+
+        <div class="shop-gallery-tabs" role="tablist" aria-label="Card Views">
+          <button type="button" class="shop-gallery-tab active" id="tab-front" data-view="front" aria-selected="true">
+            <img id="thumb-front-img" src="{% static product.front_img %}" alt="Front thumbnail">
+            <span>Front View</span>
+          </button>
+          <button type="button" class="shop-gallery-tab" id="tab-back" data-view="back" aria-selected="false">
+            <img id="thumb-back-img" src="{% static product.back_img %}" alt="Back thumbnail">
+            <span>Back View</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Product Details & Purchase -->
+      <div class="shop-detail-panel">
+        {% if product.badge %}
+          <span class="shop-detail-badge">{{ product.badge }}</span>
+        {% endif %}
+
+        <h1 class="shop-detail-title">{{ product.name }}</h1>
+
+        <div class="shop-detail-price">
+          {% if product.is_teams %}
+            <span>Request a Quote</span>
+            <span class="shop-detail-price-note">custom bulk pricing</span>
+          {% else %}
+            <span>₦{{ package.price_ngn|intcomma }}</span>
+            <span class="shop-detail-price-note">one-time purchase</span>
+          {% endif %}
+        </div>
+
+        <p class="shop-detail-desc">{{ product.description }}</p>
+
+        <!-- Colour Selection -->
+        {% if product.supports_colour_switch %}
+        <div class="shop-option-group">
+          <span class="shop-option-label">Card Finish</span>
+          <div class="shop-colour-options" role="radiogroup" aria-label="Select Card Finish">
+            <button type="button" class="shop-colour-btn {% if product.colour == 'dark' %}active{% endif %}" data-colour="dark">
+              <span class="shop-swatch shop-swatch--dark"></span>
+              <span>Dark (Matte Obsidian)</span>
+            </button>
+            <button type="button" class="shop-colour-btn {% if product.colour == 'light' %}active{% endif %}" data-colour="light">
+              <span class="shop-swatch shop-swatch--light"></span>
+              <span>Light (Soft Frost)</span>
+            </button>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Customization Options (Signature) -->
+        {% if product.supports_customization and not product.is_teams %}
+        <div class="shop-option-group" id="customize">
+          <label class="shop-option-label" for="shop-engraving-input">Personalization (Optional)</label>
+          <input type="text" id="shop-engraving-input" class="shop-custom-input" maxlength="80" placeholder="Name or role to engrave on card (e.g. Amina Bello — Architect)">
+          <div class="shop-custom-hint">Carried straight into checkout. You can also upload logos or review design details after ordering.</div>
+        </div>
+        {% endif %}
+
+        <!-- Primary Purchase / Quote Actions -->
+        <div class="shop-buy-stack">
+          {% if product.is_teams %}
+            <a href="{% url 'core:contact' %}?subject=STRIDE+Teams+Corporate+Quote" class="shop-btn-primary">
+              Request Corporate Quotation
+            </a>
+          {% else %}
+            <a id="shop-buy-now-btn"
+               href="{% url 'orders:checkout' package.code %}?colour={{ product.colour }}"
+               data-base-url="{% url 'orders:checkout' package.code %}"
+               class="shop-btn-primary">
+              Buy Now — ₦{{ package.price_ngn|intcomma }}
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- NFC & QR Explanation -->
+        <div class="shop-info-block">
+          <h2 class="shop-info-title">NFC &amp; QR Functionality</h2>
+          <p class="shop-info-copy">
+            Tap the card on any compatible iPhone or Android smartphone to open your STRIDE digital profile immediately in the browser—no app required. Every card also includes a precision QR code on the back as a universal camera backup.
+          </p>
+        </div>
+
+        <!-- What's Included -->
+        <div class="shop-info-block">
+          <h2 class="shop-info-title">What's Included</h2>
+          <ul class="shop-feature-list">
+            {% for f in package.feature_list %}
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>{{ f }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Delivery Information -->
+        <div class="shop-info-block">
+          <h2 class="shop-info-title">Delivery Information</h2>
+          <p class="shop-info-copy">
+            Nationwide tracked delivery is available across Nigeria. Delivery charges are calculated and communicated separately based on your location before payment and dispatch. Estimated delivery is 3–5 business days within Lagos, 4–7 business days to Abuja and other major cities, and 5–10 business days to other locations.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var stageImg = document.getElementById('shop-stage-img');
+  var thumbFront = document.getElementById('thumb-front-img');
+  var thumbBack = document.getElementById('thumb-back-img');
+  var tabFront = document.getElementById('tab-front');
+  var tabBack = document.getElementById('tab-back');
+  var buyBtn = document.getElementById('shop-buy-now-btn');
+  var engravingInput = document.getElementById('shop-engraving-input');
+  var colourBtns = document.querySelectorAll('.shop-colour-btn');
+
+  var assets = {
+    dark: {
+      front: "{% if product.slug == 'signature' %}{% static 'img/cards/stride-signature-front.svg' %}{% else %}{% static 'img/cards/stride-essential-dark-front.svg' %}{% endif %}",
+      back: "{% if product.slug == 'signature' %}{% static 'img/cards/stride-signature-back.svg' %}{% else %}{% static 'img/cards/stride-essential-dark-back.svg' %}{% endif %}"
+    },
+    light: {
+      front: "{% static 'img/cards/stride-essential-light-front.svg' %}",
+      back: "{% static 'img/cards/stride-essential-light-back.svg' %}"
+    }
+  };
+
+  var currentColour = "{{ product.colour|default:'dark' }}";
+  var currentView = "front";
+
+  function updateGallery() {
+    var set = assets[currentColour] || assets.dark;
+    if (stageImg) stageImg.src = set[currentView];
+    if (thumbFront) thumbFront.src = set.front;
+    if (thumbBack) thumbBack.src = set.back;
+  }
+
+  function updateCheckoutLink() {
+    if (!buyBtn) return;
+    var base = buyBtn.getAttribute('data-base-url');
+    var params = new URLSearchParams();
+    if (currentColour) params.set('colour', currentColour);
+    if (engravingInput && engravingInput.value.trim()) {
+      params.set('engraving', engravingInput.value.trim());
+    }
+    buyBtn.href = base + '?' + params.toString();
+  }
+
+  if (tabFront && tabBack) {
+    tabFront.addEventListener('click', function() {
+      currentView = 'front';
+      tabFront.classList.add('active');
+      tabFront.setAttribute('aria-selected', 'true');
+      tabBack.classList.remove('active');
+      tabBack.setAttribute('aria-selected', 'false');
+      updateGallery();
+    });
+    tabBack.addEventListener('click', function() {
+      currentView = 'back';
+      tabBack.classList.add('active');
+      tabBack.setAttribute('aria-selected', 'true');
+      tabFront.classList.remove('active');
+      tabFront.setAttribute('aria-selected', 'false');
+      updateGallery();
+    });
+  }
+
+  colourBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      colourBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentColour = btn.getAttribute('data-colour') || 'dark';
+      updateGallery();
+      updateCheckoutLink();
+    });
+  });
+
+  if (engravingInput) {
+    engravingInput.addEventListener('input', updateCheckoutLink);
+  }
+});
+</script>
+{% endblock %}

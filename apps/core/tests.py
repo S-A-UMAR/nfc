@@ -59,10 +59,96 @@ class PlatformCoreTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Modern Identity. Seamless Connection.')
 
-    def test_pricing_renders_packages(self):
-        response = self.client.get(reverse('core:pricing'))
+    def test_pricing_redirects_to_shop(self):
+        response = self.client.get(reverse('core:pricing'), follow=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('core:shop'))
+
+    def test_shop_renders_product_collection(self):
+        ProductPackage.ensure_default_packages(force=True)
+        response = self.client.get(reverse('core:shop'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Test Smart Card')
+        self.assertContains(response, 'STRIDE Essential — Dark')
+        self.assertContains(response, 'STRIDE Essential — Light')
+        self.assertContains(response, 'STRIDE Signature')
+        self.assertContains(response, 'STRIDE Teams')
+        self.assertContains(response, '₦15,000')
+        self.assertContains(response, '₦25,000')
+        self.assertContains(response, 'Request a Quote')
+        self.assertNotContains(response, '280,000')
+        self.assertNotContains(response, 'card-single.jpg')
+        self.assertNotContains(response, 'card-bundle.jpg')
+        self.assertNotContains(response, 'card-premium.jpg')
+
+    def test_shop_product_detail_pages_render(self):
+        ProductPackage.ensure_default_packages(force=True)
+        for slug in ('essential-dark', 'essential-light', 'signature', 'teams'):
+            response = self.client.get(reverse('core:shop_product', kwargs={'product_slug': slug}))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'Front View')
+            self.assertContains(response, 'Back View')
+            self.assertContains(response, 'NFC &amp; QR Functionality')
+            self.assertContains(response, 'communicated separately')
+
+    def test_teams_direct_checkout_prevented_and_redirects_to_quote(self):
+        ProductPackage.ensure_default_packages(force=True)
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('orders:checkout', kwargs={'package_code': 'corporate-fleet'}), follow=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('core:contact'), response.url)
+
+    def test_checkout_uses_authoritative_pricing_and_persists_customization(self):
+        ProductPackage.ensure_default_packages(force=True)
+        self.client.force_login(self.user)
+        checkout_url = reverse('orders:checkout', kwargs={'package_code': 'personal-suite'})
+        get_resp = self.client.get(f"{checkout_url}?colour=light&engraving=Umar+Sani")
+        self.assertEqual(get_resp.status_code, 200)
+        self.assertContains(get_resp, '₦25,000')
+        self.assertContains(get_resp, 'Quoted Separately')
+        self.assertContains(get_resp, 'Finish: Light | Personalization: Umar Sani')
+
+        post_resp = self.client.post(checkout_url, {
+            'shipping_name': 'Umar Sani',
+            'shipping_phone': '08012345678',
+            'shipping_address': '10 Kano Road',
+            'shipping_city': 'Kano',
+            'shipping_state': 'Kano',
+            'selected_colour': 'light',
+            'selected_engraving': 'Umar Sani',
+            'customer_notes': 'Finish: Light | Personalization: Umar Sani',
+        }, follow=False)
+        self.assertEqual(post_resp.status_code, 302)
+        order = Order.objects.filter(user=self.user, package__code='personal-suite').latest('created_at')
+        self.assertEqual(order.amount, 25000)
+        self.assertEqual(order.customer_notes, 'Finish: Light | Personalization: Umar Sani')
+
+    def test_historical_order_and_payment_amounts_preserved_on_price_update(self):
+        from apps.payments.models import Payment
+        pkg = ProductPackage.objects.create(
+            code='legacy-pkg-check',
+            name='Legacy Check',
+            price_ngn=65000,
+            description='Legacy',
+            features='F1',
+        )
+        order = Order.objects.create(
+            user=self.user,
+            package=pkg,
+            amount=65000,
+            payment_status=Order.PAYMENT_PAID,
+        )
+        payment = Payment.objects.create(
+            order=order,
+            reference='STR-LEGACY-001',
+            amount=65000,
+            status=Payment.STATUS_SUCCESS,
+        )
+        pkg.price_ngn = 25000
+        pkg.save()
+        order.refresh_from_db()
+        payment.refresh_from_db()
+        self.assertEqual(order.amount, 65000)
+        self.assertEqual(payment.amount, 65000)
 
     def test_nfc_active_card_redirects_to_profile(self):
         """Active card /c/BR-999001/ must redirect to /u/test-user/ and log events."""

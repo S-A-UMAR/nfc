@@ -28,10 +28,135 @@ def websites_view(request):
 def how_it_works_view(request):
     return render(request, 'core/how_it_works.html')
 
-def pricing_view(request):
+def _get_shop_catalog():
+    """
+    Build the STRIDE Shop product collection backed by live ProductPackage prices.
+    Prices are always read from the database; never hardcoded.
+    """
     ProductPackage.ensure_default_packages()
-    packages = ProductPackage.objects.filter(is_active=True).order_by('order_index', 'price_ngn')
-    return render(request, 'core/pricing.html', {'packages': packages})
+    active_pkgs = {
+        pkg.code: pkg
+        for pkg in ProductPackage.objects.filter(is_active=True).order_by('order_index', 'price_ngn')
+    }
+    fallback_pkg = next(iter(active_pkgs.values()), None)
+    essential_pkg = active_pkgs.get('smart-card') or fallback_pkg
+    signature_pkg = active_pkgs.get('personal-suite') or essential_pkg
+    teams_pkg = active_pkgs.get('corporate-fleet') or active_pkgs.get('business-suite') or signature_pkg
+
+    catalog = []
+    if essential_pkg:
+        catalog.append({
+            'slug': 'essential-dark',
+            'name': 'STRIDE Essential — Dark',
+            'short_name': 'Essential Dark',
+            'tagline': 'Matte-black NFC smart card with lifetime digital profile.',
+            'description': essential_pkg.description,
+            'package': essential_pkg,
+            'colour': 'dark',
+            'colour_label': 'Dark — Matte Obsidian',
+            'front_img': 'img/cards/stride-essential-dark-front.svg',
+            'back_img': 'img/cards/stride-essential-dark-back.svg',
+            'supports_colour_switch': True,
+            'supports_customization': False,
+            'is_teams': False,
+            'badge': 'Essential',
+        })
+        catalog.append({
+            'slug': 'essential-light',
+            'name': 'STRIDE Essential — Light',
+            'short_name': 'Essential Light',
+            'tagline': 'Clean soft-stone NFC smart card with lifetime digital profile.',
+            'description': essential_pkg.description,
+            'package': essential_pkg,
+            'colour': 'light',
+            'colour_label': 'Light — Soft Frost',
+            'front_img': 'img/cards/stride-essential-light-front.svg',
+            'back_img': 'img/cards/stride-essential-light-back.svg',
+            'supports_colour_switch': True,
+            'supports_customization': False,
+            'is_teams': False,
+            'badge': 'Essential',
+        })
+    if signature_pkg:
+        catalog.append({
+            'slug': 'signature',
+            'name': 'STRIDE Signature',
+            'short_name': 'Signature',
+            'tagline': 'Personalized NFC card with custom engraving and full identity suite.',
+            'description': signature_pkg.description,
+            'package': signature_pkg,
+            'colour': 'dark',
+            'colour_label': 'Dark — Matte Obsidian',
+            'front_img': 'img/cards/stride-signature-front.svg',
+            'back_img': 'img/cards/stride-signature-back.svg',
+            'supports_colour_switch': True,
+            'supports_customization': True,
+            'is_teams': False,
+            'badge': 'Personalized',
+        })
+    if teams_pkg:
+        catalog.append({
+            'slug': 'teams',
+            'name': 'STRIDE Teams',
+            'short_name': 'Teams',
+            'tagline': 'Corporate and bulk NFC card orders with unified company branding.',
+            'description': teams_pkg.description,
+            'package': teams_pkg,
+            'colour': 'dark',
+            'colour_label': 'Corporate Fleet',
+            'front_img': 'img/cards/stride-teams-front.svg',
+            'back_img': 'img/cards/stride-teams-back.svg',
+            'supports_colour_switch': False,
+            'supports_customization': True,
+            'is_teams': True,
+            'badge': 'Corporate & Bulk',
+        })
+    return catalog
+
+
+def shop_view(request):
+    catalog = _get_shop_catalog()
+    return render(request, 'core/shop.html', {
+        'products': catalog,
+    })
+
+
+def shop_product_detail_view(request, product_slug):
+    from django.http import Http404
+    catalog = _get_shop_catalog()
+    product = next((p for p in catalog if p['slug'] == product_slug), None)
+
+    if not product:
+        # Support direct lookup by ProductPackage.code for backwards compatibility
+        pkg = ProductPackage.objects.filter(code=product_slug, is_active=True).first()
+        if not pkg:
+            raise Http404("Product not found.")
+        product = {
+            'slug': pkg.code,
+            'name': pkg.name,
+            'short_name': pkg.name,
+            'tagline': pkg.description,
+            'description': pkg.description,
+            'package': pkg,
+            'colour': 'dark',
+            'colour_label': 'Dark — Matte Obsidian',
+            'front_img': 'img/cards/stride-signature-front.svg',
+            'back_img': 'img/cards/stride-signature-back.svg',
+            'supports_colour_switch': True,
+            'supports_customization': pkg.package_type in (ProductPackage.TYPE_PERSONAL, ProductPackage.TYPE_BUSINESS, ProductPackage.TYPE_CORPORATE),
+            'is_teams': pkg.package_type == ProductPackage.TYPE_CORPORATE,
+            'badge': pkg.badge,
+        }
+
+    return render(request, 'core/shop_product.html', {
+        'product': product,
+        'package': product['package'],
+        'all_products': catalog,
+    })
+
+
+def pricing_view(request):
+    return redirect('core:shop')
 
 def about_view(request):
     return render(request, 'core/about.html')
@@ -68,7 +193,11 @@ def contact_view(request):
             messages.success(request, "Thank you! Your message has been received. Our team will get back to you shortly.")
             return redirect('core:contact')
     else:
-        form = ContactForm()
+        initial = {}
+        subject_prefill = request.GET.get('subject', '').strip()
+        if subject_prefill:
+            initial['subject'] = subject_prefill[:150]
+        form = ContactForm(initial=initial)
     return render(request, 'core/contact.html', {'form': form})
 
 def error_403_view(request, exception=None):
