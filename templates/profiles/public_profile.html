@@ -114,11 +114,12 @@
     <div class="prf-mesh-glow"></div>
   </div>
 
-  <main class="profile-card {% if profile.cover_image %}has-cover{% endif %}" id="profile-card-container">
+  <main class="profile-card" id="profile-card-container">
 
     <!-- Ambient Glow / Cover Header -->
     <div class="profile-ambient-glow"></div>
 
+    {% comment %}Cover banner hashed till v2
     {% if profile.cover_image %}
       <div class="profile-cover">
         <img src="{{ profile.cover_image.url }}" alt="" class="profile-cover-img" width="480" height="180" fetchpriority="high" decoding="async"
@@ -127,26 +128,29 @@
         <div class="profile-cover-gradient"></div>
       </div>
     {% endif %}
+    {% endcomment %}
 
-    <!-- Top Header Bar: Brand + Quick Actions -->
-    <header class="prf-app-topbar">
+    {% if profile.profile_layout == 'centered' %}
+    <!-- ======================================================================
+         CENTERED LAYOUT — Full-Portrait Contact Card (Entirely separate)
+         ====================================================================== -->
+    <header class="prf-centered-topbar">
       <a href="{% url 'core:home' %}" class="prf-app-brand" aria-label="STRIDE Home">
         {% include 'components/brand_logo.html' with variant='dark' height='18' %}
       </a>
-
       <div class="prf-app-top-actions">
-        <button type="button" class="prf-app-icon-btn" id="btn-top-contact" aria-label="Quick contact" title="Contact options">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-          </svg>
-        </button>
-        <button type="button" class="prf-app-icon-btn" id="btn-top-share" aria-label="Share profile" title="Share profile">
+        <button type="button" class="prf-centered-icon-btn" id="btn-top-share" aria-label="Share profile" title="Share profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="18" cy="5" r="3"/>
             <circle cx="6" cy="12" r="3"/>
             <circle cx="18" cy="19" r="3"/>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button type="button" class="prf-centered-icon-btn" onclick="openSheet('sheet-preferences')" aria-label="More options" title="More options">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
           </svg>
         </button>
       </div>
@@ -291,8 +295,8 @@
 
         <!-- 4 Quick Action Icon Buttons -->
         <div class="prf-contact-quick-grid">
-          <!-- Links: scroll to links tab -->
-          <button type="button" class="prf-contact-quick-btn" data-scroll-to="tab-links" aria-label="View Links">
+          <!-- Links: open links sheet -->
+          <button type="button" class="prf-contact-quick-btn" onclick="openSheet('sheet-links')" aria-label="View Links">
             <div class="prf-contact-quick-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -463,6 +467,302 @@
         {% endif %}
 
       </div><!-- /.prf-contact-identity -->
+    </section>
+
+    {% else %}
+    <!-- ======================================================================
+         CLASSIC LAYOUT — Original STRIDE Profile
+         ====================================================================== -->
+    <!-- Top Header Bar: Brand + Quick Actions -->
+    <header class="prf-app-topbar">
+      <a href="{% url 'core:home' %}" class="prf-app-brand" aria-label="STRIDE Home">
+        {% include 'components/brand_logo.html' with variant='dark' height='18' %}
+      </a>
+
+      <div class="prf-app-top-actions">
+        <button type="button" class="prf-app-icon-btn" id="btn-top-contact" aria-label="Quick contact" title="Contact options">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+        </button>
+        <button type="button" class="prf-app-icon-btn" id="btn-top-share" aria-label="Share profile" title="Share profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Hero Identity Section (Always Visible) -->
+    <section class="prf-hero-section">
+      {% if profile.profile_type == 'business' and profile.profile_layout in 'executive_layout,business_card' %}
+      <!-- 3D Luxury Smart Card Twin for Executive & Business Card Layouts -->
+      <div class="prf-executive-card-container" id="prf-executive-card-container">
+        <div class="prf-executive-smart-card">
+          <div class="prf-esc-glow-sheen"></div>
+          <div class="prf-esc-top">
+            <div class="prf-esc-chip">
+              <div class="prf-esc-chip-lines"></div>
+            </div>
+            <div class="prf-esc-nfc-wave" aria-label="NFC Contactless">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8.5 16.5a5 5 0 0 1 0-9"/><path d="M12 19a8.5 8.5 0 0 0 0-14"/><path d="M15.5 21.5a12 12 0 0 0 0-19"/></svg>
+            </div>
+          </div>
+          <div class="prf-esc-middle">
+            <div class="prf-esc-brand">{{ profile.business_name|default:profile.full_name|upper }}</div>
+            <div class="prf-esc-category">{{ profile.business_category|default:"Verified Corporate Identity" }}</div>
+          </div>
+          <div class="prf-esc-bottom">
+            <div class="prf-esc-holder-meta">
+              <span class="prf-esc-holder-name">{{ profile.full_name|default:profile.business_name }}</span>
+              <span class="prf-esc-holder-title">{{ profile.title|default:"Executive Officer" }}</span>
+            </div>
+            <div class="prf-esc-hologram">
+              <span>STRIDE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="prf-avatar-wrap">
+        <div class="prf-avatar-ring {% if profile.profile_type == 'business' %}prf-avatar-ring--business{% endif %}">
+          <div class="prf-avatar-inner">
+            {% if profile.profile_type == 'business' %}
+              {% if profile.business_logo %}
+                <img src="{{ profile.business_logo.url }}" alt="{{ profile.business_name }}" width="96" height="96" fetchpriority="high" decoding="async" style="object-fit: contain; border-radius: 14px;" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';">
+                <span class="prf-avatar-fallback" style="display: none; border-radius: 14px;">{{ profile.business_name|make_list|first|upper }}</span>
+              {% else %}
+                <span class="prf-avatar-fallback" style="border-radius: 14px;">{{ profile.business_name|default:profile.full_name|make_list|first|upper }}</span>
+              {% endif %}
+            {% else %}
+              {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" width="96" height="96" fetchpriority="high" decoding="async" onerror="this.style.display='none'; var f=this.nextElementSibling; if(f) f.style.display='flex';">
+                <span class="prf-avatar-fallback" style="display: none;">{{ profile.full_name|make_list|first|upper }}</span>
+              {% else %}
+                <span class="prf-avatar-fallback">{{ profile.full_name|make_list|first|upper }}</span>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="prf-status-dot" title="Active on STRIDE"></div>
+      </div>
+
+      <div class="prf-name-row">
+        {% if profile.profile_type == 'business' %}
+          <h1 class="prf-hero-name">{{ profile.business_name|default:profile.full_name }}</h1>
+        {% else %}
+          <h1 class="prf-hero-name">{{ profile.full_name }}</h1>
+        {% endif %}
+        <span class="prf-badge-verified" title="Verified Digital Profile">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        </span>
+      </div>
+
+      {% if profile.profile_type == 'business' %}
+        {% if profile.business_category %}
+          <div class="prf-hero-title prf-business-category">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            {{ profile.business_category }}
+          </div>
+        {% endif %}
+        {% if profile.full_name %}
+          <div class="prf-hero-company">{{ profile.full_name }}</div>
+        {% endif %}
+      {% else %}
+        {% if profile.title %}
+          <div class="prf-hero-title">{{ profile.title }}</div>
+        {% endif %}
+        {% if profile.business_name %}
+          <div class="prf-hero-company">{{ profile.business_name }}</div>
+        {% endif %}
+      {% endif %}
+
+      <!-- Skills / Category Pill Tags -->
+      {% if profile.skills_tag_list %}
+      <div class="prf-tag-chips-row">
+        {% for tag in profile.skills_tag_list %}
+          <span class="prf-tag-chip {% if forloop.first %}active{% endif %}">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- 4 Quick Action Hub Buttons Row -->
+      <div class="prf-action-hub-row">
+        <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-action-hub-btn save" id="btn-hub-save" 
+           data-track-event="vcard_download" data-profile-slug="{{ profile.slug }}" data-track-label="Save Contact"
+           aria-label="Save Contact">
+          <div class="prf-hub-icon-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+          </div>
+          <span>Save Contact</span>
+        </a>
+
+        <button type="button" class="prf-action-hub-btn share" id="btn-hub-share" aria-label="Share">
+          <div class="prf-hub-icon-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </div>
+          <span>Share</span>
+        </button>
+
+        {% if profile.whatsapp %}
+          <a href="https://wa.me/{{ profile.clean_whatsapp }}" target="_blank" rel="noopener noreferrer"
+             class="prf-action-hub-btn wa"
+             data-track-event="whatsapp_click" data-profile-slug="{{ profile.slug }}" data-track-label="WhatsApp"
+             aria-label="WhatsApp">
+            <div class="prf-hub-icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.78 14.07c-.24.68-1.4 1.26-1.92 1.34-.51.08-1.18.11-1.91-.12-.44-.14-1.01-.33-1.74-.65-3.09-1.34-5.11-4.47-5.26-4.68-.16-.21-1.26-1.68-1.26-3.2 0-1.53.8-2.28 1.09-2.59.29-.31.63-.39.84-.39.21 0 .42.002.6.012.2.01.46-.07.72.55.27.64.91 2.22.99 2.38.08.16.13.35.03.56-.11.21-.16.35-.32.53-.16.19-.34.42-.48.56-.16.16-.33.33-.14.66.19.33.84 1.39 1.8 2.25 1.24 1.1 2.29 1.44 2.62 1.6.33.16.53.14.72-.08.2-.22.84-.98 1.07-1.32.22-.34.45-.29.75-.17.31.11 1.96.93 2.3 1.1.34.17.56.25.64.39.09.14.09.82-.15 1.5z"/>
+              </svg>
+            </div>
+            <span>WhatsApp</span>
+          </a>
+        {% else %}
+          <button type="button" class="prf-action-hub-btn wa" id="btn-hub-contact-fallback" aria-label="Message">
+            <div class="prf-hub-icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <span>Message</span>
+          </button>
+        {% endif %}
+
+        {% if profile.phone %}
+          <a href="tel:{{ profile.clean_phone }}"
+             class="prf-action-hub-btn call"
+             data-track-event="call_click" data-profile-slug="{{ profile.slug }}" data-track-label="Call"
+             aria-label="Call">
+            <div class="prf-hub-icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.93 2 2 0 0 1 2.96 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <span>Call</span>
+          </a>
+        {% elif profile.email %}
+          <a href="mailto:{{ profile.email }}"
+             class="prf-action-hub-btn call"
+             data-track-event="email_click" data-profile-slug="{{ profile.slug }}" data-track-label="Email"
+             aria-label="Email">
+            <div class="prf-hub-icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <span>Email</span>
+          </a>
+        {% else %}
+          <a href="{% url 'profiles:download_vcard' profile.slug %}"
+             class="prf-action-hub-btn call"
+             aria-label="vCard">
+            <div class="prf-hub-icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </div>
+            <span>vCard</span>
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- Bio Summary Pitch -->
+      {% if profile.profile_type == 'business' %}
+        {% if profile.business_description %}
+          <div class="prf-hero-bio">{{ profile.business_description|linebreaksbr }}</div>
+        {% elif profile.bio %}
+          <div class="prf-hero-bio">{{ profile.bio|linebreaksbr }}</div>
+        {% endif %}
+      {% else %}
+        {% if profile.bio %}
+          <div class="prf-hero-bio">{{ profile.bio|linebreaksbr }}</div>
+        {% endif %}
+      {% endif %}
+
+      <!-- Direct Details Quick List -->
+      {% if profile.profile_type == 'business' %}
+        {% if profile.address or profile.email or profile.website_url %}
+        <div class="prf-details-quicklist">
+          {% if profile.address %}
+            <div class="prf-detail-item">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span>{{ profile.address }}</span>
+            </div>
+          {% elif profile.location %}
+            <div class="prf-detail-item">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span>{{ profile.location }}</span>
+            </div>
+          {% endif %}
+          {% if profile.email %}
+            <a href="mailto:{{ profile.email }}" class="prf-detail-item" data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <span>{{ profile.email }}</span>
+            </a>
+          {% endif %}
+          {% if profile.website_url %}
+            <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-detail-item" data-track-event="website_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <span>{{ profile.website_url|cut:"https://"|cut:"http://" }}</span>
+            </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      {% else %}
+        {% if profile.location or profile.email or profile.website_url %}
+        <div class="prf-details-quicklist">
+          {% if profile.location %}
+            <div class="prf-detail-item">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span>{{ profile.location }}</span>
+            </div>
+          {% endif %}
+          {% if profile.email %}
+            <a href="mailto:{{ profile.email }}" class="prf-detail-item" data-track-event="email_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <span>{{ profile.email }}</span>
+            </a>
+          {% endif %}
+          {% if profile.website_url %}
+            <a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer" class="prf-detail-item" data-track-event="website_click" data-profile-slug="{{ profile.slug }}">
+              <div class="prf-detail-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <span>{{ profile.website_url|cut:"https://"|cut:"http://" }}</span>
+            </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      {% endif %}
     </section>
 
     <!-- Horizontal Segmented App Navigation Bar -->
@@ -886,6 +1186,7 @@
         </button>
       </div>
     </div>
+    {% endif %}
 
     <!-- Subtle Footer Branding -->
     <footer class="profile-footer">
@@ -897,7 +1198,8 @@
 
   </main>
 
-  <!-- Mobile Bottom Floating Action Dock -->
+  {% if profile.profile_layout != 'centered' %}
+  <!-- Mobile Bottom Floating Action Dock (Classic Layout) -->
   <nav class="prf-app-dock prf-action-dock" aria-label="Profile Action Dock">
     <button type="button" class="prf-dock-item prf-dock-action-btn" id="dock-btn-links" data-scroll-to="tab-links" aria-label="Jump to Links & Socials">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -932,12 +1234,44 @@
       </button>
     {% endif %}
   </nav>
+  {% endif %}
 
 </div>
 
 <!-- ==========================================================================
      MODAL BOTTOM SHEETS
      ========================================================================== -->
+
+<!-- SHEET 0: LINKS SHEET (for Centered Layout) -->
+<div class="prf-sheet-overlay" id="sheet-links">
+  <div class="prf-sheet-box">
+    <div class="prf-sheet-handle"></div>
+    <div class="prf-sheet-header">
+      <h3 class="prf-sheet-title">Links &amp; Channels</h3>
+      <button type="button" class="prf-sheet-close" data-sheet-close>&times;</button>
+    </div>
+    <div class="prf-sheet-body">
+      {% for social in social_links %}
+        <a href="{{ social.target_url|default:social.url }}" target="_blank" rel="noopener noreferrer"
+           class="prf-sheet-action-row"
+           data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ social.tile_title }}">
+          <span>{{ social.tile_title }} — {{ social.tile_subtitle }}</span>
+        </a>
+      {% endfor %}
+      {% for link in custom_links %}
+        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
+           class="prf-sheet-action-row"
+           data-track-event="social_click" data-profile-slug="{{ profile.slug }}" data-track-label="{{ link.title }}">
+          <span>{{ link.title }}</span>
+        </a>
+      {% endfor %}
+      {% if not social_links and not custom_links %}
+        <p style="color: #A1A1AA; font-size: 0.9rem; text-align: center; padding: 1rem 0;">No links added yet.</p>
+      {% endif %}
+      <button type="button" class="prf-sheet-action-row cancel" data-sheet-close>Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- SHEET 1: CONTACT OPTIONS SHEET -->
 <div class="prf-sheet-overlay" id="sheet-contact">

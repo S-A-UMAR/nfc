@@ -266,7 +266,16 @@ def profile_edit_view(request):
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            form.save()
+            updated_profile = form.save(commit=False)
+            if request.POST.get('remove_profile_image') == '1' and 'profile_image' not in request.FILES:
+                if updated_profile.profile_image:
+                    updated_profile.profile_image.delete(save=False)
+                updated_profile.profile_image = None
+            if request.POST.get('remove_business_logo') == '1' and 'business_logo' not in request.FILES:
+                if updated_profile.business_logo:
+                    updated_profile.business_logo.delete(save=False)
+                updated_profile.business_logo = None
+            updated_profile.save()
             messages.success(request, "Your digital profile has been updated successfully.")
             open_modal = request.GET.get('open') or request.POST.get('open')
             if open_modal in ('service', 'gallery', 'testimonial'):
@@ -605,17 +614,21 @@ RECOMMENDED_THEMES = [
 
 PERSONAL_LAYOUTS = [
     {'key': 'classic',        'label': 'Classic',        'desc': 'Balanced layout with avatar, bio, actions & links', 'icon': 'classic'},
-    {'key': 'centered',       'label': 'Centered',       'desc': 'Symmetrical focus on avatar and name',             'icon': 'centered'},
-    {'key': 'minimal_layout', 'label': 'Minimal',        'desc': 'Typographic focus without ambient glow',           'icon': 'minimal_layout'},
-    {'key': 'social',         'label': 'Social',         'desc': 'Prominent grid of your channels',                  'icon': 'social'},
-    {'key': 'card',           'label': 'Compact Card',   'desc': 'Condensed card with quick contact strip',           'icon': 'card'},
+    {'key': 'centered',       'label': 'Centered',       'desc': 'Full-portrait contact card with quick actions',     'icon': 'centered'},
+    # Reserved for v2:
+    # {'key': 'minimal_layout', 'label': 'Minimal',        'desc': 'Typographic focus without ambient glow',           'icon': 'minimal_layout'},
+    # {'key': 'social',         'label': 'Social',         'desc': 'Prominent grid of your channels',                  'icon': 'social'},
+    # {'key': 'card',           'label': 'Compact Card',   'desc': 'Condensed card with quick contact strip',           'icon': 'card'},
 ]
 
 BUSINESS_LAYOUTS = [
-    {'key': 'executive_layout', 'label': 'Executive',        'desc': 'Corporate layout with vertical accent bar',    'icon': 'executive_layout'},
-    {'key': 'brand_header',     'label': 'Brand Header',     'desc': 'Prominent company logo and category',         'icon': 'brand_header'},
-    {'key': 'business_card',    'label': 'Business Card',    'desc': 'Horizontal digital business card',            'icon': 'business_card'},
-    {'key': 'business_catalog', 'label': 'Business Catalog', 'desc': 'Focus on company offerings & services',        'icon': 'business_catalog'},
+    {'key': 'classic',        'label': 'Classic',        'desc': 'Balanced layout with logo, bio, actions & links',   'icon': 'classic'},
+    {'key': 'centered',       'label': 'Centered',       'desc': 'Full-portrait contact card with quick actions',     'icon': 'centered'},
+    # Reserved for v2:
+    # {'key': 'executive_layout', 'label': 'Executive',        'desc': 'Corporate layout with vertical accent bar',    'icon': 'executive_layout'},
+    # {'key': 'brand_header',     'label': 'Brand Header',     'desc': 'Prominent company logo and category',         'icon': 'brand_header'},
+    # {'key': 'business_card',    'label': 'Business Card',    'desc': 'Horizontal digital business card',            'icon': 'business_card'},
+    # {'key': 'business_catalog', 'label': 'Business Catalog', 'desc': 'Focus on company offerings & services',        'icon': 'business_catalog'},
 ]
 
 

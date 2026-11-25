@@ -152,7 +152,11 @@
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </div>
             </div>
-            <div class="prf-avatar-change" id="prf-avatar-change-label">Change photo</div>
+            <div class="prf-avatar-actions">
+              <div class="prf-avatar-change" id="prf-avatar-change-label">Change photo</div>
+              <button type="button" class="prf-avatar-remove" id="prf-avatar-remove-btn" style="{% if not profile.profile_image %}display: none;{% endif %}">Remove</button>
+            </div>
+            <input type="hidden" name="remove_profile_image" id="id_remove_profile_image" value="0">
             <!-- Hidden file input - triggered by clicking avatar -->
             <div class="prf-avatar-file-hidden">
               {{ form.profile_image }}
@@ -216,7 +220,11 @@
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </div>
             </div>
-            <div class="prf-avatar-change" id="prf-logo-change-label">Change logo</div>
+            <div class="prf-avatar-actions">
+              <div class="prf-avatar-change" id="prf-logo-change-label">Change logo</div>
+              <button type="button" class="prf-avatar-remove" id="prf-logo-remove-btn" style="{% if not profile.business_logo %}display: none;{% endif %}">Remove</button>
+            </div>
+            <input type="hidden" name="remove_business_logo" id="id_remove_business_logo" value="0">
             <div class="prf-avatar-file-hidden">
               {{ form.business_logo }}
             </div>
@@ -325,14 +333,14 @@
             </div>
             <div class="prf-summary-text">
               <span class="prf-summary-title">Advanced Profile Details</span>
-              <span class="prf-summary-desc">Cover banner, physical location, search engine visibility</span>
+              <span class="prf-summary-desc">Physical location, search engine visibility</span>
             </div>
           </div>
           <svg class="prf-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
 
         <div class="prf-accordion-body">
-          <!-- Cover Banner Upload -->
+          {% comment %}Cover Banner Upload — hashed till v2
           <div class="prf-brand-card mb-4">
             <label for="id_cover_image" class="form-label mb-1" style="font-weight: 600;">Header Cover Banner <span class="form-label-hint">(Optional)</span></label>
             <p class="text-caption mb-3" style="color: var(--text-muted); font-size: 0.775rem;">Panoramic background banner at the top of your public digital profile.</p>
@@ -361,6 +369,7 @@
               <div class="form-error" role="alert"><span>{{ form.cover_image.errors|first }}</span></div>
             {% endif %}
           </div>
+          {% endcomment %}
 
           <!-- Location & Physical Address -->
           <div class="grid-2 mb-4">
@@ -1017,8 +1026,14 @@
   z-index: 2;
   pointer-events: none;
 }
-.prf-avatar-change {
+.prf-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
   margin-top: 6px;
+}
+.prf-avatar-change {
   font-size: 0.72rem;
   font-weight: 500;
   color: var(--text-secondary, #A1A1AA);
@@ -1029,6 +1044,21 @@
 }
 .prf-avatar-change:hover {
   color: #FFFFFF;
+  text-decoration: underline;
+}
+.prf-avatar-remove {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #F87171;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  user-select: none;
+}
+.prf-avatar-remove:hover {
+  opacity: 0.8;
   text-decoration: underline;
 }
 .prf-avatar-fields {
@@ -1506,11 +1536,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const initialMode = '{{ form.instance.profile_type|default:"personal" }}';
   updateProfileTypeUI(initialMode);
 
-  // ── 2. Live Image Upload Previews ──────────────────────────────────────────
-  function setupImagePreview(inputId, previewImgId, placeholderId) {
+  // ── 2. Live Image Upload Previews & Removal ─────────────────────────────────
+  function setupImagePreview(inputId, previewImgId, placeholderId, removeFlagId, removeBtnId) {
     const input = document.getElementById(inputId);
     const previewImg = document.getElementById(previewImgId);
     const placeholder = placeholderId ? document.getElementById(placeholderId) : null;
+    const removeFlag = removeFlagId ? document.getElementById(removeFlagId) : null;
+    const removeBtn = removeBtnId ? document.getElementById(removeBtnId) : null;
 
     if (!input || !previewImg) return;
 
@@ -1526,14 +1558,29 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         };
         reader.readAsDataURL(file);
+        if (removeFlag) removeFlag.value = '0';
+        if (removeBtn) removeBtn.style.display = 'inline-block';
         markFormDirty();
       }
     });
+
+    if (removeBtn && removeFlag) {
+      removeBtn.addEventListener('click', function() {
+        input.value = '';
+        removeFlag.value = '1';
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+        if (placeholder) {
+          placeholder.style.display = 'flex';
+        }
+        removeBtn.style.display = 'none';
+        markFormDirty();
+      });
+    }
   }
 
-  setupImagePreview('id_profile_image', 'profile-img-preview', 'profile-img-fallback');
-  setupImagePreview('id_cover_image', 'cover-img-preview', 'cover-img-placeholder');
-  setupImagePreview('id_business_logo', 'logo-img-preview', 'logo-img-placeholder');
+  setupImagePreview('id_profile_image', 'profile-img-preview', 'profile-img-fallback', 'id_remove_profile_image', 'prf-avatar-remove-btn');
+  setupImagePreview('id_business_logo', 'logo-img-preview', 'logo-img-placeholder', 'id_remove_business_logo', 'prf-logo-remove-btn');
 
   // ── 2b. Click-to-upload avatar/logo ──────────────────────────────────────
   const avatarClickTarget = document.getElementById('prf-avatar-click-target');

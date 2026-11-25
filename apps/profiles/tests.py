@@ -144,7 +144,8 @@ class Phase3ProfileTests(TestCase):
         self.assertNotContains(response, '👤')
         self.assertNotContains(response, '🏢')
         # Check key UI elements are present
-        self.assertContains(response, 'id_cover_image')
+        # Cover banner is hashed till v2
+        # self.assertContains(response, 'id_cover_image')
         self.assertContains(response, 'btn-copy-live-link')
         self.assertContains(response, 'profile-sticky-save-bar')
         self.assertContains(response, 'prf-quick-nav')
@@ -450,10 +451,10 @@ class ProfileCustomizationV2Tests(TestCase):
             self.assertIn(key, dict(Profile.THEME_CHOICES))
 
     def test_appearance_page_shows_all_personal_layouts(self):
-        """All 5 personal layout keys appear in the appearance template."""
+        """v1 personal layout keys (classic, centered) appear in the appearance template; v2 layouts are hidden."""
         self.client_a.force_login(self.user_a)
         response = self.client_a.get(self.appearance_url)
-        for key in ['classic', 'centered', 'minimal_layout', 'social', 'card']:
+        for key in ['classic', 'centered']:
             self.assertContains(response, key, msg_prefix=f"Missing personal layout: {key}")
 
     def test_appearance_page_shows_all_business_layouts(self):
@@ -884,6 +885,50 @@ class DirectLinkAnd3DCardTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, 'https://snapchat.com/add/omar_sani01')
         self.assertContains(res, '1 channel')
+
+    def test_classic_and_centered_layouts_are_isolated(self):
+        """Classic renders circular avatar + tab bar; Centered renders contact card without classic nav/tabs."""
+        self.profile.profile_layout = 'classic'
+        self.profile.save()
+        res_classic = self.visitor_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(res_classic.status_code, 200)
+        self.assertContains(res_classic, 'prf-avatar-ring')
+        self.assertContains(res_classic, 'prf-tab-bar-container')
+        self.assertNotContains(res_classic, 'prf-contact-card-hero')
+        self.assertNotContains(res_classic, 'prf-centered-topbar')
+
+        self.profile.profile_layout = 'centered'
+        self.profile.save()
+        res_centered = self.visitor_client.get(reverse('profiles:public_profile', kwargs={'slug': self.profile.slug}))
+        self.assertEqual(res_centered.status_code, 200)
+        self.assertContains(res_centered, 'prf-contact-card-hero')
+        self.assertContains(res_centered, 'prf-centered-topbar')
+        self.assertNotContains(res_centered, 'class="prf-tab-bar-container"')
+        self.assertNotContains(res_centered, 'class="prf-app-dock')
+        self.assertNotContains(res_centered, 'class="prf-app-topbar"')
+
+    def test_profile_image_and_business_logo_removal(self):
+        """Users can remove an uploaded profile_image or business_logo from profile edit."""
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        gif_bytes = b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;'
+        self.profile.profile_image = SimpleUploadedFile('avatar.gif', gif_bytes, content_type='image/gif')
+        self.profile.business_logo = SimpleUploadedFile('logo.gif', gif_bytes, content_type='image/gif')
+        self.profile.save()
+        self.assertTrue(bool(self.profile.profile_image))
+        self.assertTrue(bool(self.profile.business_logo))
+
+        res = self.owner_client.post(reverse('dashboard:profile_edit'), {
+            'profile_type': 'personal',
+            'full_name': self.profile.full_name,
+            'email': self.profile.email,
+            'remove_profile_image': '1',
+            'remove_business_logo': '1',
+        }, follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.profile.refresh_from_db()
+        self.assertFalse(bool(self.profile.profile_image))
+        self.assertFalse(bool(self.profile.business_logo))
+
 
 
 

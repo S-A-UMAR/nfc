@@ -161,7 +161,7 @@
           </div>
 
           {% if profile.profile_type == 'business' %}
-          <!-- Business Layouts -->
+          <!-- Business Layouts (v1: Classic & Centered only) -->
           <div class="layout-grid appearance-layout-grid" id="business-layouts-grid">
             {% for layout in business_layouts %}
             <button type="button"
@@ -171,45 +171,23 @@
               aria-pressed="{% if profile.profile_layout == layout.key %}true{% else %}false{% endif %}">
               
               <div class="layout-wireframe-wrap">
-                {% if layout.key == 'executive_layout' %}
+                {% if layout.key == 'classic' %}
                   <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <rect width="100" height="70" rx="6" fill="#14151B"/>
-                    <rect x="14" y="10" width="3" height="50" rx="1.5" fill="#C9A84C"/>
-                    <rect x="24" y="12" width="16" height="16" rx="3" fill="#2E2C26" stroke="#C9A84C" stroke-width="1"/>
-                    <rect x="46" y="14" width="36" height="4" rx="2" fill="#F5F0E8"/>
-                    <rect x="46" y="21" width="26" height="3" rx="1.5" fill="#C9A84C"/>
-                    <rect x="24" y="36" width="58" height="10" rx="3" fill="#2E2C26"/>
-                    <rect x="24" y="49" width="58" height="10" rx="3" fill="#C9A84C"/>
+                    <rect y="0" width="100" height="22" rx="6" fill="#262833"/>
+                    <circle cx="50" cy="22" r="11" fill="#4B4E5F" stroke="#14151B" stroke-width="2"/>
+                    <rect x="34" y="37" width="32" height="4" rx="2" fill="#E2E8F0"/>
+                    <rect x="38" y="44" width="24" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="22" y="52" width="26" height="10" rx="3" fill="#323544"/>
+                    <rect x="52" y="52" width="26" height="10" rx="3" fill="#FFFFFF"/>
                   </svg>
-                {% elif layout.key == 'brand_header' %}
+                {% elif layout.key == 'centered' %}
                   <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <rect width="100" height="70" rx="6" fill="#14151B"/>
-                    <rect x="38" y="8" width="24" height="24" rx="5" fill="#262833" stroke="#F59E0B" stroke-width="1.5"/>
-                    <rect x="25" y="37" width="50" height="5" rx="2" fill="#E2E8F0"/>
-                    <rect x="34" y="45" width="32" height="3" rx="1.5" fill="#717688"/>
-                    <rect x="18" y="52" width="64" height="11" rx="4" fill="#F59E0B"/>
-                  </svg>
-                {% elif layout.key == 'business_card' %}
-                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <rect width="100" height="70" rx="6" fill="#101116"/>
-                    <rect x="10" y="8" width="80" height="54" rx="5" fill="#181820" stroke="#C9A84C" stroke-width="1.2"/>
-                    <rect x="18" y="14" width="14" height="14" rx="2" fill="#C9A84C"/>
-                    <rect x="38" y="14" width="42" height="4" rx="1" fill="#FFFFFF"/>
-                    <rect x="38" y="21" width="28" height="3" rx="1" fill="#A1A1AA"/>
-                    <line x1="18" y1="34" x2="82" y2="34" stroke="#2D2D38" stroke-width="1"/>
-                    <rect x="18" y="40" width="30" height="8" rx="2" fill="#2B2B38"/>
-                    <rect x="52" y="40" width="30" height="8" rx="2" fill="#2B2B38"/>
-                  </svg>
-                {% elif layout.key == 'business_catalog' %}
-                  <svg viewBox="0 0 100 70" width="100%" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <rect width="100" height="70" rx="6" fill="#14151B"/>
-                    <circle cx="20" cy="16" r="7" fill="#C9A84C"/>
-                    <rect x="32" y="12" width="44" height="4" rx="1.5" fill="#E2E8F0"/>
-                    <rect x="32" y="18" width="30" height="3" rx="1.5" fill="#717688"/>
-                    <rect x="14" y="28" width="33" height="18" rx="3" fill="#242633"/>
-                    <rect x="53" y="28" width="33" height="18" rx="3" fill="#242633"/>
-                    <rect x="14" y="49" width="33" height="15" rx="3" fill="#242633"/>
-                    <rect x="53" y="49" width="33" height="15" rx="3" fill="#242633"/>
+                    <circle cx="50" cy="20" r="13" fill="#4B4E5F" stroke="#FFFFFF" stroke-width="1.5"/>
+                    <rect x="30" y="38" width="40" height="4" rx="2" fill="#E2E8F0"/>
+                    <rect x="36" y="45" width="28" height="3" rx="1.5" fill="#717688"/>
+                    <rect x="20" y="52" width="60" height="11" rx="999" fill="#FFFFFF"/>
                   </svg>
                 {% endif %}
               </div>
