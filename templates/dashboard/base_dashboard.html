@@ -20,7 +20,7 @@
       <!-- Brand -->
       <div class="sidebar-brand">
         <a href="{% url 'core:home' %}?public=1" class="sidebar-brand-logo" aria-label="STRIDE Home">
-          {% include 'components/brand_logo.html' with variant='dark' height='28' %}
+          {% include 'components/brand_logo.html' with variant='dark' height='36' %}
         </a>
       </div>
 
@@ -171,7 +171,7 @@
     <header class="dash-page-header">
       <div class="dash-page-header-left">
         <a href="{% url 'core:home' %}?public=1" class="dash-header-mobile-brand" aria-label="STRIDE Public Home" title="Back to STRIDE Home">
-          {% include 'components/brand_logo.html' with variant='dark' height='24' %}
+          {% include 'components/brand_logo.html' with variant='dark' height='30' %}
         </a>
         <span class="dash-header-divider" aria-hidden="true">/</span>
         <h1 class="dash-page-title">{% block page_title %}Dashboard{% endblock %}</h1>
