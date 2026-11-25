@@ -18,7 +18,7 @@
     <div class="shop-header">
       <div>
         <div class="shop-header-brand">
-          <img src="{% static 'img/brand/stride-logo-light.svg' %}" alt="STRIDE" height="22" style="height: 22px; width: auto;">
+          {% include 'components/brand_logo.html' with variant='light' height='22' %}
           <span class="shop-eyebrow">Official Store</span>
         </div>
         <h1 class="shop-title">STRIDE Shop</h1>

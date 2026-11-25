@@ -10,146 +10,73 @@
 
 {% block content %}
 <!-- ==========================================================================
-     SECTION 1: HERO (Simple, Spacious, Friendly First Impression)
+     SECTION 1: HERO (Desktop: Studio Pedestal + Watermark | Mobile: Bold Stack)
      ========================================================================== -->
-<section class="hero-section" aria-label="Hero">
-  <div class="hero-grid-pattern" aria-hidden="true"></div>
-  <div class="hero-glow-bg" aria-hidden="true"></div>
-  <div class="hero-glow-secondary" aria-hidden="true"></div>
-  <div class="container">
-    <div class="hero-layout">
-      <!-- Left: Friendly Value Proposition & Clear Actions -->
-      <div class="hero-copy-wrap">
-        <div class="badge-pill mb-4">
-          <span class="dot dot-active dot-pulse"></span>
-          <span>NFC Smart Card + Digital Profile</span>
-        </div>
-        
-        <h1 class="hero-title text-display">
-          <span class="title-line-1">Your Introduction,</span><br>
-          <span class="title-line-3 text-gradient-animated">One Tap Away.</span>
-        </h1>
+<section class="hero-v2" aria-label="Hero">
+  <div class="hero-v2-bg" aria-hidden="true">
+    <div class="hero-v2-arc"></div>
+    <div class="hero-v2-ambient"></div>
+  </div>
 
-        <p class="hero-desc">
-          Create your digital identity, share your contact details and professional links, and connect with people instantly using a STRIDE NFC smart card.
-        </p>
-
-        <div class="hero-actions">
-          {% if user.is_authenticated %}
-            <a href="{% url 'dashboard:profile_edit' %}" class="btn btn-primary btn-lg btn-glow">
-              <span>Go to Your Digital Profile</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-            <a href="{% url 'core:smart_card' %}" class="btn btn-secondary btn-lg">
-              <span>Explore Smart Cards</span>
-            </a>
-          {% else %}
-            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">
-              <span>Create Your Free Profile</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-            <a href="#nfc-cards" class="btn btn-secondary btn-lg" data-target="#how-it-works">
-              <span>Explore Smart Cards</span>
-            </a>
-          {% endif %}
-        </div>
-
-        <!-- Capability & Credibility Badges -->
-        <div class="hero-trust-strip">
-          <div class="hero-trust-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>Zero Apps Needed</span>
-          </div>
-          <span class="hero-trust-dot" aria-hidden="true">•</span>
-          <div class="hero-trust-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            <span>iOS & Android Native</span>
-          </div>
-          <span class="hero-trust-dot" aria-hidden="true">•</span>
-          <div class="hero-trust-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>1-Tap Phonebook Save (.vcf)</span>
-          </div>
-          <span class="hero-trust-dot" aria-hidden="true">•</span>
-          <div class="hero-trust-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Free Digital Profile</span>
-          </div>
-        </div>
+  <div class="container hero-v2-container">
+    <!-- Copy Block: Order 2 on Desktop (below card), Order 1 on Mobile (above card) -->
+    <div class="hero-v2-copy">
+      <div class="hero-v2-mobile-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M8.5 16.5a5 5 0 0 1 0-9"/><path d="M12 19a8.5 8.5 0 0 0 0-14"/><path d="M15.5 21.5a12 12 0 0 0 0-19"/>
+        </svg>
+        <span>NFC Business Card</span>
       </div>
 
-      <!-- Right: Clean, Spacious Live Card + Digital Profile Showcase -->
-      <div class="hero-stage-wrap">
-        <div class="hero-dual-glow" aria-hidden="true"></div>
-        <div class="hero-interactive-scene">
-          <!-- Physical NFC Smart Card -->
-          <div class="hero-card-floating" aria-label="STRIDE Smart NFC Card Preview">
-            <div class="card-sheen-beam"></div>
-            <!-- Card Top: Chip and NFC Indicator -->
-            <div class="d-flex justify-between items-center">
-              <div class="card-mockup-chip">
-                <div class="card-chip-icon"></div>
-              </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="opacity: 0.9;" aria-hidden="true">
-                <path d="M12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5"/>
-                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9"/>
-                <path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-              </svg>
-            </div>
+      <h1 class="hero-v2-title">
+        One Tap.<br class="hero-v2-br-mobile"> Endless Connections.
+      </h1>
 
-            <!-- Card Center: STRIDE Brand Logo -->
-            <div class="text-center" style="margin: 0.85rem 0; display: flex; justify-content: center;">
-              {% include 'components/brand_logo.html' with variant='dark' height='24' %}
-            </div>
+      <p class="hero-v2-desc">
+        The smart NFC card for professionals, creators, and businesses.
+      </p>
+    </div>
 
-            <!-- Card Bottom: Type & Chip Spec -->
-            <div class="d-flex justify-between items-end">
-              <span style="font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--silver-steel); letter-spacing: 0.05em;">SMART NFC</span>
-              <span class="card-mockup-code" style="font-size: 0.65rem;">NTAG216</span>
-            </div>
+    <!-- Visual Stage: Order 1 on Desktop (with STRIDE watermark), Order 2 on Mobile -->
+    <div class="hero-v2-stage">
+      <div class="hero-v2-watermark" aria-hidden="true">STRIDE</div>
+
+      <div class="hero-v2-card-wrap">
+        <div class="hero-v2-card" aria-label="STRIDE Smart NFC Card">
+          <div class="hero-v2-card-edge-tl" aria-hidden="true"></div>
+          <div class="hero-v2-card-edge-br" aria-hidden="true"></div>
+          <div class="hero-v2-card-nfc" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M6 8.5a6.5 6.5 0 0 1 0 7"/><path d="M10 6a10 10 0 0 1 0 12"/><path d="M14 3.5a13.5 13.5 0 0 1 0 17"/><path d="M18 1a17 17 0 0 1 0 22"/>
+            </svg>
           </div>
-
-          <!-- Beaming Connection Badge: Tap Card -> Profile Opens -->
-          <div class="hero-tap-wave-connector" aria-hidden="true">
-            <span class="dot dot-active"></span>
-            <span>Tap Card &rarr; Profile Opens</span>
-          </div>
-
-          <!-- Real 3D iPhone Digital Profile Mockup -->
-          <div class="hero-iphone-mockup-frame" aria-label="Smartphone displaying live digital profile">
-            <picture>
-              <source srcset="{% static 'img/iphonemockup.webp' %}" type="image/webp">
-              <img src="{% static 'img/iphonemockup.png' %}"
-                   alt="STRIDE Verified Live Digital Profile on Titanium iPhone"
-                   class="hero-iphone-img"
-                   width="340"
-                   height="620"
-                   loading="eager"
-                   fetchpriority="high" />
-            </picture>
+          <div class="hero-v2-card-logo">
+            <img src="{% static 'img/brand/stride-primary-white.png' %}" alt="STRIDE" loading="eager" fetchpriority="high">
           </div>
         </div>
-
-        <!-- Capability Specs Strip -->
-        <div class="hero-dual-specs-strip">
-          <div class="hero-card-spec-pill">
-            <span class="spec-dot"></span>
-            <span>NTAG216 Chip</span>
-          </div>
-          <div class="hero-card-spec-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
-            <span>Instant Tap</span>
-          </div>
-          <div class="hero-card-spec-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><polyline points="8 16 12 12 16 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
-            <span>Live Cloud Sync</span>
-          </div>
-          <div class="hero-card-spec-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span>Laser QR Backup</span>
-          </div>
-        </div>
+        <div class="hero-v2-pedestal" aria-hidden="true"></div>
       </div>
+    </div>
+
+    <!-- Actions Block: Order 3 on both Desktop and Mobile -->
+    <div class="hero-v2-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard:profile_edit' %}" class="hero-v2-btn hero-v2-btn--primary">
+          <span>Go to Your Profile</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="{% url 'core:shop' %}" class="hero-v2-btn hero-v2-btn--secondary">
+          <span>Shop Smart Cards</span>
+        </a>
+      {% else %}
+        <a href="{% url 'core:shop' %}" class="hero-v2-btn hero-v2-btn--primary">
+          <span>Get Your STRIDE</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="{% url 'accounts:register' %}" class="hero-v2-btn hero-v2-btn--secondary">
+          <span>Create Free Profile</span>
+        </a>
+      {% endif %}
     </div>
   </div>
 </section>

@@ -280,16 +280,15 @@ class Phase1HomepageRedesignTests(TestCase):
         )
 
     def test_hero_communicates_product_and_ctas(self):
-        """Unauthenticated visitor sees core message and immediate registration CTA."""
+        """Unauthenticated visitor sees core message and immediate shop/registration CTAs."""
         response = self.client.get(reverse('core:home'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Your Introduction,")
-        self.assertContains(response, "One Tap Away.")
-        self.assertContains(response, "Create Your Profile Free")
+        self.assertContains(response, "One Tap.")
+        self.assertContains(response, "Endless Connections.")
+        self.assertContains(response, "Get Your STRIDE")
+        self.assertContains(response, reverse('core:shop'))
+        self.assertContains(response, "Create Free Profile")
         self.assertContains(response, reverse('accounts:register'))
-        self.assertContains(response, "#how-it-works")
-        self.assertContains(response, "Zero Apps Needed")
-        self.assertContains(response, "iOS & Android Native")
 
     def test_clarity_strip_pillars_present(self):
         """Homepage provides 5-second clarity across 3 core pillars."""
@@ -346,7 +345,7 @@ class Phase1HomepageRedesignTests(TestCase):
         # 2. Explicit public view allows viewing landing page while authenticated
         response = self.client.get(reverse('core:home') + '?public=1')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Go to Your Digital Profile")
+        self.assertContains(response, "Go to Your Profile")
         self.assertContains(response, reverse('dashboard:profile_edit'))
 
     def test_faq_accordion_answers_card_requirement(self):
