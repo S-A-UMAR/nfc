@@ -842,7 +842,7 @@
 
 /* Identity Card */
 .prf-hero-section {
-  padding: 0.5rem 1.25rem 1.25rem;
+  padding: 1.25rem 1.5rem 1.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -857,7 +857,7 @@
 
 .prf-avatar-wrap {
   position: relative;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.15rem;
 }
 
 .profile-card.has-cover .prf-avatar-wrap {
@@ -869,12 +869,12 @@
 }
 
 .prf-avatar-ring {
-  width: 82px;
-  height: 82px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
-  padding: 2.5px;
-  background: var(--prf-theme-ring, linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(191, 197, 207, 0.35) 50%, rgba(255, 255, 255, 0.15) 100%));
-  box-shadow: var(--prf-theme-ring-glow, 0 0 25px rgba(255, 255, 255, 0.12), inset 0 0 15px rgba(0, 0, 0, 0.5));
+  padding: 3px;
+  background: var(--prf-theme-ring, linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(191, 197, 207, 0.28) 50%, rgba(255, 255, 255, 0.12) 100%));
+  box-shadow: var(--prf-theme-ring-glow, 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 24px rgba(255, 255, 255, 0.08));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2753,5 +2753,110 @@
   .prf-contact-hero-photo {
     height: clamp(280px, 50%, 400px);
     border-radius: 24px 24px 0 0;
+  }
+}
+
+/* ==========================================================================
+   LIVE PROFILE REFINEMENTS: CLEAN BACKGROUND, BREATHING ROOM & 2-COL DESKTOP
+   ========================================================================== */
+
+/* Remove generic dotted particle noise & soften background orbs */
+.prf-particle-dust {
+  display: none !important;
+}
+.prf-aura-orb {
+  opacity: 0.32 !important;
+  filter: blur(110px) !important;
+}
+
+/* Remove extra bottom padding since competing floating dock is removed */
+.profile-card {
+  padding-bottom: 1.5rem;
+}
+
+/* Sleeker, less bulky quick action hub buttons */
+.prf-action-hub-row {
+  margin: 1.25rem 0 1.35rem;
+  gap: 0.65rem;
+}
+.prf-hub-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+}
+.prf-action-hub-btn span {
+  font-size: 0.72rem;
+  color: #D4D4D8;
+}
+
+.prf-classic-content-col {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── True Desktop Experience (>= 960px) ──────────────────────────────────── */
+@media (min-width: 960px) {
+  .profile-viewport {
+    padding: 3rem 2rem 4rem;
+    align-items: flex-start;
+  }
+
+  /* Classic: 2-Column Editorial Identity Card */
+  body[data-layout="classic"] .profile-card,
+  body:not([data-layout="centered"]) .profile-card {
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    column-gap: 2.25rem;
+    padding-bottom: 1.5rem;
+  }
+
+  body[data-layout="classic"] .prf-app-topbar,
+  body:not([data-layout="centered"]) .prf-app-topbar {
+    grid-column: 1 / -1;
+    padding: 1.1rem 1.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  body[data-layout="classic"] .prf-hero-section,
+  body:not([data-layout="centered"]) .prf-hero-section {
+    grid-column: 1;
+    padding: 2rem 1.75rem 2rem 2rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    align-self: stretch;
+  }
+
+  body[data-layout="classic"] .prf-avatar-ring,
+  body:not([data-layout="centered"]) .prf-avatar-ring {
+    width: 124px;
+    height: 124px;
+  }
+
+  body[data-layout="classic"] .prf-classic-content-col,
+  body:not([data-layout="centered"]) .prf-classic-content-col {
+    grid-column: 2;
+    padding: 1.5rem 2rem 1.5rem 0;
+  }
+
+  body[data-layout="classic"] .profile-footer,
+  body:not([data-layout="centered"]) .profile-footer {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding-top: 1.15rem;
+    margin-top: 0;
+  }
+
+  /* Centered: Refined Wide Portrait Card on Desktop */
+  body[data-layout="centered"] .profile-card {
+    max-width: 540px;
+  }
+  body[data-layout="centered"] .prf-contact-hero-photo {
+    height: 380px;
+  }
+  body[data-layout="centered"] .prf-contact-identity {
+    padding: 0 2rem 1.75rem;
   }
 }

@@ -20,7 +20,7 @@
       <!-- Brand -->
       <div class="sidebar-brand">
         <a href="{% url 'core:home' %}?public=1" class="sidebar-brand-logo" aria-label="STRIDE Home">
-          {% include 'components/brand_logo.html' with variant='dark' height='22' %}
+          {% include 'components/brand_logo.html' with variant='dark' height='28' %}
         </a>
       </div>
 
@@ -171,13 +171,13 @@
     <header class="dash-page-header">
       <div class="dash-page-header-left">
         <a href="{% url 'core:home' %}?public=1" class="dash-header-mobile-brand" aria-label="STRIDE Public Home" title="Back to STRIDE Home">
-          {% include 'components/brand_logo.html' with variant='dark' height='20' %}
+          {% include 'components/brand_logo.html' with variant='dark' height='24' %}
         </a>
         <span class="dash-header-divider" aria-hidden="true">/</span>
         <h1 class="dash-page-title">{% block page_title %}Dashboard{% endblock %}</h1>
       </div>
       <div class="dash-page-header-right">
-        <!-- Direct Website Link -->
+        <!-- Direct Website Link (Desktop) -->
         <a href="{% url 'core:home' %}?public=1" class="dash-header-website-btn" title="View Public Website" aria-label="View Public Website">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <span class="dash-header-website-label">Website</span>
@@ -185,16 +185,16 @@
 
         {% if user_profile and user_profile.slug %}
         <a href="{% url 'profiles:public_profile' user_profile.slug %}" target="_blank" rel="noopener noreferrer"
-           class="dash-header-profile-link" title="View your public card">
+           class="dash-header-profile-link" title="View your live card">
           <span class="dash-header-avatar">
             {% if user_profile.profile_image %}
-              <img src="{{ user_profile.profile_image.url }}" alt="" width="26" height="26" style="width: 26px; height: 26px; object-fit: cover; border-radius: 50%;">
+              <img src="{{ user_profile.profile_image.url }}" alt="" width="26" height="26">
             {% else %}
               {{ user.first_name|default:user.email|make_list|first|upper }}
             {% endif %}
             <span class="dash-header-avatar-dot dot-{% if is_profile_configured %}live{% else %}preview{% endif %}" aria-hidden="true"></span>
           </span>
-          <span class="dash-header-profile-label">{% if is_profile_configured %}Live{% else %}Preview{% endif %}</span>
+          <span class="dash-header-profile-label">{% if is_profile_configured %}Live Card{% else %}Preview{% endif %}</span>
         </a>
         {% endif %}
         <a href="{% url 'dashboard:settings_view' %}" class="dash-header-icon-btn" aria-label="Settings"

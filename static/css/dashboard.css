@@ -3048,12 +3048,15 @@
   .dash-page-title {
     font-size: 0.9375rem;
   }
+  .dash-header-website-btn {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
   .dash-page-header {
     padding: 0.65rem 0.9rem;
-    min-height: 52px;
+    min-height: 54px;
   }
   .dash-header-profile-label {
     display: none;
@@ -3063,17 +3066,6 @@
     height: 34px;
     padding: 0;
     gap: 0;
-  }
-}
-
-@media (max-width: 419px) {
-  .dash-header-website-label {
-    display: none;
-  }
-  .dash-header-website-btn {
-    width: 34px;
-    height: 34px;
-    padding: 0;
   }
 }
 

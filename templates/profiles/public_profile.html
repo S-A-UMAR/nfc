@@ -136,7 +136,7 @@
          ====================================================================== -->
     <header class="prf-centered-topbar">
       <a href="{% url 'core:home' %}" class="prf-app-brand" aria-label="STRIDE Home">
-        {% include 'components/brand_logo.html' with variant='dark' height='18' %}
+        {% include 'components/brand_logo.html' with variant='dark' height='22' %}
       </a>
       <div class="prf-app-top-actions">
         <button type="button" class="prf-centered-icon-btn" id="btn-top-share" aria-label="Share profile" title="Share profile">
@@ -476,7 +476,7 @@
     <!-- Top Header Bar: Brand + Quick Actions -->
     <header class="prf-app-topbar">
       <a href="{% url 'core:home' %}" class="prf-app-brand" aria-label="STRIDE Home">
-        {% include 'components/brand_logo.html' with variant='dark' height='18' %}
+        {% include 'components/brand_logo.html' with variant='dark' height='22' %}
       </a>
 
       <div class="prf-app-top-actions">
@@ -765,6 +765,8 @@
       {% endif %}
     </section>
 
+    <!-- Right Column (Desktop 2-col) / Stacked Tabs (Mobile) -->
+    <div class="prf-classic-content-col">
     <!-- Horizontal Segmented App Navigation Bar -->
     <div class="prf-tab-bar-container" id="prf-tab-bar-container">
       <nav class="prf-tab-bar" aria-label="Profile Sections" role="tablist">
@@ -1186,55 +1188,24 @@
         </button>
       </div>
     </div>
+    </div><!-- /.prf-classic-content-col -->
     {% endif %}
 
     <!-- Subtle Footer Branding -->
     <footer class="profile-footer">
       <a href="{% url 'core:home' %}" class="profile-powered-link" aria-label="Powered by STRIDE">
         <span>Powered by</span>
-        {% include 'components/brand_logo.html' with variant='dark' height='14' %}
+        {% include 'components/brand_logo.html' with variant='dark' height='18' %}
       </a>
     </footer>
 
   </main>
 
-  {% if profile.profile_layout != 'centered' %}
-  <!-- Mobile Bottom Floating Action Dock (Classic Layout) -->
+  {% comment %}Floating bottom dock removed to avoid competing with section navigation
   <nav class="prf-app-dock prf-action-dock" aria-label="Profile Action Dock">
-    <button type="button" class="prf-dock-item prf-dock-action-btn" id="dock-btn-links" data-scroll-to="tab-links" aria-label="Jump to Links & Socials">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      <span>Links</span>
-    </button>
-
-    <a href="{% url 'profiles:download_vcard' profile.slug %}" class="prf-dock-fab" id="dock-btn-save"
-       data-track-event="vcard_download" data-profile-slug="{{ profile.slug }}" data-track-label="Save Contact"
-       aria-label="Save Contact">
-      <div class="prf-dock-fab-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
-        </svg>
-      </div>
-      <span class="prf-dock-fab-text">Save Contact</span>
-    </a>
-
-    {% if profile.whatsapp %}
-      <a href="https://wa.me/{{ profile.clean_whatsapp }}" target="_blank" rel="noopener noreferrer"
-         class="prf-dock-item prf-dock-action-btn" id="dock-btn-inquire"
-         data-track-event="whatsapp_click" data-profile-slug="{{ profile.slug }}" aria-label="Message on WhatsApp">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="#25D366"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.78 14.07c-.24.68-1.4 1.26-1.92 1.34-.51.08-1.18.11-1.91-.12-.44-.14-1.01-.33-1.74-.65-3.09-1.34-5.11-4.47-5.26-4.68-.16-.21-1.26-1.68-1.26-3.2 0-1.53.8-2.28 1.09-2.59.29-.31.63-.39.84-.39.21 0 .42.002.6.012.2.01.46-.07.72.55.27.64.91 2.22.99 2.38.08.16.13.35.03.56-.11.21-.16.35-.32.53-.16.19-.34.42-.48.56-.16.16-.33.33-.14.66.19.33.84 1.39 1.8 2.25 1.24 1.1 2.29 1.44 2.62 1.6.33.16.53.14.72-.08.2-.22.84-.98 1.07-1.32.22-.34.45-.29.75-.17.31.11 1.96.93 2.3 1.1.34.17.56.25.64.39.09.14.09.82-.15 1.5z"/></svg>
-        <span>Inquire</span>
-      </a>
-    {% else %}
-      <button type="button" class="prf-dock-item prf-dock-action-btn" id="dock-btn-inquire"
-              onclick="openSheet('sheet-contact')" aria-label="Contact Options">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span>Inquire</span>
-      </button>
-    {% endif %}
+    ...
   </nav>
-  {% endif %}
+  {% endcomment %}
 
 </div>
 

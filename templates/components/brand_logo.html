@@ -6,7 +6,7 @@
     - height: height in pixels (default: '24')
     - extra_class: additional CSS classes (default: 'brand-logo-img')
 {% endcomment %}
-{% with logo_variant=variant|default:'dark' logo_height=height|default:'24' logo_class=extra_class|default:'brand-logo-img' %}
+{% with logo_variant=variant|default:'dark' logo_height=height|default:'30' logo_class=extra_class|default:'brand-logo-img' %}
   {% if logo_variant == 'light' %}
     <img src="{% static 'img/brand/stride-primary-dark.png' %}" alt="STRIDE" class="{{ logo_class }}" height="{{ logo_height }}" style="height: {{ logo_height }}px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" loading="eager">
   {% else %}
