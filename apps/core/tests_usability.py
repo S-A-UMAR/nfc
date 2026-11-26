@@ -280,15 +280,33 @@ class Phase1HomepageRedesignTests(TestCase):
         )
 
     def test_hero_communicates_product_and_ctas(self):
-        """Unauthenticated visitor sees core message and immediate shop/registration CTAs."""
+        """Unauthenticated visitor sees approved brand messaging and immediate shop/registration CTAs."""
         response = self.client.get(reverse('core:home'))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Beyond the Introduction.")
         self.assertContains(response, "One Tap.")
         self.assertContains(response, "Endless Connections.")
-        self.assertContains(response, "Get Your STRIDE")
+        self.assertContains(response, "Share your contact details, social links and digital profile with a single tap.")
+        self.assertContains(response, "Shop Smart Cards")
         self.assertContains(response, reverse('core:shop'))
-        self.assertContains(response, "Create Free Profile")
+        self.assertContains(response, "Create Your Profile")
         self.assertContains(response, reverse('accounts:register'))
+
+    def test_hero_authenticated_ctas_and_mobile_nav_permissions(self):
+        """Authenticated user sees Manage Your Profile as secondary CTA and Console only for staff."""
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('core:home') + '?public=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Shop Smart Cards")
+        self.assertContains(response, "Manage Your Profile")
+        self.assertContains(response, reverse('dashboard:profile_edit'))
+        self.assertNotContains(response, "STRIDE Console")
+
+        self.user.is_staff = True
+        self.user.save(update_fields=['is_staff'])
+        staff_response = self.client.get(reverse('core:home') + '?public=1')
+        self.assertEqual(staff_response.status_code, 200)
+        self.assertContains(staff_response, "STRIDE Console")
 
     def test_clarity_strip_pillars_present(self):
         """Homepage provides 5-second clarity across 3 core pillars."""

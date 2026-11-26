@@ -319,17 +319,15 @@
 }
 
 /* ==========================================================================
-   HERO V2 — PURPOSE-BUILT DESKTOP & MOBILE COMPOSITIONS
-   Desktop (>= 960px): Watermark + glowing pedestal card -> Headline -> CTAs
-   Mobile (< 960px): Pill badge + stacked headline -> Pedestal card -> Full-width CTAs
+   HERO V2 — REFINED EDITORIAL DESKTOP & MOBILE COMPOSITIONS
+   Desktop (>= 960px): Balanced 2-column split (Copy + CTAs left | Card right)
+   Mobile (< 960px): Tight top spacing -> Slogan + Headline -> Card -> CTAs
    ========================================================================== */
 .hero-v2 {
   position: relative;
   overflow: hidden;
-  padding: clamp(5.5rem, 9vw, 7.5rem) 0 clamp(3.5rem, 6vw, 5.5rem);
-  background:
-    radial-gradient(900px 460px at 50% 18%, rgba(255, 255, 255, 0.065) 0%, transparent 68%),
-    var(--bg-primary, #09090B);
+  padding: clamp(5rem, 7vw, 6.25rem) 0 clamp(3.5rem, 5.5vw, 5rem);
+  background: var(--bg-primary, #09090B);
   border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
 }
 
@@ -340,189 +338,68 @@
   overflow: hidden;
 }
 
-.hero-v2-arc {
-  position: absolute;
-  top: -32%;
-  left: -15%;
-  width: 130%;
-  height: 115%;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  background: radial-gradient(ellipse 60% 45% at 50% 28%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-}
-
 .hero-v2-ambient {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(660px 360px at 50% 44%, rgba(255, 255, 255, 0.09) 0%, transparent 72%);
+    radial-gradient(640px 380px at 72% 48%, rgba(255, 255, 255, 0.055) 0%, transparent 70%),
+    radial-gradient(520px 300px at 22% 35%, rgba(255, 255, 255, 0.025) 0%, transparent 72%);
 }
 
 .hero-v2-container {
   position: relative;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  grid-template-areas:
+    "copy stage"
+    "actions stage";
+  column-gap: clamp(2rem, 5vw, 4.5rem);
+  row-gap: 1.75rem;
   align-items: center;
-  text-align: center;
-}
-
-/* Desktop order: Stage (1) -> Copy (2) -> Actions (3) */
-.hero-v2-stage {
-  order: 1;
-  position: relative;
-  width: 100%;
-  max-width: 880px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.25rem 0 1.25rem;
-}
-
-.hero-v2-watermark {
-  position: absolute;
-  top: 44%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--font-heading, 'Sora', sans-serif);
-  font-size: clamp(5.5rem, 15vw, 11.5rem);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  user-select: none;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.04) 85%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
-}
-
-.hero-v2-card-wrap {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 2.25rem 1.25rem;
-  border-radius: 28px;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.015) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-.hero-v2-card {
-  position: relative;
-  width: clamp(300px, 35vw, 385px);
-  aspect-ratio: 1.586 / 1;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #222228 0%, #0b0b0e 52%, #16161c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  box-shadow:
-    0 28px 65px rgba(0, 0, 0, 0.85),
-    0 0 42px rgba(255, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42);
-  transform: perspective(1000px) rotateX(6deg) rotateY(-8deg) rotateZ(-2deg);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.hero-v2-card:hover {
-  transform: perspective(1000px) rotateX(2deg) rotateY(-3deg) rotateZ(0deg) translateY(-4px);
-}
-
-.hero-v2-card-edge-tl {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 72px;
-  height: 72px;
-  border-right: 1px solid rgba(255, 255, 255, 0.14);
-  transform: rotate(45deg) translate(-28px, -16px);
-  pointer-events: none;
-}
-
-.hero-v2-card-edge-br {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 72px;
-  height: 72px;
-  border-left: 1px solid rgba(255, 255, 255, 0.14);
-  transform: rotate(45deg) translate(28px, 16px);
-  pointer-events: none;
-}
-
-.hero-v2-card-nfc {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.hero-v2-card-logo img {
-  height: 52px;
-  width: auto;
-  display: block;
-  filter: drop-shadow(0 2px 14px rgba(255, 255, 255, 0.16));
-}
-
-.hero-v2-pedestal {
-  width: clamp(320px, 40vw, 450px);
-  height: 44px;
-  margin-top: -12px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.38);
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.14) 0%, transparent 72%);
-  box-shadow: 0 0 28px rgba(255, 255, 255, 0.18), inset 0 0 18px rgba(255, 255, 255, 0.08);
-  pointer-events: none;
 }
 
 .hero-v2-copy {
-  order: 2;
-  max-width: 680px;
-  margin-top: 1.25rem;
+  grid-area: copy;
+  align-self: end;
+  max-width: 560px;
 }
 
-.hero-v2-mobile-pill {
-  display: none;
+.hero-v2-slogan {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #A1A1AA;
+  margin: 0 0 0.85rem;
 }
 
 .hero-v2-title {
   font-family: var(--font-heading, 'Sora', sans-serif);
-  font-size: clamp(2.1rem, 4vw, 3.25rem);
+  font-size: clamp(2.45rem, 4.2vw, 3.6rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.08;
+  line-height: 1.07;
   color: #FFFFFF;
-  margin: 0 0 0.75rem;
-}
-
-.hero-v2-br-mobile {
-  display: none;
+  margin: 0 0 1.05rem;
 }
 
 .hero-v2-desc {
-  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
-  color: #A1A1AA;
-  line-height: 1.5;
-  margin: 0 auto;
-  max-width: 520px;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  color: #B4B4BC;
+  line-height: 1.58;
+  margin: 0;
+  max-width: 470px;
 }
 
 .hero-v2-actions {
-  order: 3;
+  grid-area: actions;
+  align-self: start;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.85rem;
-  margin-top: 1.6rem;
   flex-wrap: wrap;
 }
 
@@ -531,18 +408,17 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.7rem;
+  padding: 0.88rem 1.75rem;
   border-radius: 9999px;
   font-size: 0.94rem;
   font-weight: 700;
   text-decoration: none;
-  transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+  transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
 .hero-v2-btn--primary {
   background: #FFFFFF;
   color: #09090B;
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.14);
 }
 
 .hero-v2-btn--primary:hover {
@@ -552,98 +428,171 @@
 }
 
 .hero-v2-btn--secondary {
-  background: rgba(255, 255, 255, 0.06);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
   color: #F4F4F5;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .hero-v2-btn--secondary:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.34);
   color: #FFFFFF;
 }
 
-/* ── Mobile Purpose-Built Composition (< 960px) ───────────────────────────── */
+/* Visual Stage: Card blends directly into hero background */
+.hero-v2-stage {
+  grid-area: stage;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0;
+}
+
+.hero-v2-card-glow {
+  position: absolute;
+  width: min(92%, 440px);
+  aspect-ratio: 1.35 / 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.03) 45%, transparent 72%);
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-v2-card-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-v2-card {
+  position: relative;
+  width: clamp(300px, 33vw, 395px);
+  aspect-ratio: 1.586 / 1;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #1f1f25 0%, #0c0c10 54%, #15151a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 26px 54px rgba(0, 0, 0, 0.8),
+    0 4px 18px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transform: perspective(1100px) rotateX(4deg) rotateY(-6deg) rotateZ(-1.5deg);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-v2-card:hover {
+  transform: perspective(1100px) rotateX(1.5deg) rotateY(-2deg) rotateZ(0deg) translateY(-4px);
+  box-shadow:
+    0 32px 62px rgba(0, 0, 0, 0.85),
+    0 6px 22px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+.hero-v2-card-nfc {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.hero-v2-card-logo img {
+  height: 50px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 12px rgba(255, 255, 255, 0.14));
+}
+
+.hero-v2-card-shadow {
+  width: 78%;
+  height: 22px;
+  margin-top: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.82) 0%, transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+/* ── Mobile Composition (< 960px) ─────────────────────────────────────────── */
 @media (max-width: 959px) {
   .hero-v2 {
-    padding: 5.5rem 0 2.75rem;
+    padding: 4.5rem 0 2.75rem;
+  }
+
+  .hero-v2-ambient {
+    background:
+      radial-gradient(480px 320px at 50% 54%, rgba(255, 255, 255, 0.05) 0%, transparent 72%);
+  }
+
+  .hero-v2-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
   }
 
   .hero-v2-copy {
     order: 1;
-    margin-top: 0;
+    align-self: center;
+    max-width: 460px;
   }
 
-  .hero-v2-mobile-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.4rem 0.95rem;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.04);
-    color: #E4E4E7;
-    font-size: 0.78rem;
-    font-weight: 500;
-    margin-bottom: 1.1rem;
+  .hero-v2-slogan {
+    font-size: 0.72rem;
+    letter-spacing: 0.13em;
+    margin-bottom: 0.65rem;
   }
 
   .hero-v2-title {
-    font-size: clamp(2.15rem, 9.2vw, 2.85rem);
-    line-height: 1.04;
-    margin-bottom: 0.85rem;
-  }
-
-  .hero-v2-br-mobile {
-    display: block;
+    font-size: clamp(2.1rem, 8.8vw, 2.75rem);
+    line-height: 1.06;
+    margin-bottom: 0.8rem;
   }
 
   .hero-v2-desc {
     font-size: 0.95rem;
-    max-width: 330px;
+    line-height: 1.55;
+    max-width: 340px;
+    margin: 0 auto;
   }
 
   .hero-v2-stage {
     order: 2;
-    padding: 1.65rem 0 0.75rem;
-  }
-
-  .hero-v2-watermark {
-    display: none;
-  }
-
-  .hero-v2-card-wrap {
-    padding: 1.15rem 1.25rem 0.9rem;
-    border-radius: 22px;
+    padding: 1.5rem 0 0.85rem;
   }
 
   .hero-v2-card {
     width: min(82vw, 315px);
     border-radius: 16px;
+    transform: perspective(1000px) rotateX(3deg) rotateY(-4deg) rotateZ(-1deg);
   }
 
   .hero-v2-card-logo img {
     height: 42px;
   }
 
-  .hero-v2-pedestal {
-    width: min(90vw, 355px);
-    height: 38px;
-  }
-
   .hero-v2-actions {
     order: 3;
+    align-self: center;
     width: 100%;
-    max-width: 360px;
+    max-width: 340px;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 1.35rem;
+    align-items: stretch;
+    gap: 0.7rem;
+    margin: 1.1rem auto 0;
   }
 
   .hero-v2-btn {
     width: 100%;
-    padding: 0.95rem 1.5rem;
+    padding: 0.92rem 1.5rem;
   }
 }
