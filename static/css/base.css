@@ -61,12 +61,25 @@ a {
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25) !important;
 }
 
-/* Skip to Main Content Link */
+/* Skip to Main Content Link — visually hidden until keyboard focus */
 .skip-to-content {
-  position: fixed;
-  top: -999px;
-  left: 1.5rem;
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
   z-index: 10000;
+}
+
+.skip-to-content:focus,
+.skip-to-content:focus-visible {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.5rem;
+  width: auto;
+  height: auto;
+  overflow: visible;
   background: var(--gradient-metallic);
   color: #09090B !important;
   font-family: var(--font-heading);
@@ -76,12 +89,19 @@ a {
   border-radius: var(--radius-pill);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 0 2px #FFFFFF;
   text-decoration: none;
-  transition: top 180ms ease;
 }
 
-.skip-to-content:focus,
-.skip-to-content:focus-visible {
-  top: 1.5rem;
+/* Anchor scroll clearance for sticky floating navbar */
+#main-content,
+#how-it-works,
+#smart-card,
+#shop,
+#features,
+#personal,
+#nfc-cards,
+#pricing,
+#faq {
+  scroll-margin-top: 110px;
 }
 
 /* Screen reader only utility class */

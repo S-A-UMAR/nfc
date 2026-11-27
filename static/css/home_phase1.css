@@ -521,8 +521,8 @@
   width: min(98%, 460px);
   aspect-ratio: 1.32 / 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 46%, rgba(242, 242, 242, 0.20) 0%, rgba(196, 196, 198, 0.08) 44%, transparent 72%);
-  filter: blur(24px);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), transparent 65%);
+  filter: blur(20px);
   pointer-events: none;
   z-index: 1;
 }

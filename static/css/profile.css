@@ -825,8 +825,11 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(20, 20, 24, 0.62);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.35);
   color: #FFFFFF;
   display: flex;
   align-items: center;
@@ -1964,12 +1967,16 @@
 .prf-sheet-box {
   width: 100%;
   max-width: 460px;
-  background: #141418;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(20, 20, 24, 0.76);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-bottom: none;
   border-radius: 24px 24px 0 0;
   padding: 1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 -20px 40px rgba(0, 0, 0, 0.85);
   box-sizing: border-box;
   max-height: 85vh;
   overflow-y: auto;
@@ -2320,9 +2327,10 @@
   height: 36px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(18, 18, 22, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(20, 20, 24, 0.62);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.35);
   color: #FFFFFF;
   display: inline-flex;
   align-items: center;
@@ -2352,6 +2360,15 @@
   background: radial-gradient(ellipse 80% 90% at 50% 20%, rgba(50, 50, 60, 0.9) 0%, #0A0A0C 100%);
   overflow: hidden;
   flex-shrink: 0;
+}
+
+.prf-contact-hero-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9, 9, 11, 0.65) 0%, rgba(9, 9, 11, 0.15) 50%, rgba(9, 9, 11, 0.95) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .prf-contact-hero-img {
@@ -2414,9 +2431,9 @@
 .prf-contact-name-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   flex-wrap: wrap;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.3rem;
 }
 
 .prf-contact-name {
@@ -2426,7 +2443,7 @@
   color: #FFFFFF;
   margin: 0;
   letter-spacing: -0.03em;
-  line-height: 1.1;
+  line-height: 1.12;
 }
 
 .prf-contact-verified {
@@ -2439,6 +2456,7 @@
   color: #FFFFFF;
   border-radius: 50%;
   flex-shrink: 0;
+  vertical-align: middle;
   box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
 }
 
@@ -2447,8 +2465,9 @@
   font-size: 0.925rem;
   font-weight: 500;
   color: #A1A1AA;
-  margin-bottom: 0.1rem;
-  line-height: 1.4;
+  margin-bottom: 0.25rem;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
 }
 
 /* Company / org line */

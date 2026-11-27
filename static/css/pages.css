@@ -4643,26 +4643,35 @@ html, body {
 
 .persona-card {
   padding: 3rem 2.5rem;
-  background: linear-gradient(145deg, rgba(24, 25, 34, 0.88) 0%, rgba(13, 14, 19, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(20, 20, 24, 0.62);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 26px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 20px 40px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .persona-card:hover {
   transform: translateY(-4px);
   border-color: rgba(255, 255, 255, 0.24);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+    0 26px 52px rgba(0, 0, 0, 0.55);
 }
 
 .persona-card.featured-card {
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75), 0 0 35px rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+    0 24px 56px rgba(0, 0, 0, 0.55);
 }
 
 .persona-tag {
